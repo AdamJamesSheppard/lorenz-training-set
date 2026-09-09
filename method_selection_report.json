@@ -1,0 +1,202 @@
+{
+  "report_date": "2026-09-09",
+  "classification": "INSUFFICIENT_EVIDENCE",
+  "large_neural_operator_dataset": "NO",
+  "recommended": {
+    "production_forecast_generator": "No method is certified. Q1 upwind/SIPG with quadrature-14 L2 initialization, projected Bayesian analysis, backward Euler, and the conservative two-stage limiter is the strongest tested interim baseline.",
+    "independent_validator": "Exact-native-law Monte Carlo with at least 200000 paths, bootstrap uncertainty, common-random-number SDE timestep refinement, plus the independently implemented refined conservative finite-volume hierarchy for triangulation.",
+    "neural_operator_target_representation": "If a pilot is run: float64 exact conservative subcell averages; Q1 requires 2 subcells per native cell per axis (60x72x72 for the tested 30x36x36 mesh).",
+    "expected_covariance_error": {
+      "best_measured_short_gaussian_normalized_frobenius": 0.08557651238862092,
+      "mc_bootstrap_p95": 0.006282392718324663,
+      "error_to_mc_noise_ratio": 13.621643253693597,
+      "mature_corrected_production_resolution": null
+    },
+    "expected_full_density_error": {
+      "certified_value": null,
+      "q1_vs_refined_fv_l1": 0.1539023777887992,
+      "raw_mc_histogram_vs_refined_fv_l1": 0.19824089755228305,
+      "best_tested_smoothed_mc_vs_refined_fv_l1": 0.0889887608866811,
+      "warning": "The finite-volume level is not converged and KDE bandwidth materially changes the result."
+    },
+    "expected_cost_per_DA_forecast": {
+      "q1_30x36x36_serial_measured_seconds": 86.88113789800263,
+      "q1_30x36x36_eight_rank_step_only_estimate_seconds": 26.387353839042285,
+      "monte_carlo_200000_cpu_sampling_propagation_histogram_seconds": 3.369948232000722,
+      "scope": "One 0.05 forecast interval; MC figure excludes principled bandwidth selection and accuracy certification."
+    },
+    "principal_remaining_limitation": "No corrected mature-posterior forecast has been validated at a resolution close to production; the projected analysis limiter is already severe on the available coarse regenerated DA ensemble."
+  },
+  "pde": {
+    "linear_in_density": true,
+    "conservative": true,
+    "second_order": true,
+    "non_self_adjoint": true,
+    "type_full_rank_B": "transient spatially variable-coefficient uniformly parabolic convection-diffusion Fokker-Planck equation",
+    "type_rank_deficient_B": "degenerate parabolic; potentially hypoelliptic only if the appropriate bracket condition holds",
+    "divergence_of_drift": -13.666666666666666,
+    "divergence_identity": "div(f)=-sigma-1-beta=-41/3",
+    "expanded_form": "p_t + f.grad(p) - (41/3)p = div(D grad(p))",
+    "implication": "Lorenz phase-volume contraction amplifies density along drift characteristics; omitting the divergence/compression term changes the PDE."
+  },
+  "implementation_changes": [
+    "Quadrature-controlled mass-matrix L2 projection for analytic initialization",
+    "Exact rejection sampling from Bernstein-positive native DG Q1/Q2 density",
+    "Quadrature-accurate projected Bayesian likelihood product, with cached mass solve for repeated DA cycles",
+    "Experimental DG Q2/Q3 element path and degree-squared SIPG penalty scaling",
+    "Q2/Q3 positivity via Bernstein coefficients on 2x2x2 control subcells",
+    "Exact Qk cell averages and conservative degree+1 subcell export/reconstruction",
+    "Independent conservative finite-volume/SSPRK validator",
+    "Corrected dataset defaults: L2 initialization and projected Bayesian analysis"
+  ],
+  "initial_representation": {
+    "original_confound_confirmed": true,
+    "old_fem_initial_law": "normalized nodal Q1 interpolant",
+    "old_mc_initial_law": "exact whole-space analytic Gaussian",
+    "interpretation_of_old_end_to_end_error": "representation plus propagation error",
+    "fine_mesh_30x36x36": {
+      "nodal": {"l1": 0.1413482537668288, "l2": 0.006347681905731716, "normalized_covariance_error": 0.1261863411924134, "entropy_cell_average": 7.051590911576827},
+      "l2_unlimited": {"l1": 0.05553632311660457, "l2": 0.002281670451199051, "normalized_covariance_error": 5.095745278787078e-09, "minimum": -4.9118101689112635e-05, "entropy_cell_average": 6.853057800349407},
+      "l2_limited": {"l1": 0.05807277603914226, "l2": 0.0023226809605944704, "normalized_covariance_error": 0.00683499658458859, "limiter_relative_l1": 0.011650473013243522, "entropy_cell_average": 6.853057800349802}
+    },
+    "quadrature_relative_coefficient_error_vs_degree_16": {"4": 0.01064799897100174, "6": 0.0005966253501527138, "8": 0.0000227052687293861, "10": 6.143899341806572e-07, "12": 1.2756632764728488e-08, "14": 2.659049272065568e-10},
+    "adopted_quadrature_degree": 14
+  },
+  "same_initial_law_forecast": {
+    "configuration": {"cells": [30, 36, 36], "degree": 1, "dt": 0.000625, "t_final": 0.05, "particles": 200000, "mc_dt": 0.000125},
+    "normalized_covariance_error": 0.08557651238862092,
+    "mc_noise_p95": 0.006282392718324663,
+    "ratio": 13.621643253693597,
+    "q1_limiter_relative_l1_mean": 0.0034477248832649825,
+    "q1_limiter_relative_l1_max": 0.00629207792457219,
+    "mc_timestep_normalized_covariance_change_0.000125_to_0.0000625": 0.0001108651746932369
+  },
+  "bayesian_analysis": {
+    "nodal_operation": "Nodal interpolation of L(x)p_h(x), followed by normalization and limiting; it is not an L2 projection.",
+    "implemented_operation": "Find q_h with (q_h,v_h)=(L p_h,v_h) using quadrature degree 14, normalize by its finite-element evidence, then apply the conservative positivity limiter.",
+    "analytic_gaussian_test_30x36x36_Q1": {
+      "nodal": {"mean_error_norm": 0.07467689720428042, "l1": 0.1936098227972798, "l2": 0.01093660265141151, "normalized_covariance_error": 0.14494366801837705},
+      "projected": {"mean_error_norm": 0.0020552198052885343, "l1": 0.11554263590637164, "l2": 0.006261741600607341, "normalized_covariance_error": 0.03705642915581992, "limiter_relative_l1": 0.05688249840841712}
+    },
+    "conclusion": "Projection is materially better at fine Q1 resolution, but its 5.69% positivity correction is itself too large for certification."
+  },
+  "weak_form_and_boundary": {
+    "audit": "The UFL volume, upwind interior flux, SIPG consistency/symmetry/penalty terms, and theta update match the broken conservative total-flux derivation.",
+    "exterior_flux_statement": "The derivation removes the single exterior term integral_boundary (f p-D grad p).n v. Omitting exterior contributions in the split code therefore sets the numerical total flux to zero; it must not be interpreted as requiring both physical component fluxes to vanish separately.",
+    "manufactured_solution": "p=C exp(0.4x-0.3y+0.2z), D=I/2, f=(0.2,-0.15,0.1), so J=0 while component normal fluxes are nonzero.",
+    "manufactured_l1": {"4": 0.0014464468352244873, "6": 0.0006430838718763033, "8": 0.00036176719268774004, "12": 0.00016080227709592277},
+    "observed_l1_orders": [1.9991614551879817, 1.9996875661677413, 1.9997414251282926],
+    "maximum_mass_error": 3.1117330934193888e-12
+  },
+  "higher_order": {
+    "q2_projection_theorem": "On affine hexahedra, exact L2 projection into discontinuous Q2 preserves integrals against 1, x_i, x_i x_j, and x_i^2 because these test functions lie in Q2. Hence mass and first/second raw moments are preserved before limiting, assuming exact-enough quadrature.",
+    "measured_unlimited_q2_projection_covariance_error": 2.844e-10,
+    "equal_dofs": 311040,
+    "q1_30x36x36_same_law_covariance_error": 0.08557651238862092,
+    "q2_20x24x24_same_law_covariance_error": 0.2548425949988934,
+    "q2_limiter_relative_l1_mean": 0.012381265221437255,
+    "q2_limiter_relative_l1_max": 0.02598282086482917,
+    "q1_serial_step_seconds": 1.1516247126661863,
+    "q2_serial_step_seconds": 0.6280952266655125,
+    "q1_eight_rank_step_seconds": 0.32984192298802856,
+    "q2_eight_rank_step_seconds": 0.28150189066824777,
+    "conclusion": "Q2 is faster per step at equal global DOFs because it has fewer cells, but its positivity scaling is more intrusive and its measured covariance is three times worse. Do not adopt Q2."
+  },
+  "independent_reference": {
+    "method": "First-order cell-centred upwind finite volume, centred diagonal diffusion, SSPRK(3,3), zero total numerical boundary flux",
+    "scope": "Independent validator for default diagonal D only; not a high-order production candidate",
+    "normalized_covariance_error_vs_same_MC_by_refinement_factor": {"1": 0.5883302227936007, "2": 0.27180856284061267, "4": 0.13084128892924146},
+    "finest_cells": [120, 144, 144],
+    "finest_wall_seconds": 66.04271883600086,
+    "q1_vs_finest_fv_l1": 0.1539023777887992,
+    "conclusion": "The hierarchy trends toward MC and Q1 but is not converged enough to assign either method a full-density truth error."
+  },
+  "monte_carlo_as_production": {
+    "particles": 200000,
+    "output_grid": [120, 144, 144],
+    "covariance_sampling_noise_p95": 0.006282392718324663,
+    "raw_histogram_vs_fv_l1": 0.19824089755228305,
+    "raw_histogram_vs_q1_l1": 0.24284324011705208,
+    "batch_histogram_tv_from_full_range": [0.119785, 0.12176, 0.119385, 0.120955, 0.120325],
+    "kde_l1_vs_fv_by_bandwidth_voxels": {"0.75": 0.09895849821730096, "1.0": 0.0889887608866811, "1.5": 0.17391985894094347, "2.0": 0.3017480023300918},
+    "tail_probability_fv_below_one_expected_particle": 0.01377779368346433,
+    "tail_probability_mc_histogram_same_region": 0.006205,
+    "cpu_wall_seconds": 3.369948232000722,
+    "gpu_used": false,
+    "conclusion": "MC moments are accurate and cheap, but 200000 particles do not define a stable full 3-D target without a bandwidth-dependent reconstruction. MC is not selected as the production target generator."
+  },
+  "adaptivity": {
+    "installed_dolfinx": "0.11.0",
+    "runtime_probe": "dolfinx.mesh.refine on a hexahedral box fails for both uniform and marked-edge calls with RuntimeError: Refinement only defined for simplices",
+    "status": "not implemented",
+    "alternatives": ["tetrahedral h-adaptivity with a new positivity proof", "structured local refinement outside the current Domain/export assumptions", "p-adaptivity", "domain decomposition"],
+    "reason": "Changing topology would invalidate the present tensor-product Bernstein control and conservative tensor interface unless redesigned."
+  },
+  "characteristic_challenger": {
+    "status": "not implemented",
+    "reason": "The closest mass-preserving Lagrange-Galerkin theory assumes a characteristic map that remains in the domain (including a zero-boundary velocity hypothesis in its estimates) and does not provide positivity; Lorenz drift is nonzero on the truncation boundary. The SLDG-LDG evidence is limited to 1-D/2-D tests and does not establish the required reflecting boundary or positivity in 3-D. The requested condition that assumptions be sufficiently close was therefore not met.",
+    "smallest_prerequisite": "Derive and verify a boundary-consistent characteristic remap with total reflection and a whole-cell positivity construction before a numerical comparison."
+  },
+  "mature_DA": {
+    "old_native_states_valid_for_final_evidence": false,
+    "regenerated_configuration": {"trajectories": 20, "cycles": 20, "cells": [8,10,10], "dt": 0.005, "observation": "xz", "observation_variance": 9.0, "analysis": "projected", "quadrature_degree": 14},
+    "burn_in_cycle": 12,
+    "stationarity_criterion_met": true,
+    "forecast_limiter_relative_l1_mean": 0.08683595314063548,
+    "analysis_limiter_relative_l1_mean": 0.3626621371308765,
+    "analysis_limiter_relative_l1_p95": 0.6614391153992543,
+    "interpretation": "An operational distribution appears at this coarse configuration, but the numerical posterior family is not accurate enough to validate as production input. No corrected mature forecast at 30x36x36 or finer exists."
+  },
+  "error_budget": {
+    "initial_representation_covariance": 0.00683499658458859,
+    "propagation_plus_spatial_time_limiter_vs_MC_covariance": 0.08557651238862092,
+    "temporal_reference": "At 12x16x16, BE dt=0.000625 versus 0.0003125 changes covariance Frobenius norm by 0.0170; a fine-mesh normalized value remains unmeasured.",
+    "boundary": "Manufactured total-flux test converges at order 2 with mass error below 3.2e-12; finite-box truncation on mature states remains unmeasured.",
+    "limiter_forecast_relative_l1_mean": 0.0034477248832649825,
+    "analysis_covariance_error": 0.03705642915581992,
+    "analysis_limiter_relative_l1": 0.05688249840841712,
+    "export": "Q1 two-subcell and Q2 three-subcell round trips pass at approximately 1e-10 or better; mass is at roundoff.",
+    "mc_covariance_noise_p95": 0.006282392718324663,
+    "reference_full_density_disagreement_l1": 0.1539023777887992,
+    "additivity_warning": "These controlled estimates are coupled and are not algebraically summed."
+  },
+  "decision_thresholds": {
+    "status": "provisional and evidence-derived, not universal",
+    "covariance": "E_cov <= 0.03 and R_cov <= 5 on both startup and corrected mature states",
+    "full_density": "Set only after the independent deterministic hierarchy is converged; current reference disagreement is too large",
+    "limiter": "forecast mean relative L1 <= 0.001, maximum <= 0.005; analysis relative L1 <= 0.005",
+    "temporal": "halving dt changes E_cov by <= 0.003 and L1 by <= 0.0025",
+    "boundary": "expanded-domain mature E_cov and marginal TV change <= 0.005"
+  },
+  "smallest_additional_experiment_required": {
+    "description": "Generate at least four independent projected-analysis xz DA trajectories through cycle 20 on Q1 30x36x36, dt=0.000625; use burn-in 12 provisionally; select narrow, broad, skewed, and anisotropic posteriors; for each run Q1 at 30x36x36 and one finer aligned Q1 mesh, exact-native 200000-path MC with bootstrap and timestep refinement, and FV factors 2 and 4. Record limiter, covariance, marginal TV, full-density L1, boundary/domain sensitivity, wall time, and memory.",
+    "decision_rule": "Retain Q1 only if the mature-state covariance, limiter, boundary and converged-reference gates pass. Otherwise no tested production method is selected and a boundary-consistent characteristic or alternative high-order positivity method must be implemented."
+  },
+  "reproducibility": {
+    "python": "3.12.13",
+    "dolfinx": "0.11.0",
+    "basix": "0.11.0",
+    "ufl": "2026.1.0",
+    "petsc": "3.25.4",
+    "mpi": "Open MPI 5.0.10",
+    "cpu": "AMD Ryzen 7 9800X3D, 8 cores/16 threads",
+    "gpu": "NVIDIA RTX 4070 12 GB (not used)",
+    "git_revision": null,
+    "hash_manifest": "experiment_manifest.json"
+  },
+  "principal_evidence_files": [
+    "validation_repair_report.json",
+    "boundary_flux_report.json",
+    "higher_order_report.json",
+    "q1_fine_bayesian_update_report.json",
+    "q2_bayesian_update_subcell_report.json",
+    "q2_common_law_subcell_monte_carlo.json",
+    "independent_reference_refined_report.json",
+    "mc_timestep_same_initial_law.json",
+    "mature_da_projected_report.json",
+    "scaling_30_rank1.json",
+    "scaling_30_rank8.json",
+    "scaling_q2_20_rank1.json",
+    "scaling_q2_20_rank8.json"
+  ]
+}

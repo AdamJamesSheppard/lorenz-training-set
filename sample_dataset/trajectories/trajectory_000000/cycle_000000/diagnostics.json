@@ -1,0 +1,227 @@
+{
+  "status": "failed_limiter_severity",
+  "cycle": 0,
+  "time": 0.05,
+  "input_posterior": {
+    "time": 0.0,
+    "mass": 1.000000000000007,
+    "negative_mass": 0.0,
+    "minimum": 1.5076269526529182e-43,
+    "maximum": 0.00048072849481649424,
+    "minimum_cell_average": 2.0075248500592377e-34,
+    "mean": [
+      0.3152966583150999,
+      0.1090969937747061,
+      23.95139780346983
+    ],
+    "covariance": [
+      [
+        18.060669868042677,
+        1.2410519126741121e-14,
+        5.075623331437808e-14
+      ],
+      [
+        1.2410519126741121e-14,
+        23.854446673543865,
+        1.153163360209542e-13
+      ],
+      [
+        5.075623331437808e-14,
+        1.153163360209542e-13,
+        66.27297319045685
+      ]
+    ],
+    "l1": 1.000000000000007,
+    "l2": 0.011568299315347733,
+    "marginal_skewness": [
+      0.0009163709854008736,
+      6.301733926834495e-06,
+      0.0009656467744773144
+    ],
+    "marginal_excess_kurtosis": [
+      -0.02293602189549171,
+      -0.018074476990876498,
+      -0.005949850237631171
+    ],
+    "entropy_cell_average": 9.497247520873842,
+    "effective_support_volume": 13323.005021621235,
+    "boundary_cell_mass": 0.0001607605243258342,
+    "boundary_mass_fraction": 0.00016076052432583305,
+    "boundary_to_global_max_ratio": 0.0006775310790666964,
+    "linear_solver": {},
+    "limiter": null
+  },
+  "forecast": {
+    "time": 0.05000000000000001,
+    "mass": 0.9999999999982953,
+    "negative_mass": 0.0,
+    "minimum": -2.117582368135751e-22,
+    "maximum": 0.0010040450215429773,
+    "minimum_cell_average": 0.0,
+    "mean": [
+      0.24629009477670508,
+      0.17410229841357686,
+      21.269081365743155
+    ],
+    "covariance": [
+      [
+        14.391972556405259,
+        12.276046955315765,
+        0.09337417149104836
+      ],
+      [
+        12.276046955315765,
+        28.4757222291131,
+        -0.32265998384007105
+      ],
+      [
+        0.09337417149104836,
+        -0.32265998384007105,
+        52.05081585646119
+      ]
+    ],
+    "l1": 0.9999999999982953,
+    "l2": 0.014894856525471496,
+    "marginal_skewness": [
+      0.015842814397683733,
+      0.008659199432065822,
+      0.012526343088469831
+    ],
+    "marginal_excess_kurtosis": [
+      0.23076486200384627,
+      0.08701479808740542,
+      0.05334127351066309
+    ],
+    "entropy_cell_average": 9.09286045521263,
+    "effective_support_volume": 8891.58368744893,
+    "boundary_cell_mass": 0.00010423454119173874,
+    "boundary_mass_fraction": 0.00010423454119191643,
+    "boundary_to_global_max_ratio": 0.0003492515275229575,
+    "linear_solver": {
+      "ksp_reason": 3,
+      "ksp_iterations": 4,
+      "true_relative_residual": 4.856147604481619e-12,
+      "solve_seconds": 0.0028443659539334476
+    },
+    "limiter": {
+      "activated": true,
+      "corrected_cell_averages": 1633,
+      "scaled_cells": 3048,
+      "corrected_fraction": 0.7618815104166666,
+      "l2_cell_average_correction": 1.790648012968561e-09,
+      "minimum_before": -2.506716237635009e-05,
+      "minimum_after": -2.117582368135751e-22,
+      "minimum_cell_average": 0.0,
+      "mass_before": 0.9999999999982985,
+      "mass_after": 0.9999999999982985
+    }
+  },
+  "analysis": {
+    "evidence": 0.0007013573500560617,
+    "mass": 1.0000000000000095,
+    "minimum": 0.0
+  },
+  "posterior_next": {
+    "time": 0.05000000000000001,
+    "mass": 1.0000000000000095,
+    "negative_mass": 0.0,
+    "minimum": 0.0,
+    "maximum": 0.00274693853322191,
+    "minimum_cell_average": 0.0,
+    "mean": [
+      -1.9944721584355263,
+      -2.7627290312738055,
+      10.65019408516098
+    ],
+    "covariance": [
+      [
+        9.443469103579668,
+        8.747892215396373,
+        -0.00010435462841253198
+      ],
+      [
+        8.747892215396373,
+        25.582530383613218,
+        0.3553076710885116
+      ],
+      [
+        -0.00010435462841253198,
+        0.3553076710885116,
+        10.72898413267653
+      ]
+    ],
+    "l1": 1.0000000000000095,
+    "l2": 0.024609865919091672,
+    "marginal_skewness": [
+      -0.0734825972982952,
+      0.04031504050627886,
+      0.019288837181247524
+    ],
+    "marginal_excess_kurtosis": [
+      -0.47119638902738803,
+      -0.16649755734006533,
+      0.22971362417341323
+    ],
+    "entropy_cell_average": 8.13754753870029,
+    "effective_support_volume": 3420.5188829197605,
+    "boundary_cell_mass": 3.749755335573687e-08,
+    "boundary_mass_fraction": 3.7497553355736516e-08,
+    "boundary_to_global_max_ratio": 6.988219897172849e-08,
+    "linear_solver": {
+      "ksp_reason": 3,
+      "ksp_iterations": 4,
+      "true_relative_residual": 4.856147604481619e-12,
+      "solve_seconds": 0.0028443659539334476
+    },
+    "limiter": {
+      "activated": true,
+      "corrected_cell_averages": 1633,
+      "scaled_cells": 3048,
+      "corrected_fraction": 0.7618815104166666,
+      "l2_cell_average_correction": 1.790648012968561e-09,
+      "minimum_before": -2.506716237635009e-05,
+      "minimum_after": -2.117582368135751e-22,
+      "minimum_cell_average": 0.0,
+      "mass_before": 0.9999999999982985,
+      "mass_after": 0.9999999999982985
+    }
+  },
+  "conservative_projection_mass_error": 2.9976021664879227e-15,
+  "limiter_history": {
+    "steps": 20,
+    "relative_l1_correction": {
+      "mean": 0.01271423908023866,
+      "maximum": 0.02176890853791052,
+      "p95": 0.020532605215434544
+    },
+    "raw_to_final_l2_correction": {
+      "mean": 0.00019097336273189068,
+      "maximum": 0.0003180395563133138,
+      "p95": 0.0003017660572324032
+    },
+    "raw_negative_cell_average_fraction": {
+      "mean": 0.2486328125,
+      "maximum": 0.2721354166666667,
+      "p95": 0.27151692708333336
+    },
+    "corrected_fraction": {
+      "mean": 0.7277832031249999,
+      "maximum": 0.7618815104166666,
+      "p95": 0.7609537760416666
+    },
+    "projection_seconds": {
+      "mean": 0.016150670507340693,
+      "maximum": 0.016532514011487365,
+      "p95": 0.01648553460545372
+    },
+    "scaling_seconds": {
+      "mean": 0.015409556444501505,
+      "maximum": 0.0158735960139893,
+      "p95": 0.015843994938768445
+    },
+    "steps_with_negative_raw_average": 20,
+    "steps_with_scaling": 20
+  },
+  "accuracy_gate_version": "closure_v2",
+  "accuracy_gate_max_relative_l1_limiter": 0.005
+}

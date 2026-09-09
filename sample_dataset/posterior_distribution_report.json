@@ -1,0 +1,51 @@
+{
+  "purpose": "compare startup and post-burn-in DA posterior families; a preliminary burn-in diagnostic, not proof of stationarity",
+  "burn_in": {
+    "count": 9,
+    "mean_covariance_eigenvalues": [
+      4.342545612397984,
+      8.163589767875033,
+      25.36124095556717
+    ],
+    "mean_l2": 0.030788976297923813,
+    "mean_entropy": 7.712309109119431,
+    "mean_absolute_skewness": [
+      0.11561313055417258,
+      0.08678397601167102,
+      0.1378015129582286
+    ],
+    "mean_excess_kurtosis": [
+      0.0743011593667494,
+      0.11050956910905506,
+      0.05414425053436848
+    ],
+    "mean_boundary_mass_fraction": 5.991946431424178e-08,
+    "mean_effective_support_volume": 2292.7669770510383,
+    "mean_mode_count": 1.0,
+    "mode_count_definition": "strict 26-neighbour voxel maxima above 5% of state maximum; exploratory and mesh-dependent"
+  },
+  "mature": {
+    "count": 15,
+    "mean_covariance_eigenvalues": [
+      3.8484864988662286,
+      7.4836638313684345,
+      20.77625971207373
+    ],
+    "mean_l2": 0.03452043930649119,
+    "mean_entropy": 7.487457657357192,
+    "mean_absolute_skewness": [
+      0.1521508437906324,
+      0.12686361649342925,
+      0.13463886059747115
+    ],
+    "mean_excess_kurtosis": [
+      0.2175545483354232,
+      0.2628416557751697,
+      0.04309111029667528
+    ],
+    "mean_boundary_mass_fraction": 4.144673915343639e-05,
+    "mean_effective_support_volume": 1823.8972275617089,
+    "mean_mode_count": 1.0,
+    "mode_count_definition": "strict 26-neighbour voxel maxima above 5% of state maximum; exploratory and mesh-dependent"
+  }
+}

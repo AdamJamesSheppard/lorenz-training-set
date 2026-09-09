@@ -1,0 +1,179 @@
+{
+  "cells": [
+    20,
+    24,
+    24
+  ],
+  "mass_error": 3.1086244689504383e-15,
+  "l1_shape_error": 0.41638438448627435,
+  "l2_shape_error": 0.01741863207327772,
+  "mean_error": [
+    0.018039575897031757,
+    -0.0032690270598401128,
+    0.007251779757567078
+  ],
+  "covariance_frobenius_error": 2.049690674718523,
+  "minimum_voxel_density": 0.0,
+  "native": {
+    "time": 0.050000000000000024,
+    "mass": 1.000000000000043,
+    "negative_mass": 0.0,
+    "minimum": -4.235164736271502e-22,
+    "maximum": 0.008069546536675394,
+    "minimum_cell_average": 0.0,
+    "mean": [
+      1.0573372628786692,
+      1.3931354175685993,
+      17.6906207574557
+    ],
+    "covariance": [
+      [
+        4.944025446092493,
+        4.258149614801061,
+        0.2966005173755011
+      ],
+      [
+        4.258149614801061,
+        8.890173411857694,
+        0.02787880648867226
+      ],
+      [
+        0.2966005173755011,
+        0.02787880648867226,
+        9.979228286315942
+      ]
+    ],
+    "l1": 1.000000000000043,
+    "l2": 0.04031431483089579,
+    "marginal_skewness": [
+      0.04257147295438715,
+      0.10189291607757531,
+      0.15744884733379627
+    ],
+    "marginal_excess_kurtosis": [
+      0.07089181611932682,
+      0.08368496243244827,
+      0.09868901810243447
+    ],
+    "entropy_cell_average": 7.115263278374171,
+    "effective_support_volume": 1230.6075609130392,
+    "boundary_cell_mass": 0.0,
+    "boundary_mass_fraction": 0.0,
+    "boundary_to_global_max_ratio": 0.0,
+    "linear_solver": {
+      "ksp_reason": 3,
+      "ksp_iterations": 4,
+      "true_relative_residual": 5.273491497169196e-15,
+      "solve_seconds": 0.019130586995743215
+    },
+    "limiter": {
+      "activated": true,
+      "corrected_cell_averages": 1184,
+      "scaled_cells": 11517,
+      "corrected_fraction": 0.5512586805555556,
+      "l2_cell_average_correction": 6.132942035214098e-10,
+      "minimum_before": -8.239620994219271e-05,
+      "minimum_after": -4.235164736271502e-22,
+      "minimum_cell_average": 0.0,
+      "mass_before": 1.0000000000000444,
+      "mass_after_stage1": 1.0000000000000444,
+      "mass_after": 1.0000000000000433,
+      "raw_negative_cell_averages": 5230,
+      "raw_negative_cell_average_fraction": 0.4539930555555556,
+      "minimum_raw_cell_average": -1.0596981043254365e-10,
+      "stage1_l1_correction": 8.095093325770722e-09,
+      "stage1_l2_correction": 6.132942035216103e-10,
+      "scaling_l1_correction": 0.014571960886534339,
+      "scaling_l2_correction": 0.0005277858990216598,
+      "raw_to_final_l1_correction": 0.014571961603827972,
+      "raw_to_final_l2_correction": 0.000527785899022016,
+      "relative_l1_correction": 0.01457196160382734,
+      "minimum_scaling_factor": 0.0,
+      "mean_scaling_factor": 0.05812720779496501,
+      "projection_iterations": 100,
+      "projection_seconds": 0.06153081200318411,
+      "scaling_seconds": 0.057460702024400234
+    }
+  },
+  "voxel_reconstruction": {
+    "time": 0.050000000000000024,
+    "mass": 1.0000000000000462,
+    "negative_mass": 0.0,
+    "minimum": 0.0,
+    "maximum": 0.0035187942077273167,
+    "minimum_cell_average": 0.0,
+    "mean": [
+      1.075376838775701,
+      1.3898663905087592,
+      17.697872537213268
+    ],
+    "covariance": [
+      [
+        5.878361416351772,
+        4.108325887660234,
+        0.2849295095195958
+      ],
+      [
+        4.108325887660234,
+        10.011813826753837,
+        0.028183232398615126
+      ],
+      [
+        0.2849295095195958,
+        0.028183232398615126,
+        11.402254648598658
+      ]
+    ],
+    "l1": 1.0000000000000462,
+    "l2": 0.03635705209419968,
+    "marginal_skewness": [
+      0.010942940221940091,
+      0.06952871054410509,
+      0.14535297759160867
+    ],
+    "marginal_excess_kurtosis": [
+      -0.056369697099217575,
+      -0.01617416644266534,
+      0.025031954504543208
+    ],
+    "entropy_cell_average": 7.115263278374149,
+    "effective_support_volume": 1230.6075609130119,
+    "boundary_cell_mass": 0.0,
+    "boundary_mass_fraction": 0.0,
+    "boundary_to_global_max_ratio": 0.0,
+    "linear_solver": {
+      "ksp_reason": 3,
+      "ksp_iterations": 4,
+      "true_relative_residual": 5.273491497169196e-15,
+      "solve_seconds": 0.019130586995743215
+    },
+    "limiter": {
+      "activated": true,
+      "corrected_cell_averages": 1184,
+      "scaled_cells": 11517,
+      "corrected_fraction": 0.5512586805555556,
+      "l2_cell_average_correction": 6.132942035214098e-10,
+      "minimum_before": -8.239620994219271e-05,
+      "minimum_after": -4.235164736271502e-22,
+      "minimum_cell_average": 0.0,
+      "mass_before": 1.0000000000000444,
+      "mass_after_stage1": 1.0000000000000444,
+      "mass_after": 1.0000000000000433,
+      "raw_negative_cell_averages": 5230,
+      "raw_negative_cell_average_fraction": 0.4539930555555556,
+      "minimum_raw_cell_average": -1.0596981043254365e-10,
+      "stage1_l1_correction": 8.095093325770722e-09,
+      "stage1_l2_correction": 6.132942035216103e-10,
+      "scaling_l1_correction": 0.014571960886534339,
+      "scaling_l2_correction": 0.0005277858990216598,
+      "raw_to_final_l1_correction": 0.014571961603827972,
+      "raw_to_final_l2_correction": 0.000527785899022016,
+      "relative_l1_correction": 0.01457196160382734,
+      "minimum_scaling_factor": 0.0,
+      "mean_scaling_factor": 0.05812720779496501,
+      "projection_iterations": 100,
+      "projection_seconds": 0.06153081200318411,
+      "scaling_seconds": 0.057460702024400234
+    }
+  }
+}

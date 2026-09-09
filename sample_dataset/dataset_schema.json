@@ -1,0 +1,19 @@
+{
+  "tensor_axes": [
+    "x_cell",
+    "y_cell",
+    "z_cell"
+  ],
+  "tensor_dtype": "float64",
+  "tensor_value": "conservative cell-average density",
+  "input": "posterior.npy = p_k|k",
+  "target": "forecast.npy = p_k+1|k",
+  "split_unit": "complete trajectory",
+  "subcells_per_dg_cell": 2,
+  "tensor_shape": [
+    24,
+    32,
+    32
+  ],
+  "q1_roundtrip": "exact to floating-point tolerance through constrained least-squares reconstruction"
+}

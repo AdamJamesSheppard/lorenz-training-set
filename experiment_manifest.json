@@ -1,0 +1,356 @@
+{
+  "created_utc": "2026-09-08T23:38:02.042821+00:00",
+  "decision": "INSUFFICIENT_EVIDENCE",
+  "workspace": "/mnt/large storage/Important/Derby Masters/Original Dissertation Royal Holloway/FENICS Code/NewTest",
+  "git_revision": null,
+  "version_fallback": "SHA-256 file hashes are authoritative when git_revision is null.",
+  "software": {
+    "python": "3.12.13 | packaged by conda-forge | (main, Mar  5 2026, 16:50:00) [GCC 14.3.0]",
+    "platform": "Linux-7.1.5-76070105-generic-x86_64-with-glibc2.39",
+    "dolfinx": "0.11.0",
+    "basix": "0.11.0",
+    "ufl": "2026.1.0",
+    "petsc": "3.25.4",
+    "mpi_library": "Open MPI v5.0.10, package: Open MPI conda@9ee00b64ad27 Distribution, ident: 5.0.10, repo rev: v5.0.10, Feb 23, 2026\u0000",
+    "manifest_mpi_size": 1,
+    "cpu": "Architecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           48 bits physical, 48 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  16\nOn-line CPU(s) list:                     0-15\nVendor ID:                               AuthenticAMD\nModel name:                              AMD Ryzen 7 9800X3D 8-Core Processor\nCPU family:                              26\nModel:                                   68\nThread(s) per core:                      2\nCore(s) per socket:                      8\nSocket(s):                               1\nStepping:                                0\nFrequency boost:                         enabled\nCPU(s) scaling MHz:                      95%\nCPU max MHz:                             5271.6221\nCPU min MHz:                             603.3790\nBogoMIPS:                                9381.75\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good amd_lbr_v2 nopl xtopology nonstop_tsc cpuid extd_apicid aperfmperf rapl pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpuid_fault cpb cat_l3 cdp_l3 hw_pstate ssbd mba perfmon_v2 ibrs ibpb stibp ibrs_enhanced vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a avx512f avx512dq adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local user_shstk avx_vnni avx512_bf16 clzero irperf xsaveerptr rdpru wbnoinvd cppc arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload vgif v_spec_ctrl vnmi avx512vbmi umip pku ospke avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid bus_lock_detect movdiri movdir64b overflow_recov succor smca fsrm avx512_vp2intersect flush_l1d amd_lbr_pmc_freeze\nVirtualization:                          AMD-V\nL1d cache:                               384 KiB (8 instances)\nL1i cache:                               256 KiB (8 instances)\nL2 cache:                                8 MiB (8 instances)\nL3 cache:                                96 MiB (1 instance)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-15\nVulnerability Gather data sampling:      Not affected\nVulnerability Ghostwrite:                Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Old microcode:             Not affected\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Not affected\nVulnerability Spec rstack overflow:      Mitigation; IBPB on VMEXIT only\nVulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; Enhanced / Automatic IBRS; IBPB conditional; STIBP always-on; PBRSB-eIBRS Not affected; BHI Not affected\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Not affected\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Mitigation; IBPB on VMEXIT",
+    "gpu": "NVIDIA GeForce RTX 4070, 12282 MiB"
+  },
+  "code_sha256": {
+    "benchmark_scaling.py": "470f1a01360aac016bf51c4bb03a64f88acfb8cb5a8c6d0d7d9fd2b28e92b447",
+    "build_experiment_manifest.py": "9a7ed7adf091b4d233c7673320af206d3abeb6fd222aee34b0a831fc380b040b",
+    "generate_dataset.py": "81074edffe3a6f6bebcec4a623bc46604c5ea5158d371d74fddc54f47b6227d9",
+    "independent_reference_study.py": "6d8d03c43cc826a8272be0186633d0894e021dd2ced89b19abe44a7550569e17",
+    "lorenz_fpe/__init__.py": "7dbd7037862c69f129feac6b4e1d1fc56d1e01f49835e0aca76bb74fec066bdb",
+    "lorenz_fpe/core.py": "a4b00b96fb5fa6ccbce5285567df13c68533bb34712b14eb46d692325a2fbf48",
+    "lorenz_fpe/dataset.py": "3e9a28938499e018d810f12cb15e6fcd3358dbdd94df13d3fa67283262a71a4e",
+    "lorenz_fpe/finite_volume.py": "2bec80ae17ac8d926c0badb7d2da7a5755ff4138ffeccc077a6b6b61a0f7d367",
+    "lorenz_fpe/validation.py": "7e3258874f6cd1e5234d96b942c37faed93f1d6547743b50d3fb0c2cf9f605e7",
+    "mature_da_study.py": "9870d6a87f554a25d3a402a2c9fc6ed5fdd3a42316c7059cd27b9790bbe1775e",
+    "mature_forecast_validation.py": "0e53932d5ceda3f611c0decc2eac5861ae84023720011946d7733a16dc4a4465",
+    "mc_timestep_repair.py": "077d5c9e9f277f1cfb210649f2da3526c2d7437d8bc17fdea661730e64c8b2b5",
+    "resplit_dataset.py": "11587c66f55020daff7171e500230ff315fd5b17e781e4b653e2a8d8130267bf",
+    "solver.py": "5060082cc7e6ad1671c5fe35d2ada34fb38bb4930b720a606ab02b0c66e48d36",
+    "tests/__init__.py": "3b2bec5485bb3fb3bb29a41ff8b1d86feb92bbc6587a20491c94a0b29d2a195b",
+    "tests/mpi_probe_worker.py": "f568a7e9937e7a0d7888b6fb85255eba63e3c711b635e6cbe1231fb000a87c74",
+    "tests/test_accuracy_repairs.py": "911113e8d0cedb9bdf01c98e0136dccde0126cb4f7215ff7147c1f2a780ebd1f",
+    "tests/test_limiter.py": "d7eabdc02af1951c141f55b9c7e9b651922e0389a044a9896cbbabe9f177293a",
+    "tests/test_mpi_consistency.py": "c8e3a7c194efd163ffb1e84c799a9f80fdbb32e512762a050fe7f46a4e454e8c",
+    "tests/test_solver_smoke.py": "6b4f18916acfa23200abc2675a87bb9c9257ebc0117c988ab018faef9fe2bd72",
+    "tests/test_validation.py": "a4bd400fa133c4f72ec590d19502b46b6c617332939a27860f5e8da7d445c05b",
+    "validate.py": "57214698ba0734874482948206d8ca905c441fab42958b72a13d8640bb168e2f",
+    "validation_repair.py": "4ddd57a3ba81b7809526f4d3aa8bf1e332d39a56f95d24bd26212ddb3d1f25cb"
+  },
+  "evidence": {
+    "POSITIVITY_AUDIT.md": {
+      "sha256": "107fe2494a32603bf3c7e629fee26e02178aa877b9bd17487ddecdceafe8e7bc",
+      "configuration": {}
+    },
+    "PRODUCTION_READINESS.md": {
+      "sha256": "92f6cc8b071a8b7f22eba1cdcee5a5f7ca6aedf6c875f5c31cbd1ad5e35875f3",
+      "configuration": {}
+    },
+    "monte_carlo_uncertainty_20x24x24.json": {
+      "sha256": "854a7a0691762c7b48e7a97b565af89c5721226ba22d27662a54824c0eaaf3b8",
+      "configuration": {
+        "particles": 100000
+      }
+    },
+    "monte_carlo_fixed_dt_20x24x24.json": {
+      "sha256": "4aa3f03cd1e03de0080fe73c77d2b9f6ad844b975f074eec667c456e9690898f",
+      "configuration": {
+        "particles": 100000
+      }
+    },
+    "monte_carlo_uncertainty_30x36x36.json": {
+      "sha256": "e5faf4caecddb2811e823d8b8053af9ab05ee3bc89a0601a88b99258a02af964",
+      "configuration": {
+        "particles": 100000
+      }
+    },
+    "crank_nicolson_mc_20x24x24.json": {
+      "sha256": "e24700f61543a0bd08dc2ab9ce368a56d21e364a373c7667343cc45c28ff5cac",
+      "configuration": {
+        "particles": 100000
+      }
+    },
+    "separate_convergence_report.json": {
+      "sha256": "790aebe72cae514c17fcffd884e9dfd8c2ad6391f06c23c02cdbb95fddc907d5",
+      "configuration": {}
+    },
+    "limiter_impact_20x24x24.json": {
+      "sha256": "35d57e46db73a830728b76dabff9626dfd80be44e6f14dfd6961d047c6c3f2d6",
+      "configuration": {
+        "configuration": {
+          "cells": [
+            20,
+            24,
+            24
+          ],
+          "dt": 0.00125,
+          "t_final": 0.05
+        }
+      }
+    },
+    "mature_da_report.json": {
+      "sha256": "17f3c8adf4ada80b10a4e32fd4ccbeedc46561ff4367dbc059887297d6ed078e",
+      "configuration": {
+        "configuration": {
+          "output": "mature_da_report.json",
+          "trajectories": 20,
+          "cycles": 20,
+          "observation": "xz",
+          "cells": [
+            8,
+            10,
+            10
+          ],
+          "dt": 0.005,
+          "obs_interval": 0.05,
+          "obs_variance": 9.0,
+          "seed": 71023
+        }
+      }
+    },
+    "mature_forecast_validation.json": {
+      "sha256": "77d3be2dc08269e60b8b93a141885725795a1d30fed1d16e4915bcca076c3939",
+      "configuration": {}
+    },
+    "scaling_rank1.json": {
+      "sha256": "ad7505425c4e781a11aa17de294d64c08cafc76000169729b6565b4f58ee1ffc",
+      "configuration": {
+        "mpi_ranks": 1,
+        "cells": [
+          12,
+          16,
+          16
+        ],
+        "dt": 0.00125
+      }
+    },
+    "scaling_rank2.json": {
+      "sha256": "4d02268d143e97b1bdcba60c4e4cc04103118c64e74c2e79db2538c8e2ba70db",
+      "configuration": {
+        "mpi_ranks": 2,
+        "cells": [
+          12,
+          16,
+          16
+        ],
+        "dt": 0.00125
+      }
+    },
+    "scaling_rank4.json": {
+      "sha256": "a0b1476ec18738a928c19267fdfefafe9d01ee968f84295d7432d07aa53a2d58",
+      "configuration": {
+        "mpi_ranks": 4,
+        "cells": [
+          12,
+          16,
+          16
+        ],
+        "dt": 0.00125
+      }
+    },
+    "scaling_rank8.json": {
+      "sha256": "5b5131cfd78518fd2693a3e71796fe8afc7d1de6060e4c8878b80aa1d5e8a13a",
+      "configuration": {
+        "mpi_ranks": 8,
+        "cells": [
+          12,
+          16,
+          16
+        ],
+        "dt": 0.00125
+      }
+    },
+    "scaling_30_rank1.json": {
+      "sha256": "0c9cf701556840dd8ffa19ae8bb0410c6250076ffc1345064ceaf9756357a94c",
+      "configuration": {
+        "mpi_ranks": 1,
+        "cells": [
+          30,
+          36,
+          36
+        ],
+        "dt": 0.000625
+      }
+    },
+    "scaling_30_rank8.json": {
+      "sha256": "b44c8ac789d8ab6bdcd78b00b522ac17083246ce53b7cf56c4100508cab38dc1",
+      "configuration": {
+        "mpi_ranks": 8,
+        "cells": [
+          30,
+          36,
+          36
+        ],
+        "dt": 0.000625
+      }
+    },
+    "validation_report.json": {
+      "sha256": "6d3a3f5ce563262aecd72b2c22bc34fb63342de190007d7e44287ede06847fb5",
+      "configuration": {}
+    },
+    "validation_repair_report.json": {
+      "sha256": "23273c9cf2c35ef20acabeb51da77f0978ff29e3037ca7b6de0e3fcae9edc73f",
+      "configuration": {}
+    },
+    "boundary_flux_report.json": {
+      "sha256": "2aaf1b4cd10781cc58dd38befc269372ebb4bc07c75faa1a736e51539b171bf5",
+      "configuration": {
+        "dt": 0.00025
+      }
+    },
+    "higher_order_report.json": {
+      "sha256": "bc442fb13b6e12039534ac6deddc5db15f6f2544f0e25489f6b579d34efb4b99",
+      "configuration": {
+        "dt": 0.000625
+      }
+    },
+    "q1_fine_bayesian_update_report.json": {
+      "sha256": "9a7c6756d6f565347a870fd5e16d34c01d595371539bfbe36f34c3de3e7be3f1",
+      "configuration": {}
+    },
+    "q2_bayesian_update_subcell_report.json": {
+      "sha256": "62c3f9e83776f3c38534e26569bf4de8a7592ffdf6e59256fa6e92ecf017f2c6",
+      "configuration": {}
+    },
+    "q2_common_law_subcell_monte_carlo.json": {
+      "sha256": "d24e9b8dbd1f37c7f2017b31b12e6216ba90d17026c46797ed5afcb13e156ca9",
+      "configuration": {
+        "particles": 100000,
+        "cells": [
+          20,
+          24,
+          24
+        ],
+        "dt": 0.00125,
+        "seed": 20260911
+      }
+    },
+    "independent_reference_refined_report.json": {
+      "sha256": "fb3276e78a23480e9f422be4926d003ba6923cab862acf5fc189c8d8cf69e6e4",
+      "configuration": {}
+    },
+    "mc_timestep_same_initial_law.json": {
+      "sha256": "426252be1050611c4348da5717f2387935e19fbf63fc6cf30b902bfa60c2ff92",
+      "configuration": {
+        "particles": 50000,
+        "cells": [
+          30,
+          36,
+          36
+        ],
+        "seed": 20260910
+      }
+    },
+    "mature_da_projected_report.json": {
+      "sha256": "63bcd720c9a9d96625e1dc61d45ae7c9b9b0e4d15f2f3aa9053ba910ca141ec2",
+      "configuration": {
+        "configuration": {
+          "output": "mature_da_projected_report.json",
+          "trajectories": 20,
+          "cycles": 20,
+          "observation": "xz",
+          "cells": [
+            8,
+            10,
+            10
+          ],
+          "dt": 0.005,
+          "obs_interval": 0.05,
+          "degree": 1,
+          "analysis": "projected",
+          "quadrature_degree": 14,
+          "obs_variance": 9.0,
+          "seed": 71023
+        }
+      }
+    },
+    "scaling_q2_20_rank1.json": {
+      "sha256": "ad1c9bb3a14df2fd1d985222ecff8cd057e3ee0a5fd5d1843d68a83ff92af299",
+      "configuration": {
+        "mpi_ranks": 1,
+        "cells": [
+          20,
+          24,
+          24
+        ],
+        "dt": 0.000625
+      }
+    },
+    "scaling_q2_20_rank8.json": {
+      "sha256": "4a659798b79f629c876067090a5ebfdcd13c64561fee95fa0ea39d9f3375de89",
+      "configuration": {
+        "mpi_ranks": 8,
+        "cells": [
+          20,
+          24,
+          24
+        ],
+        "dt": 0.000625
+      }
+    },
+    "METHOD_SELECTION_REPORT.md": {
+      "sha256": "e1aae24a5134afa52932cdd54cba50d8d8c416c054c44a3893a56ed42803ce48",
+      "configuration": {}
+    },
+    "method_selection_report.json": {
+      "sha256": "ef2a3374c4e9052c48873c153bb586776bd612ef91103c493b4e194b0270f744",
+      "configuration": {}
+    }
+  },
+  "common_model": {
+    "lorenz": {
+      "sigma": 10.0,
+      "rho": 28.0,
+      "beta": 2.6666666666666665
+    },
+    "B": [
+      [
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "domain": [
+      [
+        -30.0,
+        30.0
+      ],
+      [
+        -40.0,
+        40.0
+      ],
+      [
+        -10.0,
+        70.0
+      ]
+    ],
+    "space": "discontinuous tensor-product Q1 baseline and experimental Q2 on affine hexahedra",
+    "fluxes": "upwind advection; full-tensor SIPG diffusion",
+    "time": "theta method; theta=1 unless evidence configuration says otherwise",
+    "limiter": "global KKT cell-average projection plus Bernstein scaling (Q1 whole cell; Q2 on 2x2x2 control subcells)",
+    "recommended_export_subcells_per_axis": {
+      "Q1": 2,
+      "Q2": 3
+    }
+  },
+  "principal_mc_seeds": [
+    20260908,
+    20260909,
+    20260910
+  ],
+  "mature_da_seed": 71023
+}

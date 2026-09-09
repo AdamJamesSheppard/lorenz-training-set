@@ -1,0 +1,222 @@
+{
+  "format": "lorenz63_da_operator_v1",
+  "sample_definition": "(p_k|k, dt_k) -> p_k+1|k",
+  "primary_distribution": "post-burn-in sequential Bayesian DA posteriors",
+  "config": {
+    "trajectories": 3,
+    "cycles": 8,
+    "burn_in": 3,
+    "observation_interval": 0.05,
+    "observation": "xz",
+    "observation_variance": 9.0,
+    "seed": 1729,
+    "export_subcells": 2,
+    "max_limiter_relative_l1": 0.005
+  },
+  "train_trajectory_ids": [
+    "trajectory_000000"
+  ],
+  "validation_trajectory_ids": [
+    "trajectory_000001"
+  ],
+  "test_trajectory_ids": [
+    "trajectory_000002"
+  ],
+  "training_samples": [],
+  "all_cycle_records": [
+    {
+      "trajectory_id": "trajectory_000000",
+      "cycle": 0,
+      "physical_time": 0.0,
+      "forecast_interval": 0.05,
+      "path": "trajectories/trajectory_000000/cycle_000000",
+      "status": "failed_limiter_severity"
+    },
+    {
+      "trajectory_id": "trajectory_000000",
+      "cycle": 1,
+      "physical_time": 0.05,
+      "forecast_interval": 0.05,
+      "path": "trajectories/trajectory_000000/cycle_000001",
+      "status": "failed_limiter_severity"
+    },
+    {
+      "trajectory_id": "trajectory_000000",
+      "cycle": 2,
+      "physical_time": 0.10000000000000002,
+      "forecast_interval": 0.05,
+      "path": "trajectories/trajectory_000000/cycle_000002",
+      "status": "failed_limiter_severity"
+    },
+    {
+      "trajectory_id": "trajectory_000000",
+      "cycle": 3,
+      "physical_time": 0.15000000000000002,
+      "forecast_interval": 0.05,
+      "path": "trajectories/trajectory_000000/cycle_000003",
+      "status": "failed_limiter_severity"
+    },
+    {
+      "trajectory_id": "trajectory_000000",
+      "cycle": 4,
+      "physical_time": 0.2,
+      "forecast_interval": 0.05,
+      "path": "trajectories/trajectory_000000/cycle_000004",
+      "status": "failed_limiter_severity"
+    },
+    {
+      "trajectory_id": "trajectory_000000",
+      "cycle": 5,
+      "physical_time": 0.25000000000000006,
+      "forecast_interval": 0.05,
+      "path": "trajectories/trajectory_000000/cycle_000005",
+      "status": "failed_limiter_severity"
+    },
+    {
+      "trajectory_id": "trajectory_000000",
+      "cycle": 6,
+      "physical_time": 0.30000000000000004,
+      "forecast_interval": 0.05,
+      "path": "trajectories/trajectory_000000/cycle_000006",
+      "status": "failed_limiter_severity"
+    },
+    {
+      "trajectory_id": "trajectory_000000",
+      "cycle": 7,
+      "physical_time": 0.35000000000000003,
+      "forecast_interval": 0.05,
+      "path": "trajectories/trajectory_000000/cycle_000007",
+      "status": "failed_limiter_severity"
+    },
+    {
+      "trajectory_id": "trajectory_000001",
+      "cycle": 0,
+      "physical_time": 0.0,
+      "forecast_interval": 0.05,
+      "path": "trajectories/trajectory_000001/cycle_000000",
+      "status": "failed_limiter_severity"
+    },
+    {
+      "trajectory_id": "trajectory_000001",
+      "cycle": 1,
+      "physical_time": 0.05,
+      "forecast_interval": 0.05,
+      "path": "trajectories/trajectory_000001/cycle_000001",
+      "status": "failed_limiter_severity"
+    },
+    {
+      "trajectory_id": "trajectory_000001",
+      "cycle": 2,
+      "physical_time": 0.10000000000000002,
+      "forecast_interval": 0.05,
+      "path": "trajectories/trajectory_000001/cycle_000002",
+      "status": "failed_limiter_severity"
+    },
+    {
+      "trajectory_id": "trajectory_000001",
+      "cycle": 3,
+      "physical_time": 0.15000000000000002,
+      "forecast_interval": 0.05,
+      "path": "trajectories/trajectory_000001/cycle_000003",
+      "status": "failed_limiter_severity"
+    },
+    {
+      "trajectory_id": "trajectory_000001",
+      "cycle": 4,
+      "physical_time": 0.2,
+      "forecast_interval": 0.05,
+      "path": "trajectories/trajectory_000001/cycle_000004",
+      "status": "failed_limiter_severity"
+    },
+    {
+      "trajectory_id": "trajectory_000001",
+      "cycle": 5,
+      "physical_time": 0.25000000000000006,
+      "forecast_interval": 0.05,
+      "path": "trajectories/trajectory_000001/cycle_000005",
+      "status": "failed_limiter_severity"
+    },
+    {
+      "trajectory_id": "trajectory_000001",
+      "cycle": 6,
+      "physical_time": 0.30000000000000004,
+      "forecast_interval": 0.05,
+      "path": "trajectories/trajectory_000001/cycle_000006",
+      "status": "failed_limiter_severity"
+    },
+    {
+      "trajectory_id": "trajectory_000001",
+      "cycle": 7,
+      "physical_time": 0.35000000000000003,
+      "forecast_interval": 0.05,
+      "path": "trajectories/trajectory_000001/cycle_000007",
+      "status": "failed_limiter_severity"
+    },
+    {
+      "trajectory_id": "trajectory_000002",
+      "cycle": 0,
+      "physical_time": 0.0,
+      "forecast_interval": 0.05,
+      "path": "trajectories/trajectory_000002/cycle_000000",
+      "status": "failed_limiter_severity"
+    },
+    {
+      "trajectory_id": "trajectory_000002",
+      "cycle": 1,
+      "physical_time": 0.05,
+      "forecast_interval": 0.05,
+      "path": "trajectories/trajectory_000002/cycle_000001",
+      "status": "failed_limiter_severity"
+    },
+    {
+      "trajectory_id": "trajectory_000002",
+      "cycle": 2,
+      "physical_time": 0.10000000000000002,
+      "forecast_interval": 0.05,
+      "path": "trajectories/trajectory_000002/cycle_000002",
+      "status": "failed_limiter_severity"
+    },
+    {
+      "trajectory_id": "trajectory_000002",
+      "cycle": 3,
+      "physical_time": 0.15000000000000002,
+      "forecast_interval": 0.05,
+      "path": "trajectories/trajectory_000002/cycle_000003",
+      "status": "failed_limiter_severity"
+    },
+    {
+      "trajectory_id": "trajectory_000002",
+      "cycle": 4,
+      "physical_time": 0.2,
+      "forecast_interval": 0.05,
+      "path": "trajectories/trajectory_000002/cycle_000004",
+      "status": "failed_limiter_severity"
+    },
+    {
+      "trajectory_id": "trajectory_000002",
+      "cycle": 5,
+      "physical_time": 0.25000000000000006,
+      "forecast_interval": 0.05,
+      "path": "trajectories/trajectory_000002/cycle_000005",
+      "status": "failed_limiter_severity"
+    },
+    {
+      "trajectory_id": "trajectory_000002",
+      "cycle": 6,
+      "physical_time": 0.30000000000000004,
+      "forecast_interval": 0.05,
+      "path": "trajectories/trajectory_000002/cycle_000006",
+      "status": "failed_limiter_severity"
+    },
+    {
+      "trajectory_id": "trajectory_000002",
+      "cycle": 7,
+      "physical_time": 0.35000000000000003,
+      "forecast_interval": 0.05,
+      "path": "trajectories/trajectory_000002/cycle_000007",
+      "status": "failed_limiter_severity"
+    }
+  ],
+  "quality_rule": "Only post-burn-in states passing invariant, boundary, projection, solver, and evidence-based limiter-severity gates enter training_samples.",
+  "production_readiness": "NOT_READY"
+}

@@ -1,0 +1,91 @@
+# Audit of the positivity construction
+
+> This audit originally covered Q1. The experimental Q2/Q3 path now uses
+> Bernstein coefficients on `2x2x2` control subcells; the current guarantee and
+> its measured accuracy cost are in [METHOD_SELECTION_REPORT.md](METHOD_SELECTION_REPORT.md).
+
+Primary source: Chen Liu, Jingwei Hu, William T. Taitano, and Xiangxiong
+Zhang, “An optimization-based positivity-preserving limiter in semi-implicit
+discontinuous Galerkin schemes solving Fokker--Planck equations,” *Computers &
+Mathematics with Applications* 192 (2025), 54--71,
+<https://doi.org/10.1016/j.camwa.2025.05.008>.
+
+## Finding
+
+The project implements the paper's **two-stage post-processing optimisation**,
+but it does not reproduce the paper's complete DG/time discretisation.  Earlier
+wording that could be read as claiming the whole scheme was the published
+scheme was too strong.
+
+| Item | Liu et al. | This project | Audit conclusion |
+|---|---|---|---|
+| Equation | Linearised Fokker--Planck convection--diffusion; spatially varying, uniformly SPD diffusion | Lorenz FPE; constant full tensor `D=BB^T/2` | Covered when `D` is positive definite; rank-deficient `B` gives semidefinite `D` and is outside the paper's uniform-coercivity hypothesis |
+| Mesh | Uniform rectangular/square cells in dimension `d` | Uniform affine, axis-aligned hexahedra in 3-D | Compatible special case |
+| Space | Broken polynomial degree `k>=1`, hierarchical modal basis; tensor Gauss point set | Basix discontinuous nodal Q1 on hexahedra | Different basis, same DG polynomial space for degree one |
+| Convection | Lax--Friedrichs flux, convection explicit in time | Upwind flux, convection implicit | For a continuous scalar linear drift, local LF with the exact face speed reduces to upwind spatially; time treatment differs |
+| Diffusion | NIPG, implicit | SIPG, implicit | Not the same bilinear form; the paper's NIPG coercivity statement is not being claimed for this SIPG form |
+| Time | First-order semi-implicit: explicit convection, implicit diffusion | Fully implicit backward Euler | Different scheme; both are first order |
+| Stage 1 | Constrained `L2` projection of cell averages, normally solved by Douglas--Rachford | The identical lower-bounded convex problem solved directly through its scalar KKT multiplier | Same unique minimiser; no Douglas--Rachford iteration occurs in this code |
+| Stage 2 | Zhang--Shu scaling about each corrected average, enforcing a lower tolerance at a selected quadrature set | Scaling about each corrected average using all eight Q1 vertex values and lower bound zero | Same scaling idea, different enforcement point set |
+| MPI | Douglas--Rachford described as parallelisable | Cell averages gather to rank zero, exact global projection, scatter back | Mathematically global and conservative, but not scalable like the proposed distributed iteration |
+
+## Exact claims supported by this implementation
+
+Stage 1 solves
+
+```text
+minimise    (1/2) sum_K |K| (x_K-w_K)^2
+subject to  x_K >= 0
+            sum_K |K|x_K = sum_K |K|w_K.
+```
+
+The KKT equations give `x_K=max(0,w_K-lambda)`.  Bisection to 100 iterations
+finds the unique multiplier; an active-set roundoff correction enforces the
+mass equality.  This is the same strictly convex optimisation problem as the
+paper's equations (22)--(24), solved directly rather than by the optional
+Douglas--Rachford algorithm.  The code records the mass before Stage 1, after
+Stage 1, and after Stage 2.
+
+Stage 2 applies
+
+```text
+theta_K = min(1, x_K/(x_K-min_vertex(p_K)))
+p_K <- x_K + theta_K (p_K-x_K).
+```
+
+It leaves the cell average unchanged.  On the reference cube, a nodal Q1
+polynomial is
+
+```text
+p(xi,eta,zeta) = sum_(i,j,k in {0,1}) p_ijk
+                 l_i(xi) l_j(eta) l_k(zeta),
+```
+
+where every product basis function is non-negative on `[0,1]^3` and the basis
+functions sum to one.  Consequently non-negative vertex coefficients imply
+`p>=0` everywhere on the reference cell.  An affine axis-aligned cell map
+preserves this conclusion.  This whole-cell Q1 guarantee is an independent
+argument stronger than the paper's finite-quadrature-point statement; it does
+not extend automatically to Q2, a modal coefficient check, or curved cells.
+
+The default lower bound is exactly zero, rather than the paper's small positive
+`epsilon`.  Floating-point results can consequently be around `-1e-20`; the
+integrated negative mass and a scale-aware tolerance are checked separately.
+
+## Claims not supported
+
+- The raw SIPG/backward-Euler solution is not positivity preserving.
+- The paper does not prove the complete scheme used here, because its diffusion
+  form and time treatment differ.
+- Positivity and conservation do not imply adequate resolution.
+- The paper's accuracy discussion assumes a suitably accurate underlying DG
+  solution and a feasible exact solution.  It is not a blanket proof that
+  post-processing cannot degrade every observable in this Lorenz calculation.
+- The paper's uniformly positive-definite diffusion assumption excludes
+  singular `D`; positivity post-processing remains algebraically valid there,
+  but the cited diffusion analysis does not apply.
+
+The production decision must therefore be based on measured raw-to-limited
+corrections, convergence, and independent stochastic comparisons.  Those
+measurements are generated by `lorenz_fpe.validation.limiter_impact` and the
+production-readiness workflow.

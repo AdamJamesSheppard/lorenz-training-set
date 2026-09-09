@@ -1,0 +1,387 @@
+{
+  "manufactured_density": "C exp(0.4 x - 0.3 y + 0.2 z)",
+  "diffusion": [
+    [
+      0.5,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.5,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      0.5
+    ]
+  ],
+  "velocity": [
+    0.2,
+    -0.15,
+    0.1
+  ],
+  "dt": 0.00025,
+  "t_final": 0.01,
+  "rows": [
+    {
+      "cells_per_axis": 4,
+      "advective_normal_speeds": {
+        "x_minus": -0.2,
+        "x_plus": 0.2,
+        "y_minus": 0.15,
+        "y_plus": -0.15,
+        "z_minus": -0.1,
+        "z_plus": 0.1
+      },
+      "analytic_total_flux": "identically zero",
+      "l1_error": 0.0014464468352244873,
+      "l2_error": 0.0006478015500927562,
+      "l1_change_from_projected_initial": 5.777079122546677e-05,
+      "boundary_physical_flux_trace_l2": 0.009011597642365003,
+      "mass_error": 2.525313291812381e-12,
+      "minimum": 0.04812205147305794,
+      "initialization": {
+        "quadrature_degree": 12,
+        "mass_before_normalization": 0.9999999999999146,
+        "normalized": true,
+        "minimum_coefficient_before_limiter": 0.048119749481815396,
+        "limiter": {
+          "activated": false,
+          "corrected_cell_averages": 0,
+          "scaled_cells": 0,
+          "corrected_fraction": 0.0,
+          "l2_cell_average_correction": 0.0,
+          "minimum_before": 0.048119749481815396,
+          "minimum_after": 0.048119749481815396,
+          "minimum_cell_average": 0.06083680049491274,
+          "mass_before": 1.0000000000000013,
+          "mass_after_stage1": 1.0000000000000013,
+          "mass_after": 1.0000000000000016,
+          "raw_negative_cell_averages": 0,
+          "raw_negative_cell_average_fraction": 0.0,
+          "minimum_raw_cell_average": 0.06083680049491274,
+          "stage1_l1_correction": 0.0,
+          "stage1_l2_correction": 0.0,
+          "scaling_l1_correction": 0.0,
+          "scaling_l2_correction": 0.0,
+          "raw_to_final_l1_correction": 0.0,
+          "raw_to_final_l2_correction": 0.0,
+          "relative_l1_correction": 0.0,
+          "minimum_scaling_factor": 1.0,
+          "mean_scaling_factor": 1.0,
+          "projection_iterations": 0,
+          "projection_seconds": 0.0003454390025581233,
+          "scaling_seconds": 0.00021461299911607057
+        },
+        "wall_seconds": 0.18766706099995645
+      },
+      "limiter_history": {
+        "steps": 40,
+        "relative_l1_correction": {
+          "mean": 0.0,
+          "maximum": 0.0,
+          "p95": 0.0
+        },
+        "raw_to_final_l2_correction": {
+          "mean": 0.0,
+          "maximum": 0.0,
+          "p95": 0.0
+        },
+        "raw_negative_cell_average_fraction": {
+          "mean": 0.0,
+          "maximum": 0.0,
+          "p95": 0.0
+        },
+        "corrected_fraction": {
+          "mean": 0.0,
+          "maximum": 0.0,
+          "p95": 0.0
+        },
+        "projection_seconds": {
+          "mean": 0.00028381157499097754,
+          "maximum": 0.000329257996781962,
+          "p95": 0.0003001174487508251
+        },
+        "scaling_seconds": {
+          "mean": 0.00014546779993906966,
+          "maximum": 0.00018943599934573285,
+          "p95": 0.0001717333972919732
+        },
+        "steps_with_negative_raw_average": 0,
+        "steps_with_scaling": 0
+      }
+    },
+    {
+      "cells_per_axis": 6,
+      "advective_normal_speeds": {
+        "x_minus": -0.2,
+        "x_plus": 0.2,
+        "y_minus": 0.15,
+        "y_plus": -0.15,
+        "z_minus": -0.1,
+        "z_plus": 0.1
+      },
+      "analytic_total_flux": "identically zero",
+      "l1_error": 0.0006430838718763033,
+      "l2_error": 0.0002881867843527481,
+      "l1_change_from_projected_initial": 2.1707222863077738e-05,
+      "boundary_physical_flux_trace_l2": 0.0060971504393394155,
+      "mass_error": 3.397282455352979e-14,
+      "minimum": 0.04829687796777879,
+      "initialization": {
+        "quadrature_degree": 12,
+        "mass_before_normalization": 0.9999999999999772,
+        "normalized": true,
+        "minimum_coefficient_before_limiter": 0.04829664091093096,
+        "limiter": {
+          "activated": false,
+          "corrected_cell_averages": 0,
+          "scaled_cells": 0,
+          "corrected_fraction": 0.0,
+          "l2_cell_average_correction": 0.0,
+          "minimum_before": 0.04829664091093096,
+          "minimum_after": 0.04829664091093096,
+          "minimum_cell_average": 0.05634633794915833,
+          "mass_before": 1.0000000000000009,
+          "mass_after_stage1": 1.0000000000000009,
+          "mass_after": 1.000000000000001,
+          "raw_negative_cell_averages": 0,
+          "raw_negative_cell_average_fraction": 0.0,
+          "minimum_raw_cell_average": 0.05634633794915833,
+          "stage1_l1_correction": 0.0,
+          "stage1_l2_correction": 0.0,
+          "scaling_l1_correction": 0.0,
+          "scaling_l2_correction": 0.0,
+          "raw_to_final_l1_correction": 0.0,
+          "raw_to_final_l2_correction": 0.0,
+          "relative_l1_correction": 0.0,
+          "minimum_scaling_factor": 1.0,
+          "mean_scaling_factor": 1.0,
+          "projection_iterations": 0,
+          "projection_seconds": 0.0008596749976277351,
+          "scaling_seconds": 0.0004994580012862571
+        },
+        "wall_seconds": 0.17581476700070198
+      },
+      "limiter_history": {
+        "steps": 40,
+        "relative_l1_correction": {
+          "mean": 0.0,
+          "maximum": 0.0,
+          "p95": 0.0
+        },
+        "raw_to_final_l2_correction": {
+          "mean": 0.0,
+          "maximum": 0.0,
+          "p95": 0.0
+        },
+        "raw_negative_cell_average_fraction": {
+          "mean": 0.0,
+          "maximum": 0.0,
+          "p95": 0.0
+        },
+        "corrected_fraction": {
+          "mean": 0.0,
+          "maximum": 0.0,
+          "p95": 0.0
+        },
+        "projection_seconds": {
+          "mean": 0.0007755391498903919,
+          "maximum": 0.0008107829999062233,
+          "p95": 0.0007976816001246334
+        },
+        "scaling_seconds": {
+          "mean": 0.0004729672746179858,
+          "maximum": 0.00048146400149562396,
+          "p95": 0.00048050005061668345
+        },
+        "steps_with_negative_raw_average": 0,
+        "steps_with_scaling": 0
+      },
+      "observed_l1_order": 1.9991614551879817,
+      "observed_l2_order": 1.9976455598764302
+    },
+    {
+      "cells_per_axis": 8,
+      "advective_normal_speeds": {
+        "x_minus": -0.2,
+        "x_plus": 0.2,
+        "y_minus": 0.15,
+        "y_plus": -0.15,
+        "z_minus": -0.1,
+        "z_plus": 0.1
+      },
+      "analytic_total_flux": "identically zero",
+      "l1_error": 0.00036176719268774004,
+      "l2_error": 0.00016214136853214458,
+      "l1_change_from_projected_initial": 9.90424220444473e-06,
+      "boundary_physical_flux_trace_l2": 0.004606947974032019,
+      "mass_error": 3.1117330934193888e-12,
+      "minimum": 0.0483567732246097,
+      "initialization": {
+        "quadrature_degree": 12,
+        "mass_before_normalization": 0.9999999999998955,
+        "normalized": true,
+        "minimum_coefficient_before_limiter": 0.048357007537664365,
+        "limiter": {
+          "activated": false,
+          "corrected_cell_averages": 0,
+          "scaled_cells": 0,
+          "corrected_fraction": 0.0,
+          "l2_cell_average_correction": 0.0,
+          "minimum_before": 0.048357007537664365,
+          "minimum_after": 0.048357007537664365,
+          "minimum_cell_average": 0.05424061434206079,
+          "mass_before": 1.0000000000000093,
+          "mass_after_stage1": 1.0000000000000093,
+          "mass_after": 1.0000000000000084,
+          "raw_negative_cell_averages": 0,
+          "raw_negative_cell_average_fraction": 0.0,
+          "minimum_raw_cell_average": 0.05424061434206079,
+          "stage1_l1_correction": 0.0,
+          "stage1_l2_correction": 0.0,
+          "scaling_l1_correction": 0.0,
+          "scaling_l2_correction": 0.0,
+          "raw_to_final_l1_correction": 0.0,
+          "raw_to_final_l2_correction": 0.0,
+          "relative_l1_correction": 0.0,
+          "minimum_scaling_factor": 1.0,
+          "mean_scaling_factor": 1.0,
+          "projection_iterations": 0,
+          "projection_seconds": 0.0019008710005437024,
+          "scaling_seconds": 0.001170239000202855
+        },
+        "wall_seconds": 0.1900552270017215
+      },
+      "limiter_history": {
+        "steps": 40,
+        "relative_l1_correction": {
+          "mean": 0.0,
+          "maximum": 0.0,
+          "p95": 0.0
+        },
+        "raw_to_final_l2_correction": {
+          "mean": 0.0,
+          "maximum": 0.0,
+          "p95": 0.0
+        },
+        "raw_negative_cell_average_fraction": {
+          "mean": 0.0,
+          "maximum": 0.0,
+          "p95": 0.0
+        },
+        "corrected_fraction": {
+          "mean": 0.0,
+          "maximum": 0.0,
+          "p95": 0.0
+        },
+        "projection_seconds": {
+          "mean": 0.0018250048751724535,
+          "maximum": 0.001855665999755729,
+          "p95": 0.0018473675998393446
+        },
+        "scaling_seconds": {
+          "mean": 0.0011238953750762448,
+          "maximum": 0.0011959869989368599,
+          "p95": 0.0011499537991767283
+        },
+        "steps_with_negative_raw_average": 0,
+        "steps_with_scaling": 0
+      },
+      "observed_l1_order": 1.9996875661677413,
+      "observed_l2_order": 1.9992216471244915
+    },
+    {
+      "cells_per_axis": 12,
+      "advective_normal_speeds": {
+        "x_minus": -0.2,
+        "x_plus": 0.2,
+        "y_minus": 0.15,
+        "y_plus": -0.15,
+        "z_minus": -0.1,
+        "z_plus": 0.1
+      },
+      "analytic_total_flux": "identically zero",
+      "l1_error": 0.00016080227709592277,
+      "l2_error": 7.207318789286365e-05,
+      "l1_change_from_projected_initial": 3.272207832622966e-06,
+      "boundary_physical_flux_trace_l2": 0.0030945062843407488,
+      "mass_error": 4.4353409833775004e-13,
+      "minimum": 0.04839911075492276,
+      "initialization": {
+        "quadrature_degree": 12,
+        "mass_before_normalization": 1.0000000000000693,
+        "normalized": true,
+        "minimum_coefficient_before_limiter": 0.04839942368750492,
+        "limiter": {
+          "activated": false,
+          "corrected_cell_averages": 0,
+          "scaled_cells": 0,
+          "corrected_fraction": 0.0,
+          "l2_cell_average_correction": 0.0,
+          "minimum_before": 0.04839942368750492,
+          "minimum_after": 0.04839942368750492,
+          "minimum_cell_average": 0.05222234394168733,
+          "mass_before": 1.0000000000000036,
+          "mass_after_stage1": 1.0000000000000036,
+          "mass_after": 1.0000000000000033,
+          "raw_negative_cell_averages": 0,
+          "raw_negative_cell_average_fraction": 0.0,
+          "minimum_raw_cell_average": 0.05222234394168733,
+          "stage1_l1_correction": 0.0,
+          "stage1_l2_correction": 0.0,
+          "scaling_l1_correction": 0.0,
+          "scaling_l2_correction": 0.0,
+          "raw_to_final_l1_correction": 0.0,
+          "raw_to_final_l2_correction": 0.0,
+          "relative_l1_correction": 0.0,
+          "minimum_scaling_factor": 1.0,
+          "mean_scaling_factor": 1.0,
+          "projection_iterations": 0,
+          "projection_seconds": 0.008749225999054033,
+          "scaling_seconds": 0.005556939002417494
+        },
+        "wall_seconds": 0.27019599599952926
+      },
+      "limiter_history": {
+        "steps": 40,
+        "relative_l1_correction": {
+          "mean": 0.0,
+          "maximum": 0.0,
+          "p95": 0.0
+        },
+        "raw_to_final_l2_correction": {
+          "mean": 0.0,
+          "maximum": 0.0,
+          "p95": 0.0
+        },
+        "raw_negative_cell_average_fraction": {
+          "mean": 0.0,
+          "maximum": 0.0,
+          "p95": 0.0
+        },
+        "corrected_fraction": {
+          "mean": 0.0,
+          "maximum": 0.0,
+          "p95": 0.0
+        },
+        "projection_seconds": {
+          "mean": 0.008679962674705166,
+          "maximum": 0.009483285000897013,
+          "p95": 0.00904534830187913
+        },
+        "scaling_seconds": {
+          "mean": 0.005540125174957211,
+          "maximum": 0.006298100997810252,
+          "p95": 0.005886553250275027
+        },
+        "steps_with_negative_raw_average": 0,
+        "steps_with_scaling": 0
+      },
+      "observed_l1_order": 1.9997414251282926,
+      "observed_l2_order": 1.9996455490307146
+    }
+  ]
+}

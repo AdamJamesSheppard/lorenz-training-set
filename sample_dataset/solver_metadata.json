@@ -1,0 +1,94 @@
+{
+  "software": {
+    "dolfinx": "0.11.0",
+    "petsc": "3.25.4"
+  },
+  "sde": "dX=f(X)dt+B dW; f=(sigma(y-x), x(rho-z)-y, xy-beta z)",
+  "fpe": "partial_t p + div(f p - D grad p)=0; D=0.5 B B^T",
+  "boundary": "total reflecting/no-flux (f p-D grad p).n=0 on finite box",
+  "model": {
+    "sigma": 10.0,
+    "rho": 28.0,
+    "beta": 2.6666666666666665,
+    "B": [
+      [
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ]
+  },
+  "diffusion": [
+    [
+      0.5,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.5,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      0.5
+    ]
+  ],
+  "domain": {
+    "bounds": [
+      [
+        -30.0,
+        30.0
+      ],
+      [
+        -40.0,
+        40.0
+      ],
+      [
+        -10.0,
+        70.0
+      ]
+    ],
+    "cells": [
+      12,
+      16,
+      16
+    ]
+  },
+  "dt": 0.0025,
+  "space": "discontinuous tensor-product degree 1 (DG1/Q1)",
+  "fluxes": "upwind advection; symmetric interior penalty diffusion",
+  "time_method": "backward Euler",
+  "positivity": {
+    "method": "constrained L2 projection of cell averages, then Zhang-Shu scaling",
+    "guarantee": "global mass preserved; all DG1 vertex coefficients nonnegative; hence the trilinear polynomial is nonnegative throughout each affine axis-aligned hexahedron",
+    "scope": "postprocessed state at every completed timestep; not the unlimited algebraic solution"
+  },
+  "global_cells": 3072,
+  "global_dofs": 24576,
+  "severity": {
+    "corner_sample_max_drift_speed": 1975.1568151527729,
+    "cell_widths": [
+      5.0,
+      5.0,
+      5.0
+    ],
+    "max_cell_Peclet_estimate": 9875.784075763864
+  },
+  "resource_estimates": {
+    "minimum_vector_memory_bytes": 983040,
+    "single_float32_voxel_tensor_bytes": 12288,
+    "note": "Sparse matrix/preconditioner memory is implementation-dependent and additional."
+  }
+}

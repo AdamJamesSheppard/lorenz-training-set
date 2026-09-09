@@ -1,0 +1,131 @@
+{
+  "reference": "analytic translated/spread Gaussian",
+  "coupled_refinement": [
+    {
+      "cells_per_axis": 6,
+      "dt": 0.01,
+      "l1_error": 0.6401910814799288,
+      "l2_error": 0.1314466044531177,
+      "mean_error": 0.2794293479145487,
+      "covariance_error": 0.7678364772378853
+    },
+    {
+      "cells_per_axis": 8,
+      "dt": 0.005,
+      "l1_error": 0.46986193080485394,
+      "l2_error": 0.10026344394050084,
+      "mean_error": 0.07661921685198898,
+      "covariance_error": 0.5883010895924876,
+      "observed_l1_rate_coupled_refinement": 1.075241869144991
+    },
+    {
+      "cells_per_axis": 10,
+      "dt": 0.0025,
+      "l1_error": 0.36615987062775424,
+      "l2_error": 0.08197163352699874,
+      "mean_error": 0.0157181352813355,
+      "covariance_error": 0.41715442813363174,
+      "observed_l1_rate_coupled_refinement": 1.117526555482244
+    }
+  ],
+  "spatial_refinement_fixed_dt": [
+    {
+      "cells_per_axis": 6,
+      "dt": 0.00125,
+      "l1_error": 0.6409439655927941,
+      "l2_error": 0.1314846654166076
+    },
+    {
+      "cells_per_axis": 8,
+      "dt": 0.00125,
+      "l1_error": 0.4702320406301991,
+      "l2_error": 0.10027861513430411,
+      "observed_l1_order": 1.0765904074137174,
+      "observed_l2_order": 0.9417958043118007
+    },
+    {
+      "cells_per_axis": 10,
+      "dt": 0.00125,
+      "l1_error": 0.36623039414006947,
+      "l2_error": 0.08197223178065238,
+      "observed_l1_order": 1.1201921244361979,
+      "observed_l2_order": 0.9033284131494568
+    }
+  ],
+  "temporal_refinement_fixed_mesh": [
+    {
+      "cells_per_axis": 10,
+      "dt": 0.01,
+      "l1_error": 0.36583134523794064,
+      "l2_error": 0.08195999079932109
+    },
+    {
+      "cells_per_axis": 10,
+      "dt": 0.005,
+      "l1_error": 0.3660347096585974,
+      "l2_error": 0.08196897947660453
+    },
+    {
+      "cells_per_axis": 10,
+      "dt": 0.0025,
+      "l1_error": 0.36615987062775424,
+      "l2_error": 0.08197163352699874
+    },
+    {
+      "cells_per_axis": 10,
+      "dt": 0.00125,
+      "l1_error": 0.36623039414006947,
+      "l2_error": 0.08197223178065238
+    }
+  ],
+  "lorenz_temporal_self_convergence": {
+    "cells": [
+      12,
+      16,
+      16
+    ],
+    "reference_dt": 0.0003125,
+    "records": [
+      {
+        "dt": 0.005,
+        "l1_difference_to_dt_ref": 0.030805773524202728,
+        "l2_difference_to_dt_ref": 0.0007551033475666255,
+        "mean_difference_to_dt_ref": 0.012952435773880978,
+        "covariance_difference_to_dt_ref": 0.21526406083500058
+      },
+      {
+        "dt": 0.0025,
+        "l1_difference_to_dt_ref": 0.015776310253861513,
+        "l2_difference_to_dt_ref": 0.00039381324210016844,
+        "mean_difference_to_dt_ref": 0.006698030337490081,
+        "covariance_difference_to_dt_ref": 0.11169864267624253,
+        "observed_l1_order": 0.9654409329004876
+      },
+      {
+        "dt": 0.00125,
+        "l1_difference_to_dt_ref": 0.006931669843404682,
+        "l2_difference_to_dt_ref": 0.00017128743195251748,
+        "mean_difference_to_dt_ref": 0.0023529060474804927,
+        "covariance_difference_to_dt_ref": 0.05186603856022844,
+        "observed_l1_order": 1.1864849834278897
+      },
+      {
+        "dt": 0.000625,
+        "l1_difference_to_dt_ref": 0.002283267024453128,
+        "l2_difference_to_dt_ref": 5.7132660214051094e-05,
+        "mean_difference_to_dt_ref": 0.0004701532891858264,
+        "covariance_difference_to_dt_ref": 0.01702211860159488,
+        "observed_l1_order": 1.6021033500046147
+      },
+      {
+        "dt": 0.0003125,
+        "l1_difference_to_dt_ref": 0.0,
+        "l2_difference_to_dt_ref": 0.0,
+        "mean_difference_to_dt_ref": 0.0,
+        "covariance_difference_to_dt_ref": 0.0
+      }
+    ]
+  },
+  "polynomial_degree": "DG1 only: the implemented whole-cell positivity proof relies on Q1 vertex convexity",
+  "note": "Preliminary engineering study. Spatial error dominates the fixed-mesh temporal sequence; finer meshes are required for an asymptotic publication study."
+}

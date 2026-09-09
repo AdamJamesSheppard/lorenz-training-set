@@ -1,0 +1,27 @@
+{
+  "mpi_ranks": 1,
+  "cells": [
+    20,
+    24,
+    24
+  ],
+  "degree": 2,
+  "global_cells": 11520,
+  "global_dofs": 311040,
+  "steps": 3,
+  "dt": 0.000625,
+  "export_subcells": 3,
+  "setup_seconds": 9.650362898999447,
+  "matrix_assembly_seconds": 6.521136747000128,
+  "mean_step_seconds": 0.6280952266655125,
+  "mean_rhs_seconds": 0.013928330332419137,
+  "mean_solve_seconds": 0.23074833666760242,
+  "mean_residual_seconds": 0.023605582665671438,
+  "mean_limiter_seconds": 0.3595648630010449,
+  "diagnostics_seconds": 2.303029451999464,
+  "export_seconds": 0.25088586499987287,
+  "file_output_seconds": 0.0007276069991348777,
+  "last_true_relative_residual": 4.729804456157797e-14,
+  "last_mass_error": 5.0182080713057076e-14,
+  "last_relative_l1_limiter_correction": 0.0008845181645422304
+}

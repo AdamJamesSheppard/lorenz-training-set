@@ -1,0 +1,32 @@
+# Python caches and local environments
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+
+# Editors and operating systems
+.idea/
+.vscode/
+*~
+.DS_Store
+
+# Generated logs, scratch space, and run outputs
+*.log
+tmp/
+runs/
+results/
+.cache/
+
+# Large numerical payloads; keep schemas, manifests, and summaries in Git
+*.npy
+*.npz
+*.h5
+*.hdf5
+*.xdmf
+*.bp
+
+# Large local reference material is indexed in docs/REFERENCES.md
+Fenics Book.pdf
