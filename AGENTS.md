@@ -84,6 +84,45 @@ Read deeper documentation only when it is relevant to the task.
   directions, assumptions, claims, decisions, commands, or generated repository
   map became stale; update each affected file in the same change.
 
+## Minimum change logging
+
+- First determine whether each changed path is tracked, untracked, or ignored.
+  Use `git status --short --ignored`, `git ls-files --error-unmatch -- <path>`,
+  and `git check-ignore -v -- <path>` when the answer is unclear.
+- For tracked files, Git is the change log. Do not create a duplicate diary.
+  Ensure every task change appears in `git diff`, then commit it with a concise
+  message that states the purpose. A working-tree edit is not logged until it
+  is committed.
+- `docs/assumptions.yaml`, `docs/CLAIMS.md`, `docs/DECISIONS.md`, and the other
+  living documents are tracked. Their ordinary edits need only the Git commit.
+  When an assumption change alters the model, applicability, interpretation,
+  candidate ranking, or acceptance gates, also record the reason in
+  `docs/DECISIONS.md` and update affected claims/project state. Do not add that
+  extra semantic record for spelling or non-substantive clarification.
+- Never leave a meaningful new file merely untracked. Either add and commit it,
+  or intentionally ignore it and apply the appropriate rule below.
+- Ignored caches, temporary files, and disposable local logs need no durable
+  record when they are reproducible and are not used as scientific evidence.
+- Ignored `runs/`, `results/`, `.npy`, `.npz`, HDF5/XDMF/BP data, or logs that
+  are used as evidence must have a durable record without committing the large
+  payload merely for logging. Prefer a new immutable timestamped run containing
+  the exact config, Git commit and dirty state, command, environment/package
+  versions, seeds, status, diagnostics, and hashes or immutable versions of
+  external inputs. Add or update a compact tracked manifest, report, experiment
+  specification, claim, or decision that points to the evidence and records
+  the conclusion.
+- Do not overwrite an ignored dataset or evidence run in place. Create a new
+  version/run. When regenerating sample or training data, update the tracked
+  schema/manifest/diagnostic summary with code revision, configuration, seeds,
+  acceptance status, and content hashes where practical.
+- External/local references such as `Fenics Book.pdf` and files under
+  `../sources/` are not covered by this repository's Git history. Do not edit or
+  replace them silently. If an agent changes or updates one, record its path,
+  source/version or date, and checksum in a tracked reference or decision file.
+- Before concluding, run `git status --short --ignored`; account for every
+  task-created path, commit all tracked task changes, and report the commit plus
+  any intentionally ignored evidence location. Preserve unrelated user changes.
+
 ## Output rule
 
 For technical tasks report the result, evidence, validation run, and remaining
