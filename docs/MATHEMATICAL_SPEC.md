@@ -22,7 +22,13 @@ PDE.
 - This is a bounded-domain approximation to the whole-space SDE. It does not
   impose zero advective and diffusive flux separately.
 
-## Discretization
+## Current discretization
+
+This section describes the incumbent implementation and comparison baseline.
+It does not require future methods to use the same mesh, basis, flux, time
+integrator, or positivity mechanism. A challenger may replace any of them if it
+solves the intended PDE (or clearly labels a surrogate), states its assumptions,
+and is compared on controlled common problems.
 
 - Affine hexahedral mesh; discontinuous tensor-product Q1 is the baseline.
 - Conservative upwind numerical flux for advection.
@@ -60,6 +66,11 @@ excluded claims are in `POSITIVITY_AUDIT.md`.
 Passing these checks is numerical evidence for tested configurations, not an
 analytical proof or a production certification.
 
+Additional invariants and reference comparisons should be added when a new
+method introduces a new failure mode. Existing tolerances may be revised when
+better analysis or reference resolution justifies the change, with rationale
+recorded before outcome-based selection.
+
 ## Dataset semantics
 
 An accepted pair is
@@ -69,4 +80,3 @@ An accepted pair is
 Arrays are float64 conservative subcell averages with axes `(x,y,z)`. Splits
 are by complete independent trajectory. Burn-in and failed cycles remain in
 the audit trail but are excluded from `training_samples`.
-

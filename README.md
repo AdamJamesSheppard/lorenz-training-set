@@ -1,5 +1,12 @@
 # Positivity-limited Lorenz-63 Fokker--Planck solver
 
+This is a living numerical-research repository. The current DOLFINx Q1 solver
+is an evidence-preserving baseline, not a restriction on future work. New
+agents and contributors are welcome to revise any version-controlled code,
+documentation, experiment, or architecture when a better-supported direction
+emerges; see `AGENTS.md` and `docs/RESEARCH_DIRECTIONS.md` for the maintenance
+and comparison policy.
+
 > **Current method-selection status (2026-09-09): `INSUFFICIENT_EVIDENCE`.**
 > Do not generate a large training dataset. The authoritative corrected
 > evidence is [METHOD_SELECTION_REPORT.md](METHOD_SELECTION_REPORT.md).

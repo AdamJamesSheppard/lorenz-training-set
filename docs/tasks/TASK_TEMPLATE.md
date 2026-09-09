@@ -7,6 +7,12 @@ One observable outcome.
 Why this is needed and the relevant modules, claims, decisions, and experiment
 records.
 
+# Competing approaches
+
+- State at least one credible alternative or explain why the task is genuinely
+  method-specific.
+- Identify which observation would make you switch paths.
+
 # In scope
 
 - List the permitted changes and computations.
@@ -22,6 +28,7 @@ records.
 - [ ] Relevant regression and invariant checks pass.
 - [ ] Generated runs include config, provenance, diagnostics, and compact summary.
 - [ ] Project state/claims/decisions are updated when the conclusion is durable.
+- [ ] Living documents and repository map are not left stale.
 
 # Verification
 
@@ -37,4 +44,3 @@ records.
 
 State any dependency, data, architecture, cost, or production changes that need
 separate authorization.
-

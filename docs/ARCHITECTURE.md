@@ -1,5 +1,11 @@
 # Architecture
 
+This is a living description of the current repository, not a prohibition on
+new layouts or method families. Agents are welcome to refactor it and add
+parallel implementations when that makes controlled comparisons clearer. Keep
+the dependency direction, public entry points, tests, and this document aligned
+with the code actually present.
+
 ## Scientific core
 
 - `lorenz_fpe/core.py`: Lorenz model, DG solver, positivity limiter,
@@ -12,7 +18,23 @@
   independent-reference studies.
 
 Dependency direction is `entry points -> lorenz_fpe package`; the scientific
-core must not import top-level entry-point scripts.
+core currently does not import top-level entry-point scripts. If a broader
+plugin/strategy architecture becomes useful, document and test the replacement
+rather than preserving this shape for its own sake.
+
+## Candidate implementations
+
+New method families should normally live beside the incumbent rather than
+being hidden behind unrelated conditionals in `core.py`. Shared model,
+diagnostic, reference, and dataset contracts should be factored only when they
+are genuinely method-independent. Candidate modules may include high-order
+DG/AFC, adaptive certification, characteristic or semi-Lagrangian solvers,
+complete-flux/FCDF approaches, and spectral/reference solvers.
+
+Every candidate should expose enough common configuration and diagnostics for
+same-law, same-domain, same-time, and accuracy/cost comparisons. Method-specific
+diagnostics are encouraged; a common interface must not erase important
+differences.
 
 ## Entry points
 

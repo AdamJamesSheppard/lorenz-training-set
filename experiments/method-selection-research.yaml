@@ -1,0 +1,42 @@
+id: open-method-selection-research
+kind: research_plan
+status: living
+purpose: Reduce the dominant forecast error and select a production target generator without presupposing the winning method.
+current_diagnosis:
+  evidence_class: NUMERICAL
+  suspected_dominant_errors:
+    - convection-dominated spatial transport
+    - positivity enforcement
+unresolved_scope:
+  process_noise_matrix:
+    options:
+      - identity_or_diagonal
+      - arbitrary_full_matrix
+    impact: Directional methods are more attractive in the first case; full-tensor DG/AFC and flux methods are more attractive in the second.
+candidate_branches:
+  - adaptive_q2_bernstein_diagnosis
+  - q2_constrained_projection
+  - q2_local_afc_or_convex_limiting
+  - complete_flux_or_scharfetter_gummel
+  - fcdf_directional_splitting_if_diagonal_diffusion
+  - characteristic_or_semi_lagrangian
+  - covariance_targeted_adaptivity
+  - high_order_spectral_reference
+  - monte_carlo_density_reconstruction
+comparison_axes:
+  - equal_initial_law
+  - equal_physical_mesh
+  - equal_global_dofs
+  - equal_wall_time
+  - equal_memory
+  - startup_and_regenerated_mature_states
+required_metrics:
+  - mass_and_positivity
+  - full_density_l1_or_tv_against_resolved_reference
+  - mean_and_normalized_covariance_error
+  - covariance_eigenstructure
+  - limiter_or_correction_magnitude
+  - boundary_and_timestep_sensitivity
+  - wall_time_memory_and_scaling
+selection_rule: Do not select a method until applicability and mature-state evidence support it; INSUFFICIENT_EVIDENCE remains a valid outcome.
+maintenance: Re-rank or replace branches when evidence or scope changes, and update the canonical living documents in the same change.

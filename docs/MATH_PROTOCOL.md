@@ -18,4 +18,12 @@
    with plausible prose.
 10. Promote durable conclusions into `docs/CLAIMS.md`, `docs/DECISIONS.md`, or
     `docs/PROJECT_STATE.md`; chat history is not canonical state.
-
+11. Maintain at least one serious competing hypothesis during method selection.
+    Try to falsify the preferred route and compare methods on identical physical
+    problems rather than improving only the incumbent.
+12. Treat method rankings, tolerances, and implementation choices as dated,
+    revisable conclusions. Preserve the evidence that supported an old choice,
+    mark it superseded when necessary, and update the current summary.
+13. Before finishing material work, search the living documents for statements
+    made stale by the change. A correct new result with stale canonical context
+    is an incomplete research update.

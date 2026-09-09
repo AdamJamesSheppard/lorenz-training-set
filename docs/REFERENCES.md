@@ -20,3 +20,10 @@
 - `../sources/Agent_Legible_Software_Development_Linux_Guide.pdf`: supporting
   repository, validation, and environment practices.
 
+## Historical project conversation
+
+- `../sources/Chat Response/Check FPE Lorenz File.md`: exported development and
+  review history. It records why validation was repaired, why Q1 is only a
+  comparator, why the current Q2 result is inconclusive, and which challenger
+  families remain open. The conversation is evidence context, not canonical
+  state; current conclusions belong in the living documents above.

@@ -1,6 +1,6 @@
 # Repository map
 
-Generated: 2026-09-09T03:02:15+01:00
+Generated: 2026-09-09T03:37:29+01:00
 
 ```text
 docs/ACTIVE_TASK.md
@@ -11,10 +11,12 @@ docs/MATHEMATICAL_SPEC.md
 docs/MATH_PROTOCOL.md
 docs/PROJECT_STATE.md
 docs/REFERENCES.md
+docs/RESEARCH_DIRECTIONS.md
 docs/assumptions.yaml
 docs/generated/REPO_MAP.md
 docs/tasks/TASK_TEMPLATE.md
 experiments/mature-state-decision.yaml
+experiments/method-selection-research.yaml
 experiments/smoke-forecast.yaml
 lorenz_fpe/__init__.py
 lorenz_fpe/core.py
@@ -99,11 +101,6 @@ tests/test_validation.py
 ./mature_da_study.py:28:def main():
 ./mature_forecast_validation.py:11:def sample_q1(solver,state,n,rng):
 ./mature_forecast_validation.py:23:def main():
-tests/test_validation.py:4:class TestAnalyticBenchmarks(unittest.TestCase):
-tests/test_validation.py:6:    def setUpClass(cls):
-tests/test_validation.py:8:    def test_pure_diffusion(self):
-tests/test_validation.py:12:    def test_constant_advection_diffusion(self):
-tests/test_validation.py:16:    def test_non_gaussian(self):
 scripts/verify_math.py:16:def main() -> int:
 lorenz_fpe/validation.py:19:def _correlation(cov: np.ndarray) -> np.ndarray:
 lorenz_fpe/validation.py:24:def covariance_accuracy(pde_covariance: np.ndarray, samples: np.ndarray, seed: int,
@@ -131,12 +128,11 @@ lorenz_fpe/validation.py:588:def voxel_projection_validation(cells=(12,16,16),dt
 lorenz_fpe/validation.py:637:def weighted_particle_da(cells=(20,24,24),dt=.00125,t_final=.05,n_particles=50000,seed=4401)->dict[str,object]:
 lorenz_fpe/validation.py:676:def domain_sensitivity()->dict[str,object]:
 lorenz_fpe/validation.py:691:def run_validation(output:Path)->dict[str,object]:
-tests/test_solver_smoke.py:7:class TestSolverSmoke(unittest.TestCase):
-tests/test_solver_smoke.py:9:    def setUpClass(cls):
-tests/test_solver_smoke.py:11:    def test_forecast_probability_invariants(self):
-tests/test_solver_smoke.py:22:    def test_structured_roundtrip_conserves_mass(self):
-tests/test_solver_smoke.py:26:    def test_refined_structured_roundtrip_preserves_q1_shape(self):
-tests/test_solver_smoke.py:34:    def test_checkpoint_and_da_continuity_without_gaussianisation(self):
+tests/test_validation.py:4:class TestAnalyticBenchmarks(unittest.TestCase):
+tests/test_validation.py:6:    def setUpClass(cls):
+tests/test_validation.py:8:    def test_pure_diffusion(self):
+tests/test_validation.py:12:    def test_constant_advection_diffusion(self):
+tests/test_validation.py:16:    def test_non_gaussian(self):
 lorenz_fpe/finite_volume.py:21:class FiniteVolumeResult:
 lorenz_fpe/finite_volume.py:30:class ConservativeFiniteVolume:
 lorenz_fpe/finite_volume.py:38:    def __init__(self, model: Lorenz63Model, domain: Domain, cfl: float = 0.72):
@@ -148,9 +144,12 @@ lorenz_fpe/finite_volume.py:126:    def diagnostics(self, density: np.ndarray) -
 scripts/run_experiment.py:20:def package_version(name: str) -> str | None:
 scripts/run_experiment.py:27:def git_text(*args: str) -> str:
 scripts/run_experiment.py:33:def main(config_path: Path) -> int:
-tests/test_mpi_consistency.py:4:class TestMPIConsistency(unittest.TestCase):
-tests/test_mpi_consistency.py:5:    def _run(self,ranks):
-tests/test_mpi_consistency.py:13:    def test_two_rank_limiter_agrees_with_serial(self):
+tests/test_solver_smoke.py:7:class TestSolverSmoke(unittest.TestCase):
+tests/test_solver_smoke.py:9:    def setUpClass(cls):
+tests/test_solver_smoke.py:11:    def test_forecast_probability_invariants(self):
+tests/test_solver_smoke.py:22:    def test_structured_roundtrip_conserves_mass(self):
+tests/test_solver_smoke.py:26:    def test_refined_structured_roundtrip_preserves_q1_shape(self):
+tests/test_solver_smoke.py:34:    def test_checkpoint_and_da_continuity_without_gaussianisation(self):
 lorenz_fpe/dataset.py:16:class DatasetConfig:
 lorenz_fpe/dataset.py:30:class DatasetSplitter:
 lorenz_fpe/dataset.py:32:    def split(trajectory_ids: list[str], seed: int = 1729) -> dict[str,list[str]]:
@@ -159,10 +158,9 @@ lorenz_fpe/dataset.py:41:    def __init__(self, solver: FokkerPlanckSolver, conf
 lorenz_fpe/dataset.py:44:    def generate(self, root: Path) -> dict[str,object]:
 lorenz_fpe/dataset.py:131:    def _mode_count(a: np.ndarray, relative_threshold: float = 0.05) -> int:
 lorenz_fpe/dataset.py:148:    def _distribution_report(rows: list[dict[str,object]]) -> dict[str,object]:
-tests/test_limiter.py:6:class TestProjection(unittest.TestCase):
-tests/test_limiter.py:7:    def test_positive_and_conservative(self):
-tests/test_limiter.py:12:    def test_identity(self):
-tests/test_limiter.py:14:    def test_trajectory_split_is_disjoint(self):
+tests/test_mpi_consistency.py:4:class TestMPIConsistency(unittest.TestCase):
+tests/test_mpi_consistency.py:5:    def _run(self,ranks):
+tests/test_mpi_consistency.py:13:    def test_two_rank_limiter_agrees_with_serial(self):
 lorenz_fpe/core.py:34:def _global_sum(comm: MPI.Comm, value: float) -> float:
 lorenz_fpe/core.py:38:def _global_min(comm: MPI.Comm, value: float) -> float:
 lorenz_fpe/core.py:42:def _global_max(comm: MPI.Comm, value: float) -> float:
@@ -221,6 +219,10 @@ lorenz_fpe/core.py:955:    def __init__(self, model: Lorenz63Model, dt: float = 
 lorenz_fpe/core.py:958:    def simulate(self, initial: Iterable[float], times: Iterable[float], seed: int) -> np.ndarray:
 lorenz_fpe/core.py:969:def solver_metadata(solver: FokkerPlanckSolver) -> dict[str, object]:
 lorenz_fpe/core.py:1000:def write_json(path: Path, obj: object) -> None:
+tests/test_limiter.py:6:class TestProjection(unittest.TestCase):
+tests/test_limiter.py:7:    def test_positive_and_conservative(self):
+tests/test_limiter.py:12:    def test_identity(self):
+tests/test_limiter.py:14:    def test_trajectory_split_is_disjoint(self):
 tests/test_accuracy_repairs.py:23:class TestProjectionAndSamplingAccuracy(unittest.TestCase):
 tests/test_accuracy_repairs.py:24:    def test_l2_projection_preserves_mass_and_improves_gaussian_covariance(self):
 tests/test_accuracy_repairs.py:46:    def test_limited_projection_is_positive_and_mass_conservative(self):

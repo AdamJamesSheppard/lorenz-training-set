@@ -1,7 +1,7 @@
 id: mature-state-method-decision
 kind: research_plan
 status: planned
-purpose: Decide whether the Q1 interim baseline can be certified on mature DA states.
+purpose: Select or reject candidate production methods on regenerated mature DA states.
 fixed_setup:
   projected_analysis_trajectories: 4
   cycles: 20
@@ -17,7 +17,8 @@ state_selection:
   - skewed
   - anisotropic
 required_comparisons:
-  - Q1 baseline and one finer aligned Q1 mesh
+  - Q1 baseline and one finer aligned Q1 mesh as comparators
+  - every candidate that passes the preceding applicability and startup-state gates
   - exact-native-law Monte Carlo with bootstrap uncertainty
   - common-random-number Monte Carlo timestep refinement
   - independent finite-volume factors 2 and 4
@@ -32,6 +33,6 @@ acceptance_gates:
   dt_halving_l1_change_max: 0.0025
   expanded_domain_covariance_change_max: 0.005
   expanded_domain_marginal_tv_change_max: 0.005
-decision_rule: Retain Q1 only if every gate passes on startup and mature states.
+decision_rule: Select no method unless every applicable gate passes on startup and mature states; among passing methods compare full-density accuracy, robustness, wall time, memory, and implementation risk.
+revision_policy: Gates are provisional and evidence-derived; revise only with documented rationale before inspecting the candidate outcomes, never to rescue a failed run.
 warning: Expensive plan; scripts/run-experiment intentionally accepts only kind=forecast.
-

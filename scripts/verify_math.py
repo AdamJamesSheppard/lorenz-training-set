@@ -28,6 +28,9 @@ def main() -> int:
         )
         for i in range(1, len(l1_errors))
     ]
+    classification = str(decision.get("classification", "")).strip()
+    dataset_decision = str(decision.get("large_neural_operator_dataset", "")).upper()
+    method_certified = classification in {"READY", "CERTIFIED"} and dataset_decision == "YES"
 
     checks = {
         "diffusion_symmetric": bool(np.allclose(diffusion, diffusion.T, atol=1e-14)),
@@ -37,15 +40,16 @@ def main() -> int:
             all(b < a for a, b in zip(l1_errors, l1_errors[1:]))
         ),
         "boundary_order_ok": bool(min(observed_orders) >= 1.9),
-        "dataset_block_consistent": (
-            decision["classification"] == "INSUFFICIENT_EVIDENCE"
-            and decision["large_neural_operator_dataset"] == "NO"
+        "classification_present": bool(classification),
+        "dataset_decision_valid": dataset_decision in {"YES", "NO"},
+        "certification_consistent": bool(
+            dataset_decision != "YES" or classification in {"READY", "CERTIFIED"}
         ),
     }
     result = {
         "passed": all(checks.values()),
-        "method_certified": False,
-        "classification": decision["classification"],
+        "method_certified": method_certified,
+        "classification": classification,
         "checks": checks,
         "metrics": {
             "diffusion_eigenvalues": np.linalg.eigvalsh(diffusion).tolist(),
@@ -59,8 +63,8 @@ def main() -> int:
             ],
         },
         "interpretation": (
-            "The tested invariants and evidence consistency pass. This does not certify "
-            "a production forecast method; the method-selection state remains insufficient evidence."
+            "The tested invariants and evidence consistency pass. Production certification is "
+            "derived from the current method-selection record and must be supported by its evidence."
         ),
     }
 

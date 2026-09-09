@@ -1,17 +1,19 @@
 A1:
   statement: The computational domain is an affine axis-aligned hexahedral box.
-  status: active
+  status: active_for_current_solver
   implication: Current Q1 Bernstein/vertex positivity is a whole-cell guarantee.
+  revision_rule: A challenger may use another mesh if its positivity, export, and comparison implications are documented.
 
 A2:
   statement: The numerical boundary condition is zero total probability flux.
-  status: active
+  status: current_physical_target
   formula: (f p - D grad(p)) . n = 0
 
 A3:
   statement: The default noise matrix is full rank with B equal to the identity.
-  status: active_default
+  status: default_only
   implication: D is one-half the identity and the PDE is uniformly parabolic.
+  unresolved_scope: Production may require diagonal or arbitrary full B; establish this before prioritizing a challenger.
 
 A4:
   statement: A rank-deficient noise matrix still gives uniform ellipticity.
@@ -19,7 +21,7 @@ A4:
 
 A5:
   statement: Backward Euler with theta equal to one is the validated time baseline.
-  status: active
+  status: validated_baseline_not_mandate
 
 A6:
   statement: Quadrature degree 14 is adequate for adopted projections.
@@ -40,3 +42,12 @@ A9:
   status: active
   limitation: Finite samples do not define a stable full three-dimensional density target.
 
+A10:
+  statement: The present method ranking is permanent.
+  status: false
+  revision_rule: Re-rank candidates when controlled evidence, applicability, cost, or the production scope changes.
+
+A11:
+  statement: A numerical method must be implemented in DOLFINx to be considered.
+  status: false
+  limitation: Challengers must still solve the intended equation or clearly state and justify any surrogate.
