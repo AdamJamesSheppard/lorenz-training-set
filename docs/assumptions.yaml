@@ -13,7 +13,8 @@ A3:
   statement: The default noise matrix is full rank with B equal to the identity.
   status: default_only
   implication: D is one-half the identity and the PDE is uniformly parabolic.
-  unresolved_scope: Production may require diagonal or arbitrary full B; establish this before prioritizing a challenger.
+  production_scope: The selected production method must ultimately support a constant general 3 by 3 B and therefore full SPD D with mixed derivatives.
+  branch_rule: Directional diagonal-only methods may be studied as special-case challengers but cannot certify the general production role.
 
 A4:
   statement: A rank-deficient noise matrix still gives uniform ellipticity.

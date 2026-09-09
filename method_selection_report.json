@@ -1,10 +1,10 @@
 {
-  "report_date": "2026-09-09",
+  "report_date": "2026-09-10",
   "classification": "INSUFFICIENT_EVIDENCE",
   "large_neural_operator_dataset": "NO",
   "recommended": {
-    "production_forecast_generator": "No method is certified. Q1 upwind/SIPG with quadrature-14 L2 initialization, projected Bayesian analysis, backward Euler, and the conservative two-stage limiter is the strongest tested interim baseline.",
-    "independent_validator": "Exact-native-law Monte Carlo with at least 200000 paths, bootstrap uncertainty, common-random-number SDE timestep refinement, plus the independently implemented refined conservative finite-volume hierarchy for triangulation.",
+    "production_forecast_generator": "No method is certified. The leading research path is same-physical-mesh Q2 diagnosis followed, only if raw Q2 is accurate, by local or operator-level positivity. Q1 remains the controlled baseline.",
+    "independent_validator": "Develop a dynamically scaled and translated whole-space Hermite-Galerkin reference after the Q2 gate, validated by mode-tail and moment convergence; retain exact-native-law Monte Carlo for moment uncertainty and the independent FV hierarchy for current triangulation.",
     "neural_operator_target_representation": "If a pilot is run: float64 exact conservative subcell averages; Q1 requires 2 subcells per native cell per axis (60x72x72 for the tested 30x36x36 mesh).",
     "expected_covariance_error": {
       "best_measured_short_gaussian_normalized_frobenius": 0.08557651238862092,
@@ -20,12 +20,12 @@
       "warning": "The finite-volume level is not converged and KDE bandwidth materially changes the result."
     },
     "expected_cost_per_DA_forecast": {
-      "q1_30x36x36_serial_measured_seconds": 86.88113789800263,
+      "q1_30x36x36_serial_measured_seconds": 88.10077078999893,
       "q1_30x36x36_eight_rank_step_only_estimate_seconds": 26.387353839042285,
       "monte_carlo_200000_cpu_sampling_propagation_histogram_seconds": 3.369948232000722,
       "scope": "One 0.05 forecast interval; MC figure excludes principled bandwidth selection and accuracy certification."
     },
-    "principal_remaining_limitation": "No corrected mature-posterior forecast has been validated at a resolution close to production; the projected analysis limiter is already severe on the available coarse regenerated DA ensemble."
+    "principal_remaining_limitation": "The equal-DOF Q1/Q2 comparison also changed physical cell size and timestep; no corrected mature-posterior forecast or converged deterministic full-density reference exists."
   },
   "pde": {
     "linear_in_density": true,
@@ -100,7 +100,8 @@
     "q2_serial_step_seconds": 0.6280952266655125,
     "q1_eight_rank_step_seconds": 0.32984192298802856,
     "q2_eight_rank_step_seconds": 0.28150189066824777,
-    "conclusion": "Q2 is faster per step at equal global DOFs because it has fewer cells, but its positivity scaling is more intrusive and its measured covariance is three times worse. Do not adopt Q2."
+    "comparison_confound": "Q2 used cells 1.5 times wider in every direction and dt=0.00125 versus Q1 dt=0.000625, so equal global DOFs do not isolate polynomial degree.",
+    "conclusion": "Current corrected Q2 is not adopted. The existing result rejects that configuration but cannot reject Q2 polynomial degree; a same-physical-mesh, same-timestep comparison is required."
   },
   "independent_reference": {
     "method": "First-order cell-centred upwind finite volume, centred diagonal diffusion, SSPRK(3,3), zero total numerical boundary flux",
@@ -169,8 +170,9 @@
     "boundary": "expanded-domain mature E_cov and marginal TV change <= 0.005"
   },
   "smallest_additional_experiment_required": {
-    "description": "Generate at least four independent projected-analysis xz DA trajectories through cycle 20 on Q1 30x36x36, dt=0.000625; use burn-in 12 provisionally; select narrow, broad, skewed, and anisotropic posteriors; for each run Q1 at 30x36x36 and one finer aligned Q1 mesh, exact-native 200000-path MC with bootstrap and timestep refinement, and FV factors 2 and 4. Record limiter, covariance, marginal TV, full-density L1, boundary/domain sensitivity, wall time, and memory.",
-    "decision_rule": "Retain Q1 only if the mature-state covariance, limiter, boundary and converged-reference gates pass. Otherwise no tested production method is selected and a boundary-consistent characteristic or alternative high-order positivity method must be implemented."
+    "name": "same_mesh_q2_positivity_falsification",
+    "description": "Compare Q1 and Q2 on the same 30x36x36 mesh, dt=0.000625 and t_final=0.05, starting from the same positive limited Q1 polynomial embedded exactly into Q2. Save raw Q2 coefficients before correction and classify each cell by adaptive Bernstein branch-and-bound as certified nonnegative, witnessed negative, or unresolved. Compare current fixed-subcell scaling with certificate-gated scaling against at least 200000 exact-native-law MC paths.",
+    "decision_rule": "Advance Q2 only if raw Q2 improves covariance and every marginal TV over Q1, corrected E_cov is at most 0.03 and at most five MC p95 units, limiter relative L1 mean/max are at most 0.001/0.005, invariants pass, and timestep halving changes E_cov by at most 0.003. If raw Q2 is accurate but correction fails, implement local conservative flux correction/AFC. If raw Q2 fails, close the Q2 branch and prototype a positive full-SPD finite-volume/flux method."
   },
   "reproducibility": {
     "python": "3.12.13",

@@ -1,359 +1,705 @@
-# Lorenz-63 Fokker–Planck numerical-method selection
-
-Date: 2026-09-09  
-Scope: density-to-density forecasts inside sequential Bayesian data assimilation  
-Machine-readable companion: [`method_selection_report.json`](method_selection_report.json)
-
-## Final decision
-
-**INSUFFICIENT_EVIDENCE**
-
-Recommended production forecast generator: No method is certified. The strongest tested interim baseline is corrected Q1 upwind/SIPG with backward Euler, quadrature-14 L2 initialization, projected Bayesian analysis, and conservative positivity postprocessing.  
-Recommended independent validator: exact-native-law Monte Carlo with at least 200,000 paths, bootstrap uncertainty and common-random-number timestep refinement, triangulated with the independent refined finite-volume hierarchy.  
-Recommended representation for neural-operator targets: for a pilot only, float64 exact conservative subcell averages; Q1 needs two subcells per native cell per axis.  
-Expected covariance error: the best measured short-startup result is `E_cov=0.08558`; corrected mature-state error at this resolution is unknown.  
-Expected full-density error: not certified; Q1 and the finest independent FV result differ by `L1=0.15390`.  
-Expected cost per DA forecast: `86.9 s` serial for one Q1 `30x36x36`, `Delta t=0.05` forecast; approximately `26.4 s` for step work on eight ranks, excluding non-scaling diagnostics/output.  
-Principal remaining limitation: no corrected mature-posterior forecast has been validated at a production-like resolution, and the available coarse regenerated DA ensemble requires severe forecast and analysis limiting.
-
-Should a large neural-operator training dataset be generated now?
-
-**NO**
-
-The best corrected Q1 covariance discrepancy is 13.6 times the 200,000-path MC noise floor. Q2 is worse at equal DOFs, the deterministic reference is not converged, and the corrected mature ensemble is under-resolved. A large dataset would encode known numerical artifacts.
-
-## 1. PDE classification
-
-For constant `B`, `D=BB^T/2` and
-
-```text
-p_t + div(f p - D grad p) = 0.
-```
-
-This is linear in `p`, transient, conservative, second order, variable-coefficient through `f(x)`, generally non-self-adjoint, potentially strongly convection dominated, and irreversible/non-gradient. If `B` is full rank, `D` is positive definite and the equation is uniformly parabolic on the bounded box. If `B` is rank deficient, it is degenerate parabolic; it is hypoelliptic only if an appropriate Hörmander/bracket condition holds. Uniform-elliptic arguments cannot be transferred automatically.
-
-For Lorenz-63,
-
-```text
-div f = d_x[sigma(y-x)] + d_y[x(rho-z)-y] + d_z[xy-beta z]
-      = -sigma - 1 - beta
-      = -41/3.
-```
-
-Consequently the expanded equation is
-
-```text
-p_t + f.grad(p) - (41/3) p = div(D grad p).
-```
-
-The negative divergence represents phase-volume contraction: along a drift characteristic, density is amplified by compression in the absence of diffusion. The conservative form is therefore essential; treating it as divergence-free advection solves a different PDE.
-
-The physical SDE is posed on `R^3`. The implemented box and total reflecting condition `(f p-D grad p).n=0` are a separate truncation approximation.
-
-## 2. Original Q1/SIPG audit
-
-The FEniCS book was used for variational theory—not current APIs. Its L2-projection example formulates `(p_h,v_h)=(p,v_h)`; its DG advection-diffusion chapter gives cellwise upwinding, interior-penalty diffusion and theta time integration; its verification chapters warn that convergence claims require an independent exact-enough reference. Current implementation calls were checked against the installed FEniCSx 0.11 stack and the [current FEniCSx documentation](https://docs.fenicsproject.org/).
-
-Let `n=n+` on an interior facet and `beta_n=f.n`. The code represents
-
-```text
-a_adv(p,v) = - sum_K integral_K f p . grad(v)
-             + sum_F integral_F beta_n p_up (v+ - v-),
-
-p_up = p+ when beta_n >= 0, otherwise p-.
-```
-
-For constant symmetric `D`, it represents SIPG
-
-```text
-a_diff(p,v) = sum_K integral_K D grad(p).grad(v)
- - sum_F integral_F avg(D grad(p)).jump(v n)
- - sum_F integral_F avg(D grad(v)).jump(p n)
- + sum_F integral_F eta k^2 avg(n.D.n)/avg(h) jump(p n).jump(v n).
-```
-
-Backward Euler uses `(M+dt A)p^(n+1)=M p^n`; the experimental theta path uses the corresponding old-state spatial term. With `v=1`, all volume gradients and interior jumps vanish, establishing discrete mass conservation before the limiter.
-
-The physical boundary derivation must be done before splitting advection and diffusion. Cellwise integration produces the single exterior term
-
-```text
-integral_boundary (f p-D grad p).n v.
-```
-
-The reflecting condition sets this *total* term to zero. The absence of exterior terms in the split UFL is consistent with that combined derivation; it does not assert separately that `f p.n=0` and `D grad(p).n=0`.
-
-## 3. Initial-law validation repair
-
-The confound was real:
-
-- the original FEM branch used a normalized nodal Q1 interpolant;
-- the original MC branch sampled the exact analytic whole-space Gaussian.
-
-Those were different laws. The old discrepancy is now labelled **representation + propagation error**, not propagation error.
-
-At `30x36x36`, against the finite-box-normalized analytic Gaussian:
-
-| Initial representation | L1 | L2 | `E_cov(0)` | Minimum | Limiter relative L1 |
-|---|---:|---:|---:|---:|---:|
-| Nodal Q1 interpolation | 0.14135 | 0.006348 | 0.12619 | positive | 0 |
-| L2 projection, unlimited | 0.05554 | 0.002282 | `5.10e-9` | `-4.91e-5` | n/a |
-| L2 projection, limited | 0.05807 | 0.002323 | 0.006835 | roundoff | 0.01165 |
-
-The projected cell-average entropy diagnostic is `6.8531`, versus `7.0516` for interpolation (the whole-space Gaussian entropy is `6.7417`; the diagnostic itself uses cell averages). L2 projection is much more accurate but is not positive. The limiter restores a whole-cell positivity guarantee and reintroduces measurable error.
-
-Projection quadrature convergence at `12x16x16`, relative to degree 16, is:
-
-| Quadrature degree | Relative coefficient difference |
-|---:|---:|
-| 4 | `1.065e-2` |
-| 6 | `5.966e-4` |
-| 8 | `2.271e-5` |
-| 10 | `6.144e-7` |
-| 12 | `1.276e-8` |
-| 14 | `2.659e-10` |
-
-Degree 14 is adopted for accuracy-sensitive initialization and analysis.
-
-## 4. Corrected same-law Monte Carlo comparison
-
-All branches now start from the identical limited native Q1 polynomial. Cells are selected by exact polynomial mass; within a selected cell, rejection sampling uses the largest Bernstein control coefficient as a rigorous envelope. This is exact sampling from the represented density, apart from pseudorandom sampling error.
-
-For Q1 `30x36x36`, `dt=0.000625`, `t=0.05`, and 200,000 paths with MC `dt=0.000125`:
-
-- `E_cov=0.08558`;
-- bootstrap MC covariance noise p95 `=0.006282`;
-- `R_cov=13.62`;
-- limiter relative L1 mean/max `=0.003448/0.006292`;
-- mean differences remain small, while covariance eigenvalues and principal directions show systematic over-diffusion.
-
-A same-sample, common-Brownian MC refinement from `0.000125` to `0.0000625` changes normalized covariance by only `0.000111`. MC time discretization is not the cause of the Q1 discrepancy.
-
-At `20x24x24`, the corrected propagation-only `E_cov` was `0.2604` from the limited L2 initial law. The old `0.219` fine result had mixed initialization and propagation; the corrected fine result is `0.0856`. Initialization was a major confound, but removing it does not certify Q1.
-
-Evidence: [`validation_repair_report.json`](validation_repair_report.json), [`independent_reference_refined_report.json`](independent_reference_refined_report.json), [`mc_timestep_same_initial_law.json`](mc_timestep_same_initial_law.json).
-
-## 5. Bayesian analysis audit
-
-For nodal Lagrange DG, multiplying each coefficient by a likelihood evaluated at the matching DOF constructs the nodal interpolant `I_h[L p_h]`. Because `L p_h` is generally outside Q1, this is not an L2 projection.
-
-The repaired update solves
-
-```text
-find q_h in V_h: integral q_h v_h = integral L p_h v_h  for all v_h,
-p_h+ = q_h / integral q_h,
-```
-
-with degree-14 quadrature, followed by the conservative positivity limiter. Its mass matrix and symbolic likelihood form are cached across DA cycles.
-
-The conjugate Gaussian `xz` observation test at Q1 `30x36x36` gives:
-
-| Update | Mean error norm | L1 | L2 | `E_cov` | Analysis limiter L1 |
-|---|---:|---:|---:|---:|---:|
-| Nodal product | 0.07468 | 0.19361 | 0.01094 | 0.14494 | approximately 0 |
-| L2-projected product | 0.002055 | 0.11554 | 0.006262 | 0.03706 | 0.05688 |
-
-Projection substantially improves moments and density error on the fine Q1 mesh. However, a 5.69% limiter correction means the projected update is still not certified as an accurate production analysis operator. Coarse results are much worse.
-
-Evidence: [`q1_fine_bayesian_update_report.json`](q1_fine_bayesian_update_report.json).
-
-## 6. Boundary-flux manufactured solution
-
-The mandatory test uses
-
-```text
-p = C exp(0.4x-0.3y+0.2z),  D=I/2,
-f = D(0.4,-0.3,0.2) = (0.2,-0.15,0.1).
-```
-
-Then `f p` and `D grad p` have nonzero normal traces on appropriate faces, but `J=f p-D grad p=0` pointwise. Q1 results are:
-
-| Cells/axis | L1 | L2 | L1 order | Mass error |
-|---:|---:|---:|---:|---:|
-| 4 | `1.446e-3` | `6.478e-4` | — | `2.53e-12` |
-| 6 | `6.431e-4` | `2.882e-4` | 1.9992 | `3.40e-14` |
-| 8 | `3.618e-4` | `1.621e-4` | 1.9997 | `3.11e-12` |
-| 12 | `1.608e-4` | `7.207e-5` | 1.9997 | `4.44e-13` |
-
-This validates the combined total-flux treatment for a nontrivial reflecting trace. It does not by itself bound whole-space truncation error for mature Lorenz densities.
-
-Evidence: [`boundary_flux_report.json`](boundary_flux_report.json).
-
-## 7. Positivity and Q2
-
-Stage 1 projects cell averages onto the nonnegative, equal-global-mass set. For the present lower-only constraint, the KKT solution is `x_K=max(0,w_K-lambda)`; the scalar multiplier is found by bisection. Stage 2 scales the polynomial around its corrected average.
-
-For Q1 on affine hexahedra, nonnegative vertex/Bernstein coefficients imply nonnegativity throughout the cell because tensor Q1 is a convex combination of its vertex values.
-
-Ordinary Q2 nodal coefficient positivity has no such implication. The Q2/Q3 extension converts the polynomial to Bernstein coefficients on `2x2x2` control subcells and scales until all are nonnegative. Since every subcell Bernstein basis is nonnegative and partitions unity, this is a sufficient whole-cell guarantee. It is conservative but not necessary and can be intrusive.
-
-Exact L2 projection into discontinuous Q2 preserves mass and first and second raw moments before positivity correction: `1`, `x_i`, `x_i x_j`, and `x_i^2` all belong to Q2 on affine tensor-product cells and can be chosen as projection test functions. With sufficiently converged quadrature, the measured unlimited Q2 covariance error was `2.84e-10`.
-
-The limiter defeats that theoretical advantage in the tested Lorenz case. At equal 311,040 global DOFs:
-
-| Method | Mesh | Same-law `E_cov` | Limiter L1 mean/max | Serial step | 8-rank step |
-|---|---|---:|---:|---:|---:|
-| Q1 | `30x36x36` | 0.08558 | 0.00345 / 0.00629 | 1.152 s | 0.330 s |
-| Q2 | `20x24x24` | 0.25484 | 0.01238 / 0.02598 | 0.628 s | 0.282 s |
-
-Q2 is faster per step because there are fewer cells, but its covariance is roughly three times worse. In the analytic Bayesian test, Q2 projected analysis has `E_cov=0.09347` and 9.88% limiter correction, versus Q1's `0.03706` and 5.69%. Q2 is not adopted. Q3 was not pursued after Q2 failed its priority comparison.
-
-Evidence: [`higher_order_report.json`](higher_order_report.json), [`q2_common_law_subcell_monte_carlo.json`](q2_common_law_subcell_monte_carlo.json), [`q2_bayesian_update_subcell_report.json`](q2_bayesian_update_subcell_report.json).
-
-## 8. Spatial/time convergence and limiter contribution
-
-The older isolated constant-coefficient Q1 test gives fixed-time-step L1 orders `1.08` and `1.12` and L2 orders `0.94` and `0.90`. A smoother controlled study reaches approximately second-order L1 behavior on its finer Q1 levels, but Q2 is strongly pre-asymptotic and limiter-contaminated. These are convergence tests, not universal Lorenz error rates.
-
-At fixed `12x16x16`, Lorenz backward-Euler self-comparison against `dt=0.0003125` changes L1 by `0.00228` and covariance Frobenius norm by `0.0170` at `dt=0.000625`. A fine-mesh normalized temporal error has not been measured, so this number is not promoted to a production bound.
-
-On fine Q1 startup propagation, limiting occurs at every step; mean/max relative L1 corrections are `0.00345/0.00629`. This is not clipping: mass is conserved by Stage 1 and Stage 2. Nevertheless positivity does not imply accuracy, and the size of the correction is part of the error budget.
-
-## 9. Independent deterministic reference
-
-A separate NumPy finite-volume solver was implemented without UFL or the DG operator:
-
-- cell-centred first-order upwind advective flux;
-- centred diagonal diffusion;
-- SSPRK(3,3);
-- zero total numerical flux on every exterior face;
-- explicit positivity and mass checks.
-
-It supports the default diagonal `D=I/2`; it rejects off-diagonal diffusion rather than silently approximating it.
-
-Starting from exact subcell averages of the same native Q1 initial law, its normalized covariance discrepancy from the common 200,000-path MC result is:
-
-| FV refinement factor | Cells | `E_cov` | Wall time |
-|---:|---|---:|---:|
-| 1 | `30x36x36` | 0.5883 | 0.128 s |
-| 2 | `60x72x72` | 0.2718 | 1.64 s |
-| 4 | `120x144x144` | 0.1308 | 66.0 s |
-
-The hierarchy moves toward both MC and Q1 but remains unconverged. At the finest level, Q1 and FV differ by `L1=0.15390`. This is useful triangulation: it confirms that coarse deterministic diffusion is large, but it cannot identify a high-accuracy truth.
-
-Evidence: [`independent_reference_refined_report.json`](independent_reference_refined_report.json).
-
-## 10. Monte Carlo as a production density generator
-
-The comparison is full-density versus full-density, not deterministic density versus cheap MC moments. For 200,000 CPU paths and a `120x144x144` histogram:
-
-- native-law sampling: `0.246 s`;
-- SDE propagation: `3.104 s`;
-- histogram: `0.020 s`;
-- covariance bootstrap p95: `0.00628`;
-- raw histogram L1 versus refined FV: `0.19824`;
-- raw histogram L1 versus Q1: `0.24284`;
-- five 40,000-path batch histograms differ from the full histogram by TV `0.1194–0.1218`.
-
-Gaussian smoothing is bias-sensitive. L1 versus FV is `0.09896`, `0.08899`, `0.17392`, and `0.30175` for bandwidths `0.75`, `1.0`, `1.5`, and `2.0` voxels. Voxels with under one expected particle hold 1.378% of FV probability but only 0.621% of histogram probability. The particle propagation is cheap and moment-accurate, but the density reconstruction is not stable enough to be an unqualified target generator. The RTX 4070 was not used, so no GPU production claim is made.
-
-## 11. Characteristic methods
-
-The strongest relevant sources were reviewed rather than treating every “Fokker–Planck” method as interchangeable:
-
-- [Futai et al., mass-preserving two-step Lagrange–Galerkin](https://link.springer.com/article/10.1007/s10915-022-01885-w): conservative convection-diffusion in 1–3 D, second order in time, optimal L2 estimates, and a total-flux boundary form. Exact mass requires exact integration. Its characteristic-map estimates assume velocity behavior that keeps the map in the domain (including a zero-boundary velocity hypothesis), and no positivity result is supplied.
-- [Colera et al., high-order nearly conservative Lagrange–Galerkin](https://www.sciencedirect.com/science/article/abs/pii/S004578252030551X): non-divergence-free velocity and a 3-D test, but no whole-density positivity guarantee and no verified Lorenz reflecting-boundary construction.
-- [Ding et al., SLDG-LDG convection-diffusion](https://arxiv.org/abs/1907.06117): high-order, compact and mass conservative with large steps, but numerical evidence is in 1-D/2-D and the needed 3-D reflecting-boundary and positivity properties are not established.
-
-Lorenz drift is nonzero at the truncation boundary and characteristics can leave the box while the *total* flux remains reflecting. None of these sources supplies a ready remap satisfying that boundary plus whole-cell positivity for this 3-D problem. The user's conditional instruction to implement a challenger only if assumptions were sufficiently close was therefore not met. Implementing a superficially similar periodic/pure-transport scheme would not be a controlled challenger.
-
-## 12. Adaptivity
-
-The installed runtime is DOLFINx 0.11.0. Although the [Python mesh API](https://docs.fenicsproject.org/dolfinx/v0.11.0.post0/python/generated/dolfinx.mesh.html) exposes `refine`, an actual hexahedral probe fails for both uniform and marked-edge calls with:
-
-```text
-RuntimeError: Refinement only defined for simplices
-```
-
-Adaptive hexahedral Qk is therefore unavailable in this runtime. Tetrahedral h-adaptivity would change the approximation space, export layout and positivity proof. Other candidates are nonuniform structured meshes outside the current `Domain` assumptions, p-adaptivity, and domain decomposition. Goal-oriented/dual-weighted refinement for `integral x_i x_j p` is mathematically attractive, but it is not implementation-ready without one of those topology choices.
-
-## 13. Literature applicability matrix
-
-Codes: `Y` supported; `P` partial/conditional; `N` not supported; `U` not established by the source. Columns are A linear FP/convection-diffusion, B irreversible/non-gradient, C 3-D, D full anisotropic diffusion, E transient, F arbitrary non-Gaussian input, G reflecting/no-flux, H positivity, I conservation, J high order.
-
-| Primary source | A | B | C | D | E | F | G | H | I | J | Lorenz-63 assessment |
-|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|---|
-| [Liu et al. 2025 limiter](https://arxiv.org/abs/2410.19143) | Y | P | P | Y | Y | Y | U | Y | Y | Y | Limiter architecture applies; NIPG/semi-implicit theorem is not the present SIPG/BE scheme |
-| [Liu & Yu 2014 MPP DG](https://epubs.siam.org/doi/10.1137/130935161) | Y | P | P | N | Y | Y | P | Y | Y | Y | Rectangular extension stated, but flux/time/diffusion hypotheses do not establish the current 3-D anisotropic scheme |
-| [Futai et al. 2022 LG](https://link.springer.com/article/10.1007/s10915-022-01885-w) | Y | Y | Y | N | Y | Y | P | N | Y | Y | Closest characteristic theory; boundary characteristic-map and positivity gaps remain |
-| [Colera et al. 2020 LG](https://www.sciencedirect.com/science/article/abs/pii/S004578252030551X) | Y | Y | P | N | Y | Y | U | N | P | Y | Promising transport accuracy; not ready for total reflection/positivity |
-| [Ding et al. 2020 SLDG-LDG](https://arxiv.org/abs/1907.06117) | Y | Y | N | N | Y | Y | U | N | Y | Y | 1-D/2-D evidence only; boundary and positivity gaps |
-| [Liu, Gao & Zhang irreversible FP](https://arxiv.org/abs/2210.16628) | Y | Y | P | P | Y | Y | P | Y | Y | Y | Important alternative finite-difference direction; its equilibrium reformulation/mesh constraints need a dedicated Lorenz derivation |
-| [Positive Scharfetter–Gummel FV](https://doi.org/10.1016/j.amc.2022.127071) | Y | P | P | Y | Y | Y | Y | Y | Y | Y | Strong general anisotropic/no-flux candidate, but nonlinear primal-dual implementation and Lorenz accuracy were not available in this cycle |
-| [Carrillo–Liu–Yu gradient-flow DG](https://ora.ox.ac.uk/objects/uuid%3A5ff5ab65-acf2-4d70-ae4d-e1e0b2b99fc1) | P | N | P | P | Y | Y | P | Y | Y | Y | Gradient-flow/nonlocal structure is not interchangeable with irreversible Lorenz drift |
-
-No theorem from these papers is claimed for the complete present solver. The [Liu et al. paper](https://doi.org/10.1016/j.camwa.2025.05.008) justifies the two-stage optimization/scaling architecture; the measured Lorenz result determines usefulness here.
-
-## 14. Mature DA regeneration
-
-Old mature posterior files were produced by the old analysis operator and are excluded from final validation.
-
-A new exploratory ensemble was generated with 20 independent `xz` trajectories, 20 cycles, observation variance 9, projected degree-14 analysis, Q1 `8x10x10`, and `dt=0.005`. The distribution-level stationarity rule is first met at cycle 12. Final-window mean mode count is 1.06; mean absolute marginal skewness is approximately `(0.457,0.203,0.400)`.
-
-However:
-
-- forecast limiter relative L1 mean is `0.08684`;
-- analysis limiter relative L1 mean is `0.36266`, p95 `0.66144`, maximum `0.80433`;
-- successive-state TV averages `0.5106`.
-
-Thus an operational *coarse numerical* distribution appears to exist, but it is not a trustworthy approximation to the physical posterior family. It would be circular to validate a production method on those severely limited states. No corrected mature forecast at `30x36x36` or finer has yet been generated, so mature-forecast accuracy is explicitly **unknown**, not inferred from startup Gaussians.
-
-Evidence: [`mature_da_projected_report.json`](mature_da_projected_report.json).
-
-## 15. Accuracy-per-cost comparison
-
-| Method | Resource | Time for `Delta t=0.05` | Covariance evidence | Full-density evidence | Status |
-|---|---:|---:|---:|---:|---|
-| Q1 DG | 311,040 DOFs, serial | 86.9 s | `E_cov=0.0856`, `R=13.6` | Q1–FV L1 0.1539 | Best deterministic candidate, not certified |
-| Q1 DG | 311,040 DOFs, 8 ranks | approx. 26.4 s step work | same coefficients to MPI tolerance | output/diagnostics do not scale | Forecast benchmark only |
-| Q2 DG | 311,040 DOFs | approx. 50.2 s at `dt=.000625` from step benchmark | `E_cov=0.2548` at `dt=.00125` | no converged reference | Reject current Q2 |
-| Independent FV | 2,488,320 cells | 66.0 s | `E_cov=0.1308` | validator; still refining | Not production candidate |
-| MC histogram | 200,000 paths, CPU | 3.37 s | noise p95 0.00628 | L1 0.1982 vs FV | Reconstruction too noisy |
-| MC Gaussian filter | same particles | small extra cost | moments unchanged | best L1 0.0890 vs FV, bandwidth sensitive | Not certified |
-
-The Q2 time extrapolation uses its measured `0.628 s` serial step and 80 steps; the accuracy measurement used `dt=.00125`, so this is a cost comparison rather than an unrun accuracy claim.
-
-## 16. Controlled error budget
-
-The terms are estimated separately and are **not added**, because they interact.
-
-| Source | Controlled evidence | Assessment |
+# Numerical-method selection for stochastic Lorenz-63 forecasts
+
+## Decision
+
+**Classification: `INSUFFICIENT_EVIDENCE`.** No current method is certified to
+generate a large neural-operator training set.
+
+The most defensible next direction is a **controlled Q2 falsification
+experiment**, followed—only if Q2 survives—by development of local or
+operator-level positivity. This choice is based on information value rather than
+an endorsement of the present Q2 method. The existing Q2 result confounds
+polynomial degree with 1.5-times-wider cells in every direction, a timestep twice
+as large, and a sufficient-but-unnecessary Bernstein certificate. It therefore
+cannot decide whether higher order failed or whether its test conditions did.
+
+The one next implementation experiment is specified in [Section 18](#18-one-next-implementation-experiment).
+It compares Q1 and Q2 on the same `30x36x36` physical mesh, with the same
+`dt=0.000625`, forecast interval, positive represented initial law and Monte Carlo
+paths. Raw Q2 states are audited before correction by adaptive Bernstein
+branch-and-bound with three outcomes: certified non-negative, witnessed negative,
+or unresolved. Current fixed-subcell scaling and certificate-gated scaling are
+then compared. This experiment changes diagnostics and limiter branching; it
+does not change the PDE operator during the present audit.
+
+Role assignments are separate:
+
+| Role | Decision |
+|---|---|
+| Production reference solver | **Unfilled.** The leading research path is Q2/high-order conservative spatial discretization with local or operator-level positivity, conditional on the experiment. For general full SPD diffusion, multidimensional AFC or a genuinely 3-D positive full-tensor flux method is the fallback research path. |
+| Independent verification solver | **Develop next after the Q2 gate:** a dynamically scaled, translated whole-space Hermite-Galerkin solver, checked by mode decay and moment convergence, plus Monte Carlo for moments. Spectral positivity is not assumed. |
+| Current baseline | Q1 upwind/SIPG, backward Euler, quadrature-14 L2 initialization, projected Bayesian analysis and conservative postprocessing. It is a controlled comparator rather than a production selection. |
+
+The full-SPD requirement controls the ranking. Directional
+Scharfetter-Gummel/Chang-Cooper and the 2026 Diagonal Frog/FCDF methods become
+more attractive if production noise is restricted to diagonal `B`; their present
+theory and evidence do not justify selecting them for arbitrary mixed diffusion.
+
+Literature was checked through 10 September 2026. The attached request ends
+mid-sentence in Section 31; all complete requirements through that point are
+addressed here.
+
+## 1. Mathematical target and governing risks
+
+With constant `B` and `D=BB^T/2`, the forecast equation is
+
+\[
+  \partial_t p + \nabla\!\cdot J=0,
+  \qquad J=f p-D\nabla p,
+\]
+
+on a finite box with `J.n=0`. The equation is linear in `p`, conservative,
+transient and generally non-self-adjoint. Lorenz drift is nonlinear in state and
+irreversible; it is not a gradient drift. For the standard parameters,
+
+\[
+  \nabla\!\cdot f=-\sigma-1-\beta=-\frac{41}{3},
+\]
+
+so the expanded equation contains the compressive reaction term
+`-(41/3)p`. Any method that treats the drift as divergence-free solves a
+different equation.
+
+Full-rank `B` gives a uniformly parabolic equation on the bounded box. A
+rank-deficient `B` gives a degenerate problem; hypoellipticity then requires a
+separate bracket argument. Results requiring scalar diffusion, a diagonal
+tensor, detailed balance, a known invariant density, or a gradient-flow
+factorization do not transfer automatically.
+
+The physical SDE lives on `R^3`. Reflecting truncation is a model approximation,
+even though the implemented total-flux weak form is internally consistent.
+
+## 2. `WHAT_RUN6_ACTUALLY_ESTABLISHES`
+
+### Established numerical evidence
+
+| Item | Verified result | Scope |
+|---|---:|---|
+| Best corrected Q1 covariance error | `E_P=0.0855765124` | Q1 `30x36x36`, `dt=0.000625`, `t=0.05`, 311,040 DOFs; same represented initial law as MC |
+| MC covariance uncertainty | bootstrap p95 `0.0062823927`; Q1/noise ratio `13.6216` | 200,000 paths; MC `dt=0.000125` |
+| MC timestep sensitivity | `0.000110865` normalized covariance change | common Brownian paths, `0.000125 -> 0.0000625` |
+| Q1 marginal TV | `0.02347`, `0.01275`, `0.01116` | 100,000-path validation realization; not the 200,000-path covariance bootstrap run |
+| Q1 forecast limiter | relative L1 mean/max `0.003448/0.006292`; L2 mean/max `0.000189/0.000322` | limiting at all 80 steps; final mass within `1.5e-11` |
+| Unlimited Q2 L2 projection | `E_P=2.844e-10`; minimum `-1.2125e-6`; integrated negative mass `1.9715e-4` | analytic initial Gaussian; true negativity exists despite nearly exact moments |
+| Q2 same-law forecast | `E_P=0.254842595`; marginal TV `0.02273`, `0.01586`, `0.02935` | Q2 `20x24x24`, `dt=0.00125`, 311,040 DOFs, 100,000 paths |
+| Q2 forecast limiter | relative L1 mean/max `0.012381/0.025983`; L2 mean/max `0.000549/0.001166` | cell-average correction becomes zero after startup; high-order scaling dominates |
+| Q2 correction mechanism | mean fraction with negative raw cell average `0.00547`; mean scaled fraction `0.362` | negative cell averages occur only at startup; polynomial scaling occurs at every step |
+| Q1/Q2 comparison basis | equal total DOFs, unequal cells and unequal timestep | Q1 spacings `(2,2.222,2.222)`; Q2 `(3,3.333,3.333)` |
+| Projection quadrature | degree 14 differs from degree 16 by `2.659e-10` in coefficients | `12x16x16` projection check |
+| Corrected mature DA | no production-resolution validation | exploratory Q1 `8x10x10`, `dt=0.005`; analysis limiter L1 mean `0.3627`, p95 `0.6614` |
+
+Evidence files: [initial representation](validation_repair_report.json),
+[Q1/MC/FV comparison](independent_reference_refined_report.json),
+[MC timestep](mc_timestep_same_initial_law.json),
+[Q2 projection](higher_order_report.json),
+[Q2 forecast](q2_common_law_subcell_monte_carlo.json),
+[Q2 Bayesian analysis](q2_bayesian_update_subcell_report.json), and
+[mature DA](mature_da_projected_report.json).
+
+### Reasonable inferences
+
+- Q1's covariance excess is compatible with numerical diffusion. Its covariance
+  eigenvalues are systematically too large, upwind diffusion is large at the
+  measured cell Péclet numbers, MC time error is much smaller, and the independent
+  first-order FV hierarchy approaches Q1 and MC as it is refined. The existing
+  experiments do not isolate upwind flux, backward Euler, mesh, and limiting well
+  enough to prove which component dominates.
+- Current Q2 accuracy is damaged mainly by high-order polynomial scaling rather
+  than cell-average repair: Stage 1 is normally inactive after startup, while
+  Stage 2 changes about 36% of cells on average and has a larger L1 correction
+  than Q1.
+- Fixed `2x2x2`-subcell Bernstein bounds probably generate some false positivity
+  alarms, because negative Bernstein coefficients do not imply a negative
+  polynomial. The initial Q2 projection also has measured negative mass, so
+  certificate conservatism cannot explain every correction.
+- Uniform meshes spend most cells in negligible-density regions. Adaptivity is
+  likely valuable after a base operator and positivity architecture are selected.
+
+### Unresolved questions
+
+- Would Q2 beat Q1 on the same physical cells and timestep before and after a
+  rigorously audited positivity correction?
+- What fraction of Q2 scaling is caused by certified negativity, false
+  Bernstein alarms, and unresolved near-zero cells?
+- Does a local flux correction preserve covariance materially better than
+  scaling a completed polynomial?
+- Which full-SPD method has acceptable 3-D high-Péclet accuracy and cost?
+- Are corrected mature posteriors representable at feasible resolution, and are
+  reflecting-box effects negligible for them?
+- No deterministic full-density reference is converged enough to assign a final
+  L1 error.
+
+## 3. Audit of the implemented Q1/Q2 method
+
+The code uses discontinuous tensor `Q_k` polynomials on affine hexahedra,
+conservative upwind advection, SIPG diffusion for a constant full tensor, and
+backward Euler by default. The single exterior total-flux term is set to zero;
+advection and diffusion are not separately assigned zero normal flux. Testing
+with `p=C exp(0.4x-0.3y+0.2z)`, `D=I/2` and
+`f=(0.2,-0.15,0.1)` gives about second-order Q1 L1 convergence and maximum mass
+error `3.12e-12`. This validates the discrete boundary derivation for that
+manufactured problem. It does not estimate finite-box error for Lorenz DA states.
+
+The positivity postprocessor has two stages:
+
+1. cell averages are projected onto the non-negative, equal-total-mass set;
+2. each polynomial is scaled about its corrected average until chosen Bernstein
+   coefficients are non-negative.
+
+For equal-volume cells with a lower bound of zero, the Stage-1 KKT solution has
+the form `x_K=max(0,w_K-lambda)`. The local code solves this exact convex
+projection on rank 0 and broadcasts the result. Stage 2 provides a whole-cell
+sufficient certificate for the chosen subcells. Its global scaling of all
+nonconstant modes can alter first and second moments substantially.
+
+The limiter is conservative, but MPI scalability is limited by the rank-0 gather.
+Measured eight-rank step times are `0.330 s` for Q1 and `0.282 s` for equal-DOF
+Q2; diagnostics/output and global postprocessing scale worse than assembly and
+linear solution. Matrix reuse is already available because the drift, diffusion,
+mesh and timestep are fixed during a forecast. The measured serial Q1
+`30x36x36`, 80-step forecast took `88.10 s`; the eight-rank step benchmark
+extrapolates to `26.39 s` before non-scaling diagnostics and output. Same-mesh Q2
+will have 1,049,760 unknowns, 3.375 times Q1, so peak memory and wall time must be
+measured rather than inferred from the favourable equal-DOF Q2 benchmark.
+
+## 4. Q2 raw-moment preservation
+
+Let `Pi_2 p` be the exact cellwise L2 projection into tensor-product `Q2(K)`.
+For every `v in Q2(K)`,
+
+\[
+  \int_K (\Pi_2p-p)v\,dx=0.
+\]
+
+On an affine Cartesian/hexahedral cell, `Q2(K)` contains
+
+\[
+  1,\quad x_i,\quad x_i^2,\quad x_ix_j.
+\]
+
+Choosing these functions as tests and summing over cells proves exact
+preservation of mass, first raw moments and all second raw moments. Consequently
+the mean and covariance of the projected finite-box density are preserved,
+provided the projection integrals and subsequent moment integrals are exact.
+This is a proof for the projection operation, not for the time-dependent Q2
+scheme.
+
+The property is broken or perturbed by:
+
+- inexact quadrature;
+- Stage-1 cell-average redistribution, which preserves only global mass;
+- Stage-2 scaling, which preserves each cell average but changes higher moments;
+- approximate time propagation;
+- a non-moment-preserving export or voxel projection.
+
+The measured `2.844e-10` initial covariance error confirms the projection
+argument numerically. Its importance is conditional: it removes initialization
+moment error but offers no protection against transport diffusion or repeated
+limiting.
+
+## 5. Optimization-based DG and Zhang–Shu theory
+
+The 2025 Liu–Hu–Taitano–Zhang method uses modal broken total-degree
+`P^k`, `k >= 1`, on uniform rectangular cells and a tensor-product
+`(k+1)`-point Gauss test set. Its operator combines Lax–Friedrichs convection,
+nonsymmetric interior-penalty diffusion and a first-order semi-implicit split:
+convection is explicit and diffusion implicit. The formulation permits variable
+full SPD diffusion and a total no-flux condition. The reported experiments use
+`P^2` and `P^3` only, are all two-dimensional, and exhibit the even/odd NIPG
+pattern of second-order convergence for `P^2` and fourth-order convergence for
+`P^3`. No 3-D convergence or scaling result is supplied.[^1]
+
+Its first stage solves a convex Euclidean projection of cell averages subject to
+mass and box constraints. Douglas–Rachford splitting converges to that projection;
+it does not establish accuracy of the underlying PDE discretization. Its second
+stage uses Zhang–Shu scaling about each feasible average. Positivity is imposed at
+a finite quadrature/test set `S_h`; positivity of the complete polynomial between
+those points is not claimed.[^1]
+
+The paper's high-order argument is asymptotic. If the exact solution obeys the
+bounds and the unlimited discretization has the assumed high-order error, the
+projection is no farther from the feasible exact averages than the unlimited
+averages, and scaling retains formal order. This controls absolute discretization
+error under the theorem's regularity/bound assumptions. It gives no finite-mesh
+upper bound for the relative L1 correction in near-zero tails and no guarantee
+that a DA covariance gate will pass.
+
+The local implementation shares the two-stage architecture but differs in the
+DG diffusion flux (SIPG rather than NIPG), temporal treatment (fully implicit
+advection-diffusion rather than explicit/implicit split), advective flux (upwind
+rather than Lax–Friedrichs), tensor nodal basis, zero lower tolerance, full-cell
+Bernstein certificate, and centralized rather than distributed optimization.
+Calling it paper-faithful would overstate the match.
+
+Classical Zhang–Shu scaling preserves the cell average because it multiplies only
+deviations from that average. The usual weak-positivity proof first expresses a
+forward-Euler cell-average update as a convex combination of monotone fluxes and
+quadrature values under a method-specific CFL condition; SSP Runge–Kutta retains
+the property because its stages are convex combinations of forward-Euler
+steps.[^2] Those arguments do not establish positivity for the present fully
+implicit SIPG update. Diffusion needs a separate weak-monotonicity flux analysis,
+and the available convection-diffusion constructions are limited to specific
+operators, dimensions and boundary conditions.[^3]
+
+## 6. Maximum-principle DG and monotone high-order elements
+
+Liu and Yu prove up-to-third-order maximum-principle DG for the potential-driven
+FPE
+
+\[
+  p_t=\nabla\cdot(\nabla p+p\nabla U)
+\]
+
+with a direct-DG diffusive flux, forward Euler plus SSP time stepping and a
+method-specific test set/CFL condition. The full derivation is one-dimensional;
+rectangular higher-dimensional extension is stated, while no 3-D theorem or test
+with full SPD diffusion is given.[^4]
+
+Srinivasan, Poggie and Zhang construct a nonlinear positivity-preserving LDG
+diffusion flux for scalar convection-diffusion in one and two dimensions, with
+explicit SSP time stepping and periodic or restricted Dirichlet/Neumann
+conditions. Their accuracy proof requires a compatibility condition at zeros of
+the exact solution; the paper gives boundary counterexamples where limiting
+destroys high order.[^3] This is useful design evidence for local flux correction,
+not a theorem for Lorenz/SIPG/full tensor/reflecting 3-D.
+
+Monotone `Q2` and `Q3` finite/spectral-element results by Zhang and collaborators
+concern structured-grid Laplace-type operators. The `Q2` results require mesh and
+quadrature structure; the `Q3` construction proves a 2-D Laplacian result and
+reports only numerical indications for 3-D.[^5] They do not cover a general
+non-self-adjoint Lorenz convection-diffusion operator with mixed derivatives.
+
+The irreversible FPE method of Liu, Gao and Zhang starts from a known strictly
+positive invariant measure, rewrites the operator through a symmetric/skew
+decomposition, and uses structured `Q1/Q2` finite-difference implementations with
+backward Euler. The paper explicitly simplifies to a constant scalar diffusion;
+monotonicity is proved in one and two dimensions and tests are 2-D.[^6] For
+Lorenz-63, the invariant density is unknown and is itself a difficult FPE
+solution. The method is attractive for steady-state structure after such a
+measure is available, but it is not a direct short-forecast algorithm here.
+
+## 7. AFC/FCT and local flux correction
+
+Algebraic flux correction constructs
+
+\[
+  A_{\rm high}=A_{\rm low}+F_{\rm anti},
+\]
+
+where mass lumping and added graph viscosity make the low-order update monotone,
+then conservative pairwise antidiffusive fluxes are limited against local bounds.
+Foundational FEM-FCT work proves positivity for multidimensional transport and
+supports arbitrary time stepping; published demonstrations include 1-D shocks
+and 2-D scalar transport.[^7] Later AFC analysis covers scalar
+convection-diffusion and general simplicial meshes, but theorem assumptions and
+convergence rates depend on the limiter and low-order operator.[^8]
+
+Advantages for this project are conservation by pairwise fluxes, dimension-
+agnostic graph algebra, natural compatibility with sparse PETSc matrices and a
+correction placed inside the update rather than after a complete polynomial has
+formed. A parallel FEniCS/PETSc Poisson–Nernst–Planck implementation shows
+engineering feasibility, although it uses legacy FEniCS and a different system.[^9]
+
+The gaps are material. A monotone low-order matrix for full anisotropic diffusion
+is mesh/operator dependent; a generic Galerkin matrix does not become an
+M-matrix automatically. High-order accuracy and nonlinear solver convergence are
+limiter-specific. No source found supplies 3-D Lorenz, full-SPD reflecting FPE,
+MPI scaling and covariance preservation in one result. AFC is the strongest
+architecture-level fallback after the Q2 diagnostic, while the claim that it
+damages covariance less remains untested.
+
+## 8. Exponential fitting, complete flux and finite volume
+
+Chang–Cooper and classical Scharfetter–Gummel solve a one-dimensional local
+drift-diffusion balance with an exponential fit. They are conservative, positive
+under their standard implicit formulations and accurate for equilibrium fluxes.
+Dimension-by-dimension extensions are natural for diagonal diffusion; mixed
+derivatives destroy the independent 1-D flux structure.[^10]
+
+The 2022 positive Scharfetter–Gummel DDFV scheme is the strongest mature
+full-tensor finite-volume candidate found. It treats transient nonlinear
+convection-diffusion, general anisotropic tensors and Neumann/no-flux boundaries
+with a fully implicit nonlinear positive scheme; formal second-order spatial
+accuracy and coercivity/existence are established.[^11] The analysis writes
+`Omega subset R^d`, but its primal-dual polygonal construction and every reported
+test are two-dimensional unit-square cases. There is no published 3-D Lorenz
+convergence, high-Péclet covariance or runtime result. A separate 3-D nonlinear
+cell-centred method proves and tests positivity for anisotropic **diffusion** on
+distorted meshes, without Lorenz convection or transient no-flux validation.[^12]
+
+Complete-flux variants can reduce upwind smearing and reach second order where
+their reconstruction is resolved. General full-tensor monotonicity commonly
+requires nonlinear multipoint fluxes or restrictive grids. These methods merit a
+full-SPD challenger implementation if the Q2 path fails, but the literature does
+not establish a ready production winner.
+
+Structure-preserving FPE finite volumes often preserve entropy or a known
+invariant measure under potential/detailed-balance assumptions. Lorenz drift is
+irreversible. Such labels alone supply no covariance guarantee, and invariant-
+measure formulations can require the very steady density being sought.
+
+## 9. Diagonal Frog and FCDF
+
+Diagonal Frog, Flux-Corrected Diagonal Frog and the ADI variant are arXiv
+preprints from June–August 2026, without peer-reviewed publication or independent
+replication at the time of this audit.[^13][^14]
+
+The original Diagonal Frog uses eventually nonnegative directional generators;
+directional positivity appears only above a lower timestep threshold. Mixed
+derivatives use a factorized resolvent with a conditional timestep window. The
+split is exactly mass conservative and formally second order in space and time.
+Tests are two-dimensional, including anisotropic Gaussian, Kramers and
+advection-dominated cases; multidimensional extension is described but no 3-D
+experiment is reported.[^13]
+
+FCDF splits a one-dimensional directional operator into an M-matrix upwind core
+and Zalesak-limited antidiffusion inside an implicit iteration. The preprint proves
+directional positivity for all timesteps, conservation and conditional second-
+order behavior, and reports a uniform-Péclet L1 result for its stated 1-D setting.
+Its table of contents, proof and experiments are one-dimensional. Full-SPD mixed
+diffusion relies on companion splitting ideas rather than an FCDF theorem.[^14]
+
+The August DF-ADI paper selects a second-order L-stable Padé factor with linear
+per-step cost. It explicitly states that the composite scheme is only empirically
+positive in the strong cross-diffusion regime because the directional lower step
+bound can conflict with the mixed-term upper bound. These methods are valuable
+research leads for diagonal `D`; their recency, dimensional gap and conditional
+cross-diffusion positivity keep them below mature full-SPD candidates.
+
+## 10. Spectral, low-rank and characteristic methods
+
+Hermite functions match the physical whole space and eliminate artificial box
+reflection. Published Hermite FPE analysis proves spectral convergence in
+weighted Sobolev spaces for a kinetic FPE and shows the importance of basis
+scaling.[^15] Time-dependent scaling and translation stabilize broader parabolic
+convection-diffusion problems on unbounded domains.[^16] In three state
+dimensions, a tensor Hermite basis is computationally plausible and Lorenz's
+quadratic drift gives sparse mode couplings.
+
+The obstacles are absence of pointwise positivity, possible oscillations in
+small tails, and poor efficiency when a single global Gaussian-like basis must
+represent two curved Lorenz lobes or a narrow multimodal posterior. Adaptive
+translation/scaling, sparse grids or tensor trains can reduce mode counts, but
+rank growth and positivity remain problem dependent. Accordingly Hermite is the
+best independent high-accuracy reference candidate, not the present production
+choice. It must be validated by coefficient-tail decay, order/basis refinement,
+mass and raw-moment convergence rather than by visual smoothness.
+
+Conservative Lagrange–Galerkin methods can follow non-divergence-free transport
+and reduce upwind diffusion. A mass-preserving two-step method has 1-D/2-D/3-D
+tests, second-order time accuracy and optimal L2 estimates, assuming exact-enough
+integration and a characteristic map compatible with its boundary hypotheses.[^17]
+SLDG-LDG convection-diffusion provides high order and mass conservation with
+large timesteps, but published tests are 1-D/2-D and positivity is absent.[^18]
+Lorenz characteristics leave the finite box while only the **combined** flux is
+reflecting. A boundary-consistent 3-D remap coupled to full diffusion and
+positivity is therefore a research project, rather than the next controlled
+comparison.
+
+## 11. Q2 positivity certification
+
+For a polynomial in tensor Bernstein form on a box, the range lies in the convex
+hull of its coefficients. Therefore:
+
+- all coefficients non-negative is a **sufficient certificate** of whole-cell
+  non-negativity;
+- a negative coefficient is **not a necessary indication** of a negative
+  polynomial;
+- degree elevation and subdivision tighten bounds; every polynomial with a
+  strictly positive minimum is eventually certifiable under shrinking
+  subdivision;[^19]
+- non-negative polynomials with zeros can fail to acquire a non-negative
+  Bernstein certificate under every subdivision; explicit counterexamples are
+  known.[^20]
+
+Adaptive Bernstein subdivision is thus mathematically appropriate as a rigorous
+**sufficient certificate** and a high-value **diagnostic**. It is neither a
+necessary condition nor a complete decision procedure for `p>=0`, particularly
+for probability tails that legitimately approach zero. A production test needs
+a maximum depth, scale-aware rounding policy and conservative unresolved-case
+fallback. Point evaluation can witness negativity but cannot prove positivity.
+Sum-of-squares or general polynomial optimization offers alternative sufficient
+hierarchies at far higher per-cell cost and still needs numerical certification.
+
+The recommended experiment uses Bernstein subdivision to classify and measure
+the failure mechanism. It does not assume that adaptive Bernstein itself is the
+final limiter.
+
+## 12. Genuine 3-D and Lorenz-specific evidence
+
+The literature search found very little evidence at the exact intersection of
+3-D, transient, irreversible nonlinear drift, full SPD diffusion, no-flux,
+proved positivity and high-Péclet convergence.
+
+The clearest Lorenz-63 FPE computation found solves a **stationary** null-mode
+problem using centered finite differences on `160^3` points with isotropic
+diffusion and density set to zero outside the box. It reports 500 GB memory,
+compares projected densities with very long stochastic simulation, and gives no
+positivity theorem.[^21] This is genuine 3-D Lorenz evidence, but its goal,
+boundary, diffusion tensor and memory profile differ sharply from repeated
+short-time DA forecasts.
+
+Other genuine 3-D evidence is fragmented: Lagrange–Galerkin convection-diffusion
+has 3-D tests without positivity; 3-D anisotropic finite volume has positivity
+for diffusion without Lorenz transport; the current project has 3-D Lorenz/full-
+tensor assembly and conservation but fails its covariance/limiter gates. No
+published method found satisfies the entire target specification directly.
+
+## 13. Theorem-applicability matrix
+
+Codes:
+
+- `PD`: `PROVED_DIRECTLY` for the stated property;
+- `PR`: `PROVED_WITH_RESTRICTIONS`;
+- `PE`: `PLAUSIBLE_EXTENSION_NOT_PROVED`;
+- `EO`: `EMPIRICAL_ONLY`;
+- `NA`: `NOT_APPLICABLE`;
+- `UK`: `UNKNOWN`.
+
+“Nonlinear drift” means a prescribed state-dependent coefficient; the FPE remains
+linear in density.
+
+| Candidate | 3-D theorem | nonlinear drift | irreversible | scalar D | diagonal D | full SPD/mixed | no-flux | mass | positivity/type |
+|---|---|---|---|---|---|---|---|---|---|
+| Current Q1/Q2 SIPG | PR: mass and limiter only | PD | PD | PD | PD | PD | PD | PD | PR: postprocessed whole-cell certificate |
+| Liu et al. optimization DG | PE | PR | PR | PD | PD | PD | PR | PD | PR: feasible averages + finite test set |
+| Liu–Yu MPP/DDG | PE | PR: potential drift | PR | PD | PE | NA | PR | PD | PR: test-set/CFL + scaling |
+| Positivity LDG convection-diffusion | PE | PR | PR | PD | PE | NA | PR: special boundaries | PD | PR: explicit weak positivity + scaling |
+| Monotone Q2/Q3 elements | EO | NA | NA | PD | PE | NA | PR | PR | PR: DMP under structured constraints |
+| Liu–Gao–Zhang irreversible FPE | PE | PR: known invariant measure | PD | PD | PE | NA | PD | PD | PR: 1-D/2-D monotonicity conditions |
+| AFC/FCT FE | PE | PD | PD | PD | PR | PR: low-order M-matrix required | PR | PD | PR: nodal/local DMP |
+| Chang–Cooper/directional SG | PE | PD | PD | PD | PR | NA | PR | PD | PR: nodal/cell positivity |
+| Positive SG-DDFV | PE: notation general, construction/tests 2-D | PD | PD | PD | PD | PR: 2-D DDFV full tensor | PD | PD | PD: discrete non-negativity |
+| 3-D anisotropic positive FV | PD: steady diffusion | NA | NA | PD | PD | PD | PR: Dirichlet paper | PD | PD: cell positivity |
+| Diagonal Frog | PE | PD | PD | PD | PD | PR: conditional mixed block | PR | PD | PR: timestep window |
+| FCDF | PE | PD | PD | PD | PE | NA in FCDF theorem | PR | PD | PD: 1-D directional iterates |
+| Lagrange–Galerkin | PD | PD | PD | PD | PE | PE | PR: map assumptions | PD | NA |
+| SLDG-LDG | PE | PD | PD | PD | PE | PE | UK | PD | NA |
+| Hermite-Galerkin | PR | PD | PD | PD | PD | PE | NA: whole space | PR | NA |
+
+Practical and accuracy attributes:
+
+| Candidate | space/time order | high-Péclet evidence | mesh | FEniCSx/PETSc/MPI | covariance evidence | diffusion risk | maturity |
+|---|---|---|---|---|---|---|---|
+| Current Q1/Q2 SIPG | nominal `k+1` / BE1 | project only; failing observable | Cartesian hex | implemented; rank-0 limiter bottleneck | direct, negative | Q1 high; Q2 limiter dominated | mature ingredients, uncertified combination |
+| Liu et al. optimization DG | high order / semi-implicit 1 | 2-D numerical tests | rectangles | feasible, substantial mismatch from current code | none | LF + scaling dependent | peer reviewed 2025 |
+| Liu–Yu MPP/DDG | up to 3 / SSP order | lower-D tests | rectangles | possible new flux/operator | none | limiter/CFL dependent | peer reviewed 2014 |
+| Positivity LDG | high order / SSP | 1-D/2-D tests | intervals/rectangles | major operator change | none | low when resolved; boundary caveat | peer reviewed 2018 |
+| Monotone Q2/Q3 | 4th-ish elliptic stencil / BE1 in FPE work | weak for transport | uniform structured | possible FD/FE rewrite | none | transport treatment unresolved | peer reviewed |
+| Liu–Gao–Zhang | Q1 second, Q2 fourth / BE1 | 2-D tests | uniform structured | possible, invariant precompute | none | lower than upwind when conditions hold | peer reviewed 2024 |
+| AFC/FCT | high target, locally low / explicit or implicit | extensive transport literature | general simplicial; tensor cases conditional | PETSc practical, custom graph/MPI work | none here | low-order fallback can smear | mature architecture |
+| Chang–Cooper/directional SG | usually 1–2 / implicit 1 | strong 1-D tradition | aligned Cartesian | separate FV/FD implementation | none | crosswind/splitting risk | mature diagonal method |
+| Positive SG-DDFV | formal 2 / BE1 | anisotropy tests, 2-D | general polygonal primal-dual | nontrivial new FV framework | none | nonlinear monotone flux can smear layers | peer reviewed 2022 |
+| 3-D anisotropic positive FV | observed 2 / steady | diffusion tests | distorted polyhedra | separate FV | none | convection absent | peer reviewed 2021 |
+| Diagonal Frog | 2 / 2 | 2-D high-Péclet tests | Cartesian | separate FD, banded/Krylov | none | split/cross-term risk | 2026 preprint |
+| FCDF | conditional 2 / defect-corrected 2 | 1-D Péclet sweep | Cartesian lines | separate nonlinear FD | none | limiter layers | 2026 preprint |
+| Lagrange–Galerkin | high / 2 | transport-favourable, no Lorenz test | FE | feasible, expensive remap/quadrature | none | interpolation/remap | peer reviewed 2022 |
+| SLDG-LDG | high / high | 1-D/2-D | structured DG | major 3-D implementation | none | interpolation/positivity | peer reviewed/preprint lineage |
+| Hermite-Galerkin | spectral / method dependent | no direct Lorenz transient benchmark found | whole-space modes | separate sparse tensor implementation, MPI plausible | none here | oscillatory tails, basis mismatch | mature analysis, new application |
+
+No row has `PD` across the full target. Entries describe source scope and project
+evidence; they are not endorsements.
+
+## 14. High-Péclet assessment
+
+Use the directional finite-volume convention
+
+\[
+  \mathrm{Pe}_i=\frac{|f_i|h_i}{2D_{ii}}.
+\]
+
+For the default `D=I/2`, this reduces to `|f_i|h_i`. At the initial mean
+`(1,1,20)`, `f=(0,7,-52.333...)`:
+
+| Mesh | spacings | directional Pe at initial mean |
 |---|---|---|
-| Initial representation | fine limited L2 `E_cov=0.006835`, L1 0.05807 | materially repaired |
-| Spatial + temporal + limiter propagation | same-law Q1 `E_cov=0.08558` | unresolved dominant aggregate |
-| Time discretization | coarse fixed-mesh covariance Frobenius change 0.0170 under last halving | below old spatial error, not a fine normalized bound |
-| Boundary formulation | manufactured order 2, mass below `3.2e-12` | formulation passes |
-| Box truncation | startup boundary density negligible | mature expanded-domain test missing |
-| Forecast limiter | relative L1 mean/max 0.00345/0.00629 | material |
-| Bayesian analysis | fine projected `E_cov=0.03706`; limiter 0.05688 | improved but not closed |
-| Export | Q1 two-subcell and Q2 three-subcell round trips about `1e-10` or better | controlled |
-| MC covariance | p95 0.006282; SDE step change 0.000111 | resolved for covariance |
-| Deterministic full-density reference | Q1–FV L1 0.15390 | not converged |
+| Q1 `30x36x36` | `(2,2.222,2.222)` | `(0,15.56,116.30)` |
+| Q2 `20x24x24` | `(3,3.333,3.333)` | `(0,23.33,174.44)` |
 
-## 17. Evidence-derived gates
+Over the entire current box, componentwise drift maxima are
+`(700,1300,1386.67)`, giving Q1 worst-case directional values
+`(1400,2888.9,3081.5)`. These are conservative box maxima where density may be
+tiny, rather than distribution-weighted typical values. They still show that
+diffusion-dominated asymptotics are irrelevant on the present grids.
 
-These are provisional research gates, not universal tolerances:
+First-order upwind adds a modified-equation diffusivity of order `|f_i|h_i/2`.
+At the initial mean in `z`, this is about 58, compared with physical `D_zz=0.5`.
+That calculation supports the numerical-diffusion hypothesis but does not prove
+that the multidimensional DG covariance error equals this local estimate.
 
-1. On startup and corrected mature states, `E_cov <= 0.03` and `R_cov <= 5`. With current MC p95, the ratio gate is approximately 0.0314.
-2. Do not set a final full-density L1 gate until the deterministic hierarchy is converged; present reference disagreement is too large.
-3. Forecast limiter relative L1 mean `<=0.001`, maximum `<=0.005`; analysis limiter `<=0.005`.
-4. Halving `dt` changes normalized covariance by `<=0.003` and L1 by `<=0.0025`.
-5. Expanded-domain mature-state covariance and marginal-TV changes are each `<=0.005`.
-6. Conservative export/round-trip mass and L1 remain at `1e-10` or better.
+Formal order is therefore a weak ranking criterion. A credible method needs
+pre-asymptotic layer tests at comparable Péclet numbers, positivity and moment
+checks under narrow/skewed/multimodal inputs, and mesh refinement that reaches an
+observable plateau. FCDF has the most explicit uniform-Péclet claim, but only for
+its recent 1-D directional theorem. The current project supplies the only direct
+3-D Lorenz high-Péclet comparison and it fails the covariance gate.
 
-Q1 currently fails gates 1 and 3. Mature gates 1, 4, and 5 are unmeasured. Q2 and MC reconstruction fail their respective controlled comparisons.
+## 15. Time integration
 
-## 18. Reproducibility and API scope
+| Method | Relevant property | Decision here |
+|---|---|---|
+| Backward Euler | first order, L-stable; positive when paired with an inverse-positive/M-matrix spatial system | retain for the controlled comparison; matrix reuse and robustness are valuable |
+| Crank–Nicolson | second order and A-stable; non-L-stable and can create negative/oscillatory stiff modes | insufficient as a positivity upgrade; the project coarse test changed old `E_P` only about `0.614 -> 0.602` |
+| BDF2 | second order and A-stable; no unconditional monotonicity in the ordinary form | future candidate only with a proved bound-preserving realization |
+| SSP Runge–Kutta | preserves convex forward-Euler bounds under inherited CFL | diffusion CFL is expensive in 3-D; useful for theorem-faithful explicit DG/FV tests |
+| IMEX/semi-implicit | can isolate stiff diffusion and reuse matrices | positivity is split- and flux-specific; Liu et al.'s theorem does not cover the current fully implicit operator |
+| Directional/ADI splitting | low cost for aligned diagonal operators | mixed diffusion and boundary closures introduce commutator and positivity restrictions |
 
-Runtime: Python 3.12.13, DOLFINx 0.11.0, Basix 0.11.0, UFL 2026.1.0, PETSc 3.25.4, Open MPI 5.0.10. Hardware: AMD Ryzen 7 9800X3D (8 cores/16 threads), NVIDIA RTX 4070 12 GB present but unused. The project is not a Git repository, so SHA-256 hashes in [`experiment_manifest.json`](experiment_manifest.json) are authoritative.
+Time order is not the next variable to change. The recommended experiment fixes
+the same backward-Euler timestep for Q1 and Q2, then requires a timestep halving
+before any method is promoted.
 
-Current APIs were checked against the official [DOLFINx](https://docs.fenicsproject.org/dolfinx/v0.11.0.post0/python/), [Basix](https://docs.fenicsproject.org/basix/v0.11.0/python/), [UFL](https://docs.fenicsproject.org/ufl/2026.1.0/), and [petsc4py KSP](https://petsc.org/release/petsc4py/reference/petsc4py.PETSc.KSP.html) documentation. The older FEniCS book informed only variational reasoning and verification methodology.
+## 16. Boundary and validation architecture
 
-## 19. Smallest additional experiment required to decide
+Reflecting total flux is defensible as the current conservative baseline. The
+manufactured test verifies its implementation, and the startup density is
+negligible near the box boundary. Evidence for mature posteriors is absent.
+Absorbing truncation would deliberately lose probability; a far-field/open
+condition is difficult to make conservative; whole-space Hermite avoids the
+boundary but introduces spectral positivity issues. The next certification stage
+must compare the current box with an expanded box on mature states. No boundary
+change is justified before that measurement.
 
-Generate at least four independent corrected `xz` DA trajectories through cycle 20 on Q1 `30x36x36`, `dt=0.000625`, using projected degree-14 analysis. Use burn-in 12 provisionally, then choose narrow, broad, skewed and anisotropic posteriors. For each:
+Monte Carlo is adequate for the present covariance discrimination: Q1 error
+`0.0856` is 13.6 times the p95 sampling floor, and common-noise timestep error is
+smaller still. It is inadequate as a precise full-density truth at 200,000 paths.
+Five 40,000-particle subhistograms differ from the full histogram by TV about
+`0.119–0.122`; Gaussian-filtered L1 changes strongly with bandwidth. If a future
+deterministic method reaches covariance differences near `0.006`, increase paths
+and pair with the Hermite/deterministic hierarchy rather than declaring a winner
+from MC alone.
 
-1. propagate Q1 on `30x36x36` and one finer aligned Q1 mesh;
-2. propagate 200,000 exact-native samples with bootstrap and a common-random-number SDE timestep check;
-3. run independent FV factors 2 and 4 from the exact same input averages;
-4. report covariance/eigensystems, marginal TV, full-density L1, limiter stages, domain expansion, wall time and memory.
+### DA and neural-operator consequences
 
-Retain Q1 only if the mature covariance, limiter, timestep and boundary gates pass and the deterministic hierarchy makes the full-density comparison interpretable. If they fail, the next implementation should be a boundary-consistent characteristic remap or a general positive anisotropic finite-volume method—not more labels from an uncertified solver.
+Mature Bayesian inputs are a harder distribution than the startup Gaussian:
+narrow and anisotropic peaks raise resolution demands; skewness and multiple
+modes stress a global Hermite basis; extensive near-zero regions are precisely
+where relative scaling corrections and incomplete positivity certificates are
+most troublesome. A monotone low-order core can remain stable on these states
+while still smearing covariance and separate modes. Every surviving production
+candidate must therefore be tested on regenerated post-burn-in posterior states,
+with mass, raw moments, covariance eigensystems, marginals, full-density error and
+correction size reported separately. Cartesian tensor convenience for ML export
+does not enter the method ranking; conservative projection to the training grid
+is a later operation.
+
+## 17. Hypothesis falsification
+
+| Hypothesis | Attempted falsification | Verdict |
+|---|---|---|
+| A. Q1 is robust but too diffusive | Boundary/mass tests support structural robustness. Same-law MC, eigenvalue overdispersion, high Pe and FV refinement support excess diffusion. BE, upwind, mesh and limiter were not separately isolated. | **Supported numerical inference; mechanism not proved.** |
+| B. Q2 is accurate but positivity destroys it | Unlimited projection preserves moments almost exactly; Stage 2 dominates corrections. Existing forecast uses wider cells and twice `dt`, so it cannot isolate Q2. | **Survives, underdetermined.** |
+| C. Fixed Bernstein is too conservative | Bernstein theory proves false alarms are possible; 2x subdivision improved Q2 over the older whole-cell certificate. True initial negative mass shows some alarms are genuine. | **Partly supported; material impact unresolved.** |
+| D. Paper-faithful optimization + scaling is sufficiently nonintrusive | Stage 1 is already nearly inactive; current stronger whole-cell scaling is intrusive. Paper scaling constrains only a finite point set, with lower-D evidence and a different operator. | **Falsified for the tested whole-cell variant; paper-faithful finite-point claim remains untested and would weaken positivity scope.** |
+| E. Positivity belongs in flux/operator | AFC, M-matrix and local-flux literature supports the architecture. No direct 3-D Lorenz/full-SPD covariance evidence was found. | **Plausible, not established; leading fallback.** |
+| F. A different FPE method wins | SG-DDFV is structurally strong but effectively 2-D in published construction/tests; diagonal methods miss full SPD; Hermite lacks positivity; characteristics have boundary gaps. | **No winner established. Hermite wins only the future independent-reference role.** |
+
+## 18. One next implementation experiment
+
+### Objective
+
+Determine whether Q2's failure is intrinsic to its propagation or caused mainly
+by the comparison and positivity treatment. This is the highest-information
+small experiment because it decides whether to retain or terminate the existing
+high-order branch before a substantially larger AFC/FV implementation.
+
+### Fixed configuration
+
+- domain, Lorenz parameters and `D=I/2`: unchanged;
+- physical mesh: `30x36x36` for both Q1 and Q2;
+- timestep: `0.000625`; final time: `0.05`;
+- initial density: the same already-positive limited Q1 polynomial embedded
+  exactly into Q2 on the same mesh, avoiding a Q2-initial-projection confound;
+- reference: at least 200,000 exact-native-law MC paths with the existing
+  bootstrap and common-random-number timestep check;
+- quadrature: degree 14 or higher, with a recorded convergence check;
+- run Q1 baseline, Q2 with current fixed-subcell scaling, and Q2 with the
+  certificate-gated branch. Raw Q2 coefficients are saved before each correction.
+
+### New diagnostic/certificate gate
+
+For each raw Q2 cell, adaptive tensor-Bernstein branch-and-bound reports exactly
+one status:
+
+1. `CERTIFIED_NONNEGATIVE`: all leaf lower bounds are non-negative;
+2. `WITNESSED_NEGATIVE`: a reproducible point evaluation is below a
+   scale-aware negative tolerance;
+3. `UNRESOLVED`: maximum depth or enclosure tolerance is reached.
+
+Record depth, lower/upper bounds, witness value, cell mass, high-order quadrature
+estimate of negative mass, and raw/corrected mass, mean, second raw moment,
+covariance and L1/L2 change. Keep Stage-1 and Stage-2 changes separate. For the
+certificate-gated propagation, skip scaling only for
+`CERTIFIED_NONNEGATIVE`; use the existing conservative correction for the other
+two statuses. This preserves the current whole-cell guarantee without treating a
+negative coefficient as proof of negativity.
+
+### Predeclared decision rule
+
+Advance Q2 to local/operator-level positivity development only if all of the
+following hold:
+
+- same-mesh Q2 raw propagation improves normalized covariance and all three
+  marginal TVs over Q1;
+- certificate gating reduces forecast limiter relative L1 to mean `<=0.001`
+  and maximum `<=0.005`;
+- corrected Q2 reaches `E_P<=0.03` and `E_P/MC_p95<=5`;
+- mass and whole-cell non-negativity remain within existing tolerances;
+- a timestep-halving check changes `E_P<=0.003` and L1 `<=0.0025`;
+- wall time and peak memory are recorded, without using equal DOFs as a proxy for
+  cost.
+
+If raw Q2 beats Q1 but corrected Q2 fails only the limiter gates, implement a
+local conservative flux-correction/AFC prototype next. If raw Q2 itself fails,
+close the postprocessed Q2 branch and prototype a full-SPD positive flux/FV
+method. If most cells are `UNRESOLVED`, adaptive Bernstein is rejected as the
+production decision procedure even if it remains useful diagnostically.
+
+No mature-data run or large dataset should precede this gate.
+
+## 19. Practical ranking and remaining uncertainty
+
+| Rank for next research | Method/path | Reason |
+|---:|---|---|
+| 1 | Same-mesh Q2 falsification with rigorous positivity audit | directly resolves three current confounds at modest implementation cost |
+| 2 | Local/AFC correction around a high-order conservative operator | best architecture-level route for 3-D/full SPD if raw Q2 is accurate |
+| 3 | Positive full-tensor FV/SG-DDFV challenger | strongest structural alternative, but 3-D convection implementation and evidence gap are large |
+| 4 | Dynamically scaled whole-space Hermite reference | independent, high-order and boundary-free; positivity limits production use |
+| 5 | Directional FCDF/complete flux | high value only after diagonal-noise scope is fixed; current 1-D/2-D and maturity gaps are decisive |
+| 6 | Conservative characteristics | strong transport rationale, weak boundary/positivity fit for this box |
+
+Adaptivity follows base-method selection. Covariance can be targeted through its
+raw moment functionals, and anisotropic/nonuniform refinement should eventually
+reduce wasted tail cells. The installed DOLFINx 0.11 hexahedral refinement path
+does not support the required local refinement, so immediate adaptivity would
+also change topology, positivity certification and export format.[^22]
+
+Remaining uncertainty is dominated by absent same-mesh Q2 evidence, absent
+mature-posterior validation, lack of a converged deterministic density reference,
+and lack of a directly applicable 3-D/full-SPD/high-Péclet positivity theorem.
+These are decision-relevant unknowns rather than implementation details.
+
+## Sources
+
+[^1]: C. Liu, J. Hu, W. T. Taitano and X. Zhang, [“An optimization-based positivity-preserving limiter in semi-implicit discontinuous Galerkin schemes solving Fokker–Planck equations”](https://www.math.purdue.edu/~zhan1966/research/paper/DG_anisotropic_Fokker_Planck.pdf), *Computers & Mathematics with Applications* (2025).
+[^2]: X. Zhang and C.-W. Shu, [“On maximum-principle-satisfying high order schemes for scalar conservation laws”](https://doi.org/10.1016/j.jcp.2009.12.030), *Journal of Computational Physics* 229 (2010), 3091–3120.
+[^3]: S. Srinivasan, J. Poggie and X. Zhang, [“A positivity-preserving high order discontinuous Galerkin scheme for convection–diffusion equations”](https://www.math.purdue.edu/~zhan1966/research/paper/conffusion3.pdf), *Journal of Computational Physics* 366 (2018), 120–143.
+[^4]: H. Liu and H. Yu, [“Maximum-principle-satisfying third order discontinuous Galerkin schemes for Fokker–Planck equations”](https://doi.org/10.1137/130935161), *SIAM Journal on Scientific Computing* 36 (2014), A2296–A2325.
+[^5]: X. Li and X. Zhang, [“On the monotonicity and discrete maximum principle of the finite difference implementation of C0-Q2 finite element method”](https://www.math.purdue.edu/~zhan1966/research/paper/Q2FEM_DMP.pdf), and G. Cross and X. Zhang, [“On the monotonicity of Q3 spectral element method for Laplacian on quasi-uniform rectangular meshes”](https://arxiv.org/abs/2010.07282).
+[^6]: H. Liu, Y. Gao and X. Zhang, [“A high order finite difference method for irreversible Fokker–Planck equations”](https://yuangaogao.github.io/LGZ2024-JSC.pdf), *Journal of Scientific Computing* (2024).
+[^7]: D. Kuzmin and S. Turek, [“Flux correction tools for finite elements”](https://doi.org/10.1006/jcph.2001.6955), *Journal of Computational Physics* 175 (2002), 525–558; D. Kuzmin, [“Multidimensional FEM-FCT schemes for arbitrary time stepping”](https://doi.org/10.1002/fld.493), *International Journal for Numerical Methods in Fluids* 42 (2003), 265–295.
+[^8]: G. R. Barrenechea, V. John and P. Knobloch, [“A unified analysis of algebraic flux correction schemes for convection–diffusion equations”](https://doi.org/10.1007/s40324-018-0160-6), *SeMA Journal* 75 (2018), 655–685.
+[^9]: M. Shariati, E. W. Weber and D. Höche, [parallel Poisson–Nernst–Planck AFC implementation](https://github.com/mrshariati/FEMCorrosionSimulation) associated with *Finite Elements in Analysis and Design* 202 (2022), 103734.
+[^10]: J. S. Chang and G. Cooper, [“A practical difference scheme for Fokker–Planck equations”](https://doi.org/10.1016/0021-9991(70)90001-X), *Journal of Computational Physics* 6 (1970), 1–16; N. Loy and M. Zanella, [“Structure preserving schemes for Fokker–Planck equations with nonconstant diffusion matrices”](https://arxiv.org/abs/1905.02970), *Mathematics and Computers in Simulation* 188 (2021), 342–362, an exclusively two-dimensional full-matrix construction.
+[^11]: E.-H. Quenjel, [“Positive Scharfetter–Gummel finite volume method for convection–diffusion equations on polygonal meshes”](https://doi.org/10.1016/j.amc.2022.127071), *Applied Mathematics and Computation* 425 (2022), 127071.
+[^12]: B. Lan et al., [“The cell-centered positivity-preserving finite volume scheme for 3D anisotropic diffusion problems on distorted meshes”](https://doi.org/10.1016/j.cpc.2021.108099), *Computer Physics Communications* 269 (2021), 108099.
+[^13]: A. Itkin, [“Diagonal Frog: high-order positivity-preserving FD schemes for anisotropic Fokker–Planck equations”](https://arxiv.org/abs/2606.23980), arXiv:2606.23980 (2026); A. Itkin and R. Kazbek, [“Diagonal Frog meets ADI”](https://arxiv.org/abs/2608.22703), arXiv:2608.22703 (2026).
+[^14]: A. Itkin, [“Flux-Corrected Diagonal Frog: second order and positivity at all time steps”](https://arxiv.org/abs/2607.20415), arXiv:2607.20415 (2026).
+[^15]: J. C. M. Fok, B. Guo and T. Tang, [“Combined Hermite spectral–finite difference method for the Fokker–Planck equation”](https://www.math.hkbu.edu.hk/~ttang/Papers/FokGuoT.pdf), *Mathematics of Computation* 71 (2002), 1497–1528.
+[^16]: H. Ma, W. Sun and T. Tang, [“Hermite spectral methods with a time-dependent scaling for parabolic equations in unbounded domains”](https://doi.org/10.1137/S0036142903421278), *SIAM Journal on Numerical Analysis* 43 (2005), 58–75; [adaptive multidimensional Hermite analysis](https://arxiv.org/abs/2203.15630).
+[^17]: T. Futai et al., [“A mass-preserving two-step Lagrange–Galerkin scheme for convection–diffusion problems”](https://doi.org/10.1007/s10915-022-01885-w), *Journal of Scientific Computing* 92 (2022).
+[^18]: S. Ding, S. Tan and Y. Zhang, [“High order semi-Lagrangian discontinuous Galerkin method coupled with local discontinuous Galerkin method for convection–diffusion problems”](https://arxiv.org/abs/1907.06117), arXiv:1907.06117.
+[^19]: F. Boudaoud, F. Caruso and M.-F. Roy, [“Certificates of positivity in the Bernstein basis”](https://doi.org/10.1007/s00454-007-9042-x), *Discrete & Computational Geometry* 39 (2008), 639–655; R. Leroy, [“Certificates of positivity in the simplicial Bernstein basis”](https://hal.science/hal-00589945/document), with convergence under degree elevation/subdivision for strictly positive polynomials.
+[^20]: C. Sloth, [“Nonnegative polynomial with no certificate of nonnegativity in the simplicial Bernstein basis”](https://arxiv.org/abs/1710.05735), arXiv:1710.05735.
+[^21]: A. Allawala and J. B. Marston, [“Statistics of the stochastically-forced Lorenz attractor by the Fokker–Planck equation and cumulant expansions”](https://arxiv.org/abs/1604.00867), *Physical Review E* 94 (2016), 052218.
+[^22]: [DOLFINx 0.11 mesh API](https://docs.fenicsproject.org/dolfinx/v0.11.0.post0/python/generated/dolfinx.mesh.html); the local hexahedral refinement probe fails with `RuntimeError: Refinement only defined for simplices`.

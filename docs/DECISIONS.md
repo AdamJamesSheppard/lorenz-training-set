@@ -4,6 +4,42 @@ Decisions here are dated and revisable. Add a new entry that marks an older
 decision `superseded`, `narrowed`, or `confirmed` rather than rewriting history
 to make the current direction look inevitable.
 
+## 2026-09-10 - Gate the next implementation on a same-mesh Q2 falsification
+
+The existing Q1/Q2 comparison is insufficient to rank polynomial degree because
+it held total DOFs fixed while Q2 used 1.5-times-wider cells in every direction
+and twice the timestep. Before implementing a new solver family, compare Q1 and
+Q2 on the same `30x36x36` mesh and `dt=0.000625`, starting from the same positive
+represented Q1 law embedded exactly in Q2. Audit raw Q2 polynomials before
+correction and separate cell-average from high-order changes.
+
+Adaptive Bernstein subdivision is authorized for this diagnostic as a rigorous
+sufficient certificate. It is not selected as a complete production positivity
+test because negative coefficients are inconclusive and non-negative polynomials
+with zeros may remain uncertified under arbitrary subdivision.
+
+If raw Q2 is accurate but correction fails, the next architecture is local
+conservative flux correction/AFC. If raw Q2 fails, close that branch and test a
+positive full-tensor finite-volume/flux method. Detailed gates are predeclared in
+`METHOD_SELECTION_REPORT.md`.
+
+## 2026-09-10 - Require general full-SPD production diffusion
+
+The production target must ultimately support a constant general `3 x 3` noise
+matrix and therefore mixed derivatives in full SPD `D=BB^T/2`. This supersedes
+the unresolved production-scope part of the 2026-09-09 challenger-priority
+decision. Identity noise remains the controlled experiment. Directional FCDF,
+Chang--Cooper and complete-flux variants remain valid special-case challengers,
+but diagonal-only theory cannot certify the general production role.
+
+## 2026-09-10 - Assign solver roles separately
+
+No production reference solver is certified. Q1 remains the baseline. A
+dynamically scaled whole-space Hermite-Galerkin method is the preferred future
+independent deterministic reference because it changes both discretization and
+boundary treatment; it must be validated by spectral and moment convergence and
+is not presumed positive.
+
 ## 2026-09-09 - Keep the scaffold and method selection deliberately open
 
 All version-controlled code and living documents may be edited when evidence

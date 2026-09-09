@@ -1,6 +1,6 @@
 # Project state
 
-Updated: 2026-09-09
+Updated: 2026-09-10
 
 ## Objective
 
@@ -23,6 +23,11 @@ next experiment.
   analysis, followed by the conservative two-stage positivity limiter.
 - This is neither a certified production method nor a requirement that future
   work remain on the Q1/DG path.
+- The most informative next experiment is a same-physical-mesh, same-timestep
+  Q1/Q2 comparison from one positive represented law, with raw Q2 negativity
+  classified before correction. Adaptive Bernstein subdivision is a diagnostic
+  and sufficient certificate in this experiment, not a selected production
+  limiter.
 
 ## Latest validated evidence
 
@@ -41,23 +46,27 @@ next experiment.
    covariance discrepancy.
 3. The independent finite-volume hierarchy is not converged enough to define a
    full-density truth error.
+4. The existing equal-DOF Q1/Q2 comparison also changed physical cell size and
+   timestep, so it cannot isolate polynomial-degree accuracy.
 
 ## Near-term research portfolio
 
 The living plan is in `docs/RESEARCH_DIRECTIONS.md` and
 `experiments/method-selection-research.yaml`. Current high-value branches are:
 
-1. Diagnose whether Q2 is reacting to genuine negativity or a conservative
-   fixed-subcell Bernstein certificate; test adaptive subdivision first.
-2. Compare minimally intrusive Q2 positivity approaches, including constrained
-   projection and local algebraic/convex flux limiting, while preserving the
-   strong pre-limiter moment result.
-3. Compare Q1 and repaired Q2 on equal physical meshes as well as equal degrees
-   of freedom, time, and memory.
-4. Add a structurally suitable transport challenger: FCDF/directional or
-   Scharfetter--Gummel/complete-flux methods are especially relevant if `B`
-   remains diagonal; full anisotropic `B` shifts priority toward DG/AFC and
-   full-tensor flux methods.
+1. Run the predeclared same-mesh Q2 falsification experiment in
+   `METHOD_SELECTION_REPORT.md`: Q1 and Q2 on `30x36x36`, `dt=0.000625`, from
+   the same positive Q1 law embedded exactly in Q2. Classify every raw Q2 cell
+   as certified non-negative, witnessed negative, or unresolved before applying
+   any correction.
+2. If raw Q2 is accurate but corrected Q2 fails limiter gates, develop a local
+   algebraic/convex flux correction rather than another global polynomial
+   scaling variant.
+3. If raw Q2 fails, close that branch and prototype a full-SPD positive
+   finite-volume/flux method. Directional FCDF and complete-flux methods remain
+   a separate diagonal-noise branch rather than the general production target.
+4. Develop a dynamically scaled whole-space Hermite solver as an independent
+   high-order reference after the Q2 gate.
 5. Investigate covariance-targeted goal-oriented/nonuniform resolution and a
    genuinely high-order independent deterministic reference.
 6. Regenerate and test mature DA states only after the initialization,
@@ -68,12 +77,12 @@ but it now permits any candidate that survives the earlier controlled method
 comparison. Threshold changes must be justified and versioned before the runs
 they assess.
 
-## Important unresolved choice
+## Production diffusion scope
 
-The intended production scope of `B` is not yet fixed: identity/diagonal noise
-and arbitrary full `3 x 3` noise favour different challengers. Do not silently
-assume one scope when selecting a method; establish it from the task or record
-the branch-specific assumption.
+The production method must ultimately support a constant general
+`B in R^(3x3)`, hence a full SPD `D=BB^T/2` and mixed derivatives. Identity
+`B` remains the controlled test case. Directional diagonal-only methods may be
+kept as special-case challengers but cannot certify the general production role.
 
 ## Canonical evidence
 

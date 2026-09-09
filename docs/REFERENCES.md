@@ -7,6 +7,20 @@
   solving Fokker--Planck equations," DOI: 10.1016/j.camwa.2025.05.008. Basis for
   the two-stage conservative positivity construction; applicability is audited
   in `POSITIVITY_AUDIT.md`.
+- Liu and Yu (2014), maximum-principle DG for potential-driven Fokker--Planck;
+  Srinivasan, Poggie, and Zhang (2018), positivity-preserving LDG for
+  convection--diffusion; Kuzmin and collaborators, multidimensional AFC/FCT;
+  Quenjel (2022), positive Scharfetter--Gummel DDFV; Fok, Guo, and Tang (2002),
+  Hermite Fokker--Planck approximation. Exact links and theorem-applicability
+  limits are recorded in `METHOD_SELECTION_REPORT.md`.
+- Itkin's Diagonal Frog, FCDF, and DF-ADI works (arXiv:2606.23980,
+  arXiv:2607.20415, and arXiv:2608.22703) are treated as recent preprints. Their
+  lower-dimensional validation and mixed-diffusion qualifications are recorded
+  in `METHOD_SELECTION_REPORT.md` rather than promoted to production evidence.
+- Boudaoud, Caruso, and Roy, together with Leroy's subdivision analysis, define
+  strict Bernstein positivity certificates; Sloth
+  (arXiv:1710.05735), a non-negative counterexample without a subdivision
+  certificate, define the scope of adaptive Bernstein diagnosis.
 - `../Fenics Book.pdf` (local, intentionally not tracked): background and
   implementation reference for DOLFINx/FEM and DG advection--diffusion.
 
