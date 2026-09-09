@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+
+echo '[1/2] Executable solver invariants'
+./scripts/run-in-env python -m pytest -q tests/test_limiter.py tests/test_solver_smoke.py
+
+echo '[2/2] Evidence consistency and mathematical checks'
+./scripts/run-in-env python scripts/verify_math.py
+

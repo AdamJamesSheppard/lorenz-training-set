@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+
+echo '[1/4] Critical static checks'
+./scripts/run-in-env ruff check .
+
+echo '[2/4] Python compilation'
+./scripts/run-in-env python -m compileall -q lorenz_fpe tests scripts *.py
+
+echo '[3/4] Test suite'
+./scripts/run-in-env python -m pytest -q
+
+echo '[4/4] Git whitespace check'
+git diff --check
+
+echo 'CHECK: PASS'

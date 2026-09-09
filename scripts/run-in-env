@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ "${CONDA_DEFAULT_ENV:-}" = "pde" ]; then
+  exec "$@"
+fi
+
+if ! command -v micromamba >/dev/null 2>&1; then
+  echo "micromamba is required; run ./scripts/bootstrap first" >&2
+  exit 2
+fi
+
+exec micromamba run -n pde "$@"
+

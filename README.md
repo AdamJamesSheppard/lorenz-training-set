@@ -35,18 +35,33 @@ through every forecast and Bayesian update; it is never replaced by a Gaussian.
 
 ## Environment and commands
 
-From this directory:
+The compiled FEniCSx/PETSc/MPI stack is pinned in `environment.yml`; exact
+Linux package artifacts are recorded in `environment-linux-64.lock`. From this
+directory, bootstrap or update the environment once:
 
 ```bash
-micromamba activate pde
-python solver.py --cells 30 36 36 --dt 0.000625 --t-final 0.25
+./scripts/bootstrap
+```
+
+Use the repository-owned entry points for routine work:
+
+```bash
+./scripts/context
+./scripts/check
+./scripts/verify-math
+./scripts/run-experiment experiments/smoke-forecast.yaml
+```
+
+For a direct forecast:
+
+```bash
+./scripts/run-in-env python solver.py --cells 30 36 36 --dt 0.000625 --t-final 0.25
 ```
 
 MPI forecast:
 
 ```bash
-micromamba activate pde
-mpirun -n 8 python solver.py --cells 30 36 36 --dt 0.000625 --t-final 0.25
+./scripts/run-in-env mpirun -n 8 python solver.py --cells 30 36 36 --dt 0.000625 --t-final 0.25
 ```
 
 The following is an **exploratory** DA command, not an approved production
@@ -55,8 +70,7 @@ this up until a finer solver configuration passes the configuration-level
 covariance and limiter gates:
 
 ```bash
-micromamba activate pde
-python generate_dataset.py \
+./scripts/run-in-env python generate_dataset.py \
   --output dataset_root \
   --trajectories 20 --cycles 30 --burn-in 10 \
   --observation xz --obs-variance 4 \
@@ -66,8 +80,8 @@ python generate_dataset.py \
 Run validation and tests:
 
 ```bash
-python -m unittest discover -s tests -v
-python validate.py --output validation_report.json
+./scripts/check
+./scripts/run-in-env python validate.py --output validation_report.json
 ```
 
 The coarse defaults are for development, not a claim of production accuracy.

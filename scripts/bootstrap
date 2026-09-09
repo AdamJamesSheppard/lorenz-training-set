@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+
+if ! command -v micromamba >/dev/null 2>&1; then
+  echo "micromamba is not installed. Install it, then rerun this command." >&2
+  exit 2
+fi
+
+if micromamba env list | awk '{print $1}' | grep -qx pde; then
+  echo "environment 'pde' already exists; leaving it unchanged"
+else
+  micromamba create -n pde --file environment-linux-64.lock -y
+fi
+
+./scripts/run-in-env python -c 'import dolfinx, numpy, mpi4py; print("environment: ready")'

@@ -1,0 +1,31 @@
+name: pde
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12.13
+  - fenics-dolfinx=0.11.0
+  - fenics-basix=0.11.0
+  - fenics-ufl=2026.1.0
+  - numpy=2.5.2
+  - scipy=1.18.0
+  - mpi4py=4.1.2
+  - petsc4py=3.25.4
+  - openmpi=5.0.10
+  - gmsh=4.15.2
+  - meshio=5.3.5
+  - pyvista=0.48.4
+  - slepc4py=3.25.1
+  - matplotlib=3.11.1
+  - pandas=3.0.5
+  - pyyaml=6.0.3
+  - pydantic=2.13.5
+  - sympy=1.14.0
+  - mpmath=1.4.1
+  - pytest=9.1.1
+  - hypothesis=6.167.1
+  - ruff=0.16.6
+  - mypy=2.3.1
+  - jupytext=1.19.5
+  - ipykernel=7.3.0
+  - jupyterlab=4.6.3
+

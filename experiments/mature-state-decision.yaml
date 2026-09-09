@@ -1,0 +1,37 @@
+id: mature-state-method-decision
+kind: research_plan
+status: planned
+purpose: Decide whether the Q1 interim baseline can be certified on mature DA states.
+fixed_setup:
+  projected_analysis_trajectories: 4
+  cycles: 20
+  provisional_burn_in: 12
+  observation: xz
+  baseline_cells: [30, 36, 36]
+  baseline_dt: 0.000625
+  monte_carlo_paths: 200000
+  finite_volume_refinement_factors: [2, 4]
+state_selection:
+  - narrow
+  - broad
+  - skewed
+  - anisotropic
+required_comparisons:
+  - Q1 baseline and one finer aligned Q1 mesh
+  - exact-native-law Monte Carlo with bootstrap uncertainty
+  - common-random-number Monte Carlo timestep refinement
+  - independent finite-volume factors 2 and 4
+  - boundary/domain sensitivity
+acceptance_gates:
+  covariance_normalized_frobenius_max: 0.03
+  covariance_error_to_mc_noise_ratio_max: 5.0
+  forecast_limiter_relative_l1_mean_max: 0.001
+  forecast_limiter_relative_l1_max: 0.005
+  analysis_limiter_relative_l1_max: 0.005
+  dt_halving_covariance_change_max: 0.003
+  dt_halving_l1_change_max: 0.0025
+  expanded_domain_covariance_change_max: 0.005
+  expanded_domain_marginal_tv_change_max: 0.005
+decision_rule: Retain Q1 only if every gate passes on startup and mature states.
+warning: Expensive plan; scripts/run-experiment intentionally accepts only kind=forecast.
+

@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+
+if [ "$#" -ne 1 ]; then
+  echo "usage: $0 experiments/<name>.yaml" >&2
+  exit 2
+fi
+
+exec ./scripts/run-in-env python scripts/run_experiment.py "$1"

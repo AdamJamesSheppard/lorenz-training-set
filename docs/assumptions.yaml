@@ -1,0 +1,42 @@
+A1:
+  statement: The computational domain is an affine axis-aligned hexahedral box.
+  status: active
+  implication: Current Q1 Bernstein/vertex positivity is a whole-cell guarantee.
+
+A2:
+  statement: The numerical boundary condition is zero total probability flux.
+  status: active
+  formula: (f p - D grad(p)) . n = 0
+
+A3:
+  statement: The default noise matrix is full rank with B equal to the identity.
+  status: active_default
+  implication: D is one-half the identity and the PDE is uniformly parabolic.
+
+A4:
+  statement: A rank-deficient noise matrix still gives uniform ellipticity.
+  status: false_in_general
+
+A5:
+  statement: Backward Euler with theta equal to one is the validated time baseline.
+  status: active
+
+A6:
+  statement: Quadrature degree 14 is adequate for adopted projections.
+  status: numerically_established_for_tested_cases
+  evidence: method_selection_report.json
+
+A7:
+  statement: Fixed-subcell non-negative Bernstein coefficients are necessary for Q2 positivity.
+  status: false_in_general
+
+A8:
+  statement: The current Q1 configuration is certified for large dataset generation.
+  status: false
+  evidence: method_selection_report.json
+
+A9:
+  statement: Exact-native-law Monte Carlo moments are an independent short-time reference.
+  status: active
+  limitation: Finite samples do not define a stable full three-dimensional density target.
+
