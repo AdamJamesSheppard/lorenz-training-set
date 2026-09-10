@@ -1,0 +1,23 @@
+id: same-mesh-q2-timestep
+kind: same_mesh_q2_study
+status: conditionally_triggered_after_accuracy_gates_passed
+study:
+  cells: [30, 36, 36]
+  dt: 0.0003125
+  final_time: 0.05
+  seed: 20260910
+  monte_carlo_paths: 200000
+  mc_dt: 0.000125
+  bootstrap_replicates: 200
+  certificate_max_depth: 4
+  initial_law: positive_limited_q1_polynomial_embedded_exactly_in_q2
+  branches:
+    - name: q2_certificate_gated_half_dt
+      degree: 2
+      certificate_mode: adaptive
+execution:
+  mpi_ranks: 8
+comparison_source: runs/same-mesh-q2-falsification/20260910T185420Z/q2_certificate_gated
+decision_gates:
+  normalized_covariance_change_maximum: 0.003
+  l1_density_change_maximum: 0.0025

@@ -155,6 +155,17 @@ class TestQ2Properties(unittest.TestCase):
         self.assertLess(negative["witness_value"], 0.0)
         self.assertEqual(zero["status"], "UNRESOLVED")
 
+        q = fem.Function(solver.V)
+        q.interpolate(lambda x: (x[0] - 0.37) ** 2 + 0.002 + 0.0 * x[1])
+        from lorenz_fpe.core import DensityState
+        state = DensityState(q, 0.0, "strictly_positive_q2")
+        before = q.x.array.copy()
+        self.assertLess(solver.limiter.control_coefficients(before).min(), 0.0)
+        report = solver.limiter.apply(state)
+        self.assertEqual(report.scaled_cells, 0)
+        self.assertGreaterEqual(report.minimum_after, 0.0)
+        np.testing.assert_array_equal(q.x.array, before)
+
     def test_structured_q1_embedding_into_q2_is_exact(self):
         domain = Domain(((-1.0, 1.0),) * 3, (2, 2, 2))
         q1 = FokkerPlanckSolver(Lorenz63Model(), domain, 0.01, degree=1)

@@ -15,7 +15,7 @@ from pathlib import Path
 import numpy as np
 from mpi4py import MPI
 
-from lorenz_fpe import Domain, FokkerPlanckSolver, Lorenz63Model
+from lorenz_fpe import DensityState, Domain, FokkerPlanckSolver, Lorenz63Model
 from lorenz_fpe.core import write_json
 from lorenz_fpe.validation import _propagate_particles, covariance_accuracy
 
@@ -127,6 +127,10 @@ def run_forecast(args: argparse.Namespace) -> None:
     stages=solver.limiter_stage_states(state.time)
     stage_diagnostics={name:solver.diagnostics(stage) for name,stage in stages.items()}
     stage_cells={name:solver.structured_export(stage,1) for name,stage in stages.items()}
+    final_subcells=solver.structured_export(stages["final"],3)
+    final_subcells_path=output/"final_q2_subcell_averages.npy"
+    if rank==0:
+        np.save(final_subcells_path,final_subcells)
     particles=np.load(args.mc_particles) if rank==0 else None
     if rank==0:
         comparisons={name:{
@@ -153,6 +157,8 @@ def run_forecast(args: argparse.Namespace) -> None:
     mean_step_seconds=comm.allreduce(sum(step_seconds)/len(step_seconds),op=MPI.MAX)
 
     if rank==0:
+        gathered_artifacts[0].append({"path":final_subcells_path.name,
+            "sha256":_sha256(final_subcells_path),"bytes":final_subcells_path.stat().st_size})
         history=solver.limiter_history_summary()
         corrected=comparisons["final"]["covariance_accuracy"]
         mean_l1=history["relative_l1_correction"]["mean"]
@@ -191,6 +197,45 @@ def run_forecast(args: argparse.Namespace) -> None:
         print(output/"report.json",flush=True)
 
 
+def recover_final(args: argparse.Namespace) -> None:
+    """Reconstruct a corrected final state from a prior raw MPI archive."""
+    comm=MPI.COMM_WORLD; rank=comm.rank
+    output=args.output.resolve()
+    if rank==0:
+        output.mkdir(parents=True,exist_ok=False)
+    comm.barrier()
+    solver=FokkerPlanckSolver(
+        Lorenz63Model(),Domain(cells=tuple(args.cells)),args.dt,degree=args.degree,
+        certificate_mode=args.certificate_mode,
+        certificate_max_depth=args.certificate_max_depth,
+        certificate_diagnostics=args.degree>=2,
+    )
+    archive_path=args.raw_dir/f"raw_before_correction_rank{rank:04d}.npy"
+    raw=np.load(archive_path,mmap_mode="r")
+    n_owned=solver.V.dofmap.index_map.size_local*solver.V.dofmap.index_map_bs
+    if raw.shape[1]!=n_owned:
+        raise ValueError(f"raw archive has {raw.shape[1]} owned dofs, expected {n_owned}")
+    solver.p_new.x.array[:n_owned]=raw[-1]
+    solver.p_new.x.scatter_forward()
+    state=DensityState(solver.p_new,args.t_final,"recovered_final_raw")
+    limiter=solver.limiter.apply(state)
+    diagnostics=solver.diagnostics(state)
+    subcells=solver.structured_export(state,3)
+    source_hashes=comm.gather({"rank":rank,"sha256":_sha256(archive_path)},root=0)
+    if rank==0:
+        state_path=output/"final_q2_subcell_averages.npy"; np.save(state_path,subcells)
+        report={"source_raw_directory":str(args.raw_dir.resolve()),
+            "configuration":{"cells":list(args.cells),"degree":args.degree,"dt":args.dt,
+                "t_final":args.t_final,"mpi_ranks":comm.size,
+                "certificate_mode":args.certificate_mode,
+                "certificate_max_depth":args.certificate_max_depth},
+            "source_archive_hashes":source_hashes,"limiter":asdict(limiter),
+            "diagnostics":diagnostics,"artifact":{"path":state_path.name,
+                "sha256":_sha256(state_path),"bytes":state_path.stat().st_size}}
+        write_json(output/"report.json",report)
+        print(output/"report.json",flush=True)
+
+
 def parser() -> argparse.ArgumentParser:
     p=argparse.ArgumentParser()
     sub=p.add_subparsers(dest="command",required=True)
@@ -211,6 +256,11 @@ def parser() -> argparse.ArgumentParser:
     run.add_argument("--initial-grid",type=Path,required=True)
     run.add_argument("--mc-particles",type=Path,required=True)
     run.add_argument("--bootstrap",type=int,default=200)
+    recover=sub.add_parser("recover",parents=[common])
+    recover.add_argument("--degree",type=int,choices=(1,2),default=2)
+    recover.add_argument("--certificate-mode",choices=("fixed","adaptive"),default="adaptive")
+    recover.add_argument("--certificate-max-depth",type=int,default=4)
+    recover.add_argument("--raw-dir",type=Path,required=True)
     return p
 
 
@@ -218,5 +268,7 @@ if __name__=="__main__":
     arguments=parser().parse_args()
     if arguments.command=="prepare":
         prepare_reference(arguments)
-    else:
+    elif arguments.command=="forecast":
         run_forecast(arguments)
+    else:
+        recover_final(arguments)

@@ -429,6 +429,7 @@ class PositivityLimiter:
 
         # Stage 2 scales higher modes around the corrected cell average.
         scaling_started=time.perf_counter(); scaled=0; theta_sum=0.0; theta_min=1.0
+        certified_lower=math.inf
         for c,dofs in enumerate(self.cell_dofs):
             new_avg=float(corrected[c]); values=coeff[dofs].copy()
             vmin = float(self.control_coefficients(values).min())
@@ -440,6 +441,12 @@ class PositivityLimiter:
                 theta = 0.0 if denom <= 0.0 else min(1.0, (new_avg - self.lower) / denom)
                 values = new_avg + theta * (values - new_avg)
                 scaled += 1
+            if certified:
+                certified_lower=min(certified_lower,float(
+                    stage1_certificate["local_records"][c]["lower_bound"]
+                ))
+            else:
+                certified_lower=min(certified_lower,float(self.control_coefficients(values).min()))
             theta_sum += theta; theta_min=min(theta_min,theta)
             coeff[dofs] = values
         u.x.scatter_forward()
@@ -452,8 +459,7 @@ class PositivityLimiter:
         scaling_l1,scaling_l2=self._difference_norms(stage1_coeff,final_coeff)
         final_l1,final_l2=self._difference_norms(raw_coeff,final_coeff)
 
-        minimum_after = _global_min(self.comm,
-            min(float(self.control_coefficients(coeff[d]).min()) for d in self.cell_dofs))
+        minimum_after = _global_min(self.comm,certified_lower)
         minimum_before = _global_min(self.comm, local_min)
         scaled_global = int(self.comm.allreduce(scaled, op=MPI.SUM))
         total_cells = int(self.comm.allreduce(self.n_local_cells, op=MPI.SUM))
