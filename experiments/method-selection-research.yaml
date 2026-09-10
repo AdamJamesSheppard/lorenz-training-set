@@ -13,7 +13,7 @@ production_scope:
   special_case: Directional diagonal-only methods may be compared but cannot certify the general production role.
 next_experiment:
   name: same_mesh_q2_positivity_falsification
-  status: predeclared_not_run
+  status: implemented_smoke_tested_full_run_not_started
   cells: [30, 36, 36]
   dt: 0.000625
   t_final: 0.05

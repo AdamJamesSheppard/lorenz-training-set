@@ -18,6 +18,7 @@ Evidence classes: `ESTABLISHED` (supported by derivation and targeted tests),
 | C-011 | The existing equal-DOF Q1/Q2 forecast establishes the effect of polynomial degree. | REJECTED | Q1/Q2 Run 6 reports; `METHOD_SELECTION_REPORT.md` | Q2 used 1.5-times-wider cells in each direction and twice the timestep. |
 | C-012 | A same-mesh Q2 method with less conservative positivity handling can meet the production gates. | OPEN | Predeclared experiment in `METHOD_SELECTION_REPORT.md` | Raw or corrected Q2 fails covariance, marginal, positivity, timestep, limiter, memory, or cost gates. |
 | C-013 | The production method must support full SPD diffusion induced by a constant general 3 by 3 noise matrix. | ESTABLISHED | User-defined target; `docs/assumptions.yaml` A3 | A later explicit scope change may narrow the production problem; diagonal-only evidence does not cover the present target. |
+| C-014 | The implemented adaptive Bernstein classifier has sound three-way outcomes on affine tensor cells: certification uses non-negative leaf coefficients, witnesses use evaluated negative values, and every unresolved cell receives the fixed sufficient correction. | ESTABLISHED | `POSITIVITY_AUDIT.md`; targeted classifier and MPI smoke tests | Floating-point enclosures are not interval arithmetic; classification near roundoff is deliberately conservative, and production accuracy remains unmeasured. |
 
 Review this table after every material experiment. Classes and wording are
 expected to change; preserve old evidence in Git and explain promotions,

@@ -4,6 +4,16 @@ Decisions here are dated and revisable. Add a new entry that marks an older
 decision `superseded`, `narrowed`, or `confirmed` rather than rewriting history
 to make the current direction look inevitable.
 
+## 2026-09-10 - Implement the predeclared Q2 diagnostic without relaxing positivity
+
+The same-mesh experiment now has fixed and adaptive Bernstein branches. The
+adaptive branch skips scaling only for cells certified non-negative after exact
+de Casteljau subdivision; witnessed-negative and depth-limited unresolved cells
+retain the fixed `2x2x2` conservative scaling. Raw Q2 coefficients before every
+correction, final per-cell classifications, correction norms, negative-mass
+quadrature estimates, time and memory are retained in immutable runs. This is
+an experimental comparator and does not change the production classification.
+
 ## 2026-09-10 - Gate the next implementation on a same-mesh Q2 falsification
 
 The existing Q1/Q2 comparison is insufficient to rank polynomial degree because

@@ -59,7 +59,7 @@ single multiplier `lambda`; the final active-set correction removes roundoff
 in the equality constraint.  The constant mode in every cell is shifted from
 `w_K` to `x_K`.
 
-Stage two uses
+For Q1, Stage two uses
 
 ```text
 theta_K = min(1, x_K/(x_K-min_vertex(p_K)))
@@ -68,8 +68,16 @@ p_K <- x_K + theta_K (p_K-x_K).
 
 It preserves the corrected cell average and makes every local vertex value
 non-negative.  A Q1 polynomial on an affine box is a convex combination of its
-eight vertex coefficients, so it is non-negative everywhere in the cell.  The
-code reports cell-average corrections and scaling activations separately.
+eight vertex coefficients, so it is non-negative everywhere in the cell.
+
+For Q2/Q3, the same scaling formula uses the minimum Bernstein coefficient on
+the configured tensor control subcells. Non-negative coefficients are a
+sufficient whole-cell certificate. The experimental adaptive mode recursively
+subdivides the tensor Bernstein form and skips scaling only when every leaf is
+certified non-negative. A negative point evaluation is recorded as a witness;
+a negative coefficient without such a witness remains unresolved and receives
+the fixed conservative fallback. The code reports cell-average corrections,
+scaling activations, three-way certificate counts and quadrature negative mass.
 
 This follows the two-stage framework of Liu et al. (2025), equations (22)--(23)
 and the Zhang--Shu scaling step.  The implementation solves the simple lower-
@@ -130,11 +138,10 @@ covariance error.  A Crank--Nicolson experiment only reduces the coarse
 normalized covariance error from `0.614` to `0.602` while slightly increasing
 limiter activity, so it does not resolve the problem.
 
-The cited framework allows tensor-product degree `k >= 1`, but a Q2 extension
-cannot reuse the Q1 proof: nodal positivity does not imply whole-cell
-positivity, the average is quadrature weighted, and the admissible point set
-must be redesigned and validated.  It remains a promising experimental branch,
-not a production option in this code.
+The Q2 path now has fixed-subcell and adaptive-certificate experimental modes.
+Neither has production status. The same-mesh falsification experiment must show
+whether Q2 propagation improves before any local/operator-level positivity
+method is justified.
 
 Dataset writing and the global cell-average projection currently gather to
 rank zero.  Profiling confirms that the limiter dominates step time and that

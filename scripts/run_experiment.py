@@ -33,8 +33,9 @@ def git_text(*args: str) -> str:
 def main(config_path: Path) -> int:
     source = config_path.resolve()
     config = yaml.safe_load(source.read_text())
-    if config.get("kind") != "forecast":
-        raise SystemExit("only kind=forecast is executable; research plans are specifications")
+    kind=config.get("kind")
+    if kind not in {"forecast","same_mesh_q2_study"}:
+        raise SystemExit("executable kinds are forecast and same_mesh_q2_study")
 
     run_id = str(config["id"])
     if not run_id or any(ch not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_" for ch in run_id):
@@ -47,24 +48,53 @@ def main(config_path: Path) -> int:
     run_dir.mkdir(parents=True)
     shutil.copy2(source, run_dir / "config.yaml")
 
-    solver = config["solver"]
-    initial = config["initial_density"]
-    command = [
-        sys.executable,
-        str(ROOT / "solver.py"),
-        "--cells", *map(str, solver["cells"]),
-        "--degree", str(solver["degree"]),
-        "--dt", str(solver["dt"]),
-        "--theta", str(solver["theta"]),
-        "--t-final", str(solver["final_time"]),
-        "--initialization", str(solver["initialization"]),
-        "--quadrature-degree", str(solver["quadrature_degree"]),
-        "--mean", *map(str, initial["mean"]),
-        "--std", *map(str, initial["standard_deviation"]),
-    ]
     ranks = int(config.get("execution", {}).get("mpi_ranks", 1))
-    if ranks > 1:
-        command = ["mpiexec", "-n", str(ranks), *command]
+    commands=[]
+    if kind=="forecast":
+        solver = config["solver"]
+        initial = config["initial_density"]
+        command = [
+            sys.executable,
+            str(ROOT / "solver.py"),
+            "--cells", *map(str, solver["cells"]),
+            "--degree", str(solver["degree"]),
+            "--dt", str(solver["dt"]),
+            "--theta", str(solver["theta"]),
+            "--t-final", str(solver["final_time"]),
+            "--initialization", str(solver["initialization"]),
+            "--quadrature-degree", str(solver["quadrature_degree"]),
+            "--mean", *map(str, initial["mean"]),
+            "--std", *map(str, initial["standard_deviation"]),
+        ]
+        if ranks > 1:
+            command = ["mpiexec", "-n", str(ranks), *command]
+        commands.append(("forecast",command,run_dir))
+    else:
+        study=config["study"]
+        common=["--cells",*map(str,study["cells"]),"--dt",str(study["dt"]),
+            "--t-final",str(study["final_time"]),"--seed",str(study["seed"])]
+        reference=run_dir/"reference"
+        commands.append(("reference",[
+            sys.executable,str(ROOT/"same_mesh_q2_study.py"),"prepare",*common,
+            "--particles",str(study["monte_carlo_paths"]),"--mc-dt",str(study["mc_dt"]),
+            "--output",str(reference),
+        ],ROOT))
+        initial_grid=reference/"initial_q1_subcell_averages.npy"
+        particles=reference/"mc_final_particles.npy"
+        for branch in study["branches"]:
+            branch_dir=run_dir/str(branch["name"])
+            branch_command=[
+                sys.executable,str(ROOT/"same_mesh_q2_study.py"),"forecast",*common,
+                "--branch",str(branch["name"]),"--degree",str(branch["degree"]),
+                "--certificate-mode",str(branch.get("certificate_mode","fixed")),
+                "--certificate-max-depth",str(study["certificate_max_depth"]),
+                "--initial-grid",str(initial_grid),"--mc-particles",str(particles),
+                "--bootstrap",str(study["bootstrap_replicates"]),"--output",str(branch_dir),
+            ]
+            branch_ranks=int(branch.get("mpi_ranks",ranks))
+            if branch_ranks>1:
+                branch_command=["mpiexec","-n",str(branch_ranks),*branch_command]
+            commands.append((str(branch["name"]),branch_command,ROOT))
 
     provenance = {
         "created_utc": created_at.isoformat(),
@@ -77,18 +107,23 @@ def main(config_path: Path) -> int:
             name: package_version(name)
             for name in ("fenics-dolfinx", "fenics-basix", "fenics-ufl", "numpy", "mpi4py", "petsc4py")
         },
-        "command": command,
+        "commands": [command for _,command,_ in commands],
     }
     (run_dir / "provenance.json").write_text(json.dumps(provenance, indent=2) + "\n")
 
-    with (run_dir / "stdout.log").open("w") as output:
-        completed = subprocess.run(command, cwd=ROOT, text=True, stdout=output, stderr=subprocess.STDOUT)
+    returncode=0
+    for label,command,cwd in commands:
+        with (run_dir/f"{label}.log").open("w") as output:
+            completed=subprocess.run(command,cwd=cwd,text=True,stdout=output,stderr=subprocess.STDOUT)
+        if completed.returncode:
+            returncode=completed.returncode
+            break
     (run_dir / "status.json").write_text(
-        json.dumps({"returncode": completed.returncode, "passed": completed.returncode == 0}, indent=2)
+        json.dumps({"returncode":returncode,"passed":returncode==0},indent=2)
         + "\n"
     )
     print(run_dir)
-    return completed.returncode
+    return returncode
 
 
 if __name__ == "__main__":

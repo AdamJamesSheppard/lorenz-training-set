@@ -133,6 +133,15 @@ class LimiterReport:
     projection_iterations: int
     projection_seconds: float
     scaling_seconds: float
+    certificate_mode: str
+    raw_certificate_counts: dict[str, int] | None
+    raw_certificate_max_depth: int | None
+    raw_certificate_lower_bound: float | None
+    raw_certificate_upper_bound: float | None
+    raw_witness_minimum: float | None
+    raw_quadrature_negative_mass: float | None
+    stage1_certificate_counts: dict[str, int] | None
+    stage1_certificate_max_depth: int | None
 
 
 class PositivityLimiter:
@@ -151,11 +160,20 @@ class PositivityLimiter:
     """
 
     def __init__(self, V: fem.FunctionSpace, cell_volumes: np.ndarray,
-                 degree: int = 1, lower: float = 0.0):
+                 degree: int = 1, lower: float = 0.0,
+                 certificate_mode: str = "fixed", certificate_max_depth: int = 4,
+                 certificate_diagnostics: bool = False):
         self.V = V
         self.comm = V.mesh.comm
         self.degree = int(degree)
         self.lower = float(lower)
+        if certificate_mode not in {"fixed", "adaptive"}:
+            raise ValueError("certificate_mode must be 'fixed' or 'adaptive'")
+        if certificate_max_depth < 0:
+            raise ValueError("certificate_max_depth must be non-negative")
+        self.certificate_mode = certificate_mode
+        self.certificate_max_depth = int(certificate_max_depth)
+        self.certificate_diagnostics = bool(certificate_diagnostics or certificate_mode == "adaptive")
         self.n_local_cells = V.mesh.topology.index_map(V.mesh.topology.dim).size_local
         self.cell_volumes = np.asarray(cell_volumes[: self.n_local_cells], dtype=float)
         self.cell_dofs = [V.dofmap.cell_dofs(c).copy() for c in range(self.n_local_cells)]
@@ -187,6 +205,10 @@ class PositivityLimiter:
             for i in range(self.degree+1) for j in range(self.degree+1) for k in range(self.degree+1)]
             for p in local_points])
         self.control_subdivisions=1 if self.degree==1 else 2
+        whole_lagrange=np.asarray(
+            V.element.basix_element.tabulate(0,local_points)[0,:,:,0]
+        )
+        self.to_whole_bernstein=np.linalg.solve(bernstein,whole_lagrange)
         transforms=[]
         for a in range(self.control_subdivisions):
             for b in range(self.control_subdivisions):
@@ -195,6 +217,110 @@ class PositivityLimiter:
                     lagrange_values=np.asarray(V.element.basix_element.tabulate(0,global_points)[0,:,:,0])
                     transforms.append(np.linalg.solve(bernstein,lagrange_values))
         self.to_bernstein=np.vstack(transforms)
+
+    @staticmethod
+    def _split_bernstein_axis(values: np.ndarray, axis: int) -> tuple[np.ndarray,np.ndarray]:
+        """Split a tensor Bernstein polynomial at one half along one axis."""
+        moved=np.moveaxis(np.asarray(values,dtype=float),axis,0)
+        degree=moved.shape[0]-1
+        left=np.empty_like(moved); right=np.empty_like(moved)
+        work=moved.copy(); left[0]=work[0]; right[degree]=work[degree]
+        for level in range(1,degree+1):
+            work[:degree-level+1]=.5*(work[:degree-level+1]+work[1:degree-level+2])
+            left[level]=work[0]
+            right[degree-level]=work[degree-level]
+        return np.moveaxis(left,0,axis),np.moveaxis(right,0,axis)
+
+    @classmethod
+    def _split_bernstein_box(cls, values: np.ndarray) -> list[np.ndarray]:
+        boxes=[np.asarray(values,dtype=float)]
+        for axis in range(3):
+            boxes=[child for box in boxes for child in cls._split_bernstein_axis(box,axis)]
+        return boxes
+
+    def classify_coefficients(self, coefficients: np.ndarray,
+                              max_depth: int | None = None) -> dict[str,object]:
+        """Classify tensor-polynomial non-negativity by Bernstein subdivision.
+
+        Non-negative control coefficients certify the polynomial on a box.
+        A negative point evaluation is a witness.  Bounds that still straddle
+        zero at ``max_depth`` are reported as unresolved.
+        """
+        depth_limit=self.certificate_max_depth if max_depth is None else int(max_depth)
+        if depth_limit < 0:
+            raise ValueError("max_depth must be non-negative")
+        shape=(self.degree+1,)*3
+        root=(self.to_whole_bernstein@np.asarray(coefficients,dtype=float)).reshape(shape)
+        stack=[(root,0)]; leaf_lower=math.inf; leaf_upper=-math.inf; reached=0
+        unresolved=False; witness_value=math.inf
+        weights=np.array([math.comb(self.degree,i) for i in range(self.degree+1)],dtype=float)
+        weights/=2.0**self.degree
+        while stack:
+            box,depth=stack.pop(); reached=max(reached,depth)
+            lower=float(box.min()); upper=float(box.max())
+            scale=max(float(np.max(np.abs(box))),np.finfo(float).tiny)
+            witness_tolerance=128.0*np.finfo(float).eps*scale
+            corner_min=float(min(box[i,j,k] for i in (0,-1) for j in (0,-1) for k in (0,-1)))
+            centre=float(np.einsum("i,j,k,ijk->",weights,weights,weights,box))
+            candidate=min(corner_min,centre)
+            witness_value=min(witness_value,candidate)
+            if candidate < -witness_tolerance:
+                return {"status":"WITNESSED_NEGATIVE","depth":depth,
+                    "lower_bound":lower,"upper_bound":upper,
+                    "witness_value":candidate,"witness_tolerance":witness_tolerance}
+            if lower >= self.lower:
+                leaf_lower=min(leaf_lower,lower); leaf_upper=max(leaf_upper,upper)
+                continue
+            if depth >= depth_limit:
+                leaf_lower=min(leaf_lower,lower); leaf_upper=max(leaf_upper,upper)
+                unresolved=True
+                continue
+            stack.extend((child,depth+1) for child in self._split_bernstein_box(box))
+        return {"status":"UNRESOLVED" if unresolved else "CERTIFIED_NONNEGATIVE",
+            "depth":reached,"lower_bound":leaf_lower,"upper_bound":leaf_upper,
+            "witness_value":None if math.isinf(witness_value) else witness_value,
+            "witness_tolerance":None}
+
+    def _classification_summary(self, coefficients: np.ndarray) -> dict[str,object]:
+        counts={name:0 for name in ("CERTIFIED_NONNEGATIVE","WITNESSED_NEGATIVE","UNRESOLVED")}
+        max_depth=0; lower=math.inf; upper=-math.inf; witness=math.inf; negative_mass=0.0
+        records=[]
+        for c,dofs in enumerate(self.cell_dofs):
+            cell_coefficients=coefficients[dofs]
+            result=self.classify_coefficients(cell_coefficients)
+            records.append(result); counts[str(result["status"])]+=1
+            max_depth=max(max_depth,int(result["depth"]))
+            lower=min(lower,float(result["lower_bound"])); upper=max(upper,float(result["upper_bound"]))
+            if result["status"]=="WITNESSED_NEGATIVE":
+                witness=min(witness,float(result["witness_value"]))
+            values=self._quadrature_basis@cell_coefficients
+            negative_mass+=self.cell_volumes[c]*float(self._quadrature_weights@np.maximum(-values,0.0))
+        global_counts={name:int(self.comm.allreduce(value,op=MPI.SUM)) for name,value in counts.items()}
+        global_witness=_global_min(self.comm,witness)
+        return {"counts":global_counts,
+            "max_depth":int(self.comm.allreduce(max_depth,op=MPI.MAX)),
+            "lower_bound":_global_min(self.comm,lower),"upper_bound":_global_max(self.comm,upper),
+            "witness_minimum":None if math.isinf(global_witness) else global_witness,
+            "quadrature_negative_mass":_global_sum(self.comm,negative_mass),
+            "local_records":records}
+
+    def classification_records(self, coefficients: np.ndarray) -> list[dict[str,object]]:
+        """Return auditable local cell records for an adaptive classification."""
+        records=[]
+        geom=self.V.mesh.geometry.x; gdmap=self.V.mesh.geometry.dofmaps[0]
+        for c,dofs in enumerate(self.cell_dofs):
+            cell_coefficients=np.asarray(coefficients[dofs],dtype=float)
+            result=dict(self.classify_coefficients(cell_coefficients))
+            values=self._quadrature_basis@cell_coefficients
+            midpoint=geom[gdmap[c]].mean(axis=0)
+            average=self.cell_average(cell_coefficients)
+            result.update({"local_cell":c,"midpoint":midpoint.tolist(),
+                "cell_average":average,"cell_mass":average*self.cell_volumes[c],
+                "quadrature_negative_mass":self.cell_volumes[c]*float(
+                    self._quadrature_weights@np.maximum(-values,0.0)
+                )})
+            records.append(result)
+        return records
 
     def cell_average(self, coefficients: np.ndarray) -> float:
         return float(self.average_weights@coefficients)
@@ -267,6 +393,8 @@ class PositivityLimiter:
         local_min = min(float(self.control_coefficients(coeff[d]).min()) for d in self.cell_dofs)
         raw_negative_local=int(np.count_nonzero(local_avgs < self.lower))
         raw_min_avg_local=float(local_avgs.min())
+        raw_certificate=(self._classification_summary(raw_coeff)
+                         if self.certificate_diagnostics and self.degree >= 2 else None)
         projection_started=time.perf_counter()
         gathered_w = self.comm.gather(local_avgs, root=0)
         gathered_v = self.comm.gather(self.cell_volumes, root=0)
@@ -296,6 +424,8 @@ class PositivityLimiter:
             coeff[dofs] += new_avg-old_avg
         stage1_coeff=coeff.copy()
         projection_seconds=_global_max(self.comm,time.perf_counter()-projection_started)
+        stage1_certificate=(self._classification_summary(stage1_coeff)
+                            if self.certificate_mode=="adaptive" and self.degree >= 2 else None)
 
         # Stage 2 scales higher modes around the corrected cell average.
         scaling_started=time.perf_counter(); scaled=0; theta_sum=0.0; theta_min=1.0
@@ -303,7 +433,9 @@ class PositivityLimiter:
             new_avg=float(corrected[c]); values=coeff[dofs].copy()
             vmin = float(self.control_coefficients(values).min())
             theta=1.0
-            if vmin < self.lower:
+            certified=(stage1_certificate is not None and
+                       stage1_certificate["local_records"][c]["status"]=="CERTIFIED_NONNEGATIVE")
+            if vmin < self.lower and not certified:
                 denom = new_avg - vmin
                 theta = 0.0 if denom <= 0.0 else min(1.0, (new_avg - self.lower) / denom)
                 values = new_avg + theta * (values - new_avg)
@@ -363,6 +495,15 @@ class PositivityLimiter:
             projection_iterations=projection_iterations,
             projection_seconds=projection_seconds,
             scaling_seconds=scaling_seconds,
+            certificate_mode=self.certificate_mode,
+            raw_certificate_counts=(raw_certificate["counts"] if raw_certificate else None),
+            raw_certificate_max_depth=(raw_certificate["max_depth"] if raw_certificate else None),
+            raw_certificate_lower_bound=(raw_certificate["lower_bound"] if raw_certificate else None),
+            raw_certificate_upper_bound=(raw_certificate["upper_bound"] if raw_certificate else None),
+            raw_witness_minimum=(raw_certificate["witness_minimum"] if raw_certificate else None),
+            raw_quadrature_negative_mass=(raw_certificate["quadrature_negative_mass"] if raw_certificate else None),
+            stage1_certificate_counts=(stage1_certificate["counts"] if stage1_certificate else None),
+            stage1_certificate_max_depth=(stage1_certificate["max_depth"] if stage1_certificate else None),
         )
 
 
@@ -379,6 +520,9 @@ class FokkerPlanckSolver:
         penalty: float = 16.0,
         limiter_lower: float = 0.0,
         ksp_rtol: float = 1e-10,
+        certificate_mode: str = "fixed",
+        certificate_max_depth: int = 4,
+        certificate_diagnostics: bool = False,
     ):
         self.model, self.domain, self.dt, self.theta = model, domain, float(dt), float(theta)
         self.degree = int(degree)
@@ -396,7 +540,10 @@ class FokkerPlanckSolver:
         q0e = basix.ufl.element("DG", self.mesh.basix_cell(), 0)
         self.Q0 = fem.functionspace(self.mesh, q0e)
         self.cell_volumes = self._cell_volumes()
-        self.limiter = PositivityLimiter(self.V, self.cell_volumes, self.degree, limiter_lower)
+        self.limiter = PositivityLimiter(
+            self.V,self.cell_volumes,self.degree,limiter_lower,certificate_mode,
+            certificate_max_depth,certificate_diagnostics,
+        )
 
         self.p_old = fem.Function(self.V, name="density_old")
         self.p_new = fem.Function(self.V, name="density")
@@ -623,16 +770,17 @@ class FokkerPlanckSolver:
         q.x.array[:] = coeff; q.x.scatter_forward()
         return DensityState(q, float(data["time"]), str(data["label"]))
 
-    def from_structured(self, density: np.ndarray, time_value: float = 0.0) -> DensityState:
+    def from_structured(self, density: np.ndarray, time_value: float = 0.0,
+                        apply_limiter: bool = True) -> DensityState:
         """Conservatively reconstruct DG Qk from refined voxel averages.
 
         Full polynomial reconstruction requires the subcell-average map to
         have full column rank (normally ``s >= degree+1`` per axis).  Otherwise
         only the cellwise constant mode is reconstructed.  A constant
-        correction retains input cell mass before positivity limiting.
+        correction retains input cell mass before optional positivity limiting.
+        The same global array may be supplied on every MPI rank; each rank
+        reconstructs only its owned cells.
         """
-        if self.comm.size != 1:
-            raise NotImplementedError("Structured reconstruction currently requires serial execution")
         arr = np.asarray(density, dtype=float)
         factors=[]
         for got,native in zip(arr.shape,self.domain.cells):
@@ -662,7 +810,8 @@ class FokkerPlanckSolver:
             q.x.array[self.V.dofmap.cell_dofs(c)] = coefficients
         q.x.scatter_forward()
         state=DensityState(q,time_value,"structured_reconstruction")
-        self.limiter.apply(state)
+        if apply_limiter:
+            self.limiter.apply(state)
         return state
 
     def mixture(self, means: list[Iterable[float]], covariances: list[np.ndarray], weights: Iterable[float]) -> DensityState:
@@ -748,6 +897,21 @@ class FokkerPlanckSolver:
             result[key]={"mean":float(values.mean()),"maximum":float(values.max()),"p95":float(np.quantile(values,.95))}
         result["steps_with_negative_raw_average"]=int(sum(r.raw_negative_cell_averages>0 for r in self.limiter_history))
         result["steps_with_scaling"]=int(sum(r.scaled_cells>0 for r in self.limiter_history))
+        if any(r.raw_certificate_counts is not None for r in self.limiter_history):
+            names=("CERTIFIED_NONNEGATIVE","WITNESSED_NEGATIVE","UNRESOLVED")
+            result["raw_certificate_counts_by_status"]={name:{
+                "mean":float(np.mean([r.raw_certificate_counts[name] for r in self.limiter_history])),
+                "maximum":int(max(r.raw_certificate_counts[name] for r in self.limiter_history)),
+                "final":int(self.limiter_history[-1].raw_certificate_counts[name]),
+            } for name in names}
+            result["maximum_certificate_depth"]=int(max(
+                r.raw_certificate_max_depth or 0 for r in self.limiter_history
+            ))
+            result["raw_quadrature_negative_mass"]={
+                "mean":float(np.mean([r.raw_quadrature_negative_mass or 0.0 for r in self.limiter_history])),
+                "maximum":float(max(r.raw_quadrature_negative_mass or 0.0 for r in self.limiter_history)),
+                "final":float(self.limiter_history[-1].raw_quadrature_negative_mass or 0.0),
+            }
         return result
 
     def forecast(self, posterior: DensityState, t0: float, t1: float, progress: bool = False) -> DensityState:

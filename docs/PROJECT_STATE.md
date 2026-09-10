@@ -28,6 +28,8 @@ next experiment.
   classified before correction. Adaptive Bernstein subdivision is a diagnostic
   and sufficient certificate in this experiment, not a selected production
   limiter.
+- The experiment is implemented and smoke-tested; the predeclared production-
+  scale run has not yet supplied evidence.
 
 ## Latest validated evidence
 
@@ -54,7 +56,7 @@ next experiment.
 The living plan is in `docs/RESEARCH_DIRECTIONS.md` and
 `experiments/method-selection-research.yaml`. Current high-value branches are:
 
-1. Run the predeclared same-mesh Q2 falsification experiment in
+1. Execute the implemented, predeclared same-mesh Q2 falsification experiment in
    `METHOD_SELECTION_REPORT.md`: Q1 and Q2 on `30x36x36`, `dt=0.000625`, from
    the same positive Q1 law embedded exactly in Q2. Classify every raw Q2 cell
    as certified non-negative, witnessed negative, or unresolved before applying

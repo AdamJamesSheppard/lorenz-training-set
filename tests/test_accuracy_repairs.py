@@ -133,6 +133,38 @@ class TestQ2Properties(unittest.TestCase):
         self.assertLess(error, 1.0e-10)
         self.assertLess(abs(solver.mass(restored) - 1.0), 1.0e-11)
 
+    def test_adaptive_bernstein_classification_distinguishes_three_outcomes(self):
+        domain = Domain(((0.0, 1.0),) * 3, (1, 1, 1))
+        solver = FokkerPlanckSolver(
+            Lorenz63Model(), domain, 0.01, degree=2,
+            certificate_mode="adaptive", certificate_max_depth=4,
+        )
+
+        def classify(offset):
+            q = fem.Function(solver.V)
+            q.interpolate(lambda x: (x[0] - 0.37) ** 2 + offset + 0.0 * x[1])
+            dofs = solver.V.dofmap.cell_dofs(0)
+            return solver.limiter.classify_coefficients(q.x.array[dofs])
+
+        positive = classify(0.002)
+        negative = classify(-0.002)
+        zero = classify(0.0)
+        self.assertEqual(positive["status"], "CERTIFIED_NONNEGATIVE")
+        self.assertGreater(positive["depth"], 1)
+        self.assertEqual(negative["status"], "WITNESSED_NEGATIVE")
+        self.assertLess(negative["witness_value"], 0.0)
+        self.assertEqual(zero["status"], "UNRESOLVED")
+
+    def test_structured_q1_embedding_into_q2_is_exact(self):
+        domain = Domain(((-1.0, 1.0),) * 3, (2, 2, 2))
+        q1 = FokkerPlanckSolver(Lorenz63Model(), domain, 0.01, degree=1)
+        initial = q1.gaussian_interpolated((0.1, -0.2, 0.3), np.diag([0.4, 0.5, 0.6]))
+        represented = q1.structured_export(initial, 3)
+        q2 = FokkerPlanckSolver(Lorenz63Model(), domain, 0.01, degree=2)
+        embedded = q2.from_structured(represented, apply_limiter=False)
+        reconstructed = q2.structured_export(embedded, 3)
+        np.testing.assert_allclose(reconstructed, represented, rtol=2.0e-12, atol=1.0e-14)
+
 
 class TestIndependentFiniteVolume(unittest.TestCase):
     def test_total_flux_update_preserves_mass_and_positivity(self):

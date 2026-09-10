@@ -1,8 +1,11 @@
 # Audit of the positivity construction
 
 > This audit originally covered Q1. The experimental Q2/Q3 path now uses
-> Bernstein coefficients on `2x2x2` control subcells; the current guarantee and
-> its measured accuracy cost are in [METHOD_SELECTION_REPORT.md](METHOD_SELECTION_REPORT.md).
+> Bernstein coefficients on `2x2x2` control subcells. An experimental adaptive
+> branch now uses recursive tensor-Bernstein subdivision to avoid some false
+> alarms while retaining the fixed correction for witnessed-negative and
+> unresolved cells. The current guarantee and its measured accuracy cost are
+> in [METHOD_SELECTION_REPORT.md](METHOD_SELECTION_REPORT.md).
 
 Primary source: Chen Liu, Jingwei Hu, William T. Taitano, and Xiangxiong
 Zhang, “An optimization-based positivity-preserving limiter in semi-implicit
@@ -21,12 +24,12 @@ scheme was too strong.
 |---|---|---|---|
 | Equation | Linearised Fokker--Planck convection--diffusion; spatially varying, uniformly SPD diffusion | Lorenz FPE; constant full tensor `D=BB^T/2` | Covered when `D` is positive definite; rank-deficient `B` gives semidefinite `D` and is outside the paper's uniform-coercivity hypothesis |
 | Mesh | Uniform rectangular/square cells in dimension `d` | Uniform affine, axis-aligned hexahedra in 3-D | Compatible special case |
-| Space | Broken polynomial degree `k>=1`, hierarchical modal basis; tensor Gauss point set | Basix discontinuous nodal Q1 on hexahedra | Different basis, same DG polynomial space for degree one |
+| Space | Broken polynomial degree `k>=1`, hierarchical modal basis; tensor Gauss point set | Basix discontinuous nodal Q1--Q3 on hexahedra | Different basis; the local polynomial spaces overlap but enforcement sets differ |
 | Convection | Lax--Friedrichs flux, convection explicit in time | Upwind flux, convection implicit | For a continuous scalar linear drift, local LF with the exact face speed reduces to upwind spatially; time treatment differs |
 | Diffusion | NIPG, implicit | SIPG, implicit | Not the same bilinear form; the paper's NIPG coercivity statement is not being claimed for this SIPG form |
 | Time | First-order semi-implicit: explicit convection, implicit diffusion | Fully implicit backward Euler | Different scheme; both are first order |
 | Stage 1 | Constrained `L2` projection of cell averages, normally solved by Douglas--Rachford | The identical lower-bounded convex problem solved directly through its scalar KKT multiplier | Same unique minimiser; no Douglas--Rachford iteration occurs in this code |
-| Stage 2 | Zhang--Shu scaling about each corrected average, enforcing a lower tolerance at a selected quadrature set | Scaling about each corrected average using all eight Q1 vertex values and lower bound zero | Same scaling idea, different enforcement point set |
+| Stage 2 | Zhang--Shu scaling about each corrected average, enforcing a lower tolerance at a selected quadrature set | Q1 vertices; fixed Q2/Q3 Bernstein subcells; or adaptive Bernstein certification with fixed fallback | Same scaling idea, stronger whole-cell sufficient condition locally |
 | MPI | Douglas--Rachford described as parallelisable | Cell averages gather to rank zero, exact global projection, scatter back | Mathematically global and conservative, but not scalable like the proposed distributed iteration |
 
 ## Exact claims supported by this implementation
@@ -67,6 +70,18 @@ functions sum to one.  Consequently non-negative vertex coefficients imply
 preserves this conclusion.  This whole-cell Q1 guarantee is an independent
 argument stronger than the paper's finite-quadrature-point statement; it does
 not extend automatically to Q2, a modal coefficient check, or curved cells.
+
+For Q2/Q3, the fixed branch converts each tensor polynomial to Bernstein form
+on `2x2x2` control subcells. Non-negative coefficients certify non-negativity
+because the basis is non-negative and partitions unity. The converse can fail.
+The adaptive branch recursively applies exact de Casteljau subdivision. Each
+cell is classified as `CERTIFIED_NONNEGATIVE` only when all terminal lower
+bounds are non-negative, `WITNESSED_NEGATIVE` only after an actual point value
+is negative beyond a scale-aware floating-point tolerance, and `UNRESOLVED`
+when a bound still straddles zero at the depth limit. Both latter classes use
+the existing fixed scaling, preserving its whole-cell sufficient guarantee.
+Polynomials that touch zero may remain unresolved at every finite depth, so the
+classifier is deliberately incomplete.
 
 The default lower bound is exactly zero, rather than the paper's small positive
 `epsilon`.  Floating-point results can consequently be around `-1e-20`; the

@@ -41,6 +41,8 @@ differences.
 - `solver.py`: one forecast.
 - `generate_dataset.py`: gated sequential DA dataset generation.
 - `validate.py` and focused `*_study.py` files: validation studies.
+- `same_mesh_q2_study.py`: common-law Monte Carlo preparation and auditable
+  Q1/Q2 fixed/adaptive forecast branches, including raw coefficient archives.
 - `scripts/run-experiment`: immutable config-driven runs under `runs/`.
 
 ## Evidence and state
