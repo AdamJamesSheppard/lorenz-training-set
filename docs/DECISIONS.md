@@ -6,6 +6,9 @@ to make the current direction look inevitable.
 
 ## 2026-09-11 - Retain Q2 as a challenger but withhold production selection
 
+Status: superseded as numerical evidence by the invariant audit below; its run
+artifacts remain immutable diagnostic history.
+
 The controlled same-mesh experiment resolves the earlier degree confound.
 Adaptive-certificate Q2 reduced corrected covariance error from `0.08719` for
 Q1 to `0.02377`, improved every marginal TV, and met the forecast correction
@@ -20,6 +23,21 @@ was `2.56e-10`, above `1e-10`, although covariance-error change passed at
 AFC, compare truly unlimited Q2 at both timesteps; the raw states recorded in a
 limited trajectory still inherit all previous corrections and cannot isolate
 time discretisation from accumulated limiting.
+
+## 2026-09-11 - Repair the limiter invariant and rerun the Q2 decision
+
+An independent audit found that the final unconstrained roundoff correction in
+Stage 1 could push extremely small active cell averages below zero. In the
+first adaptive-Q2 step this produced a minimum average near `-1.92e-22` and a
+negative Stage-2 scaling factor. The prior numerical gate decision is therefore
+superseded pending a replacement run.
+
+The Stage-1 residual repair now contracts non-negative slacks when mass must be
+removed and applies a guarded one-cell ulp repair. Stage-2 scaling is explicitly
+clamped to `[0,1]`. The reported `corrected_fraction` now counts the union of
+cells changed by either stage; separate Stage-1 and Stage-2 fractions are also
+recorded. The replacement comparison and the truly unlimited two-timestep
+diagnostic were predeclared before evaluation.
 
 ## 2026-09-10 - Implement the predeclared Q2 diagnostic without relaxing positivity
 

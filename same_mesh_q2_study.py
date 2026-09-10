@@ -86,6 +86,7 @@ def run_forecast(args: argparse.Namespace) -> None:
         model,domain,args.dt,degree=args.degree,certificate_mode=args.certificate_mode,
         certificate_max_depth=args.certificate_max_depth,
         certificate_diagnostics=args.degree>=2,
+        apply_positivity=not args.disable_positivity,
     )
     grid=np.load(args.initial_grid)
     initial=solver.from_structured(grid,apply_limiter=False)
@@ -104,7 +105,7 @@ def run_forecast(args: argparse.Namespace) -> None:
         raise ValueError("t_final must be an integer multiple of dt")
     n_owned=solver.V.dofmap.index_map.size_local*solver.V.dofmap.index_map_bs
     raw_path=None; raw_archive=None
-    if args.degree>=2:
+    if args.degree>=2 and not args.no_raw_archive:
         raw_path=output/f"raw_before_correction_rank{rank:04d}.npy"
         raw_archive=np.lib.format.open_memmap(
             raw_path,mode="w+",dtype=np.float64,shape=(steps,n_owned)
@@ -114,7 +115,9 @@ def run_forecast(args: argparse.Namespace) -> None:
         step_started=time.perf_counter(); state=solver.step(state)
         step_seconds.append(time.perf_counter()-step_started)
         if raw_archive is not None:
-            raw_archive[step]=solver.limiter.last_raw_coefficients[:n_owned]
+            source=(solver.limiter.last_raw_coefficients if solver.apply_positivity
+                    else state.function.x.array)
+            raw_archive[step]=source[:n_owned]
             if (step+1)%10==0:
                 raw_archive.flush()
         if rank==0 and ((step+1)%max(1,steps//10)==0 or step+1==steps):
@@ -124,7 +127,8 @@ def run_forecast(args: argparse.Namespace) -> None:
         raw_archive.flush(); del raw_archive
     forecast_seconds=time.perf_counter()-started
 
-    stages=solver.limiter_stage_states(state.time)
+    stages=(solver.limiter_stage_states(state.time) if solver.apply_positivity else
+            {name:state.copy(name) for name in ("raw","stage1","final")})
     stage_diagnostics={name:solver.diagnostics(stage) for name,stage in stages.items()}
     stage_cells={name:solver.structured_export(stage,1) for name,stage in stages.items()}
     final_subcells=solver.structured_export(stages["final"],3)
@@ -144,11 +148,15 @@ def run_forecast(args: argparse.Namespace) -> None:
         comparisons=None
 
     artifacts=[]
-    if raw_path is not None:
-        records=solver.limiter.classification_records(solver.limiter.last_raw_coefficients)
+    if args.degree>=2:
+        classification_source=(solver.limiter.last_raw_coefficients if solver.apply_positivity
+                               else state.function.x.array)
+        records=solver.limiter.classification_records(classification_source)
         records_path=output/f"final_raw_cell_classification_rank{rank:04d}.json"
         records_path.write_text(json.dumps(records,separators=(",",":")),encoding="utf-8")
-        artifacts.extend([raw_path,records_path])
+        artifacts.append(records_path)
+        if raw_path is not None:
+            artifacts.append(raw_path)
     local_artifacts=[{"path":path.name,"sha256":_sha256(path),"bytes":path.stat().st_size}
                      for path in artifacts]
     gathered_artifacts=comm.gather(local_artifacts,root=0)
@@ -161,14 +169,15 @@ def run_forecast(args: argparse.Namespace) -> None:
             "sha256":_sha256(final_subcells_path),"bytes":final_subcells_path.stat().st_size})
         history=solver.limiter_history_summary()
         corrected=comparisons["final"]["covariance_accuracy"]
-        mean_l1=history["relative_l1_correction"]["mean"]
-        maximum_l1=history["relative_l1_correction"]["maximum"]
+        mean_l1=(history["relative_l1_correction"]["mean"] if solver.apply_positivity else 0.0)
+        maximum_l1=(history["relative_l1_correction"]["maximum"] if solver.apply_positivity else 0.0)
         report={
             "branch":args.branch,
             "configuration":{"cells":list(args.cells),"degree":args.degree,"dt":args.dt,
                 "t_final":args.t_final,"mpi_ranks":comm.size,
                 "certificate_mode":args.certificate_mode,
                 "certificate_max_depth":args.certificate_max_depth,
+                "positivity_applied_each_step":solver.apply_positivity,
                 "bootstrap_replicates":args.bootstrap,"seed":args.seed},
             "initial_embedding":embedding,"initial_diagnostics":initial_diagnostics,
             "final_stage_diagnostics":stage_diagnostics,"comparisons_to_common_mc":comparisons,
@@ -256,6 +265,8 @@ def parser() -> argparse.ArgumentParser:
     run.add_argument("--initial-grid",type=Path,required=True)
     run.add_argument("--mc-particles",type=Path,required=True)
     run.add_argument("--bootstrap",type=int,default=200)
+    run.add_argument("--disable-positivity",action="store_true")
+    run.add_argument("--no-raw-archive",action="store_true")
     recover=sub.add_parser("recover",parents=[common])
     recover.add_argument("--degree",type=int,choices=(1,2),default=2)
     recover.add_argument("--certificate-mode",choices=("fixed","adaptive"),default="adaptive")

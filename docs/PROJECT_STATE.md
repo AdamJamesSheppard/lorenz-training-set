@@ -1,6 +1,6 @@
 # Project state
 
-Updated: 2026-09-10
+Updated: 2026-09-11
 
 ## Objective
 
@@ -28,9 +28,11 @@ next experiment.
   classified before correction. Adaptive Bernstein subdivision is a diagnostic
   and sufficient certificate in this experiment, not a selected production
   limiter.
-- The experiment is implemented and smoke-tested; the predeclared production-
-  scale run is complete. Adaptive Q2 passed the covariance, marginal and limiter
-  gates but failed the timestep-density and half-step mass gates.
+- The first production-scale Q2 run exposed a roundoff-invariant bug in the
+  Stage-1 mass repair: tiny active averages could become negative, leading to
+  negative Stage-2 scaling factors. The repair is implemented and directly
+  tested, but replacement evidence is required before reusing the numerical
+  conclusions from that run.
 
 ## Latest validated evidence
 
@@ -40,11 +42,10 @@ next experiment.
   convergence and maximum mass error `3.12e-12`.
 - Q2 L2 projection preserves covariance to about `2.84e-10` before limiting,
   but the tested Q2 positivity treatment is too intrusive to justify adoption.
-- On the controlled same mesh, adaptive Q2 reduced corrected startup covariance
-  error from Q1's `0.08719` to `0.02377` and passed the single-step limiter
-  gates. Halving `dt` changed the conservative three-subcell density by at least
-  `L1=0.01552`, versus the predeclared `0.0025` maximum, and accumulated mass
-  error was `2.56e-10`, versus `1e-10`.
+- The superseded controlled run suggested a reduction in corrected startup
+  covariance error from Q1's `0.08719` to `0.02377`, but it is retained only as
+  diagnostic history until the corrected predeclared run reproduces or revises
+  those values.
 
 ## Active blockers
 
@@ -54,8 +55,8 @@ next experiment.
    covariance discrepancy.
 3. The independent finite-volume hierarchy is not converged enough to define a
    full-density truth error.
-4. The corrected adaptive Q2 density remains timestep-sensitive even though its
-   covariance error is comparatively stable.
+4. Corrected replacement runs are pending, so the apparent Q2 timestep
+   sensitivity has not yet been confirmed under the repaired invariants.
 
 ## Near-term research portfolio
 

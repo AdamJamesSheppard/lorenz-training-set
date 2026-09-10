@@ -1,6 +1,8 @@
 {
   "date": "2026-09-11",
   "evidence_class": "NUMERICAL",
+  "status": "SUPERSEDED_BY_LIMITER_INVARIANT_AUDIT",
+  "limitation": "The Stage-1 roundoff repair produced tiny negative active averages and invalid negative Stage-2 scaling factors; retain these values only as diagnostic history pending the corrected rerun.",
   "classification": "INSUFFICIENT_EVIDENCE",
   "configuration": {
     "cells": [30, 36, 36],

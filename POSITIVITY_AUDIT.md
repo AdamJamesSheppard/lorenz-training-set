@@ -43,8 +43,10 @@ subject to  x_K >= 0
 ```
 
 The KKT equations give `x_K=max(0,w_K-lambda)`.  Bisection to 100 iterations
-finds the unique multiplier; an active-set roundoff correction enforces the
-mass equality.  This is the same strictly convex optimisation problem as the
+finds the unique multiplier; a bound-preserving roundoff correction contracts
+the non-negative active slacks when mass must be removed and then applies a
+guarded one-cell ulp repair.  This enforces the mass equality without crossing
+the lower bound. This is the same strictly convex optimisation problem as the
 paper's equations (22)--(24), solved directly rather than by the optional
 Douglas--Rachford algorithm.  The code records the mass before Stage 1, after
 Stage 1, and after Stage 2.
@@ -52,7 +54,7 @@ Stage 1, and after Stage 2.
 Stage 2 applies
 
 ```text
-theta_K = min(1, x_K/(x_K-min_vertex(p_K)))
+theta_K = clamp(x_K/(x_K-min_vertex(p_K)), 0, 1)
 p_K <- x_K + theta_K (p_K-x_K).
 ```
 
@@ -82,6 +84,21 @@ when a bound still straddles zero at the depth limit. Both latter classes use
 the existing fixed scaling, preserving its whole-cell sufficient guarantee.
 Polynomials that touch zero may remain unresolved at every finite depth, so the
 classifier is deliberately incomplete.
+
+A direct tensor-product example explains the incompleteness without relying on
+simplicial results. Let `p(x,y,z)=(x-c)^2`, with `c` irrational and in `(0,1)`.
+At every dyadic subdivision depth, the unique interval `[a,b]` containing `c`
+has a negative middle quadratic Bernstein coefficient proportional to
+`(a-c)(b-c)`, while `p` is globally non-negative. Hence finite dyadic
+subdivision never certifies that cell. The classifier correctly returns
+`UNRESOLVED` at its configured depth and applies the sufficient fallback.
+
+The 2026-09-11 audit also found that the former additive Stage-1 roundoff repair
+could produce tiny negative active averages and consequently negative scaling
+factors. That implementation and its numerical decision runs are superseded.
+Regression tests now require projected averages to remain non-negative,
+scaling factors to lie in `[0,1]`, and the before/after masses to agree to the
+declared tolerance.
 
 The default lower bound is exactly zero, rather than the paper's small positive
 `epsilon`.  Floating-point results can consequently be around `-1e-20`; the

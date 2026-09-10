@@ -110,7 +110,10 @@ class LimiterReport:
     activated: bool
     corrected_cell_averages: int
     scaled_cells: int
+    touched_cells: int
     corrected_fraction: float
+    corrected_cell_average_fraction: float
+    scaled_cell_fraction: float
     l2_cell_average_correction: float
     minimum_before: float
     minimum_after: float
@@ -378,11 +381,32 @@ class PositivityLimiter:
             else:
                 hi = lam
         x = np.maximum(lower, w - 0.5 * (lo + hi))
-        # Remove the last few ulps without changing the active set.
-        active = x > lower
+        # Remove the last few ulps without crossing the lower bound.  A
+        # uniform additive repair can make tiny active entries negative when
+        # the residual is negative, so contract their non-negative slacks
+        # proportionally instead.
         err = target - float(np.dot(volumes, x))
-        if active.any():
-            x[active] += err / float(volumes[active].sum())
+        if err < 0.0:
+            slack = x - lower
+            slack_mass = float(np.dot(volumes, slack))
+            if slack_mass > 0.0:
+                x = lower + np.clip(1.0 + err / slack_mass, 0.0, 1.0) * slack
+        elif err > 0.0:
+            x[int(np.argmax(volumes))] += err / float(np.max(volumes))
+        x = np.maximum(x, lower)
+
+        # A final one-cell repair addresses roundoff from the proportional
+        # contraction.  For a negative residual choose a cell with enough
+        # slack, and for a positive residual any positive-volume cell works.
+        err = target - float(np.dot(volumes, x))
+        if err < 0.0:
+            capacities = volumes * (x - lower)
+            index = int(np.argmax(capacities))
+            x[index] += err / float(volumes[index])
+        elif err > 0.0:
+            index = int(np.argmax(volumes))
+            x[index] += err / float(volumes[index])
+        x = np.maximum(x, lower)
         return x
 
     def apply(self, state: DensityState) -> LimiterReport:
@@ -416,6 +440,9 @@ class PositivityLimiter:
             chunks = None
             mass_before = mass_after_stage1 = n_corrected = correction = projection_iterations = None
         corrected = self.comm.scatter(chunks, root=0)
+        stage1_changed = np.abs(corrected - local_avgs) > (
+            5e-15 * np.maximum(1.0, np.abs(local_avgs))
+        )
 
         # Stage 1 changes only the cell constant modes.
         for c, dofs in enumerate(self.cell_dofs):
@@ -429,6 +456,7 @@ class PositivityLimiter:
 
         # Stage 2 scales higher modes around the corrected cell average.
         scaling_started=time.perf_counter(); scaled=0; theta_sum=0.0; theta_min=1.0
+        touched = stage1_changed.copy()
         certified_lower=math.inf
         for c,dofs in enumerate(self.cell_dofs):
             new_avg=float(corrected[c]); values=coeff[dofs].copy()
@@ -438,9 +466,12 @@ class PositivityLimiter:
                        stage1_certificate["local_records"][c]["status"]=="CERTIFIED_NONNEGATIVE")
             if vmin < self.lower and not certified:
                 denom = new_avg - vmin
-                theta = 0.0 if denom <= 0.0 else min(1.0, (new_avg - self.lower) / denom)
+                theta = 0.0 if denom <= 0.0 else float(np.clip(
+                    (new_avg - self.lower) / denom, 0.0, 1.0
+                ))
                 values = new_avg + theta * (values - new_avg)
                 scaled += 1
+                touched[c] = True
             if certified:
                 certified_lower=min(certified_lower,float(
                     stage1_certificate["local_records"][c]["lower_bound"]
@@ -462,6 +493,9 @@ class PositivityLimiter:
         minimum_after = _global_min(self.comm,certified_lower)
         minimum_before = _global_min(self.comm, local_min)
         scaled_global = int(self.comm.allreduce(scaled, op=MPI.SUM))
+        touched_global = int(self.comm.allreduce(
+            int(np.count_nonzero(touched)), op=MPI.SUM
+        ))
         total_cells = int(self.comm.allreduce(self.n_local_cells, op=MPI.SUM))
         mass_before = self.comm.bcast(mass_before, root=0)
         mass_after_stage1 = self.comm.bcast(mass_after_stage1, root=0)
@@ -475,10 +509,13 @@ class PositivityLimiter:
         theta_min_global=_global_min(self.comm,theta_min)
         mass_after_final=_global_sum(self.comm,float(sum(self.cell_volumes[c]*self.cell_average(coeff[d]) for c,d in enumerate(self.cell_dofs))))
         return LimiterReport(
-            activated=(n_corrected + scaled_global) > 0,
+            activated=touched_global > 0,
             corrected_cell_averages=n_corrected,
             scaled_cells=scaled_global,
-            corrected_fraction=(n_corrected + scaled_global) / max(1, 2 * total_cells),
+            touched_cells=touched_global,
+            corrected_fraction=touched_global / max(1, total_cells),
+            corrected_cell_average_fraction=n_corrected / max(1, total_cells),
+            scaled_cell_fraction=scaled_global / max(1, total_cells),
             l2_cell_average_correction=correction,
             minimum_before=minimum_before,
             minimum_after=minimum_after,
@@ -529,9 +566,11 @@ class FokkerPlanckSolver:
         certificate_mode: str = "fixed",
         certificate_max_depth: int = 4,
         certificate_diagnostics: bool = False,
+        apply_positivity: bool = True,
     ):
         self.model, self.domain, self.dt, self.theta = model, domain, float(dt), float(theta)
         self.degree = int(degree)
+        self.apply_positivity = bool(apply_positivity)
         if not (0.5 <= self.theta <= 1.0): raise ValueError("theta must lie in [0.5,1]")
         if self.degree not in (1,2,3): raise ValueError("degree must be 1, 2, or 3")
         self.comm = MPI.COMM_WORLD
@@ -872,8 +911,14 @@ class FokkerPlanckSolver:
         }
         out = DensityState(self.p_new, state.time + self.dt, "forecast")
         limiter_started=time.perf_counter()
-        self.last_limiter = self.limiter.apply(out)
-        self.limiter_history.append(self.last_limiter)
+        if self.apply_positivity:
+            self.last_limiter = self.limiter.apply(out)
+            self.limiter_history.append(self.last_limiter)
+        else:
+            self.last_limiter=None
+            self.limiter.last_raw_coefficients=out.function.x.array.copy()
+            self.limiter.last_stage1_coefficients=out.function.x.array.copy()
+            self.limiter.last_final_coefficients=out.function.x.array.copy()
         self.last_timing={"rhs_seconds":rhs_seconds,"solve_seconds":_global_max(self.comm,elapsed),
             "residual_seconds":residual_seconds,
             "limiter_seconds":_global_max(self.comm,time.perf_counter()-limiter_started),
@@ -896,7 +941,8 @@ class FokkerPlanckSolver:
     def limiter_history_summary(self) -> dict[str,object]:
         if not self.limiter_history: return {"steps":0}
         keys=("relative_l1_correction","raw_to_final_l2_correction","raw_negative_cell_average_fraction",
-              "corrected_fraction","projection_seconds","scaling_seconds")
+              "corrected_fraction","corrected_cell_average_fraction",
+              "scaled_cell_fraction","projection_seconds","scaling_seconds")
         result={"steps":len(self.limiter_history)}
         for key in keys:
             values=np.array([getattr(r,key) for r in self.limiter_history])
@@ -1158,6 +1204,7 @@ def solver_metadata(solver: FokkerPlanckSolver) -> dict[str, object]:
             "guarantee": f"global mass preserved; all Q{solver.degree} Bernstein coefficients on the limiter control subcells are nonnegative; hence the polynomial is nonnegative throughout each affine axis-aligned hexahedron",
             "control_subdivisions_per_axis":solver.limiter.control_subdivisions,
             "scope": "postprocessed state at every completed timestep; not the unlimited algebraic solution",
+            "enabled_during_forecast":solver.apply_positivity,
         },
         "global_cells": int(np.prod(solver.domain.cells)), "global_dofs":global_dofs,
         "severity":{"corner_sample_max_drift_speed":max_speed,"cell_widths":widths.tolist(),"max_cell_Peclet_estimate":pe},

@@ -164,7 +164,40 @@ class TestQ2Properties(unittest.TestCase):
         report = solver.limiter.apply(state)
         self.assertEqual(report.scaled_cells, 0)
         self.assertGreaterEqual(report.minimum_after, 0.0)
+        self.assertGreaterEqual(report.minimum_scaling_factor, 0.0)
+        self.assertLessEqual(report.mean_scaling_factor, 1.0)
         np.testing.assert_array_equal(q.x.array, before)
+
+    def test_q2_limiter_scaling_factors_stay_in_unit_interval(self):
+        solver = FokkerPlanckSolver(
+            Lorenz63Model(), Domain(cells=(4, 4, 4)), 0.000625, degree=2,
+            certificate_mode="adaptive", certificate_max_depth=4,
+        )
+        state = solver.gaussian_projected(
+            (1.0, 1.0, 20.0), np.diag([4.0, 4.0, 9.0]),
+            quadrature_degree=14, apply_limiter=False,
+        )
+        report = solver.limiter.apply(state)
+        self.assertGreaterEqual(report.minimum_cell_average, 0.0)
+        self.assertGreaterEqual(report.minimum_scaling_factor, 0.0)
+        self.assertLessEqual(report.mean_scaling_factor, 1.0)
+        self.assertLess(abs(report.mass_before-report.mass_after), 1.0e-13)
+
+    def test_forecast_can_record_an_unlimited_q2_trajectory(self):
+        solver = FokkerPlanckSolver(
+            Lorenz63Model(), Domain(cells=(3, 3, 3)), 0.000625, degree=2,
+            apply_positivity=False,
+        )
+        state = solver.gaussian_projected(
+            (1.0, 1.0, 20.0), np.diag([4.0, 4.0, 9.0]),
+            quadrature_degree=12, apply_limiter=False,
+        )
+        forecast = solver.step(state)
+        self.assertIsNone(solver.last_limiter)
+        self.assertEqual(solver.limiter_history_summary(), {"steps": 0})
+        np.testing.assert_array_equal(
+            solver.limiter.last_raw_coefficients, forecast.function.x.array
+        )
 
     def test_structured_q1_embedding_into_q2_is_exact(self):
         domain = Domain(((-1.0, 1.0),) * 3, (2, 2, 2))

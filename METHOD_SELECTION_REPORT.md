@@ -681,6 +681,12 @@ These are decision-relevant unknowns rather than implementation details.
 
 ## 20. Same-mesh Q2 experiment result (2026-09-11)
 
+**Superseded evidence notice.** A subsequent invariant audit found that the
+Stage-1 floating-point mass repair could make tiny active cell averages
+negative and produce Stage-2 scaling factors outside `[0,1]`. The values below
+are preserved as diagnostic history and cannot support a method decision until
+the predeclared corrected run reproduces or revises them.
+
 The predeclared experiment has now been executed. On `30x36x36` with
 `dt=0.000625`, corrected Q1 gave covariance error `0.08719`, fixed-subcell Q2
 gave `0.03483`, and adaptive-certificate Q2 gave `0.02377`. Adaptive Q2 also

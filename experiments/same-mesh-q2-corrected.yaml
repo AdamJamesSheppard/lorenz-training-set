@@ -1,0 +1,50 @@
+id: same-mesh-q2-corrected
+kind: same_mesh_q2_study
+status: predeclared_replacement_after_limiter_invariant_repair
+study:
+  cells: [30, 36, 36]
+  dt: 0.000625
+  final_time: 0.05
+  seed: 20260910
+  monte_carlo_paths: 200000
+  mc_dt: 0.000125
+  bootstrap_replicates: 200
+  certificate_max_depth: 4
+  initial_law: positive_limited_q1_polynomial_embedded_exactly_in_q2
+  branches:
+    - name: q1_baseline
+      degree: 1
+      certificate_mode: fixed
+      archive_raw: false
+    - name: q2_fixed_subcell
+      degree: 2
+      certificate_mode: fixed
+    - name: q2_certificate_gated
+      degree: 2
+      certificate_mode: adaptive
+    - name: q2_certificate_gated_half_dt
+      degree: 2
+      dt: 0.0003125
+      certificate_mode: adaptive
+  pairwise_comparisons:
+    - name: adaptive_timestep_halving
+      baseline: q2_certificate_gated
+      challenger: q2_certificate_gated_half_dt
+      limits:
+        covariance_error_change: 0.003
+        l1: 0.0025
+execution:
+  mpi_ranks: 8
+decision_gates:
+  corrected_covariance_error_maximum: 0.03
+  corrected_covariance_mc_p95_ratio_maximum: 5.0
+  limiter_relative_l1_mean_maximum: 0.001
+  limiter_relative_l1_step_maximum: 0.005
+  mass_error_maximum: 1.0e-10
+  negative_mass_maximum: 1.0e-13
+  timestep_halving_covariance_change_maximum: 0.003
+  timestep_halving_l1_change_maximum: 0.0025
+notes:
+  - This supersedes the two 2026-09-10 runs whose first-step scaling factors violated the unit interval.
+  - The subcell-average L1 value is a rigorous lower bound on the full polynomial L1 difference.
+  - Raw Q2 coefficients before each correction are retained under the immutable run.

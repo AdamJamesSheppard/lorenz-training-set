@@ -54,15 +54,16 @@ subject to  x_K >= 0
             sum_K |K|x_K = sum_K |K|w_K.
 ```
 
-The KKT solution is `x_K=max(0,w_K-lambda)`.  A monotone bisection finds the
-single multiplier `lambda`; the final active-set correction removes roundoff
-in the equality constraint.  The constant mode in every cell is shifted from
-`w_K` to `x_K`.
+The KKT solution is `x_K=max(0,w_K-lambda)`. A monotone bisection finds the
+single multiplier `lambda`; the final floating-point repair removes residual
+mass by proportionally contracting non-negative slacks, followed by a guarded
+one-cell ulp correction. This preserves both the lower bound and the equality
+constraint. The constant mode in every cell is shifted from `w_K` to `x_K`.
 
 For Q1, Stage two uses
 
 ```text
-theta_K = min(1, x_K/(x_K-min_vertex(p_K)))
+theta_K = clamp(x_K/(x_K-min_vertex(p_K)), 0, 1)
 p_K <- x_K + theta_K (p_K-x_K).
 ```
 
@@ -138,10 +139,12 @@ covariance error.  A Crank--Nicolson experiment only reduces the coarse
 normalized covariance error from `0.614` to `0.602` while slightly increasing
 limiter activity, so it does not resolve the problem.
 
-The Q2 path now has fixed-subcell and adaptive-certificate experimental modes.
-Neither has production status. The same-mesh falsification experiment must show
-whether Q2 propagation improves before any local/operator-level positivity
-method is justified.
+The Q2 path now has fixed-subcell and adaptive-certificate experimental modes,
+plus a diagnostic switch that evolves the unlimited algebraic trajectory.
+None has production status. The corrected same-mesh comparison must reproduce
+the earlier apparent Q2 improvement, and the two-timestep unlimited run must
+separate temporal sensitivity from accumulated limiter-path dependence before
+any local/operator-level positivity method is selected.
 
 Dataset writing and the global cell-average projection currently gather to
 rank zero.  Profiling confirms that the limiter dominates step time and that
