@@ -1,0 +1,85 @@
+{
+  "date": "2026-09-11",
+  "evidence_class": "NUMERICAL",
+  "classification": "INSUFFICIENT_EVIDENCE",
+  "configuration": {
+    "cells": [30, 36, 36],
+    "t_final": 0.05,
+    "initial_law": "positive limited Q1 polynomial reconstructed exactly in Q1 and Q2",
+    "monte_carlo_paths": 200000,
+    "mc_dt": 0.000125,
+    "mpi_ranks": 8,
+    "certificate_max_depth": 4
+  },
+  "branches": {
+    "q1_dt_0.000625": {
+      "corrected_covariance_error": 0.0871922559853788,
+      "corrected_marginal_tv": [0.023592956775960617, 0.011828094760151314, 0.01222545909729427],
+      "limiter_relative_l1_mean": 0.0034477248818538023,
+      "limiter_relative_l1_maximum": 0.006292077925628461,
+      "forecast_wall_seconds": 20.897426608000387
+    },
+    "q2_fixed_dt_0.000625": {
+      "raw_covariance_error": 0.0338796613124454,
+      "corrected_covariance_error": 0.034828949538962435,
+      "corrected_marginal_tv": [0.006737036492725368, 0.0023163995759743167, 0.004165801342070542],
+      "limiter_relative_l1_mean": 0.0010492069941486861,
+      "limiter_relative_l1_maximum": 0.0032234007304478888,
+      "forecast_wall_seconds_including_raw_classification_and_archive": 224.48543736400097
+    },
+    "q2_adaptive_dt_0.000625": {
+      "raw_covariance_error": 0.023008828692921132,
+      "corrected_covariance_error": 0.023774502268571984,
+      "corrected_covariance_mc_p95_ratio": 3.9152706650532614,
+      "corrected_marginal_tv": [0.004813253369940192, 0.0018631599551471119, 0.0032738287488678617],
+      "limiter_relative_l1_mean": 0.0006062050805138766,
+      "limiter_relative_l1_maximum": 0.004127057956550708,
+      "final_raw_cell_classes": {
+        "certified_nonnegative": 26378,
+        "witnessed_negative": 12088,
+        "unresolved": 414
+      },
+      "final_raw_quadrature_negative_mass": 4.218154092040645e-9,
+      "corrected_negative_mass": 0.0,
+      "active_certificate_lower_bound": -7.115411622455294e-20,
+      "mass_error": 4.136713194213604e-11,
+      "forecast_wall_seconds_including_raw_classification_and_archive": 396.99171510299857
+    },
+    "q2_adaptive_dt_0.0003125": {
+      "raw_covariance_error": 0.021785338286520465,
+      "corrected_covariance_error": 0.02218060511074223,
+      "corrected_covariance_mc_p95_ratio": 3.652781940172064,
+      "corrected_marginal_tv": [0.005059164709692837, 0.0017612459760148003, 0.002702245643332481],
+      "limiter_relative_l1_mean": 0.0003262514295783224,
+      "limiter_relative_l1_maximum": 0.002408228937600799,
+      "mass_error": 2.560198719026463e-10,
+      "forecast_wall_seconds_including_raw_classification_and_archive": 850.9916474010024
+    }
+  },
+  "timestep_comparison": {
+    "absolute_change_in_corrected_covariance_error": 0.001593897157829754,
+    "conservative_three_subcell_average_l1_difference": 0.01552464558388648,
+    "interpretation": "The subcell-average L1 value is a lower bound on the polynomial L1 difference by Jensen's inequality.",
+    "covariance_gate_passed": true,
+    "density_l1_gate_passed": false,
+    "half_step_mass_gate_passed": false
+  },
+  "decision": {
+    "same_mesh_q2_improves_over_q1": true,
+    "adaptive_certificate_improves_over_fixed_q2": true,
+    "all_predeclared_gates_passed": false,
+    "production_status": "not certified",
+    "next_diagnostic": "Compare unlimited Q2 at both timesteps to separate backward-Euler/DG sensitivity from accumulated positivity correction."
+  },
+  "immutable_evidence": {
+    "same_mesh_run": "runs/same-mesh-q2-falsification/20260910T185420Z",
+    "same_mesh_git_commit": "242ccf6df26dbe9d59d71f2ca753184e69857529",
+    "same_mesh_config_sha256": "85092a90637924f66020b76aa96f81bfae4f2726651c155626823102c29ebd11",
+    "half_step_run": "runs/same-mesh-q2-timestep/20260910T190840Z",
+    "half_step_git_commit": "ad9258d6d15ba302b2b4e8f3577b286d7feb4de4",
+    "half_step_config_sha256": "4529471f2062600210c19609032a9c780772bf3c2bb061eab72b12f710c6cc3f",
+    "recovered_full_step_state": "runs/same-mesh-q2-recovery/20260910T190900Z",
+    "recovered_full_step_state_sha256": "4e48a4e8a0ac0fc2e77ae3bf47cc89397fc4451184d3006103c0f1f1ecf3608b",
+    "half_step_state_sha256": "df10d75d5b66e1d249f607a72addc3ac8f11d76be849a8420a02468219d2793c"
+  }
+}

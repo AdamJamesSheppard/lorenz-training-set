@@ -4,6 +4,23 @@ Decisions here are dated and revisable. Add a new entry that marks an older
 decision `superseded`, `narrowed`, or `confirmed` rather than rewriting history
 to make the current direction look inevitable.
 
+## 2026-09-11 - Retain Q2 as a challenger but withhold production selection
+
+The controlled same-mesh experiment resolves the earlier degree confound.
+Adaptive-certificate Q2 reduced corrected covariance error from `0.08719` for
+Q1 to `0.02377`, improved every marginal TV, and met the forecast correction
+gates. Fixed-subcell Q2 reached `0.03483`; adaptive certification therefore had
+a material effect rather than merely relabelling cells.
+
+The complete gate still failed. Halving the timestep changed the conservative
+three-subcell density by `L1=0.01552`, which is already a lower bound on the
+polynomial L1 difference and exceeds the `0.0025` gate. The half-step mass error
+was `2.56e-10`, above `1e-10`, although covariance-error change passed at
+`0.00159`. Do not certify Q2 or generate production data. Before committing to
+AFC, compare truly unlimited Q2 at both timesteps; the raw states recorded in a
+limited trajectory still inherit all previous corrections and cannot isolate
+time discretisation from accumulated limiting.
+
 ## 2026-09-10 - Implement the predeclared Q2 diagnostic without relaxing positivity
 
 The same-mesh experiment now has fixed and adaptive Bernstein branches. The

@@ -1,15 +1,15 @@
 {
-  "report_date": "2026-09-10",
+  "report_date": "2026-09-11",
   "classification": "INSUFFICIENT_EVIDENCE",
   "large_neural_operator_dataset": "NO",
   "recommended": {
-    "production_forecast_generator": "No method is certified. The leading research path is same-physical-mesh Q2 diagnosis followed, only if raw Q2 is accurate, by local or operator-level positivity. Q1 remains the controlled baseline.",
+    "production_forecast_generator": "No method is certified. Same-mesh adaptive Q2 is the strongest startup challenger, but it failed the density timestep and half-step mass gates. The next diagnostic isolates unlimited Q2 time sensitivity from accumulated postprocessing. Q1 remains the controlled baseline.",
     "independent_validator": "Develop a dynamically scaled and translated whole-space Hermite-Galerkin reference after the Q2 gate, validated by mode-tail and moment convergence; retain exact-native-law Monte Carlo for moment uncertainty and the independent FV hierarchy for current triangulation.",
     "neural_operator_target_representation": "If a pilot is run: float64 exact conservative subcell averages; Q1 requires 2 subcells per native cell per axis (60x72x72 for the tested 30x36x36 mesh).",
     "expected_covariance_error": {
-      "best_measured_short_gaussian_normalized_frobenius": 0.08557651238862092,
+      "best_measured_short_gaussian_normalized_frobenius": 0.02218060511074223,
       "mc_bootstrap_p95": 0.006282392718324663,
-      "error_to_mc_noise_ratio": 13.621643253693597,
+      "error_to_mc_noise_ratio": 3.652781940172064,
       "mature_corrected_production_resolution": null
     },
     "expected_full_density_error": {
@@ -25,7 +25,7 @@
       "monte_carlo_200000_cpu_sampling_propagation_histogram_seconds": 3.369948232000722,
       "scope": "One 0.05 forecast interval; MC figure excludes principled bandwidth selection and accuracy certification."
     },
-    "principal_remaining_limitation": "The equal-DOF Q1/Q2 comparison also changed physical cell size and timestep; no corrected mature-posterior forecast or converged deterministic full-density reference exists."
+    "principal_remaining_limitation": "Adaptive Q2 has strong startup covariance and marginal accuracy but fails the predeclared density timestep gate; no corrected mature-posterior forecast or converged deterministic full-density reference exists."
   },
   "pde": {
     "linear_in_density": true,
@@ -45,6 +45,8 @@
     "Quadrature-accurate projected Bayesian likelihood product, with cached mass solve for repeated DA cycles",
     "Experimental DG Q2/Q3 element path and degree-squared SIPG penalty scaling",
     "Q2/Q3 positivity via Bernstein coefficients on 2x2x2 control subcells",
+    "Adaptive tensor-Bernstein three-way classification with fixed conservative fallback",
+    "Immutable raw pre-correction coefficient archives and same-mesh Q1/Q2 runner",
     "Exact Qk cell averages and conservative degree+1 subcell export/reconstruction",
     "Independent conservative finite-volume/SSPRK validator",
     "Corrected dataset defaults: L2 initialization and projected Bayesian analysis"
@@ -169,10 +171,19 @@
     "temporal": "halving dt changes E_cov by <= 0.003 and L1 by <= 0.0025",
     "boundary": "expanded-domain mature E_cov and marginal TV change <= 0.005"
   },
+  "executed_same_mesh_q2_experiment": {
+    "evidence": "same_mesh_q2_falsification_report.json",
+    "adaptive_q2_corrected_covariance_error": 0.023774502268571984,
+    "adaptive_q2_limiter_relative_l1_mean": 0.0006062050805138766,
+    "adaptive_q2_limiter_relative_l1_maximum": 0.004127057956550708,
+    "timestep_covariance_error_change": 0.001593897157829754,
+    "timestep_subcell_l1_lower_bound": 0.01552464558388648,
+    "all_gates_passed": false
+  },
   "smallest_additional_experiment_required": {
-    "name": "same_mesh_q2_positivity_falsification",
-    "description": "Compare Q1 and Q2 on the same 30x36x36 mesh, dt=0.000625 and t_final=0.05, starting from the same positive limited Q1 polynomial embedded exactly into Q2. Save raw Q2 coefficients before correction and classify each cell by adaptive Bernstein branch-and-bound as certified nonnegative, witnessed negative, or unresolved. Compare current fixed-subcell scaling with certificate-gated scaling against at least 200000 exact-native-law MC paths.",
-    "decision_rule": "Advance Q2 only if raw Q2 improves covariance and every marginal TV over Q1, corrected E_cov is at most 0.03 and at most five MC p95 units, limiter relative L1 mean/max are at most 0.001/0.005, invariants pass, and timestep halving changes E_cov by at most 0.003. If raw Q2 is accurate but correction fails, implement local conservative flux correction/AFC. If raw Q2 fails, close the Q2 branch and prototype a positive full-SPD finite-volume/flux method."
+    "name": "unlimited_q2_timestep_limiter_attribution",
+    "description": "Propagate the same embedded positive Q1 law with Q2 and no positivity correction at dt=0.000625 and 0.0003125. Record negativity, mass, covariance, marginals and conservative density change.",
+    "decision_rule": "If unlimited Q2 passes the density timestep gate while adaptive Q2 fails, attribute the material sensitivity to accumulated postprocessing and prototype local conservative flux correction. If unlimited Q2 also fails, investigate time integration before selecting a positivity architecture."
   },
   "reproducibility": {
     "python": "3.12.13",
@@ -200,5 +211,6 @@
     "scaling_30_rank8.json",
     "scaling_q2_20_rank1.json",
     "scaling_q2_20_rank8.json"
+    ,"same_mesh_q2_falsification_report.json"
   ]
 }

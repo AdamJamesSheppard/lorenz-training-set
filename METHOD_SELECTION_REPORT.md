@@ -679,6 +679,30 @@ mature-posterior validation, lack of a converged deterministic density reference
 and lack of a directly applicable 3-D/full-SPD/high-Péclet positivity theorem.
 These are decision-relevant unknowns rather than implementation details.
 
+## 20. Same-mesh Q2 experiment result (2026-09-11)
+
+The predeclared experiment has now been executed. On `30x36x36` with
+`dt=0.000625`, corrected Q1 gave covariance error `0.08719`, fixed-subcell Q2
+gave `0.03483`, and adaptive-certificate Q2 gave `0.02377`. Adaptive Q2 also
+improved all three physical-cell marginal TVs to
+`(0.00481, 0.00186, 0.00327)` and reduced limiter relative L1 mean/max to
+`0.000606/0.004127`. Thus the earlier equal-DOF Q2 rejection was confounded:
+Q2 is materially better on the same physical mesh, and adaptive certification
+is materially less damaging than fixed-subcell scaling.
+
+The production decision remains `INSUFFICIENT_EVIDENCE`. At half timestep,
+covariance error changed by only `0.00159`, passing that gate, while the
+conservative three-subcell density changed by `L1=0.01552`. Jensen's inequality
+makes this a lower bound on the full polynomial L1 difference, already more than
+six times the `0.0025` gate. Half-step mass drift was `2.56e-10`, above the
+`1e-10` gate. The next controlled diagnostic is unlimited Q2 at both timesteps:
+raw pre-correction states from a limited trajectory inherit earlier limiter
+changes and cannot distinguish backward-Euler/DG sensitivity from accumulated
+postprocessing.
+
+Evidence: [`same_mesh_q2_falsification_report.json`](same_mesh_q2_falsification_report.json)
+and the hashed immutable run paths recorded there.
+
 ## Sources
 
 [^1]: C. Liu, J. Hu, W. T. Taitano and X. Zhang, [“An optimization-based positivity-preserving limiter in semi-implicit discontinuous Galerkin schemes solving Fokker–Planck equations”](https://www.math.purdue.edu/~zhan1966/research/paper/DG_anisotropic_Fokker_Planck.pdf), *Computers & Mathematics with Applications* (2025).

@@ -29,7 +29,8 @@ next experiment.
   and sufficient certificate in this experiment, not a selected production
   limiter.
 - The experiment is implemented and smoke-tested; the predeclared production-
-  scale run has not yet supplied evidence.
+  scale run is complete. Adaptive Q2 passed the covariance, marginal and limiter
+  gates but failed the timestep-density and half-step mass gates.
 
 ## Latest validated evidence
 
@@ -39,6 +40,11 @@ next experiment.
   convergence and maximum mass error `3.12e-12`.
 - Q2 L2 projection preserves covariance to about `2.84e-10` before limiting,
   but the tested Q2 positivity treatment is too intrusive to justify adoption.
+- On the controlled same mesh, adaptive Q2 reduced corrected startup covariance
+  error from Q1's `0.08719` to `0.02377` and passed the single-step limiter
+  gates. Halving `dt` changed the conservative three-subcell density by at least
+  `L1=0.01552`, versus the predeclared `0.0025` maximum, and accumulated mass
+  error was `2.56e-10`, versus `1e-10`.
 
 ## Active blockers
 
@@ -48,23 +54,21 @@ next experiment.
    covariance discrepancy.
 3. The independent finite-volume hierarchy is not converged enough to define a
    full-density truth error.
-4. The existing equal-DOF Q1/Q2 comparison also changed physical cell size and
-   timestep, so it cannot isolate polynomial-degree accuracy.
+4. The corrected adaptive Q2 density remains timestep-sensitive even though its
+   covariance error is comparatively stable.
 
 ## Near-term research portfolio
 
 The living plan is in `docs/RESEARCH_DIRECTIONS.md` and
 `experiments/method-selection-research.yaml`. Current high-value branches are:
 
-1. Execute the implemented, predeclared same-mesh Q2 falsification experiment in
-   `METHOD_SELECTION_REPORT.md`: Q1 and Q2 on `30x36x36`, `dt=0.000625`, from
-   the same positive Q1 law embedded exactly in Q2. Classify every raw Q2 cell
-   as certified non-negative, witnessed negative, or unresolved before applying
-   any correction.
-2. If raw Q2 is accurate but corrected Q2 fails limiter gates, develop a local
+1. Run an unlimited-Q2 two-timestep diagnostic from the same represented law to
+   separate backward-Euler/DG sensitivity from accumulated positivity correction.
+2. If that diagnostic attributes the density failure mainly to correction, develop a local
    algebraic/convex flux correction rather than another global polynomial
    scaling variant.
-3. If raw Q2 fails, close that branch and prototype a full-SPD positive
+3. If the unlimited Q2 density also fails the timestep gate, investigate the
+   time integrator or close that branch and prototype a full-SPD positive
    finite-volume/flux method. Directional FCDF and complete-flux methods remain
    a separate diagonal-noise branch rather than the general production target.
 4. Develop a dynamically scaled whole-space Hermite solver as an independent

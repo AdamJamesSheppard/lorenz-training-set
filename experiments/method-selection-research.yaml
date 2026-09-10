@@ -13,7 +13,7 @@ production_scope:
   special_case: Directional diagonal-only methods may be compared but cannot certify the general production role.
 next_experiment:
   name: same_mesh_q2_positivity_falsification
-  status: implemented_smoke_tested_full_run_not_started
+  status: completed_failed_density_timestep_and_half_step_mass_gates
   cells: [30, 36, 36]
   dt: 0.000625
   t_final: 0.05
@@ -28,6 +28,7 @@ next_experiment:
     - unresolved
   decision_source: METHOD_SELECTION_REPORT.md
 candidate_branches:
+  - unlimited_q2_timestep_limiter_attribution
   - same_mesh_q2_positivity_falsification
   - adaptive_q2_bernstein_diagnosis
   - q2_local_afc_or_convex_limiting
