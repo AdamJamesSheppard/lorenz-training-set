@@ -1,8 +1,8 @@
 {
-  "created_utc": "2026-09-08T23:38:02.042821+00:00",
+  "created_utc": "2026-09-11T11:27:28.144247+00:00",
   "decision": "INSUFFICIENT_EVIDENCE",
   "workspace": "/mnt/large storage/Important/Derby Masters/Original Dissertation Royal Holloway/FENICS Code/NewTest",
-  "git_revision": null,
+  "git_revision": "049259930e6f85614688de6f30e93f379a3ad12e",
   "version_fallback": "SHA-256 file hashes are authoritative when git_revision is null.",
   "software": {
     "python": "3.12.13 | packaged by conda-forge | (main, Mar  5 2026, 16:50:00) [GCC 14.3.0]",
@@ -18,11 +18,11 @@
   },
   "code_sha256": {
     "benchmark_scaling.py": "470f1a01360aac016bf51c4bb03a64f88acfb8cb5a8c6d0d7d9fd2b28e92b447",
-    "build_experiment_manifest.py": "9a7ed7adf091b4d233c7673320af206d3abeb6fd222aee34b0a831fc380b040b",
+    "build_experiment_manifest.py": "fefd47147f1da22794d136955e82ecf575923ec4cc13a356ff7b70f0e5ae730c",
     "generate_dataset.py": "81074edffe3a6f6bebcec4a623bc46604c5ea5158d371d74fddc54f47b6227d9",
     "independent_reference_study.py": "6d8d03c43cc826a8272be0186633d0894e021dd2ced89b19abe44a7550569e17",
     "lorenz_fpe/__init__.py": "7dbd7037862c69f129feac6b4e1d1fc56d1e01f49835e0aca76bb74fec066bdb",
-    "lorenz_fpe/core.py": "a4b00b96fb5fa6ccbce5285567df13c68533bb34712b14eb46d692325a2fbf48",
+    "lorenz_fpe/core.py": "ef602d484e312a03fa1773910519cd3d99dcccfa2587403ce03e5765c2eff30f",
     "lorenz_fpe/dataset.py": "3e9a28938499e018d810f12cb15e6fcd3358dbdd94df13d3fa67283262a71a4e",
     "lorenz_fpe/finite_volume.py": "2bec80ae17ac8d926c0badb7d2da7a5755ff4138ffeccc077a6b6b61a0f7d367",
     "lorenz_fpe/validation.py": "7e3258874f6cd1e5234d96b942c37faed93f1d6547743b50d3fb0c2cf9f605e7",
@@ -30,11 +30,12 @@
     "mature_forecast_validation.py": "0e53932d5ceda3f611c0decc2eac5861ae84023720011946d7733a16dc4a4465",
     "mc_timestep_repair.py": "077d5c9e9f277f1cfb210649f2da3526c2d7437d8bc17fdea661730e64c8b2b5",
     "resplit_dataset.py": "11587c66f55020daff7171e500230ff315fd5b17e781e4b653e2a8d8130267bf",
+    "same_mesh_q2_study.py": "9946037202a22aa0b978725601ed9960db62be9fc8b8371b0d377829a6fd7640",
     "solver.py": "5060082cc7e6ad1671c5fe35d2ada34fb38bb4930b720a606ab02b0c66e48d36",
     "tests/__init__.py": "3b2bec5485bb3fb3bb29a41ff8b1d86feb92bbc6587a20491c94a0b29d2a195b",
     "tests/mpi_probe_worker.py": "f568a7e9937e7a0d7888b6fb85255eba63e3c711b635e6cbe1231fb000a87c74",
-    "tests/test_accuracy_repairs.py": "911113e8d0cedb9bdf01c98e0136dccde0126cb4f7215ff7147c1f2a780ebd1f",
-    "tests/test_limiter.py": "d7eabdc02af1951c141f55b9c7e9b651922e0389a044a9896cbbabe9f177293a",
+    "tests/test_accuracy_repairs.py": "0c782a0ec04dddee0035eff5fd1db35c277ca01346cb366e05d0efacc0838595",
+    "tests/test_limiter.py": "703d5eca288e21b30b915ff22c5116ddf0ff3575cda5a3e7332e4b52037079f8",
     "tests/test_mpi_consistency.py": "c8e3a7c194efd163ffb1e84c799a9f80fdbb32e512762a050fe7f46a4e454e8c",
     "tests/test_solver_smoke.py": "6b4f18916acfa23200abc2675a87bb9c9257ebc0117c988ab018faef9fe2bd72",
     "tests/test_validation.py": "a4bd400fa133c4f72ec590d19502b46b6c617332939a27860f5e8da7d445c05b",
@@ -43,7 +44,7 @@
   },
   "evidence": {
     "POSITIVITY_AUDIT.md": {
-      "sha256": "107fe2494a32603bf3c7e629fee26e02178aa877b9bd17487ddecdceafe8e7bc",
+      "sha256": "80fe345647439ef70b81ffe33bdf680829b7546f9fc64934b88f27c490e7aea0",
       "configuration": {}
     },
     "PRODUCTION_READINESS.md": {
@@ -293,12 +294,101 @@
       }
     },
     "METHOD_SELECTION_REPORT.md": {
-      "sha256": "e1aae24a5134afa52932cdd54cba50d8d8c416c054c44a3893a56ed42803ce48",
+      "sha256": "3bbb0a76d648f14c4f984a659da52c653b3a9237168d7cb25ea4a2b07c50121f",
       "configuration": {}
     },
     "method_selection_report.json": {
-      "sha256": "ef2a3374c4e9052c48873c153bb586776bd612ef91103c493b4e194b0270f744",
+      "sha256": "4a18a231849a8881aa46e50860651d3987c539ff78ca5897e6d219f869097f75",
       "configuration": {}
+    },
+    "same_mesh_q2_falsification_report.json": {
+      "sha256": "b1e7ba853ee09460e511fab95407db60376a9d3aa24cb168a9f50cfad9e06b6b",
+      "configuration": {
+        "configuration": {
+          "cells": [
+            30,
+            36,
+            36
+          ],
+          "t_final": 0.05,
+          "initial_law": "positive limited Q1 polynomial reconstructed exactly in Q1 and Q2",
+          "monte_carlo_paths": 200000,
+          "mc_dt": 0.000125,
+          "mpi_ranks": 8,
+          "certificate_max_depth": 4
+        }
+      }
+    },
+    "same_mesh_q2_corrected_report.json": {
+      "sha256": "9e9ad743b9efe76b2895afbd2e5c522af0e2e49a0938014a6ddcb6856eb74682",
+      "configuration": {}
+    },
+    "unlimited_q2_timestep_report.json": {
+      "sha256": "839815b3e40df53f2c2921abce9fc309cf8c4481eed007886707a1a07e1cabf9",
+      "configuration": {
+        "configuration": {
+          "cells": [
+            30,
+            36,
+            36
+          ],
+          "final_time": 0.05,
+          "timesteps": [
+            0.000625,
+            0.0003125
+          ],
+          "degree": 2,
+          "positivity_applied_each_step": false,
+          "monte_carlo_paths": 200000,
+          "mc_dt": 0.000125,
+          "mpi_ranks": 8
+        }
+      }
+    },
+    "unlimited_q2_crank_nicolson_report.json": {
+      "sha256": "2e74dd8b04791ebf488b2639428b25639999d9106521e15d8e196b9aa55aff06",
+      "configuration": {
+        "configuration": {
+          "cells": [
+            30,
+            36,
+            36
+          ],
+          "final_time": 0.05,
+          "timesteps": [
+            0.000625,
+            0.0003125
+          ],
+          "degree": 2,
+          "theta": 0.5,
+          "positivity_applied_each_step": false,
+          "monte_carlo_paths": 200000,
+          "mc_dt": 0.000125,
+          "mpi_ranks": 8
+        }
+      }
+    },
+    "corrected_q2_crank_nicolson_report.json": {
+      "sha256": "217d3da69ec3eb8d90b2b615930250650561ac67759b4e9c98b33becd9739550",
+      "configuration": {
+        "configuration": {
+          "cells": [
+            30,
+            36,
+            36
+          ],
+          "final_time": 0.05,
+          "timesteps": [
+            0.000625,
+            0.0003125
+          ],
+          "degree": 2,
+          "theta": 0.5,
+          "certificate_mode": "adaptive",
+          "positivity_applied_each_step": true,
+          "mpi_ranks": 8
+        }
+      }
     }
   },
   "common_model": {

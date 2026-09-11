@@ -9,12 +9,15 @@ Record why a branch moved; do not preserve a stale ranking for consistency.
 
 ## Current diagnosis
 
-The corrected same-mesh evidence shows that adaptive Q2 improves covariance and
-marginals over Q1, while both corrected and unlimited backward-Euler Q2 remain
-density-sensitive to timestep. Global positivity correction magnifies that
-sensitivity and is intrusive; the unlimited failure shows temporal/spatial DG
-error also matters. This attribution is `NUMERICAL`, not proved. Unlimited Q2
-has strong moment accuracy but unacceptable negative mass.
+The corrected same-mesh evidence shows that Q2 improves covariance and
+marginals over Q1. Unlimited Crank--Nicolson Q2 then passes the controlled
+density and covariance timestep gates, but carries genuine negative mass.
+Applying the current adaptive global correction removes negativity while
+increasing the timestep density discrepancy from `4.19e-5` to `0.01088` and
+the full-step covariance discrepancy from `0.00371` to `0.02192`. This causal
+attribution is `NUMERICAL`, not a theorem. The central problem is now local
+positivity enforcement that preserves substantially more of the accurate
+unlimited trajectory.
 
 ## Active branches
 

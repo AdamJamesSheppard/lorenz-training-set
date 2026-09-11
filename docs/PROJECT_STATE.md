@@ -18,16 +18,15 @@ next experiment.
 
 - Method-selection classification: `INSUFFICIENT_EVIDENCE`.
 - Large neural-operator dataset generation: `NO`.
-- Strongest tested interim comparator: Q1 DG, upwind advection, SIPG diffusion,
-  backward Euler, quadrature-14 L2 initialization and projected Bayesian
-  analysis, followed by the conservative two-stage positivity limiter.
-- This is neither a certified production method nor a requirement that future
-  work remain on the Q1/DG path.
-- The most informative next experiment is a same-physical-mesh, same-timestep
-  Q1/Q2 comparison from one positive represented law, with raw Q2 negativity
-  classified before correction. Adaptive Bernstein subdivision is a diagnostic
-  and sufficient certificate in this experiment, not a selected production
-  limiter.
+- Controlled baseline: Q1 DG, upwind advection, SIPG diffusion, backward
+  Euler, quadrature-14 L2 initialization and projected Bayesian analysis,
+  followed by the conservative two-stage positivity limiter.
+- Strongest observed numerical trajectory: unlimited same-mesh Q2 with
+  Crank--Nicolson. It passes the controlled timestep gates but is not an
+  admissible density because it contains genuine negative mass.
+- Strongest tested non-negative trajectory: adaptive corrected same-mesh Q2
+  with Crank--Nicolson. It fails the cross-timestep density gate and is not a
+  certified production method.
 - The corrected production-scale run reproduces the earlier Q2 accuracy and
   timestep results while satisfying cell-average and scaling-factor invariants.
   Adaptive Q2 passes its full-step branch gates but fails the half-step mass
@@ -35,7 +34,8 @@ next experiment.
 
 ## Latest validated evidence
 
-- Best short-time same-initial-law covariance error: `0.0855765`.
+- Historical Q1 short-time same-initial-law covariance error: `0.0855765`;
+  the matched controlled Q1 run gives `0.08719`.
 - Monte Carlo bootstrap p95 noise: `0.00628239`; error/noise ratio: `13.62`.
 - Manufactured total-flux boundary test: approximately second-order L1
   convergence and maximum mass error `3.12e-12`.

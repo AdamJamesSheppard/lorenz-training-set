@@ -7,10 +7,15 @@ documentation, experiment, or architecture when a better-supported direction
 emerges; see `AGENTS.md` and `docs/RESEARCH_DIRECTIONS.md` for the maintenance
 and comparison policy.
 
-> **Current method-selection status (2026-09-09): `INSUFFICIENT_EVIDENCE`.**
+> **Current method-selection status (2026-09-11): `INSUFFICIENT_EVIDENCE`.**
 > Do not generate a large training dataset. The authoritative corrected
 > evidence is [METHOD_SELECTION_REPORT.md](METHOD_SELECTION_REPORT.md).
 > Older readiness files and the sample dataset remain as audit history.
+> Q1 is the controlled baseline. Unlimited Q2--Crank--Nicolson is the most
+> accurate observed trajectory but contains genuine negative mass; adaptive
+> global correction restores non-negativity while failing the density timestep
+> gate. The active direction is a local conservative correction built from a
+> positive full-SPD low-order comparator.
 
 This project implements the forecast step of a continuous-discrete Bayesian
 filter for the stochastic Lorenz-63 model.  It uses modern DOLFINx 0.11, UFL,
@@ -20,7 +25,7 @@ through every forecast and Bayesian update; it is never replaced by a Gaussian.
 ## What is implemented
 
 - `FokkerPlanckSolver`: experimental DG/Q1--Q3, conservative upwind advection, full-tensor
-  SIPG diffusion, backward Euler, one reusable matrix, and independently
+  SIPG diffusion, theta-method time integration, one reusable matrix, and independently
   recomputed PETSc residuals.
 - `PositivityLimiter`: the two-stage optimisation/scaling method described by
   Liu, Hu, Taitano, and Zhang (2025).  It first finds the nearest non-negative

@@ -3,13 +3,15 @@
   "classification": "INSUFFICIENT_EVIDENCE",
   "large_neural_operator_dataset": "NO",
   "recommended": {
-    "production_forecast_generator": "No method is certified. Same-mesh adaptive Q2 is the strongest startup challenger, but it failed the density timestep and half-step mass gates. The next diagnostic isolates unlimited Q2 time sensitivity from accumulated postprocessing. Q1 remains the controlled baseline.",
-    "independent_validator": "Develop a dynamically scaled and translated whole-space Hermite-Galerkin reference after the Q2 gate, validated by mode-tail and moment convergence; retain exact-native-law Monte Carlo for moment uncertainty and the independent FV hierarchy for current triangulation.",
+    "production_forecast_generator": "No method is certified. Q1 is the controlled baseline. Unlimited same-mesh Q2 Crank--Nicolson is the most accurate observed trajectory but has genuine negative mass; adaptive corrected Q2 Crank--Nicolson is the strongest tested non-negative trajectory but fails the density timestep gate. The next implementation target is a local conservative correction built on a rigorously positive low-order full-SPD comparator.",
+    "independent_validator": "Develop a dynamically scaled and translated whole-space Hermite-Galerkin reference alongside the positivity-correction work, validated by mode-tail and moment convergence; retain exact-native-law Monte Carlo for moment uncertainty and the independent FV hierarchy for current triangulation.",
     "neural_operator_target_representation": "If a pilot is run: float64 exact conservative subcell averages; Q1 requires 2 subcells per native cell per axis (60x72x72 for the tested 30x36x36 mesh).",
     "expected_covariance_error": {
-      "best_measured_short_gaussian_normalized_frobenius": 0.02218060511074223,
+      "unlimited_q2_crank_nicolson_normalized_frobenius": 0.0037110963833668514,
+      "unlimited_q2_crank_nicolson_is_admissible_density": false,
+      "best_nonnegative_q2_crank_nicolson_normalized_frobenius": 0.02191559673644618,
       "mc_bootstrap_p95": 0.006282392718324663,
-      "error_to_mc_noise_ratio": 3.652781940172064,
+      "interpretation": "The unlimited covariance discrepancy is below the measured MC bootstrap p95, so it is not statistically resolved by this 200000-path reference. This does not certify the true PDE error.",
       "mature_corrected_production_resolution": null
     },
     "expected_full_density_error": {
@@ -25,7 +27,7 @@
       "monte_carlo_200000_cpu_sampling_propagation_histogram_seconds": 3.369948232000722,
       "scope": "One 0.05 forecast interval; MC figure excludes principled bandwidth selection and accuracy certification."
     },
-    "principal_remaining_limitation": "Adaptive Q2 has strong startup covariance and marginal accuracy but fails the predeclared density timestep gate; no corrected mature-posterior forecast or converged deterministic full-density reference exists."
+    "principal_remaining_limitation": "The accurate unlimited Q2 Crank--Nicolson trajectory has genuine negative mass, while the current adaptive global correction destroys its density timestep consistency. A rigorously positive, mass-conservative low-order comparator and local full-SPD correction are not yet derived or validated; no corrected mature-posterior forecast or converged deterministic full-density reference exists."
   },
   "pde": {
     "linear_in_density": true,
@@ -103,7 +105,7 @@
     "q1_eight_rank_step_seconds": 0.32984192298802856,
     "q2_eight_rank_step_seconds": 0.28150189066824777,
     "comparison_confound": "Q2 used cells 1.5 times wider in every direction and dt=0.00125 versus Q1 dt=0.000625, so equal global DOFs do not isolate polynomial degree.",
-    "conclusion": "Current corrected Q2 is not adopted. The existing result rejects that configuration but cannot reject Q2 polynomial degree; a same-physical-mesh, same-timestep comparison is required."
+    "conclusion": "Historical equal-DOF evidence rejects only the coarse Q2 configuration. It is superseded for degree ranking by the controlled same-mesh experiments, where Q2 materially outperforms Q1."
   },
   "independent_reference": {
     "method": "First-order cell-centred upwind finite volume, centred diagonal diffusion, SSPRK(3,3), zero total numerical boundary flux",
@@ -180,10 +182,46 @@
     "timestep_subcell_l1_lower_bound": 0.01552464558388648,
     "all_gates_passed": false
   },
+  "executed_q2_temporal_diagnostics": {
+    "backward_euler_unlimited": {
+      "evidence": "unlimited_q2_timestep_report.json",
+      "full_step_covariance_error": 0.007266746983800384,
+      "half_step_covariance_error": 0.004643307685509568,
+      "timestep_subcell_l1_lower_bound": 0.005409822820428714,
+      "density_timestep_gate_passed": false
+    },
+    "crank_nicolson_unlimited": {
+      "evidence": "unlimited_q2_crank_nicolson_report.json",
+      "full_step_covariance_error": 0.0037110963833668514,
+      "half_step_covariance_error": 0.0037063543182625593,
+      "timestep_subcell_l1_lower_bound": 0.00004191502224505484,
+      "density_timestep_gate_passed": true,
+      "full_step_integrated_negative_mass": 0.0008281390175251355,
+      "full_step_minimum_quadrature_value": -0.000013538559101908027,
+      "production_admissible": false
+    },
+    "crank_nicolson_adaptive_global_correction": {
+      "evidence": "corrected_q2_crank_nicolson_report.json",
+      "full_step_covariance_error": 0.02191559673644618,
+      "half_step_covariance_error": 0.02262928450982538,
+      "timestep_subcell_l1_lower_bound": 0.010883736180249902,
+      "density_timestep_gate_passed": false,
+      "global_limiter_preserves_unlimited_cn_temporal_consistency": false
+    },
+    "current_conclusion": "Q2 and Crank--Nicolson retain the leading high-order trajectory. The current global completed-polynomial correction is rejected for production because it removes negativity at the cost of failing the density timestep gate."
+  },
+  "fixed_q2_raw_archive": {
+    "archive": "../sources/upload/newtest_08.zip",
+    "scope": "q2_fixed_subcell raw_before_correction ranks 0002 through 0006",
+    "shards": 5,
+    "sha256_verified_against": "runs/same-mesh-q2-corrected/20260910T234135Z/q2_fixed_subcell/report.json",
+    "all_hashes_match": true,
+    "numerical_decision_changed": false
+  },
   "smallest_additional_experiment_required": {
-    "name": "unlimited_q2_timestep_limiter_attribution",
-    "description": "Propagate the same embedded positive Q1 law with Q2 and no positivity correction at dt=0.000625 and 0.0003125. Record negativity, mass, covariance, marginals and conservative density change.",
-    "decision_rule": "If unlimited Q2 passes the density timestep gate while adaptive Q2 fails, attribute the material sensitivity to accumulated postprocessing and prototype local conservative flux correction. If unlimited Q2 also fails, investigate time integration before selecting a positivity architecture."
+    "name": "positive_low_order_full_spd_comparator_and_local_correction",
+    "description": "Derive and test a rigorously positive, mass-conservative low-order update for the 3-D Lorenz drift--diffusion operator with general full-SPD diffusion and reflecting total-flux boundary conditions. Only then decompose the accurate Q2 Crank--Nicolson update into conservative local corrections and limit those increments.",
+    "decision_rule": "Advance the local correction only if the low-order comparator satisfies positivity, mass and boundary invariants and the corrected Q2 pair preserves substantially more of the unlimited Crank--Nicolson covariance and timestep-density result than global scaling. Do not transfer hyperbolic convex-limiting or gradient-flow DDG proofs without proving applicability."
   },
   "reproducibility": {
     "python": "3.12.13",
@@ -194,7 +232,7 @@
     "mpi": "Open MPI 5.0.10",
     "cpu": "AMD Ryzen 7 9800X3D, 8 cores/16 threads",
     "gpu": "NVIDIA RTX 4070 12 GB (not used)",
-    "git_revision": null,
+    "git_revision": "049259930e6f85614688de6f30e93f379a3ad12e",
     "hash_manifest": "experiment_manifest.json"
   },
   "principal_evidence_files": [
@@ -210,7 +248,11 @@
     "scaling_30_rank1.json",
     "scaling_30_rank8.json",
     "scaling_q2_20_rank1.json",
-    "scaling_q2_20_rank8.json"
-    ,"same_mesh_q2_falsification_report.json"
+    "scaling_q2_20_rank8.json",
+    "same_mesh_q2_falsification_report.json",
+    "same_mesh_q2_corrected_report.json",
+    "unlimited_q2_timestep_report.json",
+    "unlimited_q2_crank_nicolson_report.json",
+    "corrected_q2_crank_nicolson_report.json"
   ]
 }

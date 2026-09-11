@@ -5,29 +5,52 @@
 **Classification: `INSUFFICIENT_EVIDENCE`.** No current method is certified to
 generate a large neural-operator training set.
 
-The most defensible next direction is a **controlled Q2 falsification
-experiment**, followed—only if Q2 survives—by development of local or
-operator-level positivity. This choice is based on information value rather than
-an endorsement of the present Q2 method. The existing Q2 result confounds
-polynomial degree with 1.5-times-wider cells in every direction, a timestep twice
-as large, and a sufficient-but-unnecessary Bernstein certificate. It therefore
-cannot decide whether higher order failed or whether its test conditions did.
+The controlled same-mesh and two-timestep experiments have been completed.
+They overturn the old equal-DOF ranking: corrected Q1 is now the controlled
+baseline, while Q2 is materially more accurate on the same physical mesh and
+timestep. The strongest numerical trajectory observed is unlimited Q2 with
+Crank--Nicolson (`E_cov=0.0037111`), and the strongest tested non-negative
+trajectory is adaptive corrected Q2 with Crank--Nicolson
+(`E_cov=0.0219156`). Neither is production-certified.
 
-The one next implementation experiment is specified in [Section 18](#18-one-next-implementation-experiment).
-It compares Q1 and Q2 on the same `30x36x36` physical mesh, with the same
-`dt=0.000625`, forecast interval, positive represented initial law and Monte Carlo
-paths. Raw Q2 states are audited before correction by adaptive Bernstein
-branch-and-bound with three outcomes: certified non-negative, witnessed negative,
-or unresolved. Current fixed-subcell scaling and certificate-gated scaling are
-then compared. This experiment changes diagnostics and limiter branching; it
-does not change the PDE operator during the present audit.
+| Controlled trajectory (`30x36x36`) | `E_cov` at `dt=0.000625` | Status |
+|---|---:|---|
+| Q1, backward Euler, global limiter | `0.0871923` | controlled baseline |
+| Q2, backward Euler, adaptive global limiter | `0.0237745` | non-negative; density timestep gate fails |
+| Q2, unlimited backward Euler | `0.00726675` | negative and density timestep gate fails |
+| Q2, unlimited Crank--Nicolson | `0.00371110` | temporal gates pass; negative mass makes it inadmissible |
+| Q2, Crank--Nicolson, adaptive global limiter | `0.0219156` | non-negative; density timestep gate fails |
+
+The common 200,000-path Monte Carlo covariance bootstrap p95 is
+`0.00628239`. The unlimited Crank--Nicolson discrepancy lies below this measured
+sampling scale, which makes the discrepancy unresolved by this reference; it
+does not establish the true PDE discretization error.
+
+The decisive comparison is the unlimited-versus-corrected Crank--Nicolson
+pair. Halving `dt` changes the unlimited conservative subcell density by only
+`L1>=4.19e-5`, but the same comparison after adaptive global correction gives
+`L1>=0.010884`. The unlimited trajectory carries integrated negative mass
+`8.28e-4` and minimum quadrature value about `-1.35e-5`, so it cannot be used
+as a probability-density generator. Global correction removes that negativity
+but fails the predeclared density-convergence gate and increases covariance
+error to about `0.022`.
+
+The immediate research direction is therefore a **local conservative
+positivity correction**, beginning with a rigorously positive,
+mass-conservative low-order comparator for the actual 3-D Lorenz
+drift--diffusion operator, general full-SPD diffusion and reflecting total-flux
+boundary. The accurate unlimited Q2--Crank--Nicolson operator is the high-order
+target; completed-polynomial global scaling remains a rejected production
+correction and a useful controlled comparator. Sections 18--21 record the
+experiments that led to this decision; Sections 22--23 contain the current
+temporal evidence.
 
 Role assignments are separate:
 
 | Role | Decision |
 |---|---|
-| Production reference solver | **Unfilled.** The leading research path is Q2/high-order conservative spatial discretization with local or operator-level positivity, conditional on the experiment. For general full SPD diffusion, multidimensional AFC or a genuinely 3-D positive full-tensor flux method is the fallback research path. |
-| Independent verification solver | **Develop next after the Q2 gate:** a dynamically scaled, translated whole-space Hermite-Galerkin solver, checked by mode decay and moment convergence, plus Monte Carlo for moments. Spectral positivity is not assumed. |
+| Production reference solver | **Unfilled.** The leading research path pairs the accurate unlimited Q2--Crank--Nicolson operator with local conservative positivity, conditional on first constructing a positive full-SPD low-order comparator. A genuinely 3-D positive full-tensor flux method remains the fallback. |
+| Independent verification solver | **Develop alongside correction work:** a dynamically scaled, translated whole-space Hermite-Galerkin solver, checked by mode decay and moment convergence, plus Monte Carlo for moments. Spectral positivity is not assumed. |
 | Current baseline | Q1 upwind/SIPG, backward Euler, quadrature-14 L2 initialization, projected Bayesian analysis and conservative postprocessing. It is a controlled comparator rather than a production selection. |
 
 The full-SPD requirement controls the ranking. Directional
@@ -69,7 +92,12 @@ factorization do not transfer automatically.
 The physical SDE lives on `R^3`. Reflecting truncation is a model approximation,
 even though the implemented total-flux weak form is internally consistent.
 
-## 2. `WHAT_RUN6_ACTUALLY_ESTABLISHES`
+## 2. Historical Run-6 evidence (`WHAT_RUN6_ACTUALLY_ESTABLISHES`)
+
+This section preserves the evidence available before the controlled same-mesh
+and Crank--Nicolson experiments. Its Q1 and equal-DOF Q2 values remain valid for
+their recorded configurations, but its method ranking and proposed next
+experiment are superseded by Sections 20--23.
 
 ### Established numerical evidence
 
@@ -583,7 +611,12 @@ correction size reported separately. Cartesian tensor convenience for ML export
 does not enter the method ranking; conservative projection to the training grid
 is a later operation.
 
-## 17. Hypothesis falsification
+## 17. Historical hypothesis state before the executed Q2 experiments
+
+The table below records the pre-experiment hypotheses. Sections 20--23 provide
+their current disposition: the controlled same-mesh result refutes the apparent
+Q2 inferiority, unlimited Crank--Nicolson passes the temporal gates, and the
+current global positivity correction fails to preserve that result.
 
 | Hypothesis | Attempted falsification | Verdict |
 |---|---|---|
@@ -594,7 +627,11 @@ is a later operation.
 | E. Positivity belongs in flux/operator | AFC, M-matrix and local-flux literature supports the architecture. No direct 3-D Lorenz/full-SPD covariance evidence was found. | **Plausible, not established; leading fallback.** |
 | F. A different FPE method wins | SG-DDFV is structurally strong but effectively 2-D in published construction/tests; diagonal methods miss full SPD; Hermite lacks positivity; characteristics have boundary gaps. | **No winner established. Hermite wins only the future independent-reference role.** |
 
-## 18. One next implementation experiment
+## 18. Executed experiment specification (historical predeclaration)
+
+This was the predeclared next experiment. It has been executed and is reported
+in Sections 20--23; it is retained here to preserve the decision rules fixed
+before results were known.
 
 ### Objective
 
@@ -657,7 +694,11 @@ production decision procedure even if it remains useful diagnostically.
 
 No mature-data run or large dataset should precede this gate.
 
-## 19. Practical ranking and remaining uncertainty
+## 19. Historical pre-experiment ranking and remaining uncertainty
+
+This ranking predates the executed same-mesh and Crank--Nicolson comparisons.
+The current ranking and next action are stated in the opening Decision and
+Sections 22--23.
 
 | Rank for next research | Method/path | Reason |
 |---:|---|---|
@@ -674,9 +715,10 @@ reduce wasted tail cells. The installed DOLFINx 0.11 hexahedral refinement path
 does not support the required local refinement, so immediate adaptivity would
 also change topology, positivity certification and export format.[^22]
 
-Remaining uncertainty is dominated by absent same-mesh Q2 evidence, absent
-mature-posterior validation, lack of a converged deterministic density reference,
-and lack of a directly applicable 3-D/full-SPD/high-Péclet positivity theorem.
+Remaining uncertainty is dominated by absent mature-posterior validation, lack
+of a converged deterministic density reference, and lack of a positive
+low-order comparator or directly applicable 3-D/full-SPD/high-Péclet positivity
+theorem for a local correction of the accurate Q2--Crank--Nicolson path.
 These are decision-relevant unknowns rather than implementation details.
 
 ## 20. Same-mesh Q2 experiment result (2026-09-11)

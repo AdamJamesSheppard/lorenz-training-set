@@ -38,6 +38,9 @@ EVIDENCE = (
     "mc_timestep_same_initial_law.json", "mature_da_projected_report.json",
     "scaling_q2_20_rank1.json", "scaling_q2_20_rank8.json",
     "METHOD_SELECTION_REPORT.md", "method_selection_report.json",
+    "same_mesh_q2_falsification_report.json", "same_mesh_q2_corrected_report.json",
+    "unlimited_q2_timestep_report.json", "unlimited_q2_crank_nicolson_report.json",
+    "corrected_q2_crank_nicolson_report.json",
 )
 
 
