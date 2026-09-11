@@ -1,0 +1,38 @@
+id: corrected-q2-crank-nicolson
+kind: same_mesh_q2_study
+status: predeclared_comparator
+study:
+  cells: [30, 36, 36]
+  dt: 0.000625
+  final_time: 0.05
+  seed: 20260910
+  monte_carlo_paths: 200000
+  mc_dt: 0.000125
+  bootstrap_replicates: 200
+  certificate_max_depth: 4
+  initial_law: positive_limited_q1_polynomial_embedded_exactly_in_q2
+  branches:
+    - name: q2_adaptive_cn_full_dt
+      degree: 2
+      theta: 0.5
+      certificate_mode: adaptive
+      archive_raw: false
+    - name: q2_adaptive_cn_half_dt
+      degree: 2
+      theta: 0.5
+      dt: 0.0003125
+      certificate_mode: adaptive
+      archive_raw: false
+  pairwise_comparisons:
+    - name: corrected_cn_timestep_halving
+      baseline: q2_adaptive_cn_full_dt
+      challenger: q2_adaptive_cn_half_dt
+      limits:
+        covariance_error_change: 0.003
+        l1: 0.0025
+execution:
+  mpi_ranks: 8
+notes:
+  - This measures whether the existing sufficient global limiter preserves Crank--Nicolson temporal consistency.
+  - Raw trajectory archives are omitted because this comparator is reproducible and terminal classifications are retained.
+  - Passing does not select global scaling over local AFC; limiter-impact and mass gates still apply.

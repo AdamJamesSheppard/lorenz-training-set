@@ -1,0 +1,47 @@
+{
+  "date": "2026-09-11",
+  "evidence_class": "NUMERICAL",
+  "classification": "INSUFFICIENT_EVIDENCE",
+  "configuration": {
+    "cells": [30, 36, 36],
+    "final_time": 0.05,
+    "timesteps": [0.000625, 0.0003125],
+    "degree": 2,
+    "theta": 0.5,
+    "positivity_applied_each_step": false,
+    "monte_carlo_paths": 200000,
+    "mc_dt": 0.000125,
+    "mpi_ranks": 8
+  },
+  "full_step": {
+    "normalized_covariance_error": 0.0037110963833668514,
+    "marginal_tv": [0.002477134839469827, 0.0006429956027352027, 0.0016156912145394206],
+    "mass_error": 1.1987411063785203e-10,
+    "integrated_negative_mass": 0.0008281390175251355,
+    "minimum_quadrature_value": -0.000013538559101908027
+  },
+  "half_step": {
+    "normalized_covariance_error": 0.0037063543182625593,
+    "marginal_tv": [0.0024785342827931198, 0.0006431889613854415, 0.0016133930052076861],
+    "mass_error": 1.7565726651014302e-11,
+    "integrated_negative_mass": 0.0008270801524774038,
+    "minimum_quadrature_value": -0.000013509595251206316
+  },
+  "timestep_comparison": {
+    "subcell_average_l1_lower_bound": 0.00004191502224505484,
+    "l1_limit": 0.0025,
+    "l1_gate_passed": true,
+    "normalized_covariance_error_change": 0.000004742065104292037,
+    "covariance_error_change_limit": 0.003,
+    "covariance_gate_passed": true
+  },
+  "decision": {
+    "temporal_diagnostic_passed": true,
+    "production_status": "not certified",
+    "next_step": "Evaluate positivity correction with Crank--Nicolson, retaining global scaling as a comparator while developing a local conservative correction."
+  },
+  "immutable_evidence": {
+    "run": "runs/unlimited-q2-crank-nicolson/20260911T001508Z",
+    "git_commit": "ef6ea7d0a636039cd1eca89d5d2791da43bd4066"
+  }
+}

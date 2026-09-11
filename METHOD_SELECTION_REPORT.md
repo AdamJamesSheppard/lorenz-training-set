@@ -732,6 +732,18 @@ unlimited Crank--Nicolson pair under unchanged density and covariance gates.
 Evidence: [`same_mesh_q2_corrected_report.json`](same_mesh_q2_corrected_report.json)
 and [`unlimited_q2_timestep_report.json`](unlimited_q2_timestep_report.json).
 
+## 22. Unlimited Crank--Nicolson temporal diagnostic (2026-09-11)
+
+At `theta=0.5`, the unlimited Q2 full- and half-step covariance errors are
+`0.003711` and `0.003706`. Their conservative subcell density difference is
+only `L1>=4.19e-5`, and covariance-error change is `4.74e-6`; both predeclared
+temporal gates pass by wide margins. Integrated negative mass remains about
+`8.28e-4`, so the raw method remains unsuitable for target generation. This
+evidence retains the Q2 spatial branch and focuses the next comparison on
+whether positivity correction preserves Crank--Nicolson consistency.
+
+Evidence: [`unlimited_q2_crank_nicolson_report.json`](unlimited_q2_crank_nicolson_report.json).
+
 ## Sources
 
 [^1]: C. Liu, J. Hu, W. T. Taitano and X. Zhang, [“An optimization-based positivity-preserving limiter in semi-implicit discontinuous Galerkin schemes solving Fokker–Planck equations”](https://www.math.purdue.edu/~zhan1966/research/paper/DG_anisotropic_Fokker_Planck.pdf), *Computers & Mathematics with Applications* (2025).

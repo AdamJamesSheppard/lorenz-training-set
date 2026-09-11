@@ -22,6 +22,7 @@ Evidence classes: `ESTABLISHED` (supported by derivation and targeted tests),
 | C-015 | Same-mesh adaptive-certificate Q2 at `dt=0.000625` is substantially more accurate than Q1 for startup covariance and marginals, but the tested Q2 configuration meets every predeclared gate. | REJECTED | Corrected immutable run `runs/same-mesh-q2-corrected/20260910T234135Z` | Accuracy improves, but corrected timestep `L1>=0.01552` and half-step mass error fail their gates. |
 | C-016 | The repaired Stage-1 projection preserves its lower bound through the floating-point mass repair, and every Stage-2 scaling factor lies in `[0,1]`. | ESTABLISHED | Direct regression tests and full-mesh one-step MPI invariant check | A future adversarial input or platform produces a negative projected average, a factor outside the interval, or material mass drift. |
 | C-017 | Accumulated positivity correction is the sole cause of the Q2 density timestep failure. | REJECTED | `unlimited_q2_timestep_report.json` | Unlimited backward-Euler Q2 has `L1>=0.00541` under timestep halving, already above the `0.0025` gate. |
+| C-018 | Unlimited Crank--Nicolson Q2 on the controlled same mesh is temporally stable under the predeclared density and covariance gates. | NUMERICAL | `unlimited_q2_crank_nicolson_report.json` | A longer horizon, mature posterior, spatial refinement, or corrected trajectory may fail; raw negative mass is about `8.28e-4`. |
 
 Review this table after every material experiment. Classes and wording are
 expected to change; preserve old evidence in Git and explain promotions,

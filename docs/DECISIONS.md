@@ -55,6 +55,17 @@ carrying integrated negative mass of `7.23e-4` and `7.73e-4`. Proceed to a
 predeclared unlimited Crank--Nicolson two-timestep diagnostic; close the present
 uniform-mesh DG branch if second-order time integration also fails.
 
+## 2026-09-11 - Retain Q2 after the Crank--Nicolson temporal diagnostic
+
+Unlimited Crank--Nicolson Q2 passes the two predeclared timestep gates. Halving
+`dt` changes the conservative subcell density by only `4.19e-5` and covariance
+error by `4.74e-6`. Both trajectories have covariance error about `0.00371`,
+below the common Monte Carlo bootstrap p95, but integrated negative mass remains
+about `8.28e-4`. This supports retaining the uniform-mesh Q2 spatial branch and
+shifts the main effort toward a positivity treatment compatible with the
+second-order trajectory. First run the existing adaptive global limiter as a
+controlled comparator; it is not presumed to preserve this improvement.
+
 ## 2026-09-10 - Implement the predeclared Q2 diagnostic without relaxing positivity
 
 The same-mesh experiment now has fixed and adaptive Bernstein branches. The

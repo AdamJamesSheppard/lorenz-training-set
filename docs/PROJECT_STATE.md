@@ -50,6 +50,9 @@ next experiment.
   around `7e-4`. Its cross-timestep density difference is already at least
   `L1=0.00541`, so positivity correction magnifies rather than solely causes
   the timestep failure.
+- Unlimited Crank--Nicolson Q2 passes the density timestep gate with
+  `L1>=4.19e-5` and covariance-change gate with `4.74e-6`; its covariance error
+  is about `0.00371`, but integrated negative mass remains about `8.28e-4`.
 
 ## Active blockers
 
@@ -59,22 +62,21 @@ next experiment.
    covariance discrepancy.
 3. The independent finite-volume hierarchy is not converged enough to define a
    full-density truth error.
-4. Both corrected and unlimited backward-Euler Q2 fail the density timestep
-   gate; the remaining attribution is temporal scheme versus spatial DG error.
+4. Crank--Nicolson resolves the controlled unlimited temporal gate, while a
+   compatible positive and conservative correction remains unvalidated.
 
 ## Near-term research portfolio
 
 The living plan is in `docs/RESEARCH_DIRECTIONS.md` and
 `experiments/method-selection-research.yaml`. Current high-value branches are:
 
-1. Compare unlimited Crank--Nicolson Q2 at both timesteps using the same law and
-   gates to test whether backward-Euler temporal error explains the remaining
-   unlimited density sensitivity.
-2. If second-order time integration survives, pair it with a local
+1. Evaluate the existing adaptive global limiter with Crank--Nicolson as a
+   controlled comparator under the same two-timestep and limiter gates.
+2. Pair the successful unlimited Crank--Nicolson path with a local
    algebraic/convex positivity treatment and re-evaluate whole-trajectory
    invariants; global polynomial scaling remains a comparator.
-3. If unlimited Crank--Nicolson also fails, close the present uniform-mesh DG
-   branch and prototype a full-SPD positive finite-volume/flux method.
+3. If corrected Crank--Nicolson or the local correction fails, prototype a
+   full-SPD positive finite-volume/flux method.
    Directional FCDF and complete-flux methods remain a separate diagonal-noise
    branch rather than the general production target.
 4. Develop a dynamically scaled whole-space Hermite solver as an independent
