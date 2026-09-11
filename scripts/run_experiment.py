@@ -122,6 +122,7 @@ def main(config_path: Path) -> int:
                 "--certificate-max-depth", str(study["certificate_max_depth"]),
                 "--optimizer-ftol", str(study["optimizer_ftol"]),
                 "--feasibility-tolerance", str(study["feasibility_tolerance"]),
+                "--normalized-positivity-margin", str(study["normalized_positivity_margin"]),
                 "--maximum-iterations", str(study["maximum_iterations"]),
                 "--bootstrap", str(study["bootstrap_replicates"]),
                 "--seed", str(study["seed"]),

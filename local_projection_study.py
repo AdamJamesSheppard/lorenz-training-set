@@ -99,6 +99,7 @@ def run(args: argparse.Namespace) -> None:
         solver.limiter,
         optimizer_ftol=args.optimizer_ftol,
         feasibility_tolerance=args.feasibility_tolerance,
+        normalized_positivity_margin=args.normalized_positivity_margin,
         maximum_iterations=args.maximum_iterations,
     )
     local_only, local_only_report = projector.project_state(
@@ -167,6 +168,7 @@ def run(args: argparse.Namespace) -> None:
                 "optimizer": "SciPy SLSQP",
                 "optimizer_ftol": args.optimizer_ftol,
                 "feasibility_tolerance": args.feasibility_tolerance,
+                "normalized_positivity_margin": args.normalized_positivity_margin,
                 "maximum_iterations": args.maximum_iterations,
                 "bootstrap_replicates": args.bootstrap,
                 "seed": args.seed,
@@ -209,6 +211,7 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--certificate-max-depth", type=int, default=4)
     result.add_argument("--optimizer-ftol", type=float, default=1.0e-12)
     result.add_argument("--feasibility-tolerance", type=float, default=5.0e-11)
+    result.add_argument("--normalized-positivity-margin", type=float, default=1.0e-12)
     result.add_argument("--maximum-iterations", type=int, default=250)
     result.add_argument("--bootstrap", type=int, default=200)
     result.add_argument("--seed", type=int, default=20260910)

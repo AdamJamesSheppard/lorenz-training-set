@@ -47,6 +47,7 @@ class LocalPolynomialProjector:
         *,
         optimizer_ftol: float = 1.0e-12,
         feasibility_tolerance: float = 5.0e-11,
+        normalized_positivity_margin: float = 1.0e-12,
         maximum_iterations: int = 250,
     ) -> None:
         if limiter.lower != 0.0:
@@ -54,6 +55,9 @@ class LocalPolynomialProjector:
         self.limiter = limiter
         self.optimizer_ftol = float(optimizer_ftol)
         self.feasibility_tolerance = float(feasibility_tolerance)
+        self.normalized_positivity_margin = float(normalized_positivity_margin)
+        if not (0.0 <= self.normalized_positivity_margin < 1.0):
+            raise ValueError("normalized_positivity_margin must lie in [0,1)")
         self.maximum_iterations = int(maximum_iterations)
         basis = limiter._quadrature_basis
         weights = limiter._quadrature_weights
@@ -70,7 +74,9 @@ class LocalPolynomialProjector:
         self.constraints = full[np.sort(indices)]
         self.full_constraints = full
         self.linear_constraints = (
-            LinearConstraint(self.constraints, 0.0, np.inf),
+            LinearConstraint(
+                self.constraints, self.normalized_positivity_margin, np.inf
+            ),
             LinearConstraint(self.average_weights[None, :], 1.0, 1.0),
         )
 
@@ -80,9 +86,10 @@ class LocalPolynomialProjector:
 
     def _scaling_candidate(self, normalized: np.ndarray) -> np.ndarray:
         minimum = float((self.full_constraints @ normalized).min())
-        if minimum >= 0.0:
+        margin = self.normalized_positivity_margin
+        if minimum >= margin:
             return normalized.copy()
-        theta = float(np.clip(1.0 / (1.0 - minimum), 0.0, 1.0))
+        theta = float(np.clip((1.0 - margin) / (1.0 - minimum), 0.0, 1.0))
         return self.ones + theta * (normalized - self.ones)
 
     def project_cell(
@@ -116,7 +123,7 @@ class LocalPolynomialProjector:
         # tail cells.  The normalized polynomial has cell average one.
         normalized = raw / average
         raw_minimum = float((self.full_constraints @ normalized).min())
-        if raw_minimum >= 0.0:
+        if raw_minimum >= self.normalized_positivity_margin:
             return CellProjectionResult(
                 raw.copy(), "ALREADY_FEASIBLE", 0, 0.0, 0.0,
                 average * raw_minimum, 0.0,
@@ -142,8 +149,12 @@ class LocalPolynomialProjector:
         # amount toward the unit-average constant polynomial.
         candidate += (1.0 - float(self.average_weights @ candidate)) * self.ones
         minimum = float((self.full_constraints @ candidate).min())
-        if minimum < 0.0:
-            theta = float(np.clip(1.0 / (1.0 - minimum), 0.0, 1.0))
+        if minimum < self.normalized_positivity_margin:
+            theta = float(np.clip(
+                (1.0 - self.normalized_positivity_margin) / (1.0 - minimum),
+                0.0,
+                1.0,
+            ))
             candidate = self.ones + theta * (candidate - self.ones)
         minimum = float((self.full_constraints @ candidate).min())
         average_error = float(self.average_weights @ candidate - 1.0)
