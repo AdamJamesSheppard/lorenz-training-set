@@ -19,6 +19,12 @@ def main() -> int:
     local_projection = json.loads(
         (ROOT / "local_q2_positivity_projection_report.json").read_text()
     )
+    optimizer_validation = json.loads(
+        (ROOT / "local_q2_optimizer_validation_report.json").read_text()
+    )
+    dynamic_projection = json.loads(
+        (ROOT / "local_q2_dynamic_projection_report.json").read_text()
+    )
     diffusion = Lorenz63Model().diffusion
 
     mass_errors = [abs(float(row["mass_error"])) for row in boundary["rows"]]
@@ -59,6 +65,18 @@ def main() -> int:
             and not local_projection["decision"]
             ["pure_cell_local_projection_is_complete_solution"]
         ),
+        "local_qp_optimizer_validation_consistent": bool(
+            optimizer_validation["result"]["all_predeclared_gates_passed"]
+            and optimizer_validation["result"]["osqp_failures"] == 0
+            and optimizer_validation["result"]["objective_bound_violations"] == 0
+        ),
+        "dynamic_local_qp_decision_consistent": bool(
+            dynamic_projection["classification"] == "FAILED_PREDECLARED_DYNAMIC_GATES"
+            and dynamic_projection["trajectory_invariants"]
+            ["all_560_steps_whole_cell_positivity_certified"]
+            and dynamic_projection["timestep_comparison"]["observed_order"] <= 0.0
+            and not dynamic_projection["decision"]["dataset_generation_authorized"]
+        ),
     }
     result = {
         "passed": all(checks.values()),
@@ -77,6 +95,15 @@ def main() -> int:
             ["hybrid_covariance_error"],
             "terminal_stage1_local_qp_timestep_l1": local_projection
             ["timestep_comparison"]["hybrid_subcell_average_l1"],
+            "dynamic_local_qp_covariance_errors": [
+                level["covariance_error"] for level in dynamic_projection["levels"]
+            ],
+            "dynamic_local_qp_timestep_l1": [
+                dynamic_projection["timestep_comparison"]["full_to_half_l1"],
+                dynamic_projection["timestep_comparison"]["half_to_quarter_l1"],
+            ],
+            "dynamic_local_qp_observed_order": dynamic_projection
+            ["timestep_comparison"]["observed_order"],
         },
         "interpretation": (
             "The tested invariants and evidence consistency pass. Production certification is "

@@ -9,9 +9,9 @@ The controlled same-mesh and two-timestep experiments have been completed.
 They overturn the old equal-DOF ranking: corrected Q1 is now the controlled
 baseline, while Q2 is materially more accurate on the same physical mesh and
 timestep. The strongest numerical trajectory observed is unlimited Q2 with
-Crank--Nicolson (`E_cov=0.0037111`), and the strongest tested non-negative
-trajectory is adaptive corrected Q2 with Crank--Nicolson
-(`E_cov=0.0219156`). Neither is production-certified.
+Crank--Nicolson (`E_cov=0.0037111`), and the most accurate tested non-negative
+in-loop trajectory is Stage-1 average repair plus the local QP (`E_cov` about
+`0.0075`). Neither is production-certified.
 
 | Controlled trajectory (`30x36x36`) | `E_cov` at `dt=0.000625` | Status |
 |---|---:|---|
@@ -20,6 +20,7 @@ trajectory is adaptive corrected Q2 with Crank--Nicolson
 | Q2, unlimited backward Euler | `0.00726675` | negative and density timestep gate fails |
 | Q2, unlimited Crank--Nicolson | `0.00371110` | temporal gates pass; negative mass makes it inadmissible |
 | Q2, Crank--Nicolson, adaptive global limiter | `0.0219156` | non-negative; density timestep gate fails |
+| Q2, Crank--Nicolson, Stage-1 plus local QP | `0.0075085` | non-negative; positive observed-order and two mass gates fail |
 
 The common 200,000-path Monte Carlo covariance bootstrap p95 is
 `0.00628239`. The unlimited Crank--Nicolson discrepancy lies below this measured
@@ -43,23 +44,29 @@ certification, and cross-timestep `L1=3.94e-5`. Its mass-matrix correction
 objective is about 17% of matched scalar scaling. Purely cell-local repair is
 incomplete because about 17,500 raw cells have negative averages.
 
-The next scientific experiment is the predeclared three-level **in-loop
-Stage-1 plus local-QP Q2--Crank--Nicolson trajectory**. The candidate is
-implemented and passes short dynamic invariant checks, but generic per-cell
-SLSQP costs 15--27 seconds per production-mesh step as the active set grows.
-The immediate engineering task is a verified specialized or batched solver for
-the same convex QP before the multi-hour decision run. A rigorously positive,
-mass-conservative low-order comparator for the actual 3-D Lorenz
-drift--diffusion/full-SPD/reflecting-flux operator remains the fallback if the
-dynamic test fails. Completed-polynomial scalar scaling remains a rejected
-production correction and a controlled comparator. Sections 18--23 record the
-earlier sequence.
+The predeclared three-level **in-loop Stage-1 plus local-QP
+Q2--Crank--Nicolson trajectory** is complete. A reduced fixed-matrix OSQP
+backend passed a 2,413-cell SLSQP comparison and reduced the matched three-step
+projection time by a factor of `10.78`. Across all 560 production-mesh steps,
+every final state was Bernstein-certified, negative mass was zero, no optimizer
+fallback occurred, and covariance error stayed near `0.0075`. The adjacent
+density differences, `5.24e-4` and `5.42e-4`, both pass their absolute gate but
+do not decrease; observed order is `-0.0488`. Full and quarter levels also have
+absolute mass errors `1.25e-10` and `2.75e-10`, above the `1e-10` gate, even
+though each projection changes incoming mass by at most `8e-15`.
+
+The aggregate classification is therefore `FAILED_PREDECLARED_DYNAMIC_GATES`.
+No threshold was relaxed after seeing the result. The local QP remains a strong
+controlled comparator, while the next correction branch moves to a genuinely
+positive, mass-conservative low-order update and local flux/AFC treatment for
+the 3-D Lorenz drift--diffusion/full-SPD/reflecting-flux operator. Sections
+18--24 record the experimental sequence.
 
 Role assignments are separate:
 
 | Role | Decision |
 |---|---|
-| Production reference solver | **Unfilled.** The leading research path pairs the accurate unlimited Q2--Crank--Nicolson operator with local conservative positivity, conditional on first constructing a positive full-SPD low-order comparator. A genuinely 3-D positive full-tensor flux method remains the fallback. |
+| Production reference solver | **Unfilled.** The leading research path pairs the accurate unlimited Q2--Crank--Nicolson operator with a positive full-SPD low-order update and local conservative flux/AFC correction. Post-step local QP is retained as the strongest current non-negative comparator. |
 | Independent verification solver | **Develop alongside correction work:** a dynamically scaled, translated whole-space Hermite-Galerkin solver, checked by mode decay and moment convergence, plus Monte Carlo for moments. Spectral positivity is not assumed. |
 | Current baseline | Q1 upwind/SIPG, backward Euler, quadrature-14 L2 initialization, projected Bayesian analysis and conservative postprocessing. It is a controlled comparator rather than a production selection. |
 
@@ -816,6 +823,47 @@ next derivation without certifying it.
 
 Evidence: [`corrected_q2_crank_nicolson_report.json`](corrected_q2_crank_nicolson_report.json).
 
+## 24. Local-QP specialization and dynamic decision (2026-09-11)
+
+The cell-average equality was eliminated in a fixed null-space basis, reducing
+each Q2 correction from 27 coefficients plus an equality to 26 variables with
+125 distinct fixed Bernstein inequalities. OSQP updates only the cell-dependent
+lower bound and reuses its factorization. On 1,413 saved terminal problems and
+1,000 deterministic random stress problems, OSQP solved all 2,413 cases.[^25] It
+preserved the normalized average to `6.67e-16`, had no feasibility or
+scalar-objective-bound violation, agreed with successful SLSQP objectives to
+`3.76e-10` relative, and was `12.51` times faster. SLSQP failed in 28 cases;
+those failures are oracle limitations rather than evidence against OSQP because
+every specialised result independently passed the primal and objective checks.
+
+The production-mesh three-step profile reduced mean projection time from
+`16.65 s` with SLSQP to `1.54 s` with OSQP, passing the predeclared 10x
+engineering gate. The subsequent 80-, 160-, and 320-step branches completed in
+`205.8`, `494.5`, and `1076.3 s`.
+
+All 560 corrected steps were whole-cell Bernstein-certified, had zero measured
+negative mass, no optimizer failure or scalar fallback, and maximum
+projection-induced mass change `7.99e-15`. Covariance errors were `0.007509`,
+`0.007488`, and `0.007516`, each below `1.5` times the common bootstrap p95.
+The full/half and half/quarter conservative subcell differences were
+`5.238e-4` and `5.418e-4`, both below `0.0025`. Their ratio is `0.9668`, giving
+observed order `-0.0488`; the required positive-order gate fails. Absolute final
+mass errors were `1.25e-10`, `1.75e-11`, and `2.75e-10`, so the full and quarter
+levels also fail the `1e-10` gate. The correction itself preserves incoming
+mass, indicating that the latter failure is accumulated linear-solve drift,
+but that attribution does not waive the gate.
+
+This is a mixed scientific result: local QP is far less destructive than global
+scaling and retains useful non-negative accuracy, while the tested timestep
+sequence shows a roughly `5.3e-4` density-difference floor rather than positive
+temporal convergence. It remains a comparator and does not advance to dataset
+certification. The next correction branch is an operator-level positive
+low-order/full-SPD update with local conservative flux or algebraic correction.
+
+Evidence: [`local_q2_optimizer_validation_report.json`](local_q2_optimizer_validation_report.json),
+[`local_q2_projection_performance_report.json`](local_q2_projection_performance_report.json),
+and [`local_q2_dynamic_projection_report.json`](local_q2_dynamic_projection_report.json).
+
 ## Sources
 
 [^1]: C. Liu, J. Hu, W. T. Taitano and X. Zhang, [“An optimization-based positivity-preserving limiter in semi-implicit discontinuous Galerkin schemes solving Fokker–Planck equations”](https://www.math.purdue.edu/~zhan1966/research/paper/DG_anisotropic_Fokker_Planck.pdf), *Computers & Mathematics with Applications* (2025).
@@ -842,3 +890,4 @@ Evidence: [`corrected_q2_crank_nicolson_report.json`](corrected_q2_crank_nicolso
 [^22]: [DOLFINx 0.11 mesh API](https://docs.fenicsproject.org/dolfinx/v0.11.0.post0/python/generated/dolfinx.mesh.html); the local hexahedral refinement probe fails with `RuntimeError: Refinement only defined for simplices`.
 [^23]: J.-L. Guermond, B. Popov and I. Tomas, [“Invariant domain preserving discretization-independent schemes and convex limiting for hyperbolic systems”](https://doi.org/10.1016/j.cma.2018.11.036), *Computer Methods in Applied Mechanics and Engineering* 347 (2019), 143–175.
 [^24]: J. A. Carrillo, H. Liu and H. Yu, [“Positivity-preserving and energy-dissipating discontinuous Galerkin methods for nonlinear nonlocal Fokker–Planck equations”](https://arxiv.org/abs/2403.15643), *Communications in Applied and Industrial Mathematics* 16 (2025), 19–40.
+[^25]: B. Stellato, G. Banjac, P. Goulart, A. Bemporad and S. Boyd, [“OSQP: an operator splitting solver for quadratic programs”](https://doi.org/10.1007/s12532-020-00179-2), *Mathematical Programming Computation* 12 (2020), 637–672.

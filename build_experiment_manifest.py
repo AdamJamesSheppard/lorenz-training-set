@@ -13,6 +13,7 @@ from pathlib import Path
 import dolfinx
 import basix
 import ufl
+import osqp
 from mpi4py import MPI
 from petsc4py import PETSc
 
@@ -43,6 +44,8 @@ EVIDENCE = (
     "corrected_q2_crank_nicolson_report.json",
     "local_q2_positivity_projection_report.json",
     "local_q2_projection_performance_report.json",
+    "local_q2_optimizer_validation_report.json",
+    "local_q2_dynamic_projection_report.json",
 )
 
 
@@ -96,6 +99,7 @@ def main() -> None:
             "basix": basix.__version__,
             "ufl": ufl.__version__,
             "petsc": ".".join(map(str, PETSc.Sys.getVersion())),
+            "osqp": osqp.__version__,
             "mpi_library": MPI.Get_library_version().strip(),
             "manifest_mpi_size": MPI.COMM_WORLD.size,
             "cpu": command_output(["lscpu"]),

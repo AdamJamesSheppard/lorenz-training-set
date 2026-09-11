@@ -1,0 +1,83 @@
+{
+  "date": "2026-09-11",
+  "evidence_class": "NUMERICAL_DIAGNOSTIC",
+  "classification": "FAILED_PREDECLARED_DYNAMIC_GATES",
+  "run": "runs/local-q2-crank-nicolson/20260911T165516Z",
+  "git_commit": "7f5e97c7f3d4757a3223c71563ff867322c39f9d",
+  "git_dirty": false,
+  "provenance_sha256": "c05cc3bd93ede19a3bb835b13fb8673e5692c8ca2cbdb4c921796919c4317537",
+  "scientific_decision_sha256": "bddaf197409a96c93f40eeaeee5f07a4e1c6c9b5578e259c9768c5f9fd504545",
+  "configuration": {
+    "cells": [30, 36, 36],
+    "degree": 2,
+    "theta": 0.5,
+    "timesteps": [0.000625, 0.0003125, 0.00015625],
+    "final_time": 0.05,
+    "mpi_ranks": 8,
+    "optimizer": "OSQP reduced fixed-matrix QP",
+    "optimizer_ftol": 1e-10,
+    "bootstrap_seed": 20261910,
+    "bootstrap_replicates": 200
+  },
+  "levels": [
+    {
+      "dt": 0.000625,
+      "steps": 80,
+      "covariance_error": 0.007508531359045991,
+      "covariance_error_to_mc_p95_ratio": 1.1422359185843889,
+      "final_mass_error": 1.2535106286293285e-10,
+      "final_negative_mass": 0.0,
+      "mean_relative_l1_correction": 0.0003206260655554979,
+      "maximum_relative_l1_correction": 0.0019835900667232896,
+      "forecast_seconds": 205.7829393830034
+    },
+    {
+      "dt": 0.0003125,
+      "steps": 160,
+      "covariance_error": 0.007488068593775589,
+      "covariance_error_to_mc_p95_ratio": 1.1391230188217403,
+      "final_mass_error": 1.7541523789077473e-11,
+      "final_negative_mass": 0.0,
+      "mean_relative_l1_correction": 0.00015998747870885278,
+      "maximum_relative_l1_correction": 0.0014417590013305146,
+      "forecast_seconds": 494.5359948940022
+    },
+    {
+      "dt": 0.00015625,
+      "steps": 320,
+      "covariance_error": 0.007516086695100565,
+      "covariance_error_to_mc_p95_ratio": 1.1433852746709308,
+      "final_mass_error": 2.7547675252037607e-10,
+      "final_negative_mass": 0.0,
+      "mean_relative_l1_correction": 0.00008120074970016701,
+      "maximum_relative_l1_correction": 0.001072641205156252,
+      "forecast_seconds": 1076.3396659309947
+    }
+  ],
+  "trajectory_invariants": {
+    "all_560_steps_whole_cell_positivity_certified": true,
+    "total_optimizer_failures": 0,
+    "total_scalar_fallbacks": 0,
+    "maximum_projection_mass_change": 7.993605777301127e-15,
+    "maximum_negative_mass": 0.0,
+    "objective_bound_violations": 0
+  },
+  "timestep_comparison": {
+    "full_to_half_l1": 0.0005237945889784531,
+    "half_to_quarter_l1": 0.0005418087979552974,
+    "both_l1_limits_passed": true,
+    "maximum_covariance_error_change": 0.000028018101324975633,
+    "covariance_change_limits_passed": true,
+    "observed_order": -0.04878266427243221,
+    "positive_observed_order_gate_passed": false
+  },
+  "decision": {
+    "all_predeclared_dynamic_gates_passed": false,
+    "failed_gates": [
+      "positive observed timestep order",
+      "absolute final mass error at full and quarter timesteps"
+    ],
+    "interpretation": "Repeated local QP is much less destructive than global scaling and retains useful accuracy, but the adjacent density differences plateau near 5.3e-4 instead of decreasing. Do not advance this post-step correction to dataset certification. Use it as a comparator while developing an operator-level positive low-order/local-flux or AFC correction.",
+    "dataset_generation_authorized": false
+  }
+}

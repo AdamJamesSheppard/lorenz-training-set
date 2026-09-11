@@ -32,12 +32,37 @@
     "local_projection_seconds_first": 16.200917430993286,
     "local_projection_seconds_eighth": 27.3169988419977
   },
+  "slsqp_audit_note": {
+    "status": "superseded for fallback-count evidence",
+    "reason": "The earlier dynamic implementation did not increment scaling_fallback_cells on OPTIMIZER_FAILED. The corrected implementation has a forced-failure regression test and records optimizer invocations separately from zero-average cells."
+  },
+  "specialized_osqp_validation": {
+    "evidence": "local_q2_optimizer_validation_report.json",
+    "problems": 2413,
+    "all_problems_solved": true,
+    "objective_bound_violations": 0,
+    "maximum_feasibility_violation": 0.0,
+    "maximum_cell_average_error": 6.661338147750939e-16,
+    "speedup_over_slsqp": 12.506155621090333
+  },
+  "osqp_three_step_profile": {
+    "run": "runs/local-q2-osqp-profile/20260911T165425Z",
+    "git_commit": "7f5e97c7f3d4757a3223c71563ff867322c39f9d",
+    "forecast_seconds": 7.864980387996184,
+    "mean_step_seconds": 2.742184031997264,
+    "mean_local_projection_seconds": 1.544105619667486,
+    "maximum_local_projection_seconds": 1.6101854640000965,
+    "projected_cells": [4551, 6731, 8218],
+    "scaling_fallback_cells": [0, 0, 0],
+    "all_steps_whole_cell_positivity_certified": true,
+    "projection_speedup_over_slsqp_profile": 10.783318771830977
+  },
   "decision": {
     "dynamic_implementation_validated_on_short_profile": true,
-    "three_level_production_scale_run_completed": false,
-    "reason": "Generic per-cell SLSQP cost grows with the active cell count; the predeclared three-level run would take hours and should follow a dedicated batched or active-set QP implementation rather than brute-force validation.",
+    "three_level_production_scale_run_completed": true,
+    "reason": "The reduced OSQP backend passed the optimizer and profile gates, enabling the completed three-level run recorded in local_q2_dynamic_projection_report.json.",
     "scientific_gate_changed": false,
-    "next_engineering_step": "Replace generic per-cell SLSQP with a verified warm-started batched or specialized convex-QP solver while preserving the same objective, constraints, feasibility audit and scalar-scaling upper-bound check."
+    "next_engineering_step": "Retain the local QP as a controlled comparator. The scientific run failed positive observed order, so the next method task is an operator-level positive low-order/local-flux or AFC correction rather than further optimizer work."
   },
   "discarded_or_incomplete_runs": {
     "oversubscribed_run": "runs/local-q2-crank-nicolson/20260911T115805Z",

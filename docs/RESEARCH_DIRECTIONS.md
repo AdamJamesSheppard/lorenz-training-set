@@ -21,17 +21,19 @@ unlimited trajectory.
 
 The terminal-state isolation result is favourable: Stage-1 average repair plus
 the local QP is fully certified, gives covariance error about `0.00588`, and
-uses about 17% of the scalar-scaling mass-matrix objective. The result does not
-include feedback into later steps, so a predeclared three-timestep dynamic run
-is the current discriminator. The generic SLSQP implementation passes a short
-dynamic invariant profile but is too slow for that run; optimizer specialization
-now precedes the unchanged scientific experiment.
+uses about 17% of the scalar-scaling mass-matrix objective. A reduced
+fixed-matrix OSQP implementation then passed its optimizer gate and enabled the
+three-level dynamic run. That run remains fully positive with covariance error
+about `0.0075`, and both adjacent density differences pass `0.0025`; however,
+they plateau near `5.3e-4`, giving observed order `-0.0488`. The post-step local
+QP therefore remains a comparator while operator-level local flux/AFC correction
+becomes the leading branch.
 
 ## Active branches
 
 | Branch | Why it matters now | Switch/stop evidence |
 |---|---|---|
-| Local minimum-change Q2 projection | The terminal isolation preserves much more of the unlimited state than scalar scaling; the current question is dynamic feedback. | Run the predeclared three-timestep in-loop test. Negative-average cells require Stage-1 transfer; move to local flux/AFC if repeated projection fails. |
+| Local minimum-change Q2 projection | It is much less destructive than scalar scaling and passed positivity, covariance and density-size gates dynamically. | Retain as a comparator; it failed positive observed order and two absolute mass gates, so do not advance it to dataset certification. |
 | Positive low-order full-SPD operator | Supplies the invariant-domain baseline required by defensible local convex/AFC correction. | Must preserve mass, positivity and no-flux boundaries for 3-D Lorenz drift plus full SPD diffusion before antidiffusive fluxes are introduced. |
 | Adaptive Q2 Bernstein diagnosis | Separates a sufficient positivity certificate from witnessed negativity and unresolved near-zero cases. | Use as a diagnostic; reject it as a production decision procedure if unresolved cells dominate or correction remains intrusive. |
 | Local AFC/convex high-order DG | Limits conservative antidiffusive fluxes locally instead of scaling a completed polynomial globally. | Unlimited CN passed and global correction failed; begin only from a validated positive low-order full-SPD update and pairwise conservative flux decomposition. |

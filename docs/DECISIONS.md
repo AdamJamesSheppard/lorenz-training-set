@@ -83,6 +83,30 @@ cells changed by either stage; separate Stage-1 and Stage-2 fractions are also
 recorded. The replacement comparison and the truly unlimited two-timestep
 diagnostic were predeclared before evaluation.
 
+## 2026-09-11 - Retain local QP as comparator and advance operator-level correction
+
+The reduced fixed-matrix OSQP implementation passed all predeclared engineering
+gates on 2,413 saved and randomized cell problems. It solved every problem,
+agreed with successful SLSQP objectives to `3.76e-10` relative, and was `12.51`
+times faster. The matched three-step production-mesh projection speedup was
+`10.78`. This closes optimizer cost as the immediate blocker without changing
+the cell objective or positivity constraints.
+
+The resulting three-level in-loop run does not pass its complete scientific
+decision. Every one of 560 steps is whole-cell certified, has zero measured
+negative mass, and uses no fallback. Covariance errors remain near `0.0075`,
+and adjacent density differences `5.24e-4` and `5.42e-4` both pass the absolute
+`0.0025` gate. Because the second difference is slightly larger, observed
+order is `-0.0488`, failing the predeclared positive-order requirement. Full
+and quarter absolute mass errors also narrowly exceed `1e-10`; per-projection
+mass changes remain below `8e-15`, so accumulated linear-solve drift is the
+supported attribution for those mass misses.
+
+Do not relax the gates or advance this post-step method to dataset
+certification. Retain it as the strongest current non-negative comparator and
+move the leading correction branch to a positive low-order full-SPD update with
+local conservative flux/AFC correction. Dataset generation remains blocked.
+
 ## 2026-09-11 - Attribute only part of Q2 timestep sensitivity to limiting
 
 The corrected replacement run reproduced the prior branch metrics to roundoff

@@ -18,7 +18,8 @@ with the code actually present.
   independent-reference studies.
 - `lorenz_fpe/local_projection.py`: experimental cell-local mass-matrix QP and
   an opt-in Q2 solver that feeds Stage-1-plus-QP states into propagation. The
-  default solver remains unchanged.
+  fixed equality is eliminated once; OSQP reuses the reduced matrices while
+  SLSQP remains an oracle backend. The default solver remains unchanged.
 
 Dependency direction is `entry points -> lorenz_fpe package`; the scientific
 core currently does not import top-level entry-point scripts. If a broader
@@ -49,6 +50,9 @@ differences.
 - `local_projection_study.py`: compares terminal unlimited Q2 states with the
   incumbent correction, a strictly cell-local QP, and Stage-1 average repair
   followed by the local QP.
+- `local_projection_optimizer_study.py`: replays saved and randomized Q2 cell
+  problems through OSQP and the SLSQP oracle, checking feasibility, objective,
+  coefficient agreement, and speed.
 - `scripts/run-experiment`: immutable config-driven runs under `runs/`.
 
 ## Evidence and state

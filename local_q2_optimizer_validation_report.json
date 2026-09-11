@@ -1,0 +1,36 @@
+{
+  "date": "2026-09-11",
+  "evidence_class": "EMPIRICAL_OPTIMIZER_VALIDATION",
+  "classification": "ENGINEERING_GATE_PASSED",
+  "run": "runs/local-q2-optimizer-validation/20260911T165327Z",
+  "git_commit": "7f5e97c7f3d4757a3223c71563ff867322c39f9d",
+  "git_dirty": false,
+  "run_report_sha256": "70a0880aeba5057966fdf7fbb72b91abb79d1651416a9aeb255b9eadf848ebde",
+  "provenance_sha256": "69667a1315573ebb78303057e061c7012aa2213fe31727f58bba36892b8efeb9",
+  "configuration": {
+    "saved_full_dt_problems": 707,
+    "saved_half_dt_problems": 706,
+    "random_stress_problems": 1000,
+    "total_problems": 2413,
+    "feasibility_tolerance": 5e-11,
+    "osqp_ftol": 1e-10,
+    "slsqp_ftol": 1e-12,
+    "numerical_threads": 1
+  },
+  "result": {
+    "osqp_successes": 2413,
+    "osqp_failures": 0,
+    "slsqp_successes": 2385,
+    "slsqp_failures": 28,
+    "maximum_feasibility_violation": 0.0,
+    "maximum_cell_average_error": 6.661338147750939e-16,
+    "objective_bound_violations": 0,
+    "maximum_relative_objective_difference_on_slsqp_successes": 3.7593027497374865e-10,
+    "maximum_absolute_coefficient_difference_on_slsqp_successes": 0.0005202474900297682,
+    "osqp_seconds": 1.879967390006641,
+    "slsqp_seconds": 23.511164741998073,
+    "speedup": 12.506155621090333,
+    "all_predeclared_gates_passed": true
+  },
+  "claim_limit": "Optimizer equivalence and speed on the tested cell problems; no PDE accuracy or convergence claim follows from this result."
+}

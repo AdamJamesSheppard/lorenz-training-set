@@ -24,13 +24,19 @@ next experiment.
 - Strongest observed numerical trajectory: unlimited same-mesh Q2 with
   Crank--Nicolson. It passes the controlled timestep gates but is not an
   admissible density because it contains genuine negative mass.
-- Strongest tested non-negative trajectory: adaptive corrected same-mesh Q2
-  with Crank--Nicolson. It fails the cross-timestep density gate and is not a
-  certified production method.
+- Most accurate tested non-negative in-loop trajectory: same-mesh Q2
+  Crank--Nicolson with Stage-1 average repair and local QP. It fails positive
+  observed timestep order and is not a certified production method.
 - The corrected production-scale run reproduces the earlier Q2 accuracy and
   timestep results while satisfying cell-average and scaling-factor invariants.
   Adaptive Q2 passes its full-step branch gates but fails the half-step mass
   and cross-timestep density gates.
+- The completed in-loop Stage-1-plus-local-QP Crank--Nicolson diagnostic is
+  non-negative and has covariance errors about `0.0075`. Both adjacent density
+  differences pass `0.0025`, but they plateau at `5.24e-4` and `5.42e-4`, so
+  observed order is `-0.0488`; the full and quarter levels also narrowly miss
+  the absolute `1e-10` mass gate. This post-step correction does not advance to
+  dataset certification.
 
 ## Latest validated evidence
 
@@ -72,35 +78,33 @@ next experiment.
    negative averages. Their total negative average mass is only about
    `4.34e-6`, but a mass-preserving cell-local polynomial projection is
    mathematically infeasible in each such cell.
-6. The in-loop Stage-1-plus-QP implementation is certified in short tests, but
-   generic cell-by-cell SLSQP costs roughly 15--27 seconds per production-mesh
-   timestep as the active set grows. The three-level decision run awaits a
-   verified specialized or batched optimizer.
+6. The reduced fixed-matrix OSQP backend passed a 2,413-problem SLSQP comparison
+   and a 10x projection-speed gate. Optimizer cost is no longer the active
+   blocker; the tested post-step method fails positive temporal order.
+7. A positive low-order update and pairwise local correction for the full-SPD
+   drift--diffusion operator remain unimplemented.
 
 ## Near-term research portfolio
 
 The living plan is in `docs/RESEARCH_DIRECTIONS.md` and
 `experiments/method-selection-research.yaml`. Current high-value branches are:
 
-1. Run the predeclared three-level in-loop Q2--Crank--Nicolson diagnostic using
-   Stage-1 conservative average repair followed by the local minimum-change QP.
-   The terminal-state isolation passed, but dynamic feedback remains untested.
-2. If the dynamic QP test fails, derive and test a positive,
+1. Derive and test a positive,
    mass-conservative low-order update for the full
    drift-diffusion/no-flux operator; this is the prerequisite for local convex
    or algebraic correction.
-3. Pair the successful unlimited Crank--Nicolson high-order path with that local
+2. Pair the successful unlimited Crank--Nicolson high-order path with that local
    correction and re-evaluate whole-trajectory invariants; global polynomial
-   scaling remains a rejected comparator.
-4. If the local correction fails, prototype a
+   scaling and post-step local QP remain controlled comparators.
+3. If the local correction fails, prototype a
    full-SPD positive finite-volume/flux method.
    Directional FCDF and complete-flux methods remain a separate diagonal-noise
    branch rather than the general production target.
-5. Develop a dynamically scaled whole-space Hermite solver as an independent
+4. Develop a dynamically scaled whole-space Hermite solver as an independent
    high-order reference after the Q2 gate.
-6. Investigate covariance-targeted goal-oriented/nonuniform resolution and a
+5. Investigate covariance-targeted goal-oriented/nonuniform resolution and a
    genuinely high-order independent deterministic reference.
-7. Regenerate and test mature DA states only after the initialization,
+6. Regenerate and test mature DA states only after the initialization,
    analysis, and positivity path used to produce them is acceptable.
 
 `experiments/mature-state-decision.yaml` remains a later certification stage,

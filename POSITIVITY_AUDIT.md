@@ -2,8 +2,8 @@
 
 ## Experimental local Q2 projection
 
-`lorenz_fpe/local_projection.py` implements an offline minimum-change
-diagnostic. For every Q2 cell with non-negative average, it minimizes the local
+`lorenz_fpe/local_projection.py` implements a minimum-change diagnostic and an
+opt-in propagation candidate. For every Q2 cell with non-negative average, it minimizes the local
 DG mass-matrix distance to the raw polynomial subject to non-negative
 Bernstein coefficients on the fixed `2x2x2` control subcells and exact cell-mass
 preservation. Adaptive subdivision only skips a raw cell already certified
@@ -15,8 +15,12 @@ non-negative polynomial can have a negative integral. The optional hybrid
 diagnostic first applies the incumbent global conservative average projection,
 then replaces Stage-2 scalar scaling by the local QP. The same hybrid is wired
 as an explicitly experimental Q2 propagation strategy for a predeclared
-three-timestep test. It is not a proved positivity-preserving timestep method
-and is not enabled during production propagation.
+three-timestep test. The mass equality is eliminated in a fixed null-space
+basis, after which OSQP reuses the same reduced Hessian and inequality matrix
+for every cell. SLSQP remains available as an oracle. Accepted outputs undergo
+the same full-constraint, average and scalar-objective-bound checks. The
+completed dynamic run certified all 560 steps, but failed positive observed
+timestep order and is not enabled during production propagation.
 
 > This audit originally covered Q1. The experimental Q2/Q3 path now uses
 > Bernstein coefficients on `2x2x2` control subcells. An experimental adaptive

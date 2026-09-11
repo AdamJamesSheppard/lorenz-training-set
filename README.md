@@ -15,10 +15,11 @@ and comparison policy.
 > accurate observed trajectory but contains genuine negative mass; adaptive
 > global correction restores non-negativity while failing the density timestep
 > gate. An offline Stage-1-plus-local-QP correction is substantially less
-> intrusive and now advances to an in-loop three-timestep diagnostic; a
-> positive full-SPD low-order flux/AFC method remains the fallback. The in-loop
-> candidate is implemented; its generic QP solver needs specialization before
-> the multi-hour decision run.
+> intrusive in the terminal-state test. The completed in-loop three-timestep
+> diagnostic remains positive and accurate, but fails its positive observed
+> timestep-order gate and two absolute mass gates. It is retained as a strong
+> comparator; an operator-level positive full-SPD low-order/local-flux or AFC
+> method is now the leading correction branch.
 
 This project implements the forecast step of a continuous-discrete Bayesian
 filter for the stochastic Lorenz-63 model.  It uses modern DOLFINx 0.11, UFL,
@@ -34,6 +35,9 @@ through every forecast and Bayesian update; it is never replaced by a Gaussian.
   Liu, Hu, Taitano, and Zhang (2025).  It first finds the nearest non-negative
   cell-average field with exactly the same global mass, then scales the higher
   modes about each corrected average.
+- `LocalProjectionFokkerPlanckSolver`: experimental Q2 Crank--Nicolson followed
+  by conservative average repair and a cell-local mass-matrix QP. Its reduced
+  OSQP backend reuses fixed matrices and retains SLSQP as a validation oracle.
 - Reflecting total-flux boundary condition
   `(f p - D grad(p)).n = 0`.  This is explicitly a bounded-domain
   approximation to the whole-space SDE.

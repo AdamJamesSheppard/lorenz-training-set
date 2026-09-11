@@ -3,13 +3,13 @@
   "classification": "INSUFFICIENT_EVIDENCE",
   "large_neural_operator_dataset": "NO",
   "recommended": {
-    "production_forecast_generator": "No method is certified. Q1 is the controlled baseline. Unlimited same-mesh Q2 Crank--Nicolson is the most accurate observed trajectory but has genuine negative mass. Offline Stage-1 average repair plus a local mass-matrix QP is the strongest tested non-negative terminal correction and now advances to a three-timestep in-loop diagnostic. A rigorously positive low-order full-SPD local flux/AFC comparator remains the fallback if repeated projection fails.",
+    "production_forecast_generator": "No method is certified. Q1 is the controlled baseline. Unlimited same-mesh Q2 Crank--Nicolson is the most accurate observed trajectory but has genuine negative mass. In-loop Stage-1 average repair plus a local mass-matrix QP is the most accurate tested non-negative trajectory, but it fails positive observed timestep order and two absolute mass gates. Retain it as a comparator and advance a positive low-order full-SPD local flux/AFC correction.",
     "independent_validator": "Develop a dynamically scaled and translated whole-space Hermite-Galerkin reference alongside the positivity-correction work, validated by mode-tail and moment convergence; retain exact-native-law Monte Carlo for moment uncertainty and the independent FV hierarchy for current triangulation.",
     "neural_operator_target_representation": "If a pilot is run: float64 exact conservative subcell averages; Q1 requires 2 subcells per native cell per axis (60x72x72 for the tested 30x36x36 mesh).",
     "expected_covariance_error": {
       "unlimited_q2_crank_nicolson_normalized_frobenius": 0.0037110963833668514,
       "unlimited_q2_crank_nicolson_is_admissible_density": false,
-      "best_nonnegative_q2_crank_nicolson_normalized_frobenius": 0.02191559673644618,
+      "best_nonnegative_q2_crank_nicolson_normalized_frobenius": 0.007488068593775589,
       "mc_bootstrap_p95": 0.006282392718324663,
       "interpretation": "The unlimited covariance discrepancy is below the measured MC bootstrap p95, so it is not statistically resolved by this 200000-path reference. This does not certify the true PDE error.",
       "mature_corrected_production_resolution": null
@@ -27,7 +27,7 @@
       "monte_carlo_200000_cpu_sampling_propagation_histogram_seconds": 3.369948232000722,
       "scope": "One 0.05 forecast interval; MC figure excludes principled bandwidth selection and accuracy certification."
     },
-    "principal_remaining_limitation": "The accurate unlimited Q2 Crank--Nicolson trajectory has genuine negative mass, while the current adaptive global correction destroys its density timestep consistency. A rigorously positive, mass-conservative low-order comparator and local full-SPD correction are not yet derived or validated; no corrected mature-posterior forecast or converged deterministic full-density reference exists."
+    "principal_remaining_limitation": "The accurate unlimited Q2 Crank--Nicolson trajectory has genuine negative mass. Post-step local QP is far less destructive than global scaling but exhibits a roughly 5.3e-4 temporal-difference floor and fails positive observed order. A rigorously positive, mass-conservative low-order update and local full-SPD correction are not yet derived or validated; no corrected mature-posterior forecast or converged deterministic full-density reference exists."
   },
   "pde": {
     "linear_in_density": true,
@@ -48,6 +48,7 @@
     "Experimental DG Q2/Q3 element path and degree-squared SIPG penalty scaling",
     "Q2/Q3 positivity via Bernstein coefficients on 2x2x2 control subcells",
     "Adaptive tensor-Bernstein three-way classification with fixed conservative fallback",
+    "Reduced fixed-matrix OSQP cell projection with SLSQP oracle validation",
     "Immutable raw pre-correction coefficient archives and same-mesh Q1/Q2 runner",
     "Exact Qk cell averages and conservative degree+1 subcell export/reconstruction",
     "Independent conservative finite-volume/SSPRK validator",
@@ -220,15 +221,28 @@
     "stage1_then_local_qp_timestep_l1": 0.00003943192573064795,
     "whole_cell_positivity_certified": true,
     "qp_objective_fraction_of_scalar_scaling": [0.174073878997517, 0.1740166105971202],
-    "decision": "Advance the hybrid to a predeclared in-loop three-timestep diagnostic; retain positive low-order local flux/AFC as the fallback."
+    "decision": "Historical terminal-study decision: advance the hybrid to a predeclared in-loop three-timestep diagnostic; the completed outcome is recorded separately below."
   },
   "dynamic_local_qp_implementation": {
-    "status": "implemented and short-profile certified; full three-timestep run pending optimizer specialization",
+    "status": "specialized optimizer validated and full three-timestep run completed",
     "evidence": "local_q2_projection_performance_report.json",
-    "three_step_forecast_seconds": 49.59636715899978,
-    "projected_cells": [4451, 6625, 8882],
+    "optimizer_validation_evidence": "local_q2_optimizer_validation_report.json",
+    "three_step_forecast_seconds": 7.864980387996184,
+    "projected_cells": [4551, 6731, 8218],
     "all_profile_steps_whole_cell_positive": true,
-    "reason_full_run_pending": "Generic per-cell SLSQP cost grows with active cells and projects to hours for all three timestep levels."
+    "osqp_projection_speedup_over_slsqp": 10.783318771830977,
+    "optimizer_gate_passed": true
+  },
+  "dynamic_local_qp_three_level": {
+    "evidence": "local_q2_dynamic_projection_report.json",
+    "status": "FAILED_PREDECLARED_DYNAMIC_GATES",
+    "covariance_errors": [0.007508531359045991, 0.007488068593775589, 0.007516086695100565],
+    "timestep_l1_differences": [0.0005237945889784531, 0.0005418087979552974],
+    "observed_timestep_order": -0.04878266427243221,
+    "all_560_steps_whole_cell_positive": true,
+    "total_optimizer_fallbacks": 0,
+    "absolute_mass_errors": [1.2535106286293285e-10, 1.7541523789077473e-11, 2.7547675252037607e-10],
+    "decision": "Retain post-step local QP as a controlled comparator. Do not advance it to dataset certification; develop an operator-level positive low-order/full-SPD local flux or AFC correction."
   },
   "fixed_q2_raw_archive": {
     "archive": "../sources/upload/newtest_08.zip",
@@ -239,9 +253,9 @@
     "numerical_decision_changed": false
   },
   "smallest_additional_experiment_required": {
-    "name": "in_loop_stage1_local_qp_q2_crank_nicolson_three_timestep",
-    "description": "Feed the conservative Stage-1 average repair plus local mass-matrix QP back into Q2--Crank--Nicolson propagation at dt, dt/2 and dt/4. Record every-step certification, correction, mass, covariance and adjacent density differences.",
-    "decision_rule": "Retain the post-step hybrid only if every step is certified, adjacent density differences pass 0.0025, observed order is positive, and covariance stays within 1.5 common-MC p95 at every level. If repeated projection loses the terminal advantage, proceed to a rigorously positive low-order full-SPD local flux/AFC comparator."
+    "name": "positive_low_order_full_spd_local_flux_afc_prototype",
+    "description": "Construct and verify a positive, mass-conservative low-order update for the full 3-D Lorenz drift-diffusion/no-flux operator, then introduce pairwise local antidiffusive correction toward the accurate unlimited Q2 Crank--Nicolson operator.",
+    "decision_rule": "Require operator-level mass conservation, positivity and boundary consistency before antidiffusive correction; then compare against the unlimited, global-scaling and post-step local-QP trajectories under the existing covariance and temporal gates."
   },
   "reproducibility": {
     "python": "3.12.13",
@@ -249,6 +263,7 @@
     "basix": "0.11.0",
     "ufl": "2026.1.0",
     "petsc": "3.25.4",
+    "osqp": "1.1.3",
     "mpi": "Open MPI 5.0.10",
     "cpu": "AMD Ryzen 7 9800X3D, 8 cores/16 threads",
     "gpu": "NVIDIA RTX 4070 12 GB (not used)",
@@ -275,6 +290,8 @@
     "unlimited_q2_crank_nicolson_report.json",
     "corrected_q2_crank_nicolson_report.json",
     "local_q2_positivity_projection_report.json",
-    "local_q2_projection_performance_report.json"
+    "local_q2_projection_performance_report.json",
+    "local_q2_optimizer_validation_report.json",
+    "local_q2_dynamic_projection_report.json"
   ]
 }

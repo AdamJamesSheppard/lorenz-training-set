@@ -62,8 +62,11 @@ adaptive subdivision may certify and skip an already-positive raw polynomial.
 A negative cell average makes this set empty and is reported rather than
 hidden. `LocalProjectionFokkerPlanckSolver` is an experimental propagation
 candidate that first applies the globally conservative average repair and then
-this local QP after each Q2--Crank--Nicolson solve. It has not passed the
-predeclared dynamic evidence gates.
+this local QP after each Q2--Crank--Nicolson solve. A reduced null-space form
+uses one fixed Hessian and inequality matrix with cell-dependent lower bounds.
+The implementation passed its QP-equivalence tests but failed the predeclared
+dynamic evidence gates because its adjacent density differences did not show
+positive observed order and two levels missed the absolute mass tolerance.
 
 ## Executable invariants
 
