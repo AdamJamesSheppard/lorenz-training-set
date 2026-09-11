@@ -23,6 +23,7 @@ unlimited trajectory.
 
 | Branch | Why it matters now | Switch/stop evidence |
 |---|---|---|
+| Local minimum-change Q2 projection | Directly tests whether replacing uniform high-mode contraction by a nearest admissible polynomial preserves more of the unlimited terminal state. | Keep offline initially. Negative-average cells are infeasible without mass transfer; move to local flux/AFC if the QP correction remains intrusive or fails dynamically. |
 | Positive low-order full-SPD operator | Supplies the invariant-domain baseline required by defensible local convex/AFC correction. | Must preserve mass, positivity and no-flux boundaries for 3-D Lorenz drift plus full SPD diffusion before antidiffusive fluxes are introduced. |
 | Adaptive Q2 Bernstein diagnosis | Separates a sufficient positivity certificate from witnessed negativity and unresolved near-zero cases. | Use as a diagnostic; reject it as a production decision procedure if unresolved cells dominate or correction remains intrusive. |
 | Local AFC/convex high-order DG | Limits conservative antidiffusive fluxes locally instead of scaling a completed polynomial globally. | Unlimited CN passed and global correction failed; begin only from a validated positive low-order full-SPD update and pairwise conservative flux decomposition. |

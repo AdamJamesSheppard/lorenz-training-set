@@ -16,6 +16,8 @@ with the code actually present.
   conservative export, manifests, and leakage-safe splits.
 - `lorenz_fpe/validation.py`: analytic, Monte Carlo, convergence, domain, and
   independent-reference studies.
+- `lorenz_fpe/local_projection.py`: experimental cell-local mass-matrix QP for
+  offline Q2 positivity isolation; it does not alter propagation.
 
 Dependency direction is `entry points -> lorenz_fpe package`; the scientific
 core currently does not import top-level entry-point scripts. If a broader
@@ -43,6 +45,9 @@ differences.
 - `validate.py` and focused `*_study.py` files: validation studies.
 - `same_mesh_q2_study.py`: common-law Monte Carlo preparation and auditable
   Q1/Q2 fixed/adaptive forecast branches, including raw coefficient archives.
+- `local_projection_study.py`: compares terminal unlimited Q2 states with the
+  incumbent correction, a strictly cell-local QP, and Stage-1 average repair
+  followed by the local QP.
 - `scripts/run-experiment`: immutable config-driven runs under `runs/`.
 
 ## Evidence and state

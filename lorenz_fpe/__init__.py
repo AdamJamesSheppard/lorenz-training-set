@@ -10,6 +10,7 @@ from .core import (
     PositivityLimiter,
     TruthSimulator,
 )
+from .local_projection import LocalPolynomialProjector
 
 __all__ = [
     "BayesianAnalysis",
@@ -17,6 +18,7 @@ __all__ = [
     "Domain",
     "FokkerPlanckSolver",
     "Lorenz63Model",
+    "LocalPolynomialProjector",
     "ObservationModel",
     "PositivityLimiter",
     "TruthSimulator",

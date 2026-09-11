@@ -68,27 +68,35 @@ next experiment.
 4. Crank--Nicolson resolves the controlled unlimited temporal gate, while the
    global limiter destroys that result. A positive low-order full-SPD operator
    needed for local convex correction remains unimplemented and unvalidated.
+5. In the terminal unlimited CN states, about 17,500 of 38,880 cells have
+   negative averages. Their total negative average mass is only about
+   `4.34e-6`, but a mass-preserving cell-local polynomial projection is
+   mathematically infeasible in each such cell.
 
 ## Near-term research portfolio
 
 The living plan is in `docs/RESEARCH_DIRECTIONS.md` and
 `experiments/method-selection-research.yaml`. Current high-value branches are:
 
-1. Derive and test a positive, mass-conservative low-order update for the full
+1. Run the predeclared terminal-state isolation study comparing the incumbent
+   correction, a pure cell-local minimum-change QP, and Stage-1 conservative
+   average repair followed by that QP. Do not feed the new projection into the
+   time loop at this stage.
+2. Derive and test a positive, mass-conservative low-order update for the full
    drift-diffusion/no-flux operator; this is the prerequisite for local convex
    or algebraic correction.
-2. Pair the successful unlimited Crank--Nicolson high-order path with that local
+3. Pair the successful unlimited Crank--Nicolson high-order path with that local
    correction and re-evaluate whole-trajectory invariants; global polynomial
    scaling remains a rejected comparator.
-3. If the local correction fails, prototype a
+4. If the local correction fails, prototype a
    full-SPD positive finite-volume/flux method.
    Directional FCDF and complete-flux methods remain a separate diagonal-noise
    branch rather than the general production target.
-4. Develop a dynamically scaled whole-space Hermite solver as an independent
+5. Develop a dynamically scaled whole-space Hermite solver as an independent
    high-order reference after the Q2 gate.
-5. Investigate covariance-targeted goal-oriented/nonuniform resolution and a
+6. Investigate covariance-targeted goal-oriented/nonuniform resolution and a
    genuinely high-order independent deterministic reference.
-6. Regenerate and test mature DA states only after the initialization,
+7. Regenerate and test mature DA states only after the initialization,
    analysis, and positivity path used to produce them is acceptable.
 
 `experiments/mature-state-decision.yaml` remains a later certification stage,

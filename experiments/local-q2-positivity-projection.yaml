@@ -1,0 +1,32 @@
+id: local-q2-positivity-projection
+kind: local_projection_study
+status: predeclared_diagnostic
+study:
+  cells: [30, 36, 36]
+  final_time: 0.05
+  seed: 20260910
+  bootstrap_replicates: 200
+  certificate_max_depth: 4
+  optimizer_ftol: 1.0e-12
+  feasibility_tolerance: 5.0e-11
+  maximum_iterations: 250
+  mc_particles: runs/unlimited-q2-crank-nicolson/20260911T001508Z/reference/mc_final_particles.npy
+  inputs:
+    - name: full_dt
+      dt: 0.000625
+      input_subcells: runs/unlimited-q2-crank-nicolson/20260911T001508Z/q2_unlimited_cn_full_dt/final_q2_subcell_averages.npy
+    - name: half_dt
+      dt: 0.0003125
+      input_subcells: runs/unlimited-q2-crank-nicolson/20260911T001508Z/q2_unlimited_cn_half_dt/final_q2_subcell_averages.npy
+execution:
+  mpi_ranks: 8
+decision_rules:
+  - The pure local branch must report every negative-average cell as infeasible; it must not conceal them by changing cell mass.
+  - Any accepted QP solution must preserve its cell average and satisfy every fixed control-subcell Bernstein inequality within 5e-11.
+  - The QP mass-matrix objective must not exceed the matched scalar-scaling objective beyond numerical tolerance.
+  - This terminal-state isolation study does not authorize an in-loop positivity mechanism or dataset generation.
+  - If negative cell averages or repeated projection remain material, proceed to a positive low-order local flux or AFC comparator.
+notes:
+  - Adaptive subdivision is used only to skip raw cells already certified non-negative.
+  - Every solved QP uses one fixed convex inequality matrix from the 2x2x2 Q2 control subcells.
+  - The global-average-repair-plus-local-QP branch isolates replacement of Stage-2 scaling while retaining the incumbent Stage-1 comparator.

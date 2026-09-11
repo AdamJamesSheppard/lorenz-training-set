@@ -1,5 +1,22 @@
 # Audit of the positivity construction
 
+## Experimental local Q2 projection
+
+`lorenz_fpe/local_projection.py` implements an offline minimum-change
+diagnostic. For every Q2 cell with non-negative average, it minimizes the local
+DG mass-matrix distance to the raw polynomial subject to non-negative
+Bernstein coefficients on the fixed `2x2x2` control subcells and exact cell-mass
+preservation. Adaptive subdivision only skips a raw cell already certified
+non-negative. Accepted optimizer results are rechecked against every original
+constraint row.
+
+Negative cell averages are a declared infeasibility outcome because no
+non-negative polynomial can have a negative integral. The optional hybrid
+diagnostic first applies the incumbent global conservative average projection,
+then replaces Stage-2 scalar scaling by the local QP. Neither diagnostic is a
+proved positivity-preserving timestep method, and neither is enabled during
+production propagation.
+
 > This audit originally covered Q1. The experimental Q2/Q3 path now uses
 > Bernstein coefficients on `2x2x2` control subcells. An experimental adaptive
 > branch now uses recursive tensor-Bernstein subdivision to avoid some false

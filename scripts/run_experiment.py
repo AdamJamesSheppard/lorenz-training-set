@@ -35,8 +35,10 @@ def main(config_path: Path) -> int:
     source = config_path.resolve()
     config = yaml.safe_load(source.read_text())
     kind=config.get("kind")
-    if kind not in {"forecast","same_mesh_q2_study"}:
-        raise SystemExit("executable kinds are forecast and same_mesh_q2_study")
+    if kind not in {"forecast", "same_mesh_q2_study", "local_projection_study"}:
+        raise SystemExit(
+            "executable kinds are forecast, same_mesh_q2_study, and local_projection_study"
+        )
 
     run_id = str(config["id"])
     if not run_id or any(ch not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_" for ch in run_id):
@@ -70,7 +72,7 @@ def main(config_path: Path) -> int:
         if ranks > 1:
             command = ["mpiexec", "-n", str(ranks), *command]
         commands.append(("forecast",command,run_dir))
-    else:
+    elif kind == "same_mesh_q2_study":
         study=config["study"]
         common=["--cells",*map(str,study["cells"]),"--dt",str(study["dt"]),
             "--t-final",str(study["final_time"]),"--seed",str(study["seed"])]
@@ -104,6 +106,29 @@ def main(config_path: Path) -> int:
             if branch_ranks>1:
                 branch_command=["mpiexec","-n",str(branch_ranks),*branch_command]
             commands.append((str(branch["name"]),branch_command,ROOT))
+    else:
+        study = config["study"]
+        for item in study["inputs"]:
+            item_output = run_dir / str(item["name"])
+            command = [
+                sys.executable,
+                str(ROOT / "local_projection_study.py"),
+                "--input-subcells", str(ROOT / str(item["input_subcells"])),
+                "--mc-particles", str(ROOT / str(study["mc_particles"])),
+                "--output", str(item_output),
+                "--cells", *map(str, study["cells"]),
+                "--dt", str(item["dt"]),
+                "--final-time", str(study["final_time"]),
+                "--certificate-max-depth", str(study["certificate_max_depth"]),
+                "--optimizer-ftol", str(study["optimizer_ftol"]),
+                "--feasibility-tolerance", str(study["feasibility_tolerance"]),
+                "--maximum-iterations", str(study["maximum_iterations"]),
+                "--bootstrap", str(study["bootstrap_replicates"]),
+                "--seed", str(study["seed"]),
+            ]
+            if ranks > 1:
+                command = ["mpiexec", "-n", str(ranks), *command]
+            commands.append((str(item["name"]), command, ROOT))
 
     provenance = {
         "created_utc": created_at.isoformat(),

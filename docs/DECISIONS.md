@@ -4,6 +4,25 @@ Decisions here are dated and revisable. Add a new entry that marks an older
 decision `superseded`, `narrowed`, or `confirmed` rather than rewriting history
 to make the current direction look inevitable.
 
+## 2026-09-11 - Run a terminal-state local-QP isolation study before in-loop AFC
+
+Implement a cell-local mass-matrix projection of Q2 coefficients onto fixed
+`2x2x2` control-subcell Bernstein inequalities while preserving each feasible
+cell average. Adaptive subdivision may skip raw cells already certified
+non-negative, but the QP constraint matrix remains fixed during each solve.
+This makes the nearest-point comparison with scalar scaling a genuine convex
+quadratic program.
+
+The final unlimited Crank--Nicolson states already show a hard limit: 17,515
+full-step and 17,572 half-step cells have negative averages, with total negative
+average mass `4.341e-6` and `4.344e-6`. A pure cell-local mass-preserving
+projection is infeasible there. The diagnostic therefore compares (i) pure
+local QP with those cells explicitly retained and flagged, and (ii) the
+incumbent conservative Stage-1 average repair followed by local QP. It does not
+feed corrections into later steps. Only a favourable terminal result can
+justify a later in-loop experiment; material average transfer or dynamic
+failure moves the project to a positive low-order flux/AFC construction.
+
 ## 2026-09-11 - Retain Q2 as a challenger but withhold production selection
 
 Status: superseded as numerical evidence by the invariant audit below; its run

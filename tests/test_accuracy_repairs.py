@@ -209,6 +209,43 @@ class TestQ2Properties(unittest.TestCase):
         reconstructed = q2.structured_export(embedded, 3)
         np.testing.assert_allclose(reconstructed, represented, rtol=2.0e-12, atol=1.0e-14)
 
+    def test_local_q2_projection_is_conservative_positive_and_minimum_change(self):
+        from lorenz_fpe.local_projection import LocalPolynomialProjector
+
+        domain = Domain(((0.0, 1.0),) * 3, (1, 1, 1))
+        solver = FokkerPlanckSolver(
+            Lorenz63Model(), domain, 0.01, degree=2,
+            certificate_mode="adaptive", certificate_max_depth=4,
+        )
+        q = fem.Function(solver.V)
+        q.interpolate(lambda x: (x[0] - 0.37) ** 2 - 0.002 + 0.0 * x[1])
+        dofs = solver.V.dofmap.cell_dofs(0)
+        raw = q.x.array[dofs].copy()
+        result = LocalPolynomialProjector(solver.limiter).project_cell(raw)
+
+        self.assertEqual(result.status, "PROJECTED")
+        self.assertLess(
+            abs(solver.limiter.cell_average(result.coefficients)
+                - solver.limiter.cell_average(raw)),
+            1.0e-12,
+        )
+        self.assertGreaterEqual(
+            solver.limiter.control_coefficients(result.coefficients).min(), -1.0e-12
+        )
+        self.assertLessEqual(result.objective, result.scaling_objective + 1.0e-12)
+
+    def test_local_q2_projection_exposes_negative_average_infeasibility(self):
+        from lorenz_fpe.local_projection import LocalPolynomialProjector
+
+        solver = FokkerPlanckSolver(
+            Lorenz63Model(), Domain(((0.0, 1.0),) * 3, (1, 1, 1)),
+            0.01, degree=2,
+        )
+        raw = -np.ones(27)
+        result = LocalPolynomialProjector(solver.limiter).project_cell(raw)
+        self.assertEqual(result.status, "NEGATIVE_CELL_AVERAGE")
+        np.testing.assert_array_equal(result.coefficients, raw)
+
 
 class TestIndependentFiniteVolume(unittest.TestCase):
     def test_total_flux_update_preserves_mass_and_positivity(self):

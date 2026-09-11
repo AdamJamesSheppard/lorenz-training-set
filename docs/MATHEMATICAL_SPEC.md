@@ -52,6 +52,16 @@ guarantee. For Q2/Q3, positivity on fixed control subcells is sufficient but
 not necessary and can over-limit the solution. Exact implementation claims and
 excluded claims are in `POSITIVITY_AUDIT.md`.
 
+An offline Q2 diagnostic also exposes the convex cell-local set
+
+`{c: Bc >= 0 and m^T c = m^T c_raw}`
+
+and projects onto it in the local DG mass-matrix norm. The current diagnostic
+uses fixed Bernstein inequalities on the existing `2x2x2` control subcells;
+adaptive subdivision may certify and skip an already-positive raw polynomial.
+A negative cell average makes this set empty and is reported rather than
+hidden. This projection is not yet part of the timestep update.
+
 ## Executable invariants
 
 - Probability mass error below the test-specific tolerance.
