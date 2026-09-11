@@ -709,6 +709,29 @@ postprocessing.
 Evidence: [`same_mesh_q2_falsification_report.json`](same_mesh_q2_falsification_report.json)
 and the hashed immutable run paths recorded there.
 
+## 21. Corrected rerun and unlimited attribution (2026-09-11)
+
+The bound-preserving Stage-1 repair and clamped Stage-2 factor were rerun under
+the same mesh, initial law, Monte Carlo sample, timesteps and gates. Every
+recorded corrected cell average was non-negative and every scaling factor lay
+in `[0,1]`. The earlier branch values were reproduced to roundoff: adaptive Q2
+gave covariance errors `0.02377` and `0.02218`, while its timestep-halving
+subcell-average difference remained `L1>=0.01552` and half-step mass error
+remained `2.56e-10`. The failed method decision is therefore robust to the
+formal limiter repair.
+
+The two genuinely unlimited backward-Euler Q2 trajectories gave covariance
+errors `0.00727` and `0.00464`, but terminal integrated negative masses
+`7.23e-4` and `7.73e-4`. Their timestep-halving density difference was
+`L1>=0.00541`, above the `0.0025` limit, while covariance-error change `0.00262`
+passed. Positivity correction increases the corrected cross-timestep difference
+by a factor of about `2.87`; the unlimited failure shows that accumulated
+limiting does not fully explain the sensitivity. The next discriminator is an
+unlimited Crank--Nicolson pair under unchanged density and covariance gates.
+
+Evidence: [`same_mesh_q2_corrected_report.json`](same_mesh_q2_corrected_report.json)
+and [`unlimited_q2_timestep_report.json`](unlimited_q2_timestep_report.json).
+
 ## Sources
 
 [^1]: C. Liu, J. Hu, W. T. Taitano and X. Zhang, [“An optimization-based positivity-preserving limiter in semi-implicit discontinuous Galerkin schemes solving Fokker–Planck equations”](https://www.math.purdue.edu/~zhan1966/research/paper/DG_anisotropic_Fokker_Planck.pdf), *Computers & Mathematics with Applications* (2025).

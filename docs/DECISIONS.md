@@ -39,6 +39,22 @@ cells changed by either stage; separate Stage-1 and Stage-2 fractions are also
 recorded. The replacement comparison and the truly unlimited two-timestep
 diagnostic were predeclared before evaluation.
 
+## 2026-09-11 - Attribute only part of Q2 timestep sensitivity to limiting
+
+The corrected replacement run reproduced the prior branch metrics to roundoff
+with all recorded scaling factors in `[0,1]` and non-negative corrected cell
+averages. Its cross-timestep density lower bound remains `0.01552` and the
+half-step mass error remains `2.56e-10`, so Q2 remains uncertified.
+
+The truly unlimited backward-Euler Q2 pair also fails the density timestep gate:
+its conservative subcell lower bound is `0.00541` versus the `0.0025` limit.
+Global positivity correction increases the corrected discrepancy by a factor
+of about `2.87`, but the unlimited failure rules out correction as the sole
+cause. Unlimited Q2 has lower covariance errors (`0.00727` and `0.00464`) while
+carrying integrated negative mass of `7.23e-4` and `7.73e-4`. Proceed to a
+predeclared unlimited Crank--Nicolson two-timestep diagnostic; close the present
+uniform-mesh DG branch if second-order time integration also fails.
+
 ## 2026-09-10 - Implement the predeclared Q2 diagnostic without relaxing positivity
 
 The same-mesh experiment now has fixed and adaptive Bernstein branches. The

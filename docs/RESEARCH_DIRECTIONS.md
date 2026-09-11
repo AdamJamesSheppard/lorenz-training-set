@@ -1,6 +1,6 @@
 # Research directions
 
-Updated: 2026-09-10
+Updated: 2026-09-11
 
 This is a living portfolio, not a queue that must be executed in order. Agents
 are welcome to add, remove, split, merge, or re-rank branches as the production
@@ -9,22 +9,21 @@ Record why a branch moved; do not preserve a stale ranking for consistency.
 
 ## Current diagnosis
 
-The corrected evidence suggests that the dominant unresolved problem is the
-combination of convection-dominated spatial transport and positivity
-enforcement. This is `NUMERICAL`, not proved: controlled error decomposition may
-revise it. Initialization and projected Bayesian analysis have improved, while
-the current Q1 covariance discrepancy remains much larger than the Monte Carlo
-noise floor. The prior Q1/Q2 result matched global DOFs while changing physical
-cell widths and timestep, so it cannot decide the polynomial-degree question.
+The corrected same-mesh evidence shows that adaptive Q2 improves covariance and
+marginals over Q1, while both corrected and unlimited backward-Euler Q2 remain
+density-sensitive to timestep. Global positivity correction magnifies that
+sensitivity and is intrusive; the unlimited failure shows temporal/spatial DG
+error also matters. This attribution is `NUMERICAL`, not proved. Unlimited Q2
+has strong moment accuracy but unacceptable negative mass.
 
 ## Active branches
 
 | Branch | Why it matters now | Switch/stop evidence |
 |---|---|---|
-| Same-mesh Q2 falsification | Isolates degree, timestep and positivity-certificate effects using one represented initial law. | Advance Q2 only under the predeclared covariance, marginal, limiter, timestep and invariant gates in `METHOD_SELECTION_REPORT.md`. |
+| Unlimited Q2 Crank--Nicolson attribution | Tests whether second-order time integration removes the backward-Euler cross-timestep density failure. | Advance only if the predeclared `L1<=0.0025` and covariance-change gates pass; positivity remains a separate blocker. |
 | Adaptive Q2 Bernstein diagnosis | Separates a sufficient positivity certificate from witnessed negativity and unresolved near-zero cases. | Use as a diagnostic; reject it as a production decision procedure if unresolved cells dominate or correction remains intrusive. |
-| Local AFC/convex high-order DG | Limits conservative antidiffusive fluxes locally instead of scaling a completed polynomial globally. | Start only if raw same-mesh Q2 is accurate; require full-SPD Lorenz boundary applicability. |
-| Positive full-tensor finite volume | Provides an operator-level positivity fallback with substantially different numerical principles. | Start if raw Q2 fails; require genuine 3-D convection-diffusion, no-flux and high-Peclet validation. |
+| Local AFC/convex high-order DG | Limits conservative antidiffusive fluxes locally instead of scaling a completed polynomial globally. | Start if unlimited CN passes the time gate; require full-SPD Lorenz boundary applicability. |
+| Positive full-tensor finite volume | Provides an operator-level positivity fallback with substantially different numerical principles. | Prioritize if unlimited CN fails; require genuine 3-D convection-diffusion, no-flux and high-Peclet validation. |
 | FCDF or directional complete flux | Directly targets drift-diffusion flux and high-Peclet numerical diffusion. | Keep as an identity/diagonal `B` special-case branch; present FCDF proof is directional and its 2026 evidence is lower-dimensional. |
 | Characteristic/semi-Lagrangian methods | Could reduce upwind transport diffusion substantially. | Require a defensible 3-D diffusion, positivity, conservation, and reflecting-boundary treatment. |
 | Goal-oriented/nonuniform resolution | Mean and raw second moments are linear functionals, so covariance-oriented refinement may beat uniform grids. | Reconsider if current DOLFINx topology or estimator cost prevents a controlled implementation. |

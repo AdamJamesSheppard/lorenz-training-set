@@ -90,6 +90,7 @@ def main(config_path: Path) -> int:
             branch_command=[
                 sys.executable,str(ROOT/"same_mesh_q2_study.py"),"forecast",*branch_common,
                 "--branch",str(branch["name"]),"--degree",str(branch["degree"]),
+                "--theta",str(branch.get("theta",1.0)),
                 "--certificate-mode",str(branch.get("certificate_mode","fixed")),
                 "--certificate-max-depth",str(study["certificate_max_depth"]),
                 "--initial-grid",str(initial_grid),"--mc-particles",str(particles),

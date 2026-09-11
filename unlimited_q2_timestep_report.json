@@ -1,0 +1,60 @@
+{
+  "date": "2026-09-11",
+  "evidence_class": "NUMERICAL",
+  "classification": "INSUFFICIENT_EVIDENCE",
+  "configuration": {
+    "cells": [30, 36, 36],
+    "final_time": 0.05,
+    "timesteps": [0.000625, 0.0003125],
+    "degree": 2,
+    "positivity_applied_each_step": false,
+    "monte_carlo_paths": 200000,
+    "mc_dt": 0.000125,
+    "mpi_ranks": 8
+  },
+  "full_step": {
+    "normalized_covariance_error": 0.007266746983800384,
+    "marginal_tv": [0.003320894342604081, 0.0008948079628156283, 0.00231784632333146],
+    "mass_error": 4.2033931890728127e-11,
+    "integrated_negative_mass": 0.0007231825893760409,
+    "minimum_quadrature_value": -0.000011475579508069562,
+    "final_certificate_counts": {
+      "CERTIFIED_NONNEGATIVE": 115,
+      "WITNESSED_NEGATIVE": 38764,
+      "UNRESOLVED": 1
+    },
+    "forecast_seconds": 69.19530330999987
+  },
+  "half_step": {
+    "normalized_covariance_error": 0.004643307685509568,
+    "marginal_tv": [0.002903017762814638, 0.0006883933355090973, 0.0016402672333545086],
+    "mass_error": 2.3691204553699663e-10,
+    "integrated_negative_mass": 0.000773166574358513,
+    "minimum_quadrature_value": -0.00001243867091342033,
+    "final_certificate_counts": {
+      "CERTIFIED_NONNEGATIVE": 111,
+      "WITNESSED_NEGATIVE": 38767,
+      "UNRESOLVED": 2
+    },
+    "forecast_seconds": 115.45417741100391
+  },
+  "timestep_comparison": {
+    "subcell_average_l1_lower_bound": 0.005409822820428714,
+    "l1_limit": 0.0025,
+    "l1_gate_passed": false,
+    "normalized_covariance_error_change": 0.0026234392982908165,
+    "covariance_error_change_limit": 0.003,
+    "covariance_gate_passed": true
+  },
+  "correction_attribution": {
+    "corrected_timestep_l1_lower_bound": 0.015524645583522435,
+    "corrected_to_unlimited_timestep_l1_ratio": 2.869714238041364,
+    "full_step_corrected_vs_unlimited_l1_lower_bound": 0.030610355590020864,
+    "half_step_corrected_vs_unlimited_l1_lower_bound": 0.03273819093153825,
+    "interpretation": "Unlimited backward-Euler Q2 already fails the density timestep gate. Positivity correction materially changes each terminal density and magnifies the cross-timestep discrepancy, but is not its sole cause."
+  },
+  "immutable_evidence": {
+    "run": "runs/unlimited-q2-timestep-attribution/20260911T000813Z",
+    "git_commit": "43b83d23b8335f2089a1542a2bfc3365b2fb7221"
+  }
+}

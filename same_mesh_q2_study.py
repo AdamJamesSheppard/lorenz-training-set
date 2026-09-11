@@ -83,7 +83,8 @@ def run_forecast(args: argparse.Namespace) -> None:
     comm.barrier()
     domain=Domain(cells=tuple(args.cells)); model=Lorenz63Model()
     solver=FokkerPlanckSolver(
-        model,domain,args.dt,degree=args.degree,certificate_mode=args.certificate_mode,
+        model,domain,args.dt,theta=args.theta,degree=args.degree,
+        certificate_mode=args.certificate_mode,
         certificate_max_depth=args.certificate_max_depth,
         certificate_diagnostics=args.degree>=2,
         apply_positivity=not args.disable_positivity,
@@ -174,7 +175,7 @@ def run_forecast(args: argparse.Namespace) -> None:
         report={
             "branch":args.branch,
             "configuration":{"cells":list(args.cells),"degree":args.degree,"dt":args.dt,
-                "t_final":args.t_final,"mpi_ranks":comm.size,
+                "theta":args.theta,"t_final":args.t_final,"mpi_ranks":comm.size,
                 "certificate_mode":args.certificate_mode,
                 "certificate_max_depth":args.certificate_max_depth,
                 "positivity_applied_each_step":solver.apply_positivity,
@@ -260,6 +261,7 @@ def parser() -> argparse.ArgumentParser:
     run=sub.add_parser("forecast",parents=[common])
     run.add_argument("--branch",required=True)
     run.add_argument("--degree",type=int,choices=(1,2),required=True)
+    run.add_argument("--theta",type=float,choices=(0.5,1.0),default=1.0)
     run.add_argument("--certificate-mode",choices=("fixed","adaptive"),default="fixed")
     run.add_argument("--certificate-max-depth",type=int,default=4)
     run.add_argument("--initial-grid",type=Path,required=True)

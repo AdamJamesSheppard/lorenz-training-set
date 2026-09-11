@@ -28,11 +28,10 @@ next experiment.
   classified before correction. Adaptive Bernstein subdivision is a diagnostic
   and sufficient certificate in this experiment, not a selected production
   limiter.
-- The first production-scale Q2 run exposed a roundoff-invariant bug in the
-  Stage-1 mass repair: tiny active averages could become negative, leading to
-  negative Stage-2 scaling factors. The repair is implemented and directly
-  tested, but replacement evidence is required before reusing the numerical
-  conclusions from that run.
+- The corrected production-scale run reproduces the earlier Q2 accuracy and
+  timestep results while satisfying cell-average and scaling-factor invariants.
+  Adaptive Q2 passes its full-step branch gates but fails the half-step mass
+  and cross-timestep density gates.
 
 ## Latest validated evidence
 
@@ -42,10 +41,15 @@ next experiment.
   convergence and maximum mass error `3.12e-12`.
 - Q2 L2 projection preserves covariance to about `2.84e-10` before limiting,
   but the tested Q2 positivity treatment is too intrusive to justify adoption.
-- The superseded controlled run suggested a reduction in corrected startup
-  covariance error from Q1's `0.08719` to `0.02377`, but it is retained only as
-  diagnostic history until the corrected predeclared run reproduces or revises
-  those values.
+- The corrected controlled run confirms a reduction in corrected startup
+  covariance error from Q1's `0.08719` to adaptive Q2's `0.02377`. Halving the
+  timestep changes the corrected density by at least `L1=0.01552` and produces
+  mass error `2.56e-10`; both exceed their predeclared limits.
+- Truly unlimited backward-Euler Q2 is more accurate in covariance
+  (`0.00727` full step, `0.00464` half step) but has integrated negative mass
+  around `7e-4`. Its cross-timestep density difference is already at least
+  `L1=0.00541`, so positivity correction magnifies rather than solely causes
+  the timestep failure.
 
 ## Active blockers
 
@@ -55,23 +59,24 @@ next experiment.
    covariance discrepancy.
 3. The independent finite-volume hierarchy is not converged enough to define a
    full-density truth error.
-4. Corrected replacement runs are pending, so the apparent Q2 timestep
-   sensitivity has not yet been confirmed under the repaired invariants.
+4. Both corrected and unlimited backward-Euler Q2 fail the density timestep
+   gate; the remaining attribution is temporal scheme versus spatial DG error.
 
 ## Near-term research portfolio
 
 The living plan is in `docs/RESEARCH_DIRECTIONS.md` and
 `experiments/method-selection-research.yaml`. Current high-value branches are:
 
-1. Run an unlimited-Q2 two-timestep diagnostic from the same represented law to
-   separate backward-Euler/DG sensitivity from accumulated positivity correction.
-2. If that diagnostic attributes the density failure mainly to correction, develop a local
-   algebraic/convex flux correction rather than another global polynomial
-   scaling variant.
-3. If the unlimited Q2 density also fails the timestep gate, investigate the
-   time integrator or close that branch and prototype a full-SPD positive
-   finite-volume/flux method. Directional FCDF and complete-flux methods remain
-   a separate diagonal-noise branch rather than the general production target.
+1. Compare unlimited Crank--Nicolson Q2 at both timesteps using the same law and
+   gates to test whether backward-Euler temporal error explains the remaining
+   unlimited density sensitivity.
+2. If second-order time integration survives, pair it with a local
+   algebraic/convex positivity treatment and re-evaluate whole-trajectory
+   invariants; global polynomial scaling remains a comparator.
+3. If unlimited Crank--Nicolson also fails, close the present uniform-mesh DG
+   branch and prototype a full-SPD positive finite-volume/flux method.
+   Directional FCDF and complete-flux methods remain a separate diagonal-noise
+   branch rather than the general production target.
 4. Develop a dynamically scaled whole-space Hermite solver as an independent
    high-order reference after the Q2 gate.
 5. Investigate covariance-targeted goal-oriented/nonuniform resolution and a
