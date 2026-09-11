@@ -246,6 +246,20 @@ class TestQ2Properties(unittest.TestCase):
         self.assertEqual(result.status, "NEGATIVE_CELL_AVERAGE")
         np.testing.assert_array_equal(result.coefficients, raw)
 
+    def test_local_q2_projection_honours_prescribed_zero_average(self):
+        from lorenz_fpe.local_projection import LocalPolynomialProjector
+
+        solver = FokkerPlanckSolver(
+            Lorenz63Model(), Domain(((0.0, 1.0),) * 3, (1, 1, 1)),
+            0.01, degree=2,
+        )
+        raw = np.linspace(-1.0e-8, 1.0e-8, 27)
+        result = LocalPolynomialProjector(solver.limiter).project_cell(
+            raw, prescribed_average=0.0
+        )
+        self.assertEqual(result.status, "PROJECTED_ZERO_AVERAGE")
+        np.testing.assert_array_equal(result.coefficients, np.zeros(27))
+
 
 class TestIndependentFiniteVolume(unittest.TestCase):
     def test_total_flux_update_preserves_mass_and_positivity(self):

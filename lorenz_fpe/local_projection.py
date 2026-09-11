@@ -85,12 +85,20 @@ class LocalPolynomialProjector:
         theta = float(np.clip(1.0 / (1.0 - minimum), 0.0, 1.0))
         return self.ones + theta * (normalized - self.ones)
 
-    def project_cell(self, coefficients: np.ndarray) -> CellProjectionResult:
+    def project_cell(
+        self,
+        coefficients: np.ndarray,
+        *,
+        prescribed_average: float | None = None,
+    ) -> CellProjectionResult:
         """Project one polynomial or return an explicit infeasibility result."""
         raw = np.asarray(coefficients, dtype=float)
         if raw.shape != self.ones.shape:
             raise ValueError(f"Expected {len(self.ones)} cell coefficients, got {raw.shape}")
-        average = float(self.average_weights @ raw)
+        average = (
+            float(self.average_weights @ raw)
+            if prescribed_average is None else float(prescribed_average)
+        )
         if average < 0.0:
             return CellProjectionResult(
                 raw.copy(), "NEGATIVE_CELL_AVERAGE", 0, 0.0, 0.0,
@@ -156,6 +164,21 @@ class LocalPolynomialProjector:
             None if status == "PROJECTED" else str(result.message),
         )
 
+    def scaling_fallback(
+        self, coefficients: np.ndarray, *, prescribed_average: float | None = None
+    ) -> np.ndarray:
+        """Return the feasible scalar-scaling comparator for a positive average."""
+        raw = np.asarray(coefficients, dtype=float)
+        average = (
+            float(self.average_weights @ raw)
+            if prescribed_average is None else float(prescribed_average)
+        )
+        if average < 0.0:
+            raise ValueError("Scalar fallback is infeasible for a negative cell average")
+        if average == 0.0:
+            return np.zeros_like(raw)
+        return average * self._scaling_candidate(raw / average)
+
     def project_state(
         self,
         state: DensityState,
@@ -215,6 +238,7 @@ class LocalPolynomialProjector:
         objective = 0.0
         scaling_objective = 0.0
         objective_bound_violations = 0
+        scaling_fallback_cells = 0
         optimizer_messages: dict[str, int] = {}
 
         for cell, dofs in enumerate(limiter.cell_dofs):
@@ -224,7 +248,12 @@ class LocalPolynomialProjector:
                 if classification["status"] == "CERTIFIED_NONNEGATIVE":
                     counts["ALREADY_CERTIFIED"] += 1
                     continue
-            result = self.project_cell(values)
+            prescribed_average = (
+                float(target_averages[cell]) if repair_cell_averages else None
+            )
+            result = self.project_cell(
+                values, prescribed_average=prescribed_average
+            )
             counts[result.status] += 1
             if result.status in {"PROJECTED", "PROJECTED_ZERO_AVERAGE"}:
                 coefficients[dofs] = result.coefficients
@@ -236,6 +265,11 @@ class LocalPolynomialProjector:
                     objective_bound_violations += 1
             elif result.optimizer_message is not None:
                 optimizer_messages[result.optimizer_message] = optimizer_messages.get(result.optimizer_message, 0) + 1
+                fallback = self.scaling_fallback(
+                    values, prescribed_average=prescribed_average
+                )
+                coefficients[dofs] = fallback
+                scaling_fallback_cells += 1
         output.function.x.scatter_forward()
 
         final_coefficients = coefficients.copy()
@@ -272,6 +306,7 @@ class LocalPolynomialProjector:
             "mass_matrix_objective": _global_sum(limiter.comm, objective),
             "matched_scalar_scaling_objective": _global_sum(limiter.comm, scaling_objective),
             "objective_bound_violations": int(limiter.comm.allreduce(objective_bound_violations, op=MPI.SUM)),
+            "scaling_fallback_cells": int(limiter.comm.allreduce(scaling_fallback_cells, op=MPI.SUM)),
             "optimizer_iterations_mean": float(
                 _global_sum(limiter.comm, float(sum(iterations))) /
                 max(1, limiter.comm.allreduce(len(iterations), op=MPI.SUM))
