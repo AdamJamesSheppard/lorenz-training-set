@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import platform
 import shutil
 import subprocess
@@ -52,6 +53,11 @@ def main(config_path: Path) -> int:
     shutil.copy2(source, run_dir / "config.yaml")
 
     ranks = int(config.get("execution", {}).get("mpi_ranks", 1))
+    numerical_threads = int(config.get("execution", {}).get("numerical_threads", 0))
+    child_environment = os.environ.copy()
+    if numerical_threads > 0:
+        for name in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS"):
+            child_environment[name] = str(numerical_threads)
     commands=[]
     if kind=="forecast":
         solver = config["solver"]
@@ -101,7 +107,11 @@ def main(config_path: Path) -> int:
             if not branch.get("apply_positivity",True):
                 branch_command.append("--disable-positivity")
             if branch.get("positivity_method") == "local_qp":
-                branch_command.append("--local-projection")
+                branch_command.extend([
+                    "--local-projection",
+                    "--local-optimizer-ftol", str(branch.get("optimizer_ftol", 1.0e-10)),
+                    "--local-maximum-iterations", str(branch.get("maximum_iterations", 250)),
+                ])
             if not branch.get("archive_raw",True):
                 branch_command.append("--no-raw-archive")
             branch_ranks=int(branch.get("mpi_ranks",ranks))
@@ -145,13 +155,17 @@ def main(config_path: Path) -> int:
             for name in ("fenics-dolfinx", "fenics-basix", "fenics-ufl", "numpy", "mpi4py", "petsc4py")
         },
         "commands": [command for _,command,_ in commands],
+        "numerical_threads_per_rank": numerical_threads or None,
     }
     (run_dir / "provenance.json").write_text(json.dumps(provenance, indent=2) + "\n")
 
     returncode=0
     for label,command,cwd in commands:
         with (run_dir/f"{label}.log").open("w") as output:
-            completed=subprocess.run(command,cwd=cwd,text=True,stdout=output,stderr=subprocess.STDOUT)
+            completed=subprocess.run(
+                command, cwd=cwd, text=True, stdout=output,
+                stderr=subprocess.STDOUT, env=child_environment,
+            )
         if completed.returncode:
             returncode=completed.returncode
             break

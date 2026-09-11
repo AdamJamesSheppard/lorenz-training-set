@@ -72,6 +72,10 @@ next experiment.
    negative averages. Their total negative average mass is only about
    `4.34e-6`, but a mass-preserving cell-local polynomial projection is
    mathematically infeasible in each such cell.
+6. The in-loop Stage-1-plus-QP implementation is certified in short tests, but
+   generic cell-by-cell SLSQP costs roughly 15--27 seconds per production-mesh
+   timestep as the active set grows. The three-level decision run awaits a
+   verified specialized or batched optimizer.
 
 ## Near-term research portfolio
 

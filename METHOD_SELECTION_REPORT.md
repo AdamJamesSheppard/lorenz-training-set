@@ -43,10 +43,13 @@ certification, and cross-timestep `L1=3.94e-5`. Its mass-matrix correction
 objective is about 17% of matched scalar scaling. Purely cell-local repair is
 incomplete because about 17,500 raw cells have negative averages.
 
-The immediate experiment is therefore the predeclared three-level **in-loop
-Stage-1 plus local-QP Q2--Crank--Nicolson trajectory**. This determines whether
-repeated projection preserves the promising terminal result. A rigorously
-positive, mass-conservative low-order comparator for the actual 3-D Lorenz
+The next scientific experiment is the predeclared three-level **in-loop
+Stage-1 plus local-QP Q2--Crank--Nicolson trajectory**. The candidate is
+implemented and passes short dynamic invariant checks, but generic per-cell
+SLSQP costs 15--27 seconds per production-mesh step as the active set grows.
+The immediate engineering task is a verified specialized or batched solver for
+the same convex QP before the multi-hour decision run. A rigorously positive,
+mass-conservative low-order comparator for the actual 3-D Lorenz
 drift--diffusion/full-SPD/reflecting-flux operator remains the fallback if the
 dynamic test fails. Completed-polynomial scalar scaling remains a rejected
 production correction and a controlled comparator. Sections 18--23 record the

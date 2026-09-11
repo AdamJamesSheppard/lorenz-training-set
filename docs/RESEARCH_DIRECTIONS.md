@@ -23,7 +23,9 @@ The terminal-state isolation result is favourable: Stage-1 average repair plus
 the local QP is fully certified, gives covariance error about `0.00588`, and
 uses about 17% of the scalar-scaling mass-matrix objective. The result does not
 include feedback into later steps, so a predeclared three-timestep dynamic run
-is the current discriminator.
+is the current discriminator. The generic SLSQP implementation passes a short
+dynamic invariant profile but is too slow for that run; optimizer specialization
+now precedes the unchanged scientific experiment.
 
 ## Active branches
 

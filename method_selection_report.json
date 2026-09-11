@@ -222,6 +222,14 @@
     "qp_objective_fraction_of_scalar_scaling": [0.174073878997517, 0.1740166105971202],
     "decision": "Advance the hybrid to a predeclared in-loop three-timestep diagnostic; retain positive low-order local flux/AFC as the fallback."
   },
+  "dynamic_local_qp_implementation": {
+    "status": "implemented and short-profile certified; full three-timestep run pending optimizer specialization",
+    "evidence": "local_q2_projection_performance_report.json",
+    "three_step_forecast_seconds": 49.59636715899978,
+    "projected_cells": [4451, 6625, 8882],
+    "all_profile_steps_whole_cell_positive": true,
+    "reason_full_run_pending": "Generic per-cell SLSQP cost grows with active cells and projects to hours for all three timestep levels."
+  },
   "fixed_q2_raw_archive": {
     "archive": "../sources/upload/newtest_08.zip",
     "scope": "q2_fixed_subcell raw_before_correction ranks 0002 through 0006",
@@ -266,6 +274,7 @@
     "unlimited_q2_timestep_report.json",
     "unlimited_q2_crank_nicolson_report.json",
     "corrected_q2_crank_nicolson_report.json",
-    "local_q2_positivity_projection_report.json"
+    "local_q2_positivity_projection_report.json",
+    "local_q2_projection_performance_report.json"
   ]
 }

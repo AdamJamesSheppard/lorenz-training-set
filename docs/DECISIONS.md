@@ -38,6 +38,16 @@ must remain explicit. If the dynamic trajectory loses the terminal advantage,
 stop post-step projection development and construct the positive low-order
 full-SPD flux/AFC comparator.
 
+The in-loop implementation passes a short whole-cell certification and mass
+smoke test. A production-mesh profile with one numerical-library thread per MPI
+rank takes `49.6 s` for three steps; local projection time grows from `14.7 s`
+to `16.3 s` as projected cells grow from 4,451 to 8,882. A prior eight-step
+profile without warm starts reached 11,305 projected cells and `27.3 s` of
+projection time at step eight. The full three-level experiment remains
+predeclared, but generic per-cell SLSQP is too costly for a responsible
+brute-force run. Preserve the mathematical problem and replace the optimizer
+with a verified specialized or batched implementation before executing it.
+
 ## 2026-09-11 - Retain Q2 as a challenger but withhold production selection
 
 Status: superseded as numerical evidence by the invariant audit below; its run

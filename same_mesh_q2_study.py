@@ -89,12 +89,19 @@ def run_forecast(args: argparse.Namespace) -> None:
     comm.barrier()
     domain=Domain(cells=tuple(args.cells)); model=Lorenz63Model()
     solver_class = LocalProjectionFokkerPlanckSolver if args.local_projection else FokkerPlanckSolver
+    solver_options = {}
+    if args.local_projection:
+        solver_options = {
+            "local_optimizer_ftol": args.local_optimizer_ftol,
+            "local_maximum_iterations": args.local_maximum_iterations,
+        }
     solver=solver_class(
         model,domain,args.dt,theta=args.theta,degree=args.degree,
         certificate_mode=args.certificate_mode,
         certificate_max_depth=args.certificate_max_depth,
         certificate_diagnostics=args.degree>=2,
         apply_positivity=not args.disable_positivity,
+        **solver_options,
     )
     grid=np.load(args.initial_grid)
     initial=solver.from_structured(grid,apply_limiter=False)
@@ -202,6 +209,10 @@ def run_forecast(args: argparse.Namespace) -> None:
                 "positivity_method":("global_average_repair_then_local_qp"
                     if args.local_projection else
                     ("global_average_repair_then_scaling" if solver.apply_positivity else "none")),
+                "local_optimizer_ftol":(args.local_optimizer_ftol
+                    if args.local_projection else None),
+                "local_maximum_iterations":(args.local_maximum_iterations
+                    if args.local_projection else None),
                 "bootstrap_replicates":args.bootstrap,"seed":args.seed},
             "initial_embedding":embedding,"initial_diagnostics":initial_diagnostics,
             "final_stage_diagnostics":stage_diagnostics,"comparisons_to_common_mc":comparisons,
@@ -293,6 +304,8 @@ def parser() -> argparse.ArgumentParser:
     run.add_argument("--bootstrap",type=int,default=200)
     run.add_argument("--disable-positivity",action="store_true")
     run.add_argument("--local-projection",action="store_true")
+    run.add_argument("--local-optimizer-ftol",type=float,default=1.0e-10)
+    run.add_argument("--local-maximum-iterations",type=int,default=250)
     run.add_argument("--no-raw-archive",action="store_true")
     recover=sub.add_parser("recover",parents=[common])
     recover.add_argument("--degree",type=int,choices=(1,2),default=2)

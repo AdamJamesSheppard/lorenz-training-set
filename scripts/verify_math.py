@@ -16,6 +16,9 @@ from lorenz_fpe import Lorenz63Model  # noqa: E402
 def main() -> int:
     decision = json.loads((ROOT / "method_selection_report.json").read_text())
     boundary = json.loads((ROOT / "boundary_flux_report.json").read_text())
+    local_projection = json.loads(
+        (ROOT / "local_q2_positivity_projection_report.json").read_text()
+    )
     diffusion = Lorenz63Model().diffusion
 
     mass_errors = [abs(float(row["mass_error"])) for row in boundary["rows"]]
@@ -45,6 +48,17 @@ def main() -> int:
         "certification_consistent": bool(
             dataset_decision != "YES" or classification in {"READY", "CERTIFIED"}
         ),
+        "local_projection_evidence_consistent": bool(
+            np.isclose(
+                decision["terminal_local_q2_projection"]
+                ["stage1_then_local_qp_covariance_errors"][0],
+                local_projection["full_step"]["hybrid_covariance_error"],
+            )
+            and local_projection["full_step"]["whole_cell_positivity_certified"]
+            and local_projection["half_step"]["whole_cell_positivity_certified"]
+            and not local_projection["decision"]
+            ["pure_cell_local_projection_is_complete_solution"]
+        ),
     }
     result = {
         "passed": all(checks.values()),
@@ -55,12 +69,14 @@ def main() -> int:
             "diffusion_eigenvalues": np.linalg.eigvalsh(diffusion).tolist(),
             "maximum_boundary_mass_error": max(mass_errors),
             "minimum_observed_boundary_l1_order": min(observed_orders),
-            "best_same_law_covariance_error": decision["same_initial_law_forecast"][
-                "normalized_covariance_error"
-            ],
-            "covariance_error_to_mc_noise_ratio": decision["same_initial_law_forecast"][
-                "ratio"
-            ],
+            "controlled_q1_covariance_error": decision["same_initial_law_forecast"]
+            ["normalized_covariance_error"],
+            "unlimited_q2_cn_covariance_error": decision["executed_q2_temporal_diagnostics"]
+            ["crank_nicolson_unlimited"]["full_step_covariance_error"],
+            "terminal_stage1_local_qp_covariance_error": local_projection["full_step"]
+            ["hybrid_covariance_error"],
+            "terminal_stage1_local_qp_timestep_l1": local_projection
+            ["timestep_comparison"]["hybrid_subcell_average_l1"],
         },
         "interpretation": (
             "The tested invariants and evidence consistency pass. Production certification is "

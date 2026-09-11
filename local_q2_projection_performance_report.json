@@ -1,0 +1,46 @@
+{
+  "date": "2026-09-11",
+  "evidence_class": "EMPIRICAL_DEVELOPMENT_PROFILE",
+  "classification": "INSUFFICIENT_EVIDENCE",
+  "configuration": {
+    "cells": [30, 36, 36],
+    "degree": 2,
+    "theta": 0.5,
+    "dt": 0.000625,
+    "mpi_ranks": 8,
+    "numerical_threads_per_rank": 1,
+    "optimizer": "SciPy SLSQP",
+    "optimizer_ftol": 1e-10,
+    "warm_start": "previous feasible normalized cell polynomial when closer than scalar scaling"
+  },
+  "three_step_profile": {
+    "forecast_seconds": 49.59636715899978,
+    "mean_step_seconds": 16.650591398662073,
+    "local_projection_seconds": [14.74560888200358, 15.267284378991462, 16.322138320014346],
+    "projected_cells": [4451, 6625, 8882],
+    "mean_optimizer_iterations": [90.008762075938, 75.5462641509434, 69.05663138932672],
+    "scaling_fallback_cells": [0, 0, 0],
+    "all_steps_whole_cell_positivity_certified": true,
+    "objective_bound_violations": 0
+  },
+  "comparison_profile_before_warm_start": {
+    "steps": 8,
+    "forecast_seconds": 182.8855260299897,
+    "mean_step_seconds": 22.90688239087467,
+    "projected_cells_first": 4451,
+    "projected_cells_eighth": 11305,
+    "local_projection_seconds_first": 16.200917430993286,
+    "local_projection_seconds_eighth": 27.3169988419977
+  },
+  "decision": {
+    "dynamic_implementation_validated_on_short_profile": true,
+    "three_level_production_scale_run_completed": false,
+    "reason": "Generic per-cell SLSQP cost grows with the active cell count; the predeclared three-level run would take hours and should follow a dedicated batched or active-set QP implementation rather than brute-force validation.",
+    "scientific_gate_changed": false,
+    "next_engineering_step": "Replace generic per-cell SLSQP with a verified warm-started batched or specialized convex-QP solver while preserving the same objective, constraints, feasibility audit and scalar-scaling upper-bound check."
+  },
+  "discarded_or_incomplete_runs": {
+    "oversubscribed_run": "runs/local-q2-crank-nicolson/20260911T115805Z",
+    "status": "manually interrupted before the first progress checkpoint; no numerical result used"
+  }
+}

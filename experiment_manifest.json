@@ -1,8 +1,8 @@
 {
-  "created_utc": "2026-09-11T11:57:49.825508+00:00",
+  "created_utc": "2026-09-11T12:15:46.623796+00:00",
   "decision": "INSUFFICIENT_EVIDENCE",
   "workspace": "/mnt/large storage/Important/Derby Masters/Original Dissertation Royal Holloway/FENICS Code/NewTest",
-  "git_revision": "aeaeac851d5a4aae6f9b9ae58e9725c00a08d647",
+  "git_revision": "a27bc564604f698e3803fb79bd2651946f23a3b3",
   "version_fallback": "SHA-256 file hashes are authoritative when git_revision is null.",
   "software": {
     "python": "3.12.13 | packaged by conda-forge | (main, Mar  5 2026, 16:50:00) [GCC 14.3.0]",
@@ -18,7 +18,7 @@
   },
   "code_sha256": {
     "benchmark_scaling.py": "470f1a01360aac016bf51c4bb03a64f88acfb8cb5a8c6d0d7d9fd2b28e92b447",
-    "build_experiment_manifest.py": "9b967027248fb7a8a3233f073e1484e76579a69f584755620fbd40a5b67fd1a6",
+    "build_experiment_manifest.py": "35bcba9f8c3c224d021d281d6f66075e7dabfbd3caa8c8e04c0881301b6eeab5",
     "generate_dataset.py": "81074edffe3a6f6bebcec4a623bc46604c5ea5158d371d74fddc54f47b6227d9",
     "independent_reference_study.py": "6d8d03c43cc826a8272be0186633d0894e021dd2ced89b19abe44a7550569e17",
     "local_projection_study.py": "23ef3a2e1f984ae9b73eade034efe375abf98c8efe316fc9ca93bb7b884b71b0",
@@ -26,13 +26,13 @@
     "lorenz_fpe/core.py": "ef602d484e312a03fa1773910519cd3d99dcccfa2587403ce03e5765c2eff30f",
     "lorenz_fpe/dataset.py": "3e9a28938499e018d810f12cb15e6fcd3358dbdd94df13d3fa67283262a71a4e",
     "lorenz_fpe/finite_volume.py": "2bec80ae17ac8d926c0badb7d2da7a5755ff4138ffeccc077a6b6b61a0f7d367",
-    "lorenz_fpe/local_projection.py": "a6504ea51a0c6959d1b60da22f998bc493470711119789aaf221b77e8dc2da6b",
+    "lorenz_fpe/local_projection.py": "e47d402ba73aa19b1916d06e32c592406c47ff50386db54e3f48dafeb0ca4ee8",
     "lorenz_fpe/validation.py": "7e3258874f6cd1e5234d96b942c37faed93f1d6547743b50d3fb0c2cf9f605e7",
     "mature_da_study.py": "9870d6a87f554a25d3a402a2c9fc6ed5fdd3a42316c7059cd27b9790bbe1775e",
     "mature_forecast_validation.py": "0e53932d5ceda3f611c0decc2eac5861ae84023720011946d7733a16dc4a4465",
     "mc_timestep_repair.py": "077d5c9e9f277f1cfb210649f2da3526c2d7437d8bc17fdea661730e64c8b2b5",
     "resplit_dataset.py": "11587c66f55020daff7171e500230ff315fd5b17e781e4b653e2a8d8130267bf",
-    "same_mesh_q2_study.py": "a8eddda4f16f6a7bac5d83cc2d02d3f0b99c924655ab11a4dd9d1a656271ac1b",
+    "same_mesh_q2_study.py": "b8dc30d1024fcabe6fe41c700eae31084078f7d40c3a0d587b462e066d1d21c2",
     "solver.py": "5060082cc7e6ad1671c5fe35d2ada34fb38bb4930b720a606ab02b0c66e48d36",
     "tests/__init__.py": "3b2bec5485bb3fb3bb29a41ff8b1d86feb92bbc6587a20491c94a0b29d2a195b",
     "tests/mpi_probe_worker.py": "f568a7e9937e7a0d7888b6fb85255eba63e3c711b635e6cbe1231fb000a87c74",
@@ -296,11 +296,11 @@
       }
     },
     "METHOD_SELECTION_REPORT.md": {
-      "sha256": "28101b747a91d1a732cf757b401276fdf2c479afa89c5ac905563f4cc22b06a6",
+      "sha256": "079d38afe059fdb6503b680b60aec04df567760d4554017fb3d5ce56244ce5f8",
       "configuration": {}
     },
     "method_selection_report.json": {
-      "sha256": "5b88068e530c559229b4a62ce52bf0a48c0a2677751b9953353f33d6862591d9",
+      "sha256": "16f992cadb405f2593187e3497026383569c7ff11404f1b4e8118b33f16cc9ae",
       "configuration": {}
     },
     "same_mesh_q2_falsification_report.json": {
@@ -412,6 +412,26 @@
           "constraint": "adaptive certification skip, otherwise fixed 2x2x2 control-subcell Bernstein inequalities",
           "objective": "cell-local DG mass-matrix distance",
           "cell_mass": "preserved after the incumbent globally conservative Stage-1 average repair"
+        }
+      }
+    },
+    "local_q2_projection_performance_report.json": {
+      "sha256": "03c50ae711accdf21d14596adc6dd3280ac638506ea3a1347a7e9ecb330b9f66",
+      "configuration": {
+        "configuration": {
+          "cells": [
+            30,
+            36,
+            36
+          ],
+          "degree": 2,
+          "theta": 0.5,
+          "dt": 0.000625,
+          "mpi_ranks": 8,
+          "numerical_threads_per_rank": 1,
+          "optimizer": "SciPy SLSQP",
+          "optimizer_ftol": 1e-10,
+          "warm_start": "previous feasible normalized cell polynomial when closer than scalar scaling"
         }
       }
     }

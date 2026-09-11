@@ -52,7 +52,7 @@ class LocalPolynomialProjector:
         self,
         limiter: PositivityLimiter,
         *,
-        optimizer_ftol: float = 1.0e-12,
+        optimizer_ftol: float = 1.0e-10,
         feasibility_tolerance: float = 5.0e-11,
         normalized_positivity_margin: float = 1.0e-12,
         maximum_iterations: int = 250,
@@ -86,6 +86,9 @@ class LocalPolynomialProjector:
             ),
             LinearConstraint(self.average_weights[None, :], 1.0, 1.0),
         )
+        self._warm_starts: list[np.ndarray | None] = [
+            None for _ in range(limiter.n_local_cells)
+        ]
 
     def _objective(self, candidate: np.ndarray, raw: np.ndarray) -> float:
         difference = candidate - raw
@@ -104,6 +107,7 @@ class LocalPolynomialProjector:
         coefficients: np.ndarray,
         *,
         prescribed_average: float | None = None,
+        initial_guess: np.ndarray | None = None,
     ) -> CellProjectionResult:
         """Project one polynomial or return an explicit infeasibility result."""
         raw = np.asarray(coefficients, dtype=float)
@@ -136,10 +140,24 @@ class LocalPolynomialProjector:
                 average * raw_minimum, 0.0,
             )
         scaling = self._scaling_candidate(normalized)
+        optimizer_start = scaling
+        if initial_guess is not None:
+            warm = np.asarray(initial_guess, dtype=float)
+            warm_feasible = (
+                warm.shape == normalized.shape
+                and abs(float(self.average_weights @ warm) - 1.0)
+                    <= self.feasibility_tolerance
+                and float((self.full_constraints @ warm).min())
+                    >= self.normalized_positivity_margin - self.feasibility_tolerance
+            )
+            if warm_feasible and self._objective(warm, normalized) < self._objective(
+                scaling, normalized
+            ):
+                optimizer_start = warm
 
         result = minimize(
             lambda value: self._objective(value, normalized),
-            scaling,
+            optimizer_start,
             jac=lambda value: self.mass_matrix @ (value - normalized),
             constraints=self.linear_constraints,
             method="SLSQP",
@@ -265,16 +283,26 @@ class LocalPolynomialProjector:
                 classification = limiter.classify_coefficients(values)
                 if classification["status"] == "CERTIFIED_NONNEGATIVE":
                     counts["ALREADY_CERTIFIED"] += 1
+                    self._warm_starts[cell] = None
                     continue
             prescribed_average = (
                 float(target_averages[cell]) if repair_cell_averages else None
             )
             result = self.project_cell(
-                values, prescribed_average=prescribed_average
+                values,
+                prescribed_average=prescribed_average,
+                initial_guess=self._warm_starts[cell],
             )
             counts[result.status] += 1
             if result.status in {"PROJECTED", "PROJECTED_ZERO_AVERAGE"}:
                 coefficients[dofs] = result.coefficients
+                average = (
+                    prescribed_average if prescribed_average is not None
+                    else limiter.cell_average(result.coefficients)
+                )
+                self._warm_starts[cell] = (
+                    result.coefficients / average if average > 0.0 else None
+                )
                 iterations.append(result.iterations)
                 volume = float(limiter.cell_volumes[cell])
                 objective += volume * result.objective
@@ -287,6 +315,19 @@ class LocalPolynomialProjector:
                     values, prescribed_average=prescribed_average
                 )
                 coefficients[dofs] = fallback
+                average = (
+                    prescribed_average if prescribed_average is not None
+                    else limiter.cell_average(fallback)
+                )
+                self._warm_starts[cell] = fallback / average if average > 0.0 else None
+            elif result.status == "ALREADY_FEASIBLE":
+                average = (
+                    prescribed_average if prescribed_average is not None
+                    else limiter.cell_average(values)
+                )
+                self._warm_starts[cell] = values / average if average > 0.0 else None
+            else:
+                self._warm_starts[cell] = None
                 scaling_fallback_cells += 1
         output.function.x.scatter_forward()
 
@@ -352,11 +393,17 @@ class LocalProjectionFokkerPlanckSolver(FokkerPlanckSolver):
     """Experimental Q2 solver feeding the average-repair/local-QP state forward."""
 
     def __init__(self, *args, **kwargs) -> None:
+        local_optimizer_ftol = float(kwargs.pop("local_optimizer_ftol", 1.0e-10))
+        local_maximum_iterations = int(kwargs.pop("local_maximum_iterations", 250))
         kwargs["apply_positivity"] = False
         super().__init__(*args, **kwargs)
         if self.degree != 2:
             raise ValueError("LocalProjectionFokkerPlanckSolver currently requires Q2")
-        self.local_projector = LocalPolynomialProjector(self.limiter)
+        self.local_projector = LocalPolynomialProjector(
+            self.limiter,
+            optimizer_ftol=local_optimizer_ftol,
+            maximum_iterations=local_maximum_iterations,
+        )
         self.local_projection_history: list[dict[str, object]] = []
         self.last_local_projection_report: dict[str, object] | None = None
         self.last_unlimited_state: DensityState | None = None

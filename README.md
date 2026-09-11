@@ -16,7 +16,9 @@ and comparison policy.
 > global correction restores non-negativity while failing the density timestep
 > gate. An offline Stage-1-plus-local-QP correction is substantially less
 > intrusive and now advances to an in-loop three-timestep diagnostic; a
-> positive full-SPD low-order flux/AFC method remains the fallback.
+> positive full-SPD low-order flux/AFC method remains the fallback. The in-loop
+> candidate is implemented; its generic QP solver needs specialization before
+> the multi-hour decision run.
 
 This project implements the forecast step of a continuous-discrete Bayesian
 filter for the stochastic Lorenz-63 model.  It uses modern DOLFINx 0.11, UFL,
