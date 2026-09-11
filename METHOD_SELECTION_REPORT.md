@@ -744,6 +744,26 @@ whether positivity correction preserves Crank--Nicolson consistency.
 
 Evidence: [`unlimited_q2_crank_nicolson_report.json`](unlimited_q2_crank_nicolson_report.json).
 
+## 23. Corrected Crank--Nicolson comparator (2026-09-11)
+
+The current adaptive global limiter does not preserve the unlimited temporal
+result. Full- and half-step corrected covariance errors are `0.02192` and
+`0.02263`, while the conservative density difference is `L1>=0.01088`, above
+the `0.0025` gate. Full-step mass error is `1.27e-10`, slightly above the
+`1e-10` gate. Positivity and limiter-impact gates pass, and all repaired limiter
+invariants hold. The evidence rejects global completed-polynomial scaling for
+the Crank--Nicolson production path and sets a quantitative target for a local
+conservative correction.
+
+Convex limiting supplies a general local-correction architecture when a
+positive low-order update and conservative pairwise antidiffusive increments
+are available,[^23] and recent DDG Fokker--Planck work applies local correction
+to diffusive fluxes.[^24] Their proved settings differ from the present
+full-SPD SIPG Lorenz operator and Crank--Nicolson time step. They motivate the
+next derivation without certifying it.
+
+Evidence: [`corrected_q2_crank_nicolson_report.json`](corrected_q2_crank_nicolson_report.json).
+
 ## Sources
 
 [^1]: C. Liu, J. Hu, W. T. Taitano and X. Zhang, [“An optimization-based positivity-preserving limiter in semi-implicit discontinuous Galerkin schemes solving Fokker–Planck equations”](https://www.math.purdue.edu/~zhan1966/research/paper/DG_anisotropic_Fokker_Planck.pdf), *Computers & Mathematics with Applications* (2025).
@@ -768,3 +788,5 @@ Evidence: [`unlimited_q2_crank_nicolson_report.json`](unlimited_q2_crank_nicolso
 [^20]: C. Sloth, [“Nonnegative polynomial with no certificate of nonnegativity in the simplicial Bernstein basis”](https://arxiv.org/abs/1710.05735), arXiv:1710.05735.
 [^21]: A. Allawala and J. B. Marston, [“Statistics of the stochastically-forced Lorenz attractor by the Fokker–Planck equation and cumulant expansions”](https://arxiv.org/abs/1604.00867), *Physical Review E* 94 (2016), 052218.
 [^22]: [DOLFINx 0.11 mesh API](https://docs.fenicsproject.org/dolfinx/v0.11.0.post0/python/generated/dolfinx.mesh.html); the local hexahedral refinement probe fails with `RuntimeError: Refinement only defined for simplices`.
+[^23]: J.-L. Guermond, B. Popov and I. Tomas, [“Invariant domain preserving discretization-independent schemes and convex limiting for hyperbolic systems”](https://doi.org/10.1016/j.cma.2018.11.036), *Computer Methods in Applied Mechanics and Engineering* 347 (2019), 143–175.
+[^24]: J. A. Carrillo, H. Liu and H. Yu, [“Positivity-preserving and energy-dissipating discontinuous Galerkin methods for nonlinear nonlocal Fokker–Planck equations”](https://arxiv.org/abs/2403.15643), *Communications in Applied and Industrial Mathematics* 16 (2025), 19–40.

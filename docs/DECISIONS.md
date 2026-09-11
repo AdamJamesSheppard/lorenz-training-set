@@ -66,6 +66,22 @@ shifts the main effort toward a positivity treatment compatible with the
 second-order trajectory. First run the existing adaptive global limiter as a
 controlled comparator; it is not presumed to preserve this improvement.
 
+## 2026-09-11 - Reject global scaling for the Crank--Nicolson Q2 path
+
+Adaptive global correction changes the successful unlimited Crank--Nicolson
+timestep result from `L1>=4.19e-5` to `L1>=0.01088`, failing the `0.0025` gate.
+The full-step corrected mass error is `1.27e-10`, also above its gate. Covariance,
+marginal, negativity and limiter-impact metrics pass, but they do not override
+the density and conservation failures. Global scaling remains an audit
+comparator and is rejected as the production correction for this path.
+
+Proceed to a local conservative correction only after defining a genuinely
+positive low-order update for the full drift-diffusion operator. Published
+convex-limiting results for hyperbolic systems and local DDG flux corrections
+for gradient-flow Fokker--Planck equations motivate architectures; their proofs
+do not directly cover this fully implicit SIPG, full-SPD Lorenz operator or
+Crank--Nicolson step.
+
 ## 2026-09-10 - Implement the predeclared Q2 diagnostic without relaxing positivity
 
 The same-mesh experiment now has fixed and adaptive Bernstein branches. The

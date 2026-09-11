@@ -53,6 +53,9 @@ next experiment.
 - Unlimited Crank--Nicolson Q2 passes the density timestep gate with
   `L1>=4.19e-5` and covariance-change gate with `4.74e-6`; its covariance error
   is about `0.00371`, but integrated negative mass remains about `8.28e-4`.
+- Applying the current adaptive global limiter to Crank--Nicolson increases the
+  timestep density difference to `L1>=0.01088` and gives full-step mass error
+  `1.27e-10`; that correction architecture is rejected for production Q2.
 
 ## Active blockers
 
@@ -62,20 +65,22 @@ next experiment.
    covariance discrepancy.
 3. The independent finite-volume hierarchy is not converged enough to define a
    full-density truth error.
-4. Crank--Nicolson resolves the controlled unlimited temporal gate, while a
-   compatible positive and conservative correction remains unvalidated.
+4. Crank--Nicolson resolves the controlled unlimited temporal gate, while the
+   global limiter destroys that result. A positive low-order full-SPD operator
+   needed for local convex correction remains unimplemented and unvalidated.
 
 ## Near-term research portfolio
 
 The living plan is in `docs/RESEARCH_DIRECTIONS.md` and
 `experiments/method-selection-research.yaml`. Current high-value branches are:
 
-1. Evaluate the existing adaptive global limiter with Crank--Nicolson as a
-   controlled comparator under the same two-timestep and limiter gates.
-2. Pair the successful unlimited Crank--Nicolson path with a local
-   algebraic/convex positivity treatment and re-evaluate whole-trajectory
-   invariants; global polynomial scaling remains a comparator.
-3. If corrected Crank--Nicolson or the local correction fails, prototype a
+1. Derive and test a positive, mass-conservative low-order update for the full
+   drift-diffusion/no-flux operator; this is the prerequisite for local convex
+   or algebraic correction.
+2. Pair the successful unlimited Crank--Nicolson high-order path with that local
+   correction and re-evaluate whole-trajectory invariants; global polynomial
+   scaling remains a rejected comparator.
+3. If the local correction fails, prototype a
    full-SPD positive finite-volume/flux method.
    Directional FCDF and complete-flux methods remain a separate diagonal-noise
    branch rather than the general production target.

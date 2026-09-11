@@ -23,6 +23,7 @@ Evidence classes: `ESTABLISHED` (supported by derivation and targeted tests),
 | C-016 | The repaired Stage-1 projection preserves its lower bound through the floating-point mass repair, and every Stage-2 scaling factor lies in `[0,1]`. | ESTABLISHED | Direct regression tests and full-mesh one-step MPI invariant check | A future adversarial input or platform produces a negative projected average, a factor outside the interval, or material mass drift. |
 | C-017 | Accumulated positivity correction is the sole cause of the Q2 density timestep failure. | REJECTED | `unlimited_q2_timestep_report.json` | Unlimited backward-Euler Q2 has `L1>=0.00541` under timestep halving, already above the `0.0025` gate. |
 | C-018 | Unlimited Crank--Nicolson Q2 on the controlled same mesh is temporally stable under the predeclared density and covariance gates. | NUMERICAL | `unlimited_q2_crank_nicolson_report.json` | A longer horizon, mature posterior, spatial refinement, or corrected trajectory may fail; raw negative mass is about `8.28e-4`. |
+| C-019 | The current adaptive global positivity correction preserves the unlimited Crank--Nicolson Q2 temporal result. | REJECTED | `corrected_q2_crank_nicolson_report.json` | Corrected timestep `L1>=0.01088` exceeds the `0.0025` gate although the unlimited value is `4.19e-5`. |
 
 Review this table after every material experiment. Classes and wording are
 expected to change; preserve old evidence in Git and explain promotions,

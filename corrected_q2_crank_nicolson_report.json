@@ -1,0 +1,56 @@
+{
+  "date": "2026-09-11",
+  "evidence_class": "NUMERICAL",
+  "classification": "INSUFFICIENT_EVIDENCE",
+  "configuration": {
+    "cells": [30, 36, 36],
+    "final_time": 0.05,
+    "timesteps": [0.000625, 0.0003125],
+    "degree": 2,
+    "theta": 0.5,
+    "certificate_mode": "adaptive",
+    "positivity_applied_each_step": true,
+    "mpi_ranks": 8
+  },
+  "full_step": {
+    "normalized_covariance_error": 0.02191559673644618,
+    "marginal_tv": [0.004901293774683522, 0.0016148975570257826, 0.002398728361789536],
+    "mass_error": 1.2721201869680954e-10,
+    "integrated_negative_mass": 0.0,
+    "limiter_relative_l1_mean": 0.00076689874263631,
+    "limiter_relative_l1_maximum": 0.004401560921366061,
+    "mean_scaled_cell_fraction": 0.3568206661522634
+  },
+  "half_step": {
+    "normalized_covariance_error": 0.02262928450982538,
+    "marginal_tv": [0.0051488793615186955, 0.001651112883166664, 0.0024292358120531735],
+    "mass_error": 1.7158496845581794e-11,
+    "integrated_negative_mass": 0.0,
+    "limiter_relative_l1_mean": 0.00040195184014555827,
+    "limiter_relative_l1_maximum": 0.004651688986623259,
+    "mean_scaled_cell_fraction": 0.2519060249485596
+  },
+  "invariant_audit": {
+    "minimum_corrected_cell_average": 0.0,
+    "minimum_scaling_factor": 0.0,
+    "all_scaling_factors_in_unit_interval": true
+  },
+  "timestep_comparison": {
+    "subcell_average_l1_lower_bound": 0.010883736180249902,
+    "l1_limit": 0.0025,
+    "l1_gate_passed": false,
+    "normalized_covariance_error_change": 0.0007136877733791985,
+    "covariance_error_change_limit": 0.003,
+    "covariance_gate_passed": true
+  },
+  "decision": {
+    "global_limiter_preserves_unlimited_cn_temporal_consistency": false,
+    "all_predeclared_gates_passed": false,
+    "production_status": "not certified",
+    "next_step": "Design a local conservative correction with a rigorously positive low-order comparator; do not adapt hyperbolic convex-limiting or DDG Fokker--Planck proofs without establishing applicability to full-SPD SIPG Lorenz transport."
+  },
+  "immutable_evidence": {
+    "run": "runs/corrected-q2-crank-nicolson/20260911T002101Z",
+    "git_commit": "2ffda91811f9245fbcc231393f063477e224332b"
+  }
+}

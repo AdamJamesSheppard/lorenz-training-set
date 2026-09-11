@@ -131,13 +131,14 @@ limiter remains the final guard for tensors not produced by this solver.
 
 ## Remaining limitations
 
-The current priority limitation is spatial accuracy: first-order upwind
-advection plus frequent positivity limiting is diffusive on the tested Lorenz
-meshes.  Separate temporal and fixed-timestep spatial studies now show that
-backward-Euler error is small at `dt=0.000625` relative to the remaining
-covariance error.  A Crank--Nicolson experiment only reduces the coarse
-normalized covariance error from `0.614` to `0.602` while slightly increasing
-limiter activity, so it does not resolve the problem.
+The current priority limitation is positivity correction compatible with the
+accurate Q2 trajectory. On the controlled same mesh, unlimited Crank--Nicolson
+passes the timestep density gate and reaches covariance error about `0.00371`,
+but carries integrated negative mass about `8.28e-4`. Applying the current
+adaptive global limiter removes negative mass while increasing the
+full-versus-half density difference from `4.19e-5` to `0.01088`. A positive,
+mass-conservative low-order full-SPD update and local pairwise flux correction
+are therefore required before this path can advance.
 
 The Q2 path now has fixed-subcell and adaptive-certificate experimental modes,
 plus a diagnostic switch that evolves the unlimited algebraic trajectory.
