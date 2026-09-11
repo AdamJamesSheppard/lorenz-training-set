@@ -1,0 +1,58 @@
+id: local-q2-crank-nicolson
+kind: same_mesh_q2_study
+status: predeclared_diagnostic
+study:
+  cells: [30, 36, 36]
+  dt: 0.000625
+  final_time: 0.05
+  seed: 20260910
+  monte_carlo_paths: 200000
+  mc_dt: 0.000125
+  bootstrap_replicates: 200
+  certificate_max_depth: 4
+  initial_law: positive_limited_q1_polynomial_embedded_exactly_in_q2
+  branches:
+    - name: q2_local_qp_cn_full_dt
+      degree: 2
+      theta: 0.5
+      positivity_method: local_qp
+      archive_raw: false
+    - name: q2_local_qp_cn_half_dt
+      degree: 2
+      theta: 0.5
+      dt: 0.0003125
+      positivity_method: local_qp
+      archive_raw: false
+    - name: q2_local_qp_cn_quarter_dt
+      degree: 2
+      theta: 0.5
+      dt: 0.00015625
+      positivity_method: local_qp
+      archive_raw: false
+  pairwise_comparisons:
+    - name: local_qp_cn_full_to_half
+      baseline: q2_local_qp_cn_full_dt
+      challenger: q2_local_qp_cn_half_dt
+      limits:
+        covariance_error_change: 0.003
+        l1: 0.0025
+    - name: local_qp_cn_half_to_quarter
+      baseline: q2_local_qp_cn_half_dt
+      challenger: q2_local_qp_cn_quarter_dt
+      limits:
+        covariance_error_change: 0.003
+        l1: 0.0025
+execution:
+  mpi_ranks: 8
+research_gates:
+  - Every completed step is whole-cell Bernstein-certified with zero measured negative mass.
+  - Correction preserves raw mass to 1e-12; the existing absolute mass-error gate remains 1e-10.
+  - Each covariance discrepancy is at most 1.5 times its common-MC bootstrap p95; at most one p95 is the stretch target.
+  - Both adjacent timestep density differences are at most 0.0025.
+  - Report p_obs=log2(L1_full_half/L1_half_quarter); positive observed order is required before expansion.
+  - No dataset generation follows directly from this startup-state diagnostic.
+notes:
+  - The solver and Q2 Crank--Nicolson operator are unchanged; only the positivity strategy differs.
+  - Each step applies the incumbent conservative cell-average repair, then the cell-local mass-matrix QP.
+  - Adaptive certification skips already-positive cells. Fixed 2x2x2 Bernstein inequalities define every QP.
+  - Explicitly counted scalar scaling is retained only as an optimizer-failure safety fallback.

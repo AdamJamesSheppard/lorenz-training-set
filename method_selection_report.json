@@ -3,7 +3,7 @@
   "classification": "INSUFFICIENT_EVIDENCE",
   "large_neural_operator_dataset": "NO",
   "recommended": {
-    "production_forecast_generator": "No method is certified. Q1 is the controlled baseline. Unlimited same-mesh Q2 Crank--Nicolson is the most accurate observed trajectory but has genuine negative mass; adaptive corrected Q2 Crank--Nicolson is the strongest tested non-negative trajectory but fails the density timestep gate. The next implementation target is a local conservative correction built on a rigorously positive low-order full-SPD comparator.",
+    "production_forecast_generator": "No method is certified. Q1 is the controlled baseline. Unlimited same-mesh Q2 Crank--Nicolson is the most accurate observed trajectory but has genuine negative mass. Offline Stage-1 average repair plus a local mass-matrix QP is the strongest tested non-negative terminal correction and now advances to a three-timestep in-loop diagnostic. A rigorously positive low-order full-SPD local flux/AFC comparator remains the fallback if repeated projection fails.",
     "independent_validator": "Develop a dynamically scaled and translated whole-space Hermite-Galerkin reference alongside the positivity-correction work, validated by mode-tail and moment convergence; retain exact-native-law Monte Carlo for moment uncertainty and the independent FV hierarchy for current triangulation.",
     "neural_operator_target_representation": "If a pilot is run: float64 exact conservative subcell averages; Q1 requires 2 subcells per native cell per axis (60x72x72 for the tested 30x36x36 mesh).",
     "expected_covariance_error": {
@@ -210,6 +210,18 @@
     },
     "current_conclusion": "Q2 and Crank--Nicolson retain the leading high-order trajectory. The current global completed-polynomial correction is rejected for production because it removes negativity at the cost of failing the density timestep gate."
   },
+  "terminal_local_q2_projection": {
+    "evidence": "local_q2_positivity_projection_report.json",
+    "scope": "offline terminal-state correction without feedback into propagation",
+    "pure_local_projection_complete": false,
+    "negative_cell_average_cells": [17515, 17572],
+    "negative_cell_average_mass": [0.000004341455236034248, 0.000004344244476903254],
+    "stage1_then_local_qp_covariance_errors": [0.005876421218692274, 0.0058741834937176135],
+    "stage1_then_local_qp_timestep_l1": 0.00003943192573064795,
+    "whole_cell_positivity_certified": true,
+    "qp_objective_fraction_of_scalar_scaling": [0.174073878997517, 0.1740166105971202],
+    "decision": "Advance the hybrid to a predeclared in-loop three-timestep diagnostic; retain positive low-order local flux/AFC as the fallback."
+  },
   "fixed_q2_raw_archive": {
     "archive": "../sources/upload/newtest_08.zip",
     "scope": "q2_fixed_subcell raw_before_correction ranks 0002 through 0006",
@@ -219,9 +231,9 @@
     "numerical_decision_changed": false
   },
   "smallest_additional_experiment_required": {
-    "name": "positive_low_order_full_spd_comparator_and_local_correction",
-    "description": "Derive and test a rigorously positive, mass-conservative low-order update for the 3-D Lorenz drift--diffusion operator with general full-SPD diffusion and reflecting total-flux boundary conditions. Only then decompose the accurate Q2 Crank--Nicolson update into conservative local corrections and limit those increments.",
-    "decision_rule": "Advance the local correction only if the low-order comparator satisfies positivity, mass and boundary invariants and the corrected Q2 pair preserves substantially more of the unlimited Crank--Nicolson covariance and timestep-density result than global scaling. Do not transfer hyperbolic convex-limiting or gradient-flow DDG proofs without proving applicability."
+    "name": "in_loop_stage1_local_qp_q2_crank_nicolson_three_timestep",
+    "description": "Feed the conservative Stage-1 average repair plus local mass-matrix QP back into Q2--Crank--Nicolson propagation at dt, dt/2 and dt/4. Record every-step certification, correction, mass, covariance and adjacent density differences.",
+    "decision_rule": "Retain the post-step hybrid only if every step is certified, adjacent density differences pass 0.0025, observed order is positive, and covariance stays within 1.5 common-MC p95 at every level. If repeated projection loses the terminal advantage, proceed to a rigorously positive low-order full-SPD local flux/AFC comparator."
   },
   "reproducibility": {
     "python": "3.12.13",
@@ -232,7 +244,7 @@
     "mpi": "Open MPI 5.0.10",
     "cpu": "AMD Ryzen 7 9800X3D, 8 cores/16 threads",
     "gpu": "NVIDIA RTX 4070 12 GB (not used)",
-    "git_revision": "049259930e6f85614688de6f30e93f379a3ad12e",
+    "git_revision": null,
     "hash_manifest": "experiment_manifest.json"
   },
   "principal_evidence_files": [
@@ -253,6 +265,7 @@
     "same_mesh_q2_corrected_report.json",
     "unlimited_q2_timestep_report.json",
     "unlimited_q2_crank_nicolson_report.json",
-    "corrected_q2_crank_nicolson_report.json"
+    "corrected_q2_crank_nicolson_report.json",
+    "local_q2_positivity_projection_report.json"
   ]
 }

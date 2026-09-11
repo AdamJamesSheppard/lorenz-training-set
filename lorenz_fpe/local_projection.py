@@ -17,7 +17,14 @@ import numpy as np
 from mpi4py import MPI
 from scipy.optimize import LinearConstraint, minimize
 
-from .core import DensityState, PositivityLimiter, _global_max, _global_min, _global_sum
+from .core import (
+    DensityState,
+    FokkerPlanckSolver,
+    PositivityLimiter,
+    _global_max,
+    _global_min,
+    _global_sum,
+)
 
 
 @dataclass(frozen=True)
@@ -314,6 +321,10 @@ class LocalPolynomialProjector:
             "local_qp_l2_correction": local_l2,
             "raw_to_final_l1_correction": total_l1,
             "raw_to_final_l2_correction": total_l2,
+            "relative_l1_correction": total_l1 / max(
+                abs(_global_sum(limiter.comm, float(np.dot(limiter.cell_volumes, local_averages)))),
+                np.finfo(float).tiny,
+            ),
             "mass_matrix_objective": _global_sum(limiter.comm, objective),
             "matched_scalar_scaling_objective": _global_sum(limiter.comm, scaling_objective),
             "objective_bound_violations": int(limiter.comm.allreduce(objective_bound_violations, op=MPI.SUM)),
@@ -335,3 +346,68 @@ class LocalPolynomialProjector:
         if limiter.comm.rank != 0:
             report["optimizer_messages_by_rank"] = None
         return output, report
+
+
+class LocalProjectionFokkerPlanckSolver(FokkerPlanckSolver):
+    """Experimental Q2 solver feeding the average-repair/local-QP state forward."""
+
+    def __init__(self, *args, **kwargs) -> None:
+        kwargs["apply_positivity"] = False
+        super().__init__(*args, **kwargs)
+        if self.degree != 2:
+            raise ValueError("LocalProjectionFokkerPlanckSolver currently requires Q2")
+        self.local_projector = LocalPolynomialProjector(self.limiter)
+        self.local_projection_history: list[dict[str, object]] = []
+        self.last_local_projection_report: dict[str, object] | None = None
+        self.last_unlimited_state: DensityState | None = None
+        self.uses_local_projection = True
+
+    def step(self, state: DensityState) -> DensityState:
+        started = time.perf_counter()
+        unlimited = super().step(state)
+        self.last_unlimited_state = unlimited.copy("raw_unlimited")
+        corrected, report = self.local_projector.project_state(
+            unlimited, repair_cell_averages=True, adaptive_skip=True
+        )
+        report["step_time"] = corrected.time
+        self.last_local_projection_report = report
+        self.local_projection_history.append(report)
+        self.limiter.last_raw_coefficients = unlimited.function.x.array.copy()
+        self.limiter.last_stage1_coefficients = corrected.function.x.array.copy()
+        self.limiter.last_final_coefficients = corrected.function.x.array.copy()
+        self.last_timing["local_projection_seconds"] = float(report["wall_seconds"])
+        self.last_timing["step_seconds"] = _global_max(
+            self.comm, time.perf_counter() - started
+        )
+        return corrected
+
+    def local_projection_history_summary(self) -> dict[str, object]:
+        if not self.local_projection_history:
+            return {"steps": 0}
+        scalar_keys = (
+            "relative_l1_correction",
+            "raw_to_final_l2_correction",
+            "stage1_l1_correction",
+            "local_qp_l1_correction",
+            "local_qp_l2_correction",
+            "raw_negative_cell_average_mass",
+            "scaling_fallback_cells",
+            "wall_seconds",
+        )
+        result: dict[str, object] = {"steps": len(self.local_projection_history)}
+        for key in scalar_keys:
+            values = np.asarray([float(item[key]) for item in self.local_projection_history])
+            result[key] = {
+                "mean": float(values.mean()),
+                "maximum": float(values.max()),
+                "p95": float(np.quantile(values, 0.95)),
+            }
+        result["all_steps_whole_cell_positivity_certified"] = all(
+            bool(item["whole_cell_positivity_certified"])
+            for item in self.local_projection_history
+        )
+        result["maximum_objective_bound_violations"] = int(max(
+            int(item["objective_bound_violations"])
+            for item in self.local_projection_history
+        ))
+        return result

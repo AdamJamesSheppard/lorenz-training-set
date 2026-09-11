@@ -1,6 +1,6 @@
 # Repository map
 
-Generated: 2026-09-11T12:43:33+01:00
+Generated: 2026-09-11T12:57:48+01:00
 
 ```text
 docs/ACTIVE_TASK.md
@@ -16,6 +16,7 @@ docs/assumptions.yaml
 docs/generated/REPO_MAP.md
 docs/tasks/TASK_TEMPLATE.md
 experiments/corrected-q2-crank-nicolson.yaml
+experiments/local-q2-crank-nicolson.yaml
 experiments/local-q2-positivity-projection.yaml
 experiments/mature-state-decision.yaml
 experiments/method-selection-research.yaml
@@ -67,6 +68,7 @@ tests/test_validation.py
 ./independent_reference_study.py
 ./limiter_impact_20x24x24.json
 ./local_projection_study.py
+./local_q2_positivity_projection_report.json
 ./mature_da_projected_report.json
 ./mature_da_report.json
 ./mature_da_study.py
@@ -107,32 +109,35 @@ tests/test_validation.py
 ```
 
 ## Python symbols
-./same_mesh_q2_study.py:23:def _sha256(path: Path) -> str:
-./same_mesh_q2_study.py:31:def _marginal_tv(cell_averages: np.ndarray, particles: np.ndarray,
-./same_mesh_q2_study.py:43:def prepare_reference(args: argparse.Namespace) -> None:
-./same_mesh_q2_study.py:78:def run_forecast(args: argparse.Namespace) -> None:
-./same_mesh_q2_study.py:210:def recover_final(args: argparse.Namespace) -> None:
-./same_mesh_q2_study.py:249:def parser() -> argparse.ArgumentParser:
-./build_experiment_manifest.py:47:def sha256(path: Path) -> str:
-./build_experiment_manifest.py:55:def git_revision() -> str | None:
-./build_experiment_manifest.py:65:def extract_configuration(path: Path) -> dict[str, object]:
-./build_experiment_manifest.py:74:def command_output(command: list[str]) -> str | None:
-./build_experiment_manifest.py:81:def main() -> None:
+./same_mesh_q2_study.py:29:def _sha256(path: Path) -> str:
+./same_mesh_q2_study.py:37:def _marginal_tv(cell_averages: np.ndarray, particles: np.ndarray,
+./same_mesh_q2_study.py:49:def prepare_reference(args: argparse.Namespace) -> None:
+./same_mesh_q2_study.py:84:def run_forecast(args: argparse.Namespace) -> None:
+./same_mesh_q2_study.py:234:def recover_final(args: argparse.Namespace) -> None:
+./same_mesh_q2_study.py:273:def parser() -> argparse.ArgumentParser:
+./build_experiment_manifest.py:48:def sha256(path: Path) -> str:
+./build_experiment_manifest.py:56:def git_revision() -> str | None:
+./build_experiment_manifest.py:66:def extract_configuration(path: Path) -> dict[str, object]:
+./build_experiment_manifest.py:75:def command_output(command: list[str]) -> str | None:
+./build_experiment_manifest.py:82:def main() -> None:
 ./local_projection_study.py:21:def _sha256(path: Path) -> str:
 ./local_projection_study.py:29:def _marginal_tv(
 ./local_projection_study.py:44:def _difference_report(
 ./local_projection_study.py:66:def run(args: argparse.Namespace) -> None:
-./local_projection_study.py:201:def parser() -> argparse.ArgumentParser:
-./mature_da_study.py:11:def tensor_stats(a,domain):
-./mature_da_study.py:28:def main():
+./local_projection_study.py:203:def parser() -> argparse.ArgumentParser:
 ./mature_forecast_validation.py:11:def sample_q1(solver,state,n,rng):
 ./mature_forecast_validation.py:23:def main():
+./mature_da_study.py:11:def tensor_stats(a,domain):
+./mature_da_study.py:28:def main():
 scripts/verify_math.py:16:def main() -> int:
 tests/test_validation.py:4:class TestAnalyticBenchmarks(unittest.TestCase):
 tests/test_validation.py:6:    def setUpClass(cls):
 tests/test_validation.py:8:    def test_pure_diffusion(self):
 tests/test_validation.py:12:    def test_constant_advection_diffusion(self):
 tests/test_validation.py:16:    def test_non_gaussian(self):
+scripts/run_experiment.py:21:def package_version(name: str) -> str | None:
+scripts/run_experiment.py:28:def git_text(*args: str) -> str:
+scripts/run_experiment.py:34:def main(config_path: Path) -> int:
 lorenz_fpe/validation.py:19:def _correlation(cov: np.ndarray) -> np.ndarray:
 lorenz_fpe/validation.py:24:def covariance_accuracy(pde_covariance: np.ndarray, samples: np.ndarray, seed: int,
 lorenz_fpe/validation.py:58:class ConstantModel:
@@ -165,16 +170,18 @@ tests/test_solver_smoke.py:11:    def test_forecast_probability_invariants(self)
 tests/test_solver_smoke.py:22:    def test_structured_roundtrip_conserves_mass(self):
 tests/test_solver_smoke.py:26:    def test_refined_structured_roundtrip_preserves_q1_shape(self):
 tests/test_solver_smoke.py:34:    def test_checkpoint_and_da_continuity_without_gaussianisation(self):
-scripts/run_experiment.py:21:def package_version(name: str) -> str | None:
-scripts/run_experiment.py:28:def git_text(*args: str) -> str:
-scripts/run_experiment.py:34:def main(config_path: Path) -> int:
-lorenz_fpe/local_projection.py:24:class CellProjectionResult:
-lorenz_fpe/local_projection.py:35:class LocalPolynomialProjector:
-lorenz_fpe/local_projection.py:44:    def __init__(
-lorenz_fpe/local_projection.py:77:    def _objective(self, candidate: np.ndarray, raw: np.ndarray) -> float:
-lorenz_fpe/local_projection.py:81:    def _scaling_candidate(self, normalized: np.ndarray) -> np.ndarray:
-lorenz_fpe/local_projection.py:88:    def project_cell(self, coefficients: np.ndarray) -> CellProjectionResult:
-lorenz_fpe/local_projection.py:159:    def project_state(
+lorenz_fpe/local_projection.py:31:class CellProjectionResult:
+lorenz_fpe/local_projection.py:42:class LocalPolynomialProjector:
+lorenz_fpe/local_projection.py:51:    def __init__(
+lorenz_fpe/local_projection.py:90:    def _objective(self, candidate: np.ndarray, raw: np.ndarray) -> float:
+lorenz_fpe/local_projection.py:94:    def _scaling_candidate(self, normalized: np.ndarray) -> np.ndarray:
+lorenz_fpe/local_projection.py:102:    def project_cell(
+lorenz_fpe/local_projection.py:185:    def scaling_fallback(
+lorenz_fpe/local_projection.py:200:    def project_state(
+lorenz_fpe/local_projection.py:351:class LocalProjectionFokkerPlanckSolver(FokkerPlanckSolver):
+lorenz_fpe/local_projection.py:354:    def __init__(self, *args, **kwargs) -> None:
+lorenz_fpe/local_projection.py:365:    def step(self, state: DensityState) -> DensityState:
+lorenz_fpe/local_projection.py:384:    def local_projection_history_summary(self) -> dict[str, object]:
 tests/test_mpi_consistency.py:4:class TestMPIConsistency(unittest.TestCase):
 tests/test_mpi_consistency.py:5:    def _run(self,ranks):
 tests/test_mpi_consistency.py:13:    def test_two_rank_limiter_agrees_with_serial(self):
@@ -216,8 +223,10 @@ tests/test_accuracy_repairs.py:186:    def test_forecast_can_record_an_unlimited
 tests/test_accuracy_repairs.py:202:    def test_structured_q1_embedding_into_q2_is_exact(self):
 tests/test_accuracy_repairs.py:212:    def test_local_q2_projection_is_conservative_positive_and_minimum_change(self):
 tests/test_accuracy_repairs.py:237:    def test_local_q2_projection_exposes_negative_average_infeasibility(self):
-tests/test_accuracy_repairs.py:250:class TestIndependentFiniteVolume(unittest.TestCase):
-tests/test_accuracy_repairs.py:251:    def test_total_flux_update_preserves_mass_and_positivity(self):
+tests/test_accuracy_repairs.py:249:    def test_local_q2_projection_honours_prescribed_zero_average(self):
+tests/test_accuracy_repairs.py:263:    def test_local_projection_solver_feeds_certified_state_forward(self):
+tests/test_accuracy_repairs.py:289:class TestIndependentFiniteVolume(unittest.TestCase):
+tests/test_accuracy_repairs.py:290:    def test_total_flux_update_preserves_mass_and_positivity(self):
 lorenz_fpe/core.py:34:def _global_sum(comm: MPI.Comm, value: float) -> float:
 lorenz_fpe/core.py:38:def _global_min(comm: MPI.Comm, value: float) -> float:
 lorenz_fpe/core.py:42:def _global_max(comm: MPI.Comm, value: float) -> float:

@@ -260,6 +260,31 @@ class TestQ2Properties(unittest.TestCase):
         self.assertEqual(result.status, "PROJECTED_ZERO_AVERAGE")
         np.testing.assert_array_equal(result.coefficients, np.zeros(27))
 
+    def test_local_projection_solver_feeds_certified_state_forward(self):
+        from lorenz_fpe import LocalProjectionFokkerPlanckSolver
+
+        solver = LocalProjectionFokkerPlanckSolver(
+            Lorenz63Model(), Domain(cells=(3, 3, 3)), 0.000625,
+            theta=0.5, degree=2, certificate_mode="adaptive",
+        )
+        state = solver.gaussian_projected(
+            (1.0, 1.0, 20.0), np.diag([4.0, 4.0, 9.0]),
+            quadrature_degree=12, apply_limiter=False,
+        )
+        mass_before = solver.mass(state)
+        forecast = solver.step(state)
+        self.assertIsNotNone(solver.last_unlimited_state)
+        self.assertTrue(
+            solver.last_local_projection_report["whole_cell_positivity_certified"]
+        )
+        self.assertLess(abs(solver.mass(forecast) - mass_before), 1.0e-12)
+        self.assertEqual(
+            solver.local_projection_history_summary()[
+                "all_steps_whole_cell_positivity_certified"
+            ],
+            True,
+        )
+
 
 class TestIndependentFiniteVolume(unittest.TestCase):
     def test_total_flux_update_preserves_mass_and_positivity(self):

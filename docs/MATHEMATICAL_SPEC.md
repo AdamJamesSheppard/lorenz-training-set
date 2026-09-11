@@ -60,7 +60,10 @@ and projects onto it in the local DG mass-matrix norm. The current diagnostic
 uses fixed Bernstein inequalities on the existing `2x2x2` control subcells;
 adaptive subdivision may certify and skip an already-positive raw polynomial.
 A negative cell average makes this set empty and is reported rather than
-hidden. This projection is not yet part of the timestep update.
+hidden. `LocalProjectionFokkerPlanckSolver` is an experimental propagation
+candidate that first applies the globally conservative average repair and then
+this local QP after each Q2--Crank--Nicolson solve. It has not passed the
+predeclared dynamic evidence gates.
 
 ## Executable invariants
 

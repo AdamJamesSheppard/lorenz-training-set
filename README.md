@@ -14,8 +14,9 @@ and comparison policy.
 > Q1 is the controlled baseline. Unlimited Q2--Crank--Nicolson is the most
 > accurate observed trajectory but contains genuine negative mass; adaptive
 > global correction restores non-negativity while failing the density timestep
-> gate. The active direction is a local conservative correction built from a
-> positive full-SPD low-order comparator.
+> gate. An offline Stage-1-plus-local-QP correction is substantially less
+> intrusive and now advances to an in-loop three-timestep diagnostic; a
+> positive full-SPD low-order flux/AFC method remains the fallback.
 
 This project implements the forecast step of a continuous-discrete Bayesian
 filter for the stochastic Lorenz-63 model.  It uses modern DOLFINx 0.11, UFL,

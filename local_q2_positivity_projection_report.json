@@ -1,0 +1,79 @@
+{
+  "date": "2026-09-11",
+  "evidence_class": "NUMERICAL_DIAGNOSTIC",
+  "classification": "INSUFFICIENT_EVIDENCE",
+  "scope": "Independent terminal-state correction; corrected states do not feed subsequent Crank--Nicolson steps.",
+  "configuration": {
+    "cells": [30, 36, 36],
+    "degree": 2,
+    "theta": 0.5,
+    "timesteps": [0.000625, 0.0003125],
+    "final_time": 0.05,
+    "mpi_ranks": 8,
+    "constraint": "adaptive certification skip, otherwise fixed 2x2x2 control-subcell Bernstein inequalities",
+    "objective": "cell-local DG mass-matrix distance",
+    "cell_mass": "preserved after the incumbent globally conservative Stage-1 average repair"
+  },
+  "full_step": {
+    "raw_covariance_error": 0.003711096383366762,
+    "raw_negative_mass": 0.0008281390175251344,
+    "raw_negative_cell_average_cells": 17515,
+    "raw_negative_cell_average_mass": 0.000004341455236034248,
+    "pure_local_qp_covariance_error": 0.005873563618090585,
+    "pure_local_qp_negative_mass": 0.00001860509004490827,
+    "pure_local_qp_whole_cell_positive": false,
+    "current_terminal_scaling_covariance_error": 0.013157272828802889,
+    "current_terminal_scaling_l1_correction": 0.039366054349732234,
+    "hybrid_covariance_error": 0.005876421218692274,
+    "hybrid_negative_mass": 0.0,
+    "hybrid_l1_correction": 0.01617822158627527,
+    "hybrid_l2_correction": 0.0010363944120513544,
+    "hybrid_mass_matrix_objective": 5.370565341426103e-7,
+    "matched_scalar_scaling_objective": 0.000003085221872283066,
+    "qp_objective_fraction_of_scaling": 0.174073878997517,
+    "optimizer_scaling_fallback_cells": 13,
+    "whole_cell_positivity_certified": true,
+    "mc_bootstrap_p95_in_this_run": 0.006871747958774172
+  },
+  "half_step": {
+    "raw_covariance_error": 0.0037063543182626574,
+    "raw_negative_mass": 0.0008270801524774028,
+    "raw_negative_cell_average_cells": 17572,
+    "raw_negative_cell_average_mass": 0.000004344244476903254,
+    "pure_local_qp_covariance_error": 0.005871519807850894,
+    "pure_local_qp_negative_mass": 0.000018606608264803822,
+    "pure_local_qp_whole_cell_positive": false,
+    "current_terminal_scaling_covariance_error": 0.013160739888700795,
+    "current_terminal_scaling_l1_correction": 0.03936935722390171,
+    "hybrid_covariance_error": 0.0058741834937176135,
+    "hybrid_negative_mass": 0.0,
+    "hybrid_l1_correction": 0.016176549003080277,
+    "hybrid_l2_correction": 0.00103634124793682,
+    "hybrid_mass_matrix_objective": 5.370013221160686e-7,
+    "matched_scalar_scaling_objective": 0.000003085931426267404,
+    "qp_objective_fraction_of_scaling": 0.1740166105971202,
+    "optimizer_scaling_fallback_cells": 14,
+    "whole_cell_positivity_certified": true,
+    "mc_bootstrap_p95_in_this_run": 0.006871747958774172
+  },
+  "timestep_comparison": {
+    "raw_subcell_average_l1": 0.0000419150222450373,
+    "pure_local_qp_subcell_average_l1": 0.00003969193364185724,
+    "hybrid_subcell_average_l1": 0.00003943192573064795,
+    "hybrid_covariance_error_change": 0.00000223772497466065,
+    "density_limit": 0.0025,
+    "terminal_hybrid_density_gate_passed": true
+  },
+  "decision": {
+    "pure_cell_local_projection_is_complete_solution": false,
+    "reason": "Negative raw cell averages make a mass-preserving non-negative polynomial infeasible in about 45 percent of cells, although their total mass deficit is small.",
+    "stage1_average_repair_then_local_qp_is_promising": true,
+    "production_status": "not certified",
+    "next_step": "Run the predeclared in-loop hybrid Q2--Crank--Nicolson experiment at three timestep levels. If repeated projection loses the terminal advantage, proceed to a positive low-order local flux/AFC construction."
+  },
+  "immutable_evidence": {
+    "run": "runs/local-q2-positivity-projection/20260911T114957Z",
+    "git_commit": "aeaeac851d5a4aae6f9b9ae58e9725c00a08d647",
+    "git_dirty": false
+  }
+}

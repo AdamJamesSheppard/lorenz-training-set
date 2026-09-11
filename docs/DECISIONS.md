@@ -23,6 +23,21 @@ feed corrections into later steps. Only a favourable terminal result can
 justify a later in-loop experiment; material average transfer or dynamic
 failure moves the project to a positive low-order flux/AFC construction.
 
+## 2026-09-11 - Advance Stage-1 plus local QP to an in-loop diagnostic
+
+The clean terminal-state run `20260911T114957Z` fully certifies the hybrid at
+both timestep levels and measures zero negative mass. Covariance errors are
+`0.0058764` and `0.0058742`; the cross-timestep density difference is
+`3.943e-5`. The QP correction objective is about 17% of matched scalar scaling,
+and the terminal L1 correction falls from about `0.03937` to `0.01618`.
+
+These results justify a dynamic test while leaving production classification
+unchanged. Predeclare three timestep levels so repeated-projection effects and
+an observed temporal order are visible. Scalar fallback after optimizer failure
+must remain explicit. If the dynamic trajectory loses the terminal advantage,
+stop post-step projection development and construct the positive low-order
+full-SPD flux/AFC comparator.
+
 ## 2026-09-11 - Retain Q2 as a challenger but withhold production selection
 
 Status: superseded as numerical evidence by the invariant audit below; its run

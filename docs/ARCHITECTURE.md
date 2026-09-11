@@ -16,8 +16,9 @@ with the code actually present.
   conservative export, manifests, and leakage-safe splits.
 - `lorenz_fpe/validation.py`: analytic, Monte Carlo, convergence, domain, and
   independent-reference studies.
-- `lorenz_fpe/local_projection.py`: experimental cell-local mass-matrix QP for
-  offline Q2 positivity isolation; it does not alter propagation.
+- `lorenz_fpe/local_projection.py`: experimental cell-local mass-matrix QP and
+  an opt-in Q2 solver that feeds Stage-1-plus-QP states into propagation. The
+  default solver remains unchanged.
 
 Dependency direction is `entry points -> lorenz_fpe package`; the scientific
 core currently does not import top-level entry-point scripts. If a broader

@@ -100,6 +100,8 @@ def main(config_path: Path) -> int:
             ]
             if not branch.get("apply_positivity",True):
                 branch_command.append("--disable-positivity")
+            if branch.get("positivity_method") == "local_qp":
+                branch_command.append("--local-projection")
             if not branch.get("archive_raw",True):
                 branch_command.append("--no-raw-archive")
             branch_ranks=int(branch.get("mpi_ranks",ranks))
@@ -190,6 +192,22 @@ def main(config_path: Path) -> int:
         if pairwise:
             (run_dir/"pairwise_comparisons.json").write_text(
                 json.dumps(pairwise,indent=2)+"\n"
+            )
+        if len(pairwise) >= 2:
+            first = float(pairwise[0]["subcell_average_l1_lower_bound"])
+            second = float(pairwise[1]["subcell_average_l1_lower_bound"])
+            observed_order = (
+                float(np.log2(first / second))
+                if first > 0.0 and second > 0.0 else None
+            )
+            (run_dir / "observed_timestep_order.json").write_text(
+                json.dumps({
+                    "first_comparison": pairwise[0]["name"],
+                    "second_comparison": pairwise[1]["name"],
+                    "l1_ratio": first / second if second > 0.0 else None,
+                    "observed_order": observed_order,
+                    "interpretation": "Numerical diagnostic from three timestep levels; no asymptotic-regime proof.",
+                }, indent=2) + "\n"
             )
     (run_dir / "status.json").write_text(
         json.dumps({"returncode":returncode,"passed":returncode==0},indent=2)

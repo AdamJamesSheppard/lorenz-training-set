@@ -78,11 +78,11 @@ next experiment.
 The living plan is in `docs/RESEARCH_DIRECTIONS.md` and
 `experiments/method-selection-research.yaml`. Current high-value branches are:
 
-1. Run the predeclared terminal-state isolation study comparing the incumbent
-   correction, a pure cell-local minimum-change QP, and Stage-1 conservative
-   average repair followed by that QP. Do not feed the new projection into the
-   time loop at this stage.
-2. Derive and test a positive, mass-conservative low-order update for the full
+1. Run the predeclared three-level in-loop Q2--Crank--Nicolson diagnostic using
+   Stage-1 conservative average repair followed by the local minimum-change QP.
+   The terminal-state isolation passed, but dynamic feedback remains untested.
+2. If the dynamic QP test fails, derive and test a positive,
+   mass-conservative low-order update for the full
    drift-diffusion/no-flux operator; this is the prerequisite for local convex
    or algebraic correction.
 3. Pair the successful unlimited Crank--Nicolson high-order path with that local

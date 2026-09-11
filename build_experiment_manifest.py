@@ -41,6 +41,7 @@ EVIDENCE = (
     "same_mesh_q2_falsification_report.json", "same_mesh_q2_corrected_report.json",
     "unlimited_q2_timestep_report.json", "unlimited_q2_crank_nicolson_report.json",
     "corrected_q2_crank_nicolson_report.json",
+    "local_q2_positivity_projection_report.json",
 )
 
 

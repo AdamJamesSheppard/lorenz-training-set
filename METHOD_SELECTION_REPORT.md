@@ -35,15 +35,22 @@ as a probability-density generator. Global correction removes that negativity
 but fails the predeclared density-convergence gate and increases covariance
 error to about `0.022`.
 
-The immediate research direction is therefore a **local conservative
-positivity correction**, beginning with a rigorously positive,
-mass-conservative low-order comparator for the actual 3-D Lorenz
-drift--diffusion operator, general full-SPD diffusion and reflecting total-flux
-boundary. The accurate unlimited Q2--Crank--Nicolson operator is the high-order
-target; completed-polynomial global scaling remains a rejected production
-correction and a useful controlled comparator. Sections 18--21 record the
-experiments that led to this decision; Sections 22--23 contain the current
-temporal evidence.
+An offline terminal-state experiment now shows that conservative Stage-1
+average repair followed by a cell-local minimum-change QP is materially less
+intrusive than scalar scaling. It gives `E_cov=0.005876/0.005874` at the two
+timestep levels, zero measured negative mass, complete Bernstein
+certification, and cross-timestep `L1=3.94e-5`. Its mass-matrix correction
+objective is about 17% of matched scalar scaling. Purely cell-local repair is
+incomplete because about 17,500 raw cells have negative averages.
+
+The immediate experiment is therefore the predeclared three-level **in-loop
+Stage-1 plus local-QP Q2--Crank--Nicolson trajectory**. This determines whether
+repeated projection preserves the promising terminal result. A rigorously
+positive, mass-conservative low-order comparator for the actual 3-D Lorenz
+drift--diffusion/full-SPD/reflecting-flux operator remains the fallback if the
+dynamic test fails. Completed-polynomial scalar scaling remains a rejected
+production correction and a controlled comparator. Sections 18--23 record the
+earlier sequence.
 
 Role assignments are separate:
 

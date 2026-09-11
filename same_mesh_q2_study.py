@@ -15,7 +15,13 @@ from pathlib import Path
 import numpy as np
 from mpi4py import MPI
 
-from lorenz_fpe import DensityState, Domain, FokkerPlanckSolver, Lorenz63Model
+from lorenz_fpe import (
+    DensityState,
+    Domain,
+    FokkerPlanckSolver,
+    LocalProjectionFokkerPlanckSolver,
+    Lorenz63Model,
+)
 from lorenz_fpe.core import write_json
 from lorenz_fpe.validation import _propagate_particles, covariance_accuracy
 
@@ -82,7 +88,8 @@ def run_forecast(args: argparse.Namespace) -> None:
         output.mkdir(parents=True,exist_ok=False)
     comm.barrier()
     domain=Domain(cells=tuple(args.cells)); model=Lorenz63Model()
-    solver=FokkerPlanckSolver(
+    solver_class = LocalProjectionFokkerPlanckSolver if args.local_projection else FokkerPlanckSolver
+    solver=solver_class(
         model,domain,args.dt,theta=args.theta,degree=args.degree,
         certificate_mode=args.certificate_mode,
         certificate_max_depth=args.certificate_max_depth,
@@ -116,7 +123,8 @@ def run_forecast(args: argparse.Namespace) -> None:
         step_started=time.perf_counter(); state=solver.step(state)
         step_seconds.append(time.perf_counter()-step_started)
         if raw_archive is not None:
-            source=(solver.limiter.last_raw_coefficients if solver.apply_positivity
+            source=(solver.limiter.last_raw_coefficients
+                    if (solver.apply_positivity or args.local_projection)
                     else state.function.x.array)
             raw_archive[step]=source[:n_owned]
             if (step+1)%10==0:
@@ -128,8 +136,17 @@ def run_forecast(args: argparse.Namespace) -> None:
         raw_archive.flush(); del raw_archive
     forecast_seconds=time.perf_counter()-started
 
-    stages=(solver.limiter_stage_states(state.time) if solver.apply_positivity else
-            {name:state.copy(name) for name in ("raw","stage1","final")})
+    if args.local_projection:
+        if solver.last_unlimited_state is None:
+            raise RuntimeError("Local projection did not retain the unlimited state")
+        stages={
+            "raw":solver.last_unlimited_state.copy("raw"),
+            "final":state.copy("final"),
+        }
+    elif solver.apply_positivity:
+        stages=solver.limiter_stage_states(state.time)
+    else:
+        stages={name:state.copy(name) for name in ("raw","stage1","final")}
     stage_diagnostics={name:solver.diagnostics(stage) for name,stage in stages.items()}
     stage_cells={name:solver.structured_export(stage,1) for name,stage in stages.items()}
     final_subcells=solver.structured_export(stages["final"],3)
@@ -150,7 +167,8 @@ def run_forecast(args: argparse.Namespace) -> None:
 
     artifacts=[]
     if args.degree>=2:
-        classification_source=(solver.limiter.last_raw_coefficients if solver.apply_positivity
+        classification_source=(solver.limiter.last_raw_coefficients
+                               if (solver.apply_positivity or args.local_projection)
                                else state.function.x.array)
         records=solver.limiter.classification_records(classification_source)
         records_path=output/f"final_raw_cell_classification_rank{rank:04d}.json"
@@ -168,22 +186,28 @@ def run_forecast(args: argparse.Namespace) -> None:
     if rank==0:
         gathered_artifacts[0].append({"path":final_subcells_path.name,
             "sha256":_sha256(final_subcells_path),"bytes":final_subcells_path.stat().st_size})
-        history=solver.limiter_history_summary()
+        history=(solver.local_projection_history_summary() if args.local_projection
+                 else solver.limiter_history_summary())
         corrected=comparisons["final"]["covariance_accuracy"]
-        mean_l1=(history["relative_l1_correction"]["mean"] if solver.apply_positivity else 0.0)
-        maximum_l1=(history["relative_l1_correction"]["maximum"] if solver.apply_positivity else 0.0)
+        positivity_enabled=bool(solver.apply_positivity or args.local_projection)
+        mean_l1=(history["relative_l1_correction"]["mean"] if positivity_enabled else 0.0)
+        maximum_l1=(history["relative_l1_correction"]["maximum"] if positivity_enabled else 0.0)
         report={
             "branch":args.branch,
             "configuration":{"cells":list(args.cells),"degree":args.degree,"dt":args.dt,
                 "theta":args.theta,"t_final":args.t_final,"mpi_ranks":comm.size,
                 "certificate_mode":args.certificate_mode,
                 "certificate_max_depth":args.certificate_max_depth,
-                "positivity_applied_each_step":solver.apply_positivity,
+                "positivity_applied_each_step":positivity_enabled,
+                "positivity_method":("global_average_repair_then_local_qp"
+                    if args.local_projection else
+                    ("global_average_repair_then_scaling" if solver.apply_positivity else "none")),
                 "bootstrap_replicates":args.bootstrap,"seed":args.seed},
             "initial_embedding":embedding,"initial_diagnostics":initial_diagnostics,
             "final_stage_diagnostics":stage_diagnostics,"comparisons_to_common_mc":comparisons,
             "limiter_history":history,
-            "limiter_steps":[asdict(item) for item in solver.limiter_history],
+            "limiter_steps":(solver.local_projection_history if args.local_projection else
+                [asdict(item) for item in solver.limiter_history]),
             "timing":{"forecast_seconds":forecast_seconds,
                 "maximum_step_seconds":maximum_step_seconds,"mean_step_seconds":mean_step_seconds,
                 "matrix_assembly_seconds":solver.matrix_assembly_seconds},
@@ -268,6 +292,7 @@ def parser() -> argparse.ArgumentParser:
     run.add_argument("--mc-particles",type=Path,required=True)
     run.add_argument("--bootstrap",type=int,default=200)
     run.add_argument("--disable-positivity",action="store_true")
+    run.add_argument("--local-projection",action="store_true")
     run.add_argument("--no-raw-archive",action="store_true")
     recover=sub.add_parser("recover",parents=[common])
     recover.add_argument("--degree",type=int,choices=(1,2),default=2)
