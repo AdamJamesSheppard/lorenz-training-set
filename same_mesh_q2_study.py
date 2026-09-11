@@ -92,6 +92,7 @@ def run_forecast(args: argparse.Namespace) -> None:
     solver_options = {}
     if args.local_projection:
         solver_options = {
+            "local_optimizer_backend": args.local_optimizer_backend,
             "local_optimizer_ftol": args.local_optimizer_ftol,
             "local_maximum_iterations": args.local_maximum_iterations,
         }
@@ -146,10 +147,7 @@ def run_forecast(args: argparse.Namespace) -> None:
     if args.local_projection:
         if solver.last_unlimited_state is None:
             raise RuntimeError("Local projection did not retain the unlimited state")
-        stages={
-            "raw":solver.last_unlimited_state.copy("raw"),
-            "final":state.copy("final"),
-        }
+        stages=solver.limiter_stage_states(state.time)
     elif solver.apply_positivity:
         stages=solver.limiter_stage_states(state.time)
     else:
@@ -162,13 +160,14 @@ def run_forecast(args: argparse.Namespace) -> None:
         np.save(final_subcells_path,final_subcells)
     particles=np.load(args.mc_particles) if rank==0 else None
     if rank==0:
+        bootstrap_seed=args.seed+1000
         comparisons={name:{
             "covariance_accuracy":covariance_accuracy(
                 np.asarray(stage_diagnostics[name]["covariance"]),particles,
-                args.seed+1000+index,args.bootstrap,
+                bootstrap_seed,args.bootstrap,
             ),
             "marginal_total_variation_distance":_marginal_tv(values,particles,domain),
-        } for index,(name,values) in enumerate(stage_cells.items())}
+        } for name,values in stage_cells.items()}
     else:
         comparisons=None
 
@@ -209,11 +208,14 @@ def run_forecast(args: argparse.Namespace) -> None:
                 "positivity_method":("global_average_repair_then_local_qp"
                     if args.local_projection else
                     ("global_average_repair_then_scaling" if solver.apply_positivity else "none")),
+                "local_optimizer_backend":(args.local_optimizer_backend
+                    if args.local_projection else None),
                 "local_optimizer_ftol":(args.local_optimizer_ftol
                     if args.local_projection else None),
                 "local_maximum_iterations":(args.local_maximum_iterations
                     if args.local_projection else None),
-                "bootstrap_replicates":args.bootstrap,"seed":args.seed},
+                "bootstrap_replicates":args.bootstrap,
+                "bootstrap_seed":bootstrap_seed,"seed":args.seed},
             "initial_embedding":embedding,"initial_diagnostics":initial_diagnostics,
             "final_stage_diagnostics":stage_diagnostics,"comparisons_to_common_mc":comparisons,
             "limiter_history":history,
@@ -304,8 +306,9 @@ def parser() -> argparse.ArgumentParser:
     run.add_argument("--bootstrap",type=int,default=200)
     run.add_argument("--disable-positivity",action="store_true")
     run.add_argument("--local-projection",action="store_true")
+    run.add_argument("--local-optimizer-backend",choices=("osqp","slsqp"),default="osqp")
     run.add_argument("--local-optimizer-ftol",type=float,default=1.0e-10)
-    run.add_argument("--local-maximum-iterations",type=int,default=250)
+    run.add_argument("--local-maximum-iterations",type=int,default=10_000)
     run.add_argument("--no-raw-archive",action="store_true")
     recover=sub.add_parser("recover",parents=[common])
     recover.add_argument("--degree",type=int,choices=(1,2),default=2)

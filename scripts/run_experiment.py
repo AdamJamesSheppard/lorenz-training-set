@@ -36,9 +36,12 @@ def main(config_path: Path) -> int:
     source = config_path.resolve()
     config = yaml.safe_load(source.read_text())
     kind=config.get("kind")
-    if kind not in {"forecast", "same_mesh_q2_study", "local_projection_study"}:
+    if kind not in {
+        "forecast", "same_mesh_q2_study", "local_projection_study",
+        "local_projection_optimizer_validation",
+    }:
         raise SystemExit(
-            "executable kinds are forecast, same_mesh_q2_study, and local_projection_study"
+            "unsupported executable experiment kind"
         )
 
     run_id = str(config["id"])
@@ -109,8 +112,9 @@ def main(config_path: Path) -> int:
             if branch.get("positivity_method") == "local_qp":
                 branch_command.extend([
                     "--local-projection",
+                    "--local-optimizer-backend", str(branch.get("optimizer_backend", "osqp")),
                     "--local-optimizer-ftol", str(branch.get("optimizer_ftol", 1.0e-10)),
-                    "--local-maximum-iterations", str(branch.get("maximum_iterations", 250)),
+                    "--local-maximum-iterations", str(branch.get("maximum_iterations", 10_000)),
                 ])
             if not branch.get("archive_raw",True):
                 branch_command.append("--no-raw-archive")
@@ -118,7 +122,7 @@ def main(config_path: Path) -> int:
             if branch_ranks>1:
                 branch_command=["mpiexec","-n",str(branch_ranks),*branch_command]
             commands.append((str(branch["name"]),branch_command,ROOT))
-    else:
+    elif kind == "local_projection_study":
         study = config["study"]
         for item in study["inputs"]:
             item_output = run_dir / str(item["name"])
@@ -133,6 +137,7 @@ def main(config_path: Path) -> int:
                 "--final-time", str(study["final_time"]),
                 "--certificate-max-depth", str(study["certificate_max_depth"]),
                 "--optimizer-ftol", str(study["optimizer_ftol"]),
+                "--optimizer-backend", str(study.get("optimizer_backend", "osqp")),
                 "--feasibility-tolerance", str(study["feasibility_tolerance"]),
                 "--normalized-positivity-margin", str(study["normalized_positivity_margin"]),
                 "--maximum-iterations", str(study["maximum_iterations"]),
@@ -142,6 +147,27 @@ def main(config_path: Path) -> int:
             if ranks > 1:
                 command = ["mpiexec", "-n", str(ranks), *command]
             commands.append((str(item["name"]), command, ROOT))
+    else:
+        study = config["study"]
+        command = [
+            sys.executable, str(ROOT / "local_projection_optimizer_study.py"),
+            "--input-subcells", *[str(ROOT / str(path)) for path in study["input_subcells"]],
+            "--output", str(run_dir / "validation"),
+            "--cells", *map(str, study["cells"]),
+            "--dt", str(study["dt"]),
+            "--certificate-max-depth", str(study["certificate_max_depth"]),
+            "--optimizer-ftol", str(study["optimizer_ftol"]),
+            "--oracle-ftol", str(study["oracle_ftol"]),
+            "--feasibility-tolerance", str(study["feasibility_tolerance"]),
+            "--osqp-maximum-iterations", str(study["osqp_maximum_iterations"]),
+            "--oracle-maximum-iterations", str(study["oracle_maximum_iterations"]),
+            "--random-problems", str(study["random_problems"]),
+            "--seed", str(study["seed"]),
+            "--objective-agreement-tolerance", str(study["objective_agreement_tolerance"]),
+            "--coefficient-agreement-tolerance", str(study["coefficient_agreement_tolerance"]),
+            "--minimum-speedup", str(study["minimum_speedup"]),
+        ]
+        commands.append(("validation", command, ROOT))
 
     provenance = {
         "created_utc": created_at.isoformat(),
@@ -152,7 +178,10 @@ def main(config_path: Path) -> int:
         "platform": platform.platform(),
         "packages": {
             name: package_version(name)
-            for name in ("fenics-dolfinx", "fenics-basix", "fenics-ufl", "numpy", "mpi4py", "petsc4py")
+            for name in (
+                "fenics-dolfinx", "fenics-basix", "fenics-ufl", "numpy",
+                "mpi4py", "petsc4py", "osqp",
+            )
         },
         "commands": [command for _,command,_ in commands],
         "numerical_threads_per_rank": numerical_threads or None,
@@ -171,6 +200,7 @@ def main(config_path: Path) -> int:
             break
     if returncode == 0 and kind == "same_mesh_q2_study":
         pairwise=[]
+        observed_order = None
         for specification in study.get("pairwise_comparisons",[]):
             baseline=run_dir/str(specification["baseline"])
             challenger=run_dir/str(specification["challenger"])
@@ -222,6 +252,97 @@ def main(config_path: Path) -> int:
                     "observed_order": observed_order,
                     "interpretation": "Numerical diagnostic from three timestep levels; no asymptotic-regime proof.",
                 }, indent=2) + "\n"
+            )
+        decision_specification = config.get("scientific_decision")
+        if decision_specification is not None:
+            branch_results = []
+            for branch in study["branches"]:
+                branch_name = str(branch["name"])
+                branch_report = json.loads((run_dir / branch_name / "report.json").read_text())
+                steps = branch_report["limiter_steps"]
+                maximum_step_mass_change = max(
+                    (abs(float(step["mass_after"]) - float(step["mass_before"])) for step in steps),
+                    default=0.0,
+                )
+                maximum_step_negative_mass = max(
+                    (float(step["final_quadrature_negative_mass"]) for step in steps),
+                    default=0.0,
+                )
+                final_diagnostics = branch_report["final_stage_diagnostics"]["final"]
+                covariance = branch_report["comparisons_to_common_mc"]["final"][
+                    "covariance_accuracy"
+                ]
+                branch_gates = {
+                    "every_step_whole_cell_positive": all(
+                        bool(step["whole_cell_positivity_certified"]) for step in steps
+                    ),
+                    "maximum_step_mass_change": maximum_step_mass_change
+                    <= float(decision_specification["maximum_step_mass_change"]),
+                    "maximum_negative_mass": max(
+                        maximum_step_negative_mass,
+                        float(final_diagnostics["negative_mass"]),
+                    ) <= float(decision_specification["maximum_negative_mass"]),
+                    "absolute_mass_error": abs(float(final_diagnostics["mass"]) - 1.0)
+                    <= float(decision_specification["maximum_absolute_mass_error"]),
+                    "covariance_error_to_mc_p95_ratio": float(
+                        covariance["pde_error_to_mc_noise_p95_ratio"]
+                    ) <= float(
+                        decision_specification["maximum_covariance_error_to_mc_p95_ratio"]
+                    ),
+                }
+                branch_results.append({
+                    "branch": branch_name,
+                    "measured": {
+                        "maximum_step_mass_change": maximum_step_mass_change,
+                        "maximum_step_negative_mass": maximum_step_negative_mass,
+                        "final_negative_mass": float(final_diagnostics["negative_mass"]),
+                        "absolute_mass_error": abs(float(final_diagnostics["mass"]) - 1.0),
+                        "covariance_error_to_mc_p95_ratio": float(
+                            covariance["pde_error_to_mc_noise_p95_ratio"]
+                        ),
+                    },
+                    "gates": branch_gates,
+                    "passes": all(branch_gates.values()),
+                })
+            pairwise_gates = {
+                item["name"]: (
+                    float(item["subcell_average_l1_lower_bound"])
+                    <= float(decision_specification["maximum_adjacent_density_l1"])
+                    and all(bool(value) for value in item["passes"].values())
+                )
+                for item in pairwise
+            }
+            positive_order_required = bool(
+                decision_specification.get("require_positive_observed_order", False)
+            )
+            order_gate = (
+                not positive_order_required
+                or (observed_order is not None and observed_order > 0.0)
+            )
+            all_passed = (
+                all(item["passes"] for item in branch_results)
+                and all(pairwise_gates.values())
+                and order_gate
+            )
+            scientific_decision = {
+                "classification": (
+                    "PASSED_PREDECLARED_DYNAMIC_GATES"
+                    if all_passed else "FAILED_PREDECLARED_DYNAMIC_GATES"
+                ),
+                "all_gates_passed": all_passed,
+                "branch_results": branch_results,
+                "pairwise_density_gates": pairwise_gates,
+                "observed_timestep_order": observed_order,
+                "positive_observed_order_gate": order_gate,
+                "thresholds": decision_specification,
+                "dataset_generation_authorized": False,
+                "interpretation": (
+                    "Startup-state dynamic diagnostic only; passing advances the candidate to "
+                    "spatial, full-SPD, and mature-state certification."
+                ),
+            }
+            (run_dir / "scientific_decision.json").write_text(
+                json.dumps(scientific_decision, indent=2) + "\n"
             )
     (run_dir / "status.json").write_text(
         json.dumps({"returncode":returncode,"passed":returncode==0},indent=2)

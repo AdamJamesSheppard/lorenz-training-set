@@ -97,6 +97,7 @@ def run(args: argparse.Namespace) -> None:
 
     projector = LocalPolynomialProjector(
         solver.limiter,
+        optimizer_backend=args.optimizer_backend,
         optimizer_ftol=args.optimizer_ftol,
         feasibility_tolerance=args.feasibility_tolerance,
         normalized_positivity_margin=args.normalized_positivity_margin,
@@ -165,7 +166,7 @@ def run(args: argparse.Namespace) -> None:
                 "mpi_ranks": comm.size,
                 "certificate_mode": "adaptive_skip_then_fixed_2x2x2_constraints",
                 "certificate_max_depth": args.certificate_max_depth,
-                "optimizer": "SciPy SLSQP",
+                "optimizer": args.optimizer_backend,
                 "optimizer_ftol": args.optimizer_ftol,
                 "feasibility_tolerance": args.feasibility_tolerance,
                 "normalized_positivity_margin": args.normalized_positivity_margin,
@@ -210,9 +211,10 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--final-time", type=float, default=0.05)
     result.add_argument("--certificate-max-depth", type=int, default=4)
     result.add_argument("--optimizer-ftol", type=float, default=1.0e-12)
+    result.add_argument("--optimizer-backend", choices=("osqp", "slsqp"), default="osqp")
     result.add_argument("--feasibility-tolerance", type=float, default=5.0e-11)
     result.add_argument("--normalized-positivity-margin", type=float, default=1.0e-12)
-    result.add_argument("--maximum-iterations", type=int, default=250)
+    result.add_argument("--maximum-iterations", type=int, default=10_000)
     result.add_argument("--bootstrap", type=int, default=200)
     result.add_argument("--seed", type=int, default=20260910)
     return result

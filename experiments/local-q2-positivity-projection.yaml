@@ -10,6 +10,7 @@ study:
   optimizer_ftol: 1.0e-12
   feasibility_tolerance: 5.0e-11
   normalized_positivity_margin: 1.0e-12
+  optimizer_backend: slsqp
   maximum_iterations: 250
   mc_particles: runs/unlimited-q2-crank-nicolson/20260911T001508Z/reference/mc_final_particles.npy
   inputs:

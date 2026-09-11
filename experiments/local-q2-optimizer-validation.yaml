@@ -1,0 +1,27 @@
+id: local-q2-optimizer-validation
+kind: local_projection_optimizer_validation
+status: predeclared_engineering_gate
+study:
+  cells: [30, 36, 36]
+  dt: 0.000625
+  certificate_max_depth: 4
+  optimizer_ftol: 1.0e-10
+  oracle_ftol: 1.0e-12
+  feasibility_tolerance: 5.0e-11
+  osqp_maximum_iterations: 10000
+  oracle_maximum_iterations: 250
+  random_problems: 1000
+  seed: 20260911
+  objective_agreement_tolerance: 5.0e-7
+  coefficient_agreement_tolerance: 1.0e-3
+  minimum_speedup: 10.0
+  input_subcells:
+    - runs/unlimited-q2-crank-nicolson/20260911T001508Z/q2_unlimited_cn_full_dt/final_q2_subcell_averages.npy
+    - runs/unlimited-q2-crank-nicolson/20260911T001508Z/q2_unlimited_cn_half_dt/final_q2_subcell_averages.npy
+execution:
+  mpi_ranks: 1
+  numerical_threads: 1
+notes:
+  - OSQP and SLSQP solve the same fixed-constraint, mass-matrix projection.
+  - Saved terminal problems are supplemented by deterministic randomized stress polynomials.
+  - Passing this engineering gate does not establish dynamic PDE accuracy.

@@ -14,7 +14,10 @@ import time
 from dataclasses import dataclass
 
 import numpy as np
+import osqp
 from mpi4py import MPI
+from scipy import sparse
+from scipy.linalg import null_space
 from scipy.optimize import LinearConstraint, minimize
 
 from .core import (
@@ -37,6 +40,7 @@ class CellProjectionResult:
     minimum_constraint: float
     average_error: float
     optimizer_message: str | None = None
+    dual_variables: np.ndarray | None = None
 
 
 class LocalPolynomialProjector:
@@ -55,7 +59,8 @@ class LocalPolynomialProjector:
         optimizer_ftol: float = 1.0e-10,
         feasibility_tolerance: float = 5.0e-11,
         normalized_positivity_margin: float = 1.0e-12,
-        maximum_iterations: int = 250,
+        maximum_iterations: int = 10_000,
+        optimizer_backend: str = "osqp",
     ) -> None:
         if limiter.lower != 0.0:
             raise NotImplementedError("The experimental local projection currently requires lower=0")
@@ -66,6 +71,9 @@ class LocalPolynomialProjector:
         if not (0.0 <= self.normalized_positivity_margin < 1.0):
             raise ValueError("normalized_positivity_margin must lie in [0,1)")
         self.maximum_iterations = int(maximum_iterations)
+        if optimizer_backend not in {"osqp", "slsqp"}:
+            raise ValueError("optimizer_backend must be 'osqp' or 'slsqp'")
+        self.optimizer_backend = optimizer_backend
         basis = limiter._quadrature_basis
         weights = limiter._quadrature_weights
         self.mass_matrix = basis.T @ (weights[:, None] * basis)
@@ -89,6 +97,35 @@ class LocalPolynomialProjector:
         self._warm_starts: list[np.ndarray | None] = [
             None for _ in range(limiter.n_local_cells)
         ]
+        self._warm_dual_starts: list[np.ndarray | None] = [
+            None for _ in range(limiter.n_local_cells)
+        ]
+        self.last_stage1_coefficients: np.ndarray | None = None
+        self.last_final_coefficients: np.ndarray | None = None
+
+        # Eliminate the cell-average equality once.  The reduced Hessian and
+        # inequality matrix are identical for every cell; only the lower bound
+        # changes.  OSQP therefore reuses one symbolic/numeric factorization.
+        self.null_basis = null_space(self.average_weights[None, :])
+        self.reduced_hessian = self.null_basis.T @ self.mass_matrix @ self.null_basis
+        self.reduced_constraints = self.constraints @ self.null_basis
+        self._osqp: osqp.OSQP | None = None
+        if self.optimizer_backend == "osqp":
+            qp = osqp.OSQP()
+            qp.setup(
+                P=sparse.csc_matrix(self.reduced_hessian),
+                q=np.zeros(self.reduced_hessian.shape[0]),
+                A=sparse.csc_matrix(self.reduced_constraints),
+                l=np.zeros(self.reduced_constraints.shape[0]),
+                u=np.full(self.reduced_constraints.shape[0], np.inf),
+                eps_abs=min(self.optimizer_ftol, 0.2 * self.feasibility_tolerance),
+                eps_rel=min(self.optimizer_ftol, 0.2 * self.feasibility_tolerance),
+                max_iter=self.maximum_iterations,
+                polishing=True,
+                warm_starting=True,
+                verbose=False,
+            )
+            self._osqp = qp
 
     def _objective(self, candidate: np.ndarray, raw: np.ndarray) -> float:
         difference = candidate - raw
@@ -108,6 +145,7 @@ class LocalPolynomialProjector:
         *,
         prescribed_average: float | None = None,
         initial_guess: np.ndarray | None = None,
+        dual_initial_guess: np.ndarray | None = None,
     ) -> CellProjectionResult:
         """Project one polynomial or return an explicit infeasibility result."""
         raw = np.asarray(coefficients, dtype=float)
@@ -155,19 +193,42 @@ class LocalPolynomialProjector:
             ):
                 optimizer_start = warm
 
-        result = minimize(
-            lambda value: self._objective(value, normalized),
-            optimizer_start,
-            jac=lambda value: self.mass_matrix @ (value - normalized),
-            constraints=self.linear_constraints,
-            method="SLSQP",
-            options={
-                "ftol": self.optimizer_ftol,
-                "maxiter": self.maximum_iterations,
-                "disp": False,
-            },
-        )
-        candidate = np.asarray(result.x, dtype=float)
+        dual_variables = None
+        if self.optimizer_backend == "slsqp":
+            result = minimize(
+                lambda value: self._objective(value, normalized),
+                optimizer_start,
+                jac=lambda value: self.mass_matrix @ (value - normalized),
+                constraints=self.linear_constraints,
+                method="SLSQP",
+                options={
+                    "ftol": self.optimizer_ftol,
+                    "maxiter": self.maximum_iterations,
+                    "disp": False,
+                },
+            )
+            candidate = np.asarray(result.x, dtype=float)
+            optimizer_success = bool(result.success)
+            optimizer_iterations = int(result.nit)
+            optimizer_message = str(result.message)
+        else:
+            if self._osqp is None:  # pragma: no cover - constructor invariant
+                raise RuntimeError("OSQP backend was not initialized")
+            lower = self.normalized_positivity_margin - self.constraints @ normalized
+            reduced_start = self.null_basis.T @ (optimizer_start - normalized)
+            dual_start = np.zeros(len(lower))
+            if dual_initial_guess is not None:
+                supplied_dual = np.asarray(dual_initial_guess, dtype=float)
+                if supplied_dual.shape == dual_start.shape and np.all(np.isfinite(supplied_dual)):
+                    dual_start = supplied_dual
+            self._osqp.update(l=lower)
+            self._osqp.warm_start(x=reduced_start, y=dual_start)
+            result = self._osqp.solve(raise_error=False)
+            candidate = normalized + self.null_basis @ np.asarray(result.x, dtype=float)
+            optimizer_success = int(result.info.status_val) in {1, 2}
+            optimizer_iterations = int(result.info.iter)
+            optimizer_message = str(result.info.status)
+            dual_variables = np.asarray(result.y, dtype=float).copy()
 
         # Remove the equality residual in the constant direction.  If this
         # creates a tiny negative Bernstein residual, contract by the minimum
@@ -187,17 +248,18 @@ class LocalPolynomialProjector:
         scaling_objective = self._objective(scaling, normalized)
         feasible = minimum >= -self.feasibility_tolerance and abs(average_error) <= self.feasibility_tolerance
         optimal_enough = objective <= scaling_objective + 1.0e-8 * max(1.0, scaling_objective)
-        status = "PROJECTED" if result.success and feasible and optimal_enough else "OPTIMIZER_FAILED"
+        status = "PROJECTED" if optimizer_success and feasible and optimal_enough else "OPTIMIZER_FAILED"
         final = average * candidate if status == "PROJECTED" else raw.copy()
         return CellProjectionResult(
             final,
             status,
-            int(result.nit),
+            optimizer_iterations,
             average * average * objective,
             average * average * scaling_objective,
             average * minimum if status == "PROJECTED" else float((self.full_constraints @ raw).min()),
             average * average_error if status == "PROJECTED" else 0.0,
-            None if status == "PROJECTED" else str(result.message),
+            None if status == "PROJECTED" else optimizer_message,
+            dual_variables if status == "PROJECTED" else None,
         )
 
     def scaling_fallback(
@@ -261,6 +323,7 @@ class LocalPolynomialProjector:
                 coefficients[dofs] += float(target_averages[cell] - local_averages[cell])
         output.function.x.scatter_forward()
         after_average_repair = coefficients.copy()
+        self.last_stage1_coefficients = after_average_repair.copy()
 
         counts = {
             "ALREADY_CERTIFIED": 0,
@@ -292,6 +355,7 @@ class LocalPolynomialProjector:
                 values,
                 prescribed_average=prescribed_average,
                 initial_guess=self._warm_starts[cell],
+                dual_initial_guess=self._warm_dual_starts[cell],
             )
             counts[result.status] += 1
             if result.status in {"PROJECTED", "PROJECTED_ZERO_AVERAGE"}:
@@ -303,13 +367,16 @@ class LocalPolynomialProjector:
                 self._warm_starts[cell] = (
                     result.coefficients / average if average > 0.0 else None
                 )
-                iterations.append(result.iterations)
+                self._warm_dual_starts[cell] = result.dual_variables
+                if result.status == "PROJECTED":
+                    iterations.append(result.iterations)
                 volume = float(limiter.cell_volumes[cell])
                 objective += volume * result.objective
                 scaling_objective += volume * result.scaling_objective
                 if result.objective > result.scaling_objective + 1.0e-8 * max(1.0, result.scaling_objective):
                     objective_bound_violations += 1
             elif result.optimizer_message is not None:
+                iterations.append(result.iterations)
                 optimizer_messages[result.optimizer_message] = optimizer_messages.get(result.optimizer_message, 0) + 1
                 fallback = self.scaling_fallback(
                     values, prescribed_average=prescribed_average
@@ -320,18 +387,25 @@ class LocalPolynomialProjector:
                     else limiter.cell_average(fallback)
                 )
                 self._warm_starts[cell] = fallback / average if average > 0.0 else None
+                self._warm_dual_starts[cell] = None
+                volume = float(limiter.cell_volumes[cell])
+                objective += volume * result.scaling_objective
+                scaling_objective += volume * result.scaling_objective
+                scaling_fallback_cells += 1
             elif result.status == "ALREADY_FEASIBLE":
                 average = (
                     prescribed_average if prescribed_average is not None
                     else limiter.cell_average(values)
                 )
                 self._warm_starts[cell] = values / average if average > 0.0 else None
+                self._warm_dual_starts[cell] = None
             else:
                 self._warm_starts[cell] = None
-                scaling_fallback_cells += 1
+                self._warm_dual_starts[cell] = None
         output.function.x.scatter_forward()
 
         final_coefficients = coefficients.copy()
+        self.last_final_coefficients = final_coefficients.copy()
         stage1_l1, stage1_l2 = limiter._difference_norms(raw_coefficients, after_average_repair)
         local_l1, local_l2 = limiter._difference_norms(after_average_repair, final_coefficients)
         total_l1, total_l2 = limiter._difference_norms(raw_coefficients, final_coefficients)
@@ -344,6 +418,7 @@ class LocalPolynomialProjector:
         total_cells = int(limiter.comm.allreduce(limiter.n_local_cells, op=MPI.SUM))
         report: dict[str, object] = {
             "method": "cell-local mass-matrix QP with fixed control-subcell Bernstein constraints",
+            "optimizer_backend": self.optimizer_backend,
             "average_repair": "global conservative L2 projection" if repair_cell_averages else "disabled",
             "adaptive_certified_cells_skipped": bool(adaptive_skip),
             "total_cells": total_cells,
@@ -370,6 +445,7 @@ class LocalPolynomialProjector:
             "matched_scalar_scaling_objective": _global_sum(limiter.comm, scaling_objective),
             "objective_bound_violations": int(limiter.comm.allreduce(objective_bound_violations, op=MPI.SUM)),
             "scaling_fallback_cells": int(limiter.comm.allreduce(scaling_fallback_cells, op=MPI.SUM)),
+            "optimizer_invoked_cells": int(limiter.comm.allreduce(len(iterations), op=MPI.SUM)),
             "optimizer_iterations_mean": float(
                 _global_sum(limiter.comm, float(sum(iterations))) /
                 max(1, limiter.comm.allreduce(len(iterations), op=MPI.SUM))
@@ -394,7 +470,8 @@ class LocalProjectionFokkerPlanckSolver(FokkerPlanckSolver):
 
     def __init__(self, *args, **kwargs) -> None:
         local_optimizer_ftol = float(kwargs.pop("local_optimizer_ftol", 1.0e-10))
-        local_maximum_iterations = int(kwargs.pop("local_maximum_iterations", 250))
+        local_maximum_iterations = int(kwargs.pop("local_maximum_iterations", 10_000))
+        local_optimizer_backend = str(kwargs.pop("local_optimizer_backend", "osqp"))
         kwargs["apply_positivity"] = False
         super().__init__(*args, **kwargs)
         if self.degree != 2:
@@ -403,6 +480,7 @@ class LocalProjectionFokkerPlanckSolver(FokkerPlanckSolver):
             self.limiter,
             optimizer_ftol=local_optimizer_ftol,
             maximum_iterations=local_maximum_iterations,
+            optimizer_backend=local_optimizer_backend,
         )
         self.local_projection_history: list[dict[str, object]] = []
         self.last_local_projection_report: dict[str, object] | None = None
@@ -420,7 +498,9 @@ class LocalProjectionFokkerPlanckSolver(FokkerPlanckSolver):
         self.last_local_projection_report = report
         self.local_projection_history.append(report)
         self.limiter.last_raw_coefficients = unlimited.function.x.array.copy()
-        self.limiter.last_stage1_coefficients = corrected.function.x.array.copy()
+        if self.local_projector.last_stage1_coefficients is None:
+            raise RuntimeError("Local projection did not retain its Stage-1 state")
+        self.limiter.last_stage1_coefficients = self.local_projector.last_stage1_coefficients.copy()
         self.limiter.last_final_coefficients = corrected.function.x.array.copy()
         self.last_timing["local_projection_seconds"] = float(report["wall_seconds"])
         self.last_timing["step_seconds"] = _global_max(

@@ -234,6 +234,127 @@ class TestQ2Properties(unittest.TestCase):
         )
         self.assertLessEqual(result.objective, result.scaling_objective + 1.0e-12)
 
+    def test_osqp_local_projection_agrees_with_slsqp_oracle(self):
+        from lorenz_fpe.local_projection import LocalPolynomialProjector
+
+        domain = Domain(((0.0, 1.0),) * 3, (1, 1, 1))
+        solver = FokkerPlanckSolver(
+            Lorenz63Model(), domain, 0.01, degree=2,
+            certificate_mode="adaptive", certificate_max_depth=4,
+        )
+        q = fem.Function(solver.V)
+        q.interpolate(lambda x: (x[0] - 0.37) ** 2 - 0.002 + 0.0 * x[1])
+        dofs = solver.V.dofmap.cell_dofs(0)
+        raw = q.x.array[dofs].copy()
+        specialized = LocalPolynomialProjector(
+            solver.limiter, optimizer_backend="osqp"
+        ).project_cell(raw)
+        oracle = LocalPolynomialProjector(
+            solver.limiter, optimizer_backend="slsqp",
+            optimizer_ftol=1.0e-12, maximum_iterations=250,
+        ).project_cell(raw)
+
+        self.assertEqual(specialized.status, "PROJECTED")
+        self.assertEqual(oracle.status, "PROJECTED")
+        self.assertGreaterEqual(specialized.minimum_constraint, -5.0e-11)
+        self.assertLess(abs(specialized.average_error), 5.0e-11)
+        self.assertLessEqual(
+            specialized.objective,
+            oracle.objective + 1.0e-8 * max(1.0, oracle.objective),
+        )
+        np.testing.assert_allclose(
+            specialized.coefficients, oracle.coefficients, rtol=1.0e-5, atol=1.0e-6
+        )
+
+    def test_local_projection_reports_optimizer_fallback_and_true_iteration_mean(self):
+        from lorenz_fpe.core import DensityState
+        from lorenz_fpe.local_projection import (
+            CellProjectionResult,
+            LocalPolynomialProjector,
+        )
+
+        solver = FokkerPlanckSolver(
+            Lorenz63Model(), Domain(((0.0, 1.0),) * 3, (1, 1, 1)),
+            0.01, degree=2,
+        )
+        q = fem.Function(solver.V)
+        q.interpolate(lambda x: (x[0] - 0.37) ** 2 - 0.002 + 0.0 * x[1])
+        state = DensityState(q, 0.0, "forced_optimizer_failure")
+        projector = LocalPolynomialProjector(solver.limiter)
+        original = projector.project_cell
+
+        def fail_projection(coefficients, **kwargs):
+            raw = np.asarray(coefficients, dtype=float)
+            average = solver.limiter.cell_average(raw)
+            scaling = projector.scaling_fallback(raw, prescribed_average=average)
+            scaling_objective = projector._objective(scaling, raw)
+            return CellProjectionResult(
+                raw.copy(), "OPTIMIZER_FAILED", 7, scaling_objective,
+                scaling_objective, float((projector.full_constraints @ raw).min()),
+                0.0, "forced failure",
+            )
+
+        projector.project_cell = fail_projection
+        try:
+            corrected, report = projector.project_state(
+                state, repair_cell_averages=False, adaptive_skip=False
+            )
+        finally:
+            projector.project_cell = original
+
+        self.assertEqual(report["counts"]["OPTIMIZER_FAILED"], 1)
+        self.assertEqual(report["scaling_fallback_cells"], 1)
+        self.assertEqual(report["optimizer_invoked_cells"], 1)
+        self.assertEqual(report["optimizer_iterations_mean"], 7.0)
+        self.assertGreaterEqual(
+            solver.limiter.control_coefficients(
+                corrected.function.x.array[solver.V.dofmap.cell_dofs(0)]
+            ).min(),
+            -5.0e-11,
+        )
+
+    def test_local_projection_retains_actual_stage1_state(self):
+        from lorenz_fpe.core import DensityState
+        from lorenz_fpe.local_projection import LocalPolynomialProjector
+
+        solver = FokkerPlanckSolver(
+            Lorenz63Model(), Domain(((0.0, 1.0),) * 3, (2, 1, 1)),
+            0.01, degree=2,
+        )
+        reference_solver = FokkerPlanckSolver(
+            Lorenz63Model(), Domain(((0.0, 1.0),) * 3, (1, 1, 1)),
+            0.01, degree=2,
+        )
+        reference = fem.Function(reference_solver.V)
+        reference.interpolate(lambda x: (x[0] - 0.37) ** 2 - 0.002 + 0.0 * x[1])
+        q = fem.Function(solver.V)
+        q.x.array[solver.V.dofmap.cell_dofs(0)] = -0.05
+        q.x.array[solver.V.dofmap.cell_dofs(1)] = reference.x.array[
+            reference_solver.V.dofmap.cell_dofs(0)
+        ]
+        q.x.scatter_forward()
+        raw = q.x.array.copy()
+        projector = LocalPolynomialProjector(solver.limiter)
+        corrected, _ = projector.project_state(
+            DensityState(q, 0.0, "stage1_archive_test"),
+            repair_cell_averages=True,
+            adaptive_skip=False,
+        )
+
+        self.assertIsNotNone(projector.last_stage1_coefficients)
+        np.testing.assert_raises(
+            AssertionError,
+            np.testing.assert_array_equal,
+            projector.last_stage1_coefficients,
+            raw,
+        )
+        np.testing.assert_raises(
+            AssertionError,
+            np.testing.assert_array_equal,
+            projector.last_stage1_coefficients,
+            corrected.function.x.array,
+        )
+
     def test_local_q2_projection_exposes_negative_average_infeasibility(self):
         from lorenz_fpe.local_projection import LocalPolynomialProjector
 
