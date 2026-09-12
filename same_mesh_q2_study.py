@@ -98,6 +98,7 @@ def run_forecast(args: argparse.Namespace) -> None:
         }
     solver=solver_class(
         model,domain,args.dt,theta=args.theta,degree=args.degree,
+        ksp_rtol=args.ksp_rtol,ksp_atol=args.ksp_atol,
         certificate_mode=args.certificate_mode,
         certificate_max_depth=args.certificate_max_depth,
         certificate_diagnostics=args.degree>=2,
@@ -202,6 +203,7 @@ def run_forecast(args: argparse.Namespace) -> None:
             "branch":args.branch,
             "configuration":{"cells":list(args.cells),"degree":args.degree,"dt":args.dt,
                 "theta":args.theta,"t_final":args.t_final,"mpi_ranks":comm.size,
+                "ksp_rtol":args.ksp_rtol,"ksp_atol":args.ksp_atol,
                 "certificate_mode":args.certificate_mode,
                 "certificate_max_depth":args.certificate_max_depth,
                 "positivity_applied_each_step":positivity_enabled,
@@ -299,6 +301,8 @@ def parser() -> argparse.ArgumentParser:
     run.add_argument("--branch",required=True)
     run.add_argument("--degree",type=int,choices=(1,2),required=True)
     run.add_argument("--theta",type=float,choices=(0.5,1.0),default=1.0)
+    run.add_argument("--ksp-rtol",type=float,default=1.0e-10)
+    run.add_argument("--ksp-atol",type=float,default=1.0e-13)
     run.add_argument("--certificate-mode",choices=("fixed","adaptive"),default="fixed")
     run.add_argument("--certificate-max-depth",type=int,default=4)
     run.add_argument("--initial-grid",type=Path,required=True)

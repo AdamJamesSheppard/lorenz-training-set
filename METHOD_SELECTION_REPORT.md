@@ -857,8 +857,12 @@ This is a mixed scientific result: local QP is far less destructive than global
 scaling and retains useful non-negative accuracy, while the tested timestep
 sequence shows a roughly `5.3e-4` density-difference floor rather than positive
 temporal convergence. It remains a comparator and does not advance to dataset
-certification. The next correction branch is an operator-level positive
-low-order/full-SPD update with local conservative flux or algebraic correction.
+certification. Because its mean correction is approximately proportional to the
+timestep and it improves the global-scaling density discrepancy by about 20.8
+times, one further full/half/quarter/eighth diagnostic is predeclared with KSP
+`rtol=1e-12`, `atol=1e-15`. A decrease in the final adjacent difference advances
+only to spatial/full-SPD testing; another plateau prioritizes adaptive
+constraints or an operator-level positive low-order/AFC correction.
 
 Evidence: [`local_q2_optimizer_validation_report.json`](local_q2_optimizer_validation_report.json),
 [`local_q2_projection_performance_report.json`](local_q2_projection_performance_report.json),

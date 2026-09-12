@@ -563,16 +563,20 @@ class FokkerPlanckSolver:
         penalty: float = 16.0,
         limiter_lower: float = 0.0,
         ksp_rtol: float = 1e-10,
+        ksp_atol: float = 1e-13,
         certificate_mode: str = "fixed",
         certificate_max_depth: int = 4,
         certificate_diagnostics: bool = False,
         apply_positivity: bool = True,
     ):
         self.model, self.domain, self.dt, self.theta = model, domain, float(dt), float(theta)
+        self.ksp_rtol, self.ksp_atol = float(ksp_rtol), float(ksp_atol)
         self.degree = int(degree)
         self.apply_positivity = bool(apply_positivity)
         if not (0.5 <= self.theta <= 1.0): raise ValueError("theta must lie in [0.5,1]")
         if self.degree not in (1,2,3): raise ValueError("degree must be 1, 2, or 3")
+        if self.ksp_rtol <= 0.0 or self.ksp_atol < 0.0:
+            raise ValueError("KSP tolerances require ksp_rtol > 0 and ksp_atol >= 0")
         self.comm = MPI.COMM_WORLD
         a = [b[0] for b in domain.bounds]
         b = [b[1] for b in domain.bounds]
@@ -632,7 +636,7 @@ class FokkerPlanckSolver:
         self.ksp = PETSc.KSP().create(self.comm)
         self.ksp.setOperators(self.A)
         self.ksp.setType("gmres")
-        self.ksp.setTolerances(rtol=ksp_rtol, atol=1e-13, max_it=1000)
+        self.ksp.setTolerances(rtol=self.ksp_rtol, atol=self.ksp_atol, max_it=1000)
         self.ksp.setErrorIfNotConverged(True)
         pc = self.ksp.getPC()
         pc.setType("bjacobi" if self.comm.size > 1 else "ilu")
@@ -1197,6 +1201,9 @@ def solver_metadata(solver: FokkerPlanckSolver) -> dict[str, object]:
         "boundary": "total reflecting/no-flux (f p-D grad p).n=0 on finite box",
         "model": asdict(solver.model), "diffusion": D.tolist(), "domain": asdict(solver.domain),
         "dt": solver.dt, "space": f"discontinuous tensor-product degree {solver.degree} (DG/Q{solver.degree})",
+        "linear_solver_tolerances": {
+            "rtol": solver.ksp_rtol, "atol": solver.ksp_atol,
+        },
         "fluxes": "upwind advection; symmetric interior penalty diffusion",
         "time_method": "backward Euler" if solver.theta==1.0 else f"theta method (theta={solver.theta})",
         "positivity": {

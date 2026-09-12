@@ -102,6 +102,8 @@ def main(config_path: Path) -> int:
                 sys.executable,str(ROOT/"same_mesh_q2_study.py"),"forecast",*branch_common,
                 "--branch",str(branch["name"]),"--degree",str(branch["degree"]),
                 "--theta",str(branch.get("theta",1.0)),
+                "--ksp-rtol",str(branch.get("ksp_rtol",study.get("ksp_rtol",1.0e-10))),
+                "--ksp-atol",str(branch.get("ksp_atol",study.get("ksp_atol",1.0e-13))),
                 "--certificate-mode",str(branch.get("certificate_mode","fixed")),
                 "--certificate-max-depth",str(study["certificate_max_depth"]),
                 "--initial-grid",str(initial_grid),"--mc-particles",str(particles),
@@ -201,6 +203,7 @@ def main(config_path: Path) -> int:
     if returncode == 0 and kind == "same_mesh_q2_study":
         pairwise=[]
         observed_order = None
+        observed_orders = []
         for specification in study.get("pairwise_comparisons",[]):
             baseline=run_dir/str(specification["baseline"])
             challenger=run_dir/str(specification["challenger"])
@@ -238,19 +241,26 @@ def main(config_path: Path) -> int:
                 json.dumps(pairwise,indent=2)+"\n"
             )
         if len(pairwise) >= 2:
-            first = float(pairwise[0]["subcell_average_l1_lower_bound"])
-            second = float(pairwise[1]["subcell_average_l1_lower_bound"])
-            observed_order = (
-                float(np.log2(first / second))
-                if first > 0.0 and second > 0.0 else None
-            )
+            for first_item, second_item in zip(pairwise[:-1], pairwise[1:]):
+                first = float(first_item["subcell_average_l1_lower_bound"])
+                second = float(second_item["subcell_average_l1_lower_bound"])
+                value = (
+                    float(np.log2(first / second))
+                    if first > 0.0 and second > 0.0 else None
+                )
+                observed_orders.append({
+                    "first_comparison": first_item["name"],
+                    "second_comparison": second_item["name"],
+                    "l1_ratio": first / second if second > 0.0 else None,
+                    "observed_order": value,
+                })
+            observed_order = observed_orders[-1]["observed_order"]
             (run_dir / "observed_timestep_order.json").write_text(
                 json.dumps({
-                    "first_comparison": pairwise[0]["name"],
-                    "second_comparison": pairwise[1]["name"],
-                    "l1_ratio": first / second if second > 0.0 else None,
+                    **observed_orders[-1],
                     "observed_order": observed_order,
-                    "interpretation": "Numerical diagnostic from three timestep levels; no asymptotic-regime proof.",
+                    "all_consecutive_orders": observed_orders,
+                    "interpretation": "Consecutive-level numerical diagnostic; no asymptotic-regime proof.",
                 }, indent=2) + "\n"
             )
         decision_specification = config.get("scientific_decision")
@@ -333,6 +343,7 @@ def main(config_path: Path) -> int:
                 "branch_results": branch_results,
                 "pairwise_density_gates": pairwise_gates,
                 "observed_timestep_order": observed_order,
+                "all_consecutive_observed_orders": observed_orders,
                 "positive_observed_order_gate": order_gate,
                 "thresholds": decision_specification,
                 "dataset_generation_authorized": False,

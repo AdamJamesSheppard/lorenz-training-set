@@ -1,6 +1,6 @@
 # Repository map
 
-Generated: 2026-09-11T18:32:56+01:00
+Generated: 2026-09-12T01:13:14+01:00
 
 ```text
 docs/ACTIVE_TASK.md
@@ -16,6 +16,7 @@ docs/assumptions.yaml
 docs/generated/REPO_MAP.md
 docs/tasks/TASK_TEMPLATE.md
 experiments/corrected-q2-crank-nicolson.yaml
+experiments/local-q2-cn-tight-ksp-refinement.yaml
 experiments/local-q2-crank-nicolson.yaml
 experiments/local-q2-optimizer-validation.yaml
 experiments/local-q2-osqp-profile.yaml
@@ -119,27 +120,27 @@ tests/test_validation.py
 ./same_mesh_q2_study.py:37:def _marginal_tv(cell_averages: np.ndarray, particles: np.ndarray,
 ./same_mesh_q2_study.py:49:def prepare_reference(args: argparse.Namespace) -> None:
 ./same_mesh_q2_study.py:84:def run_forecast(args: argparse.Namespace) -> None:
-./same_mesh_q2_study.py:247:def recover_final(args: argparse.Namespace) -> None:
-./same_mesh_q2_study.py:286:def parser() -> argparse.ArgumentParser:
+./same_mesh_q2_study.py:249:def recover_final(args: argparse.Namespace) -> None:
+./same_mesh_q2_study.py:288:def parser() -> argparse.ArgumentParser:
 ./build_experiment_manifest.py:52:def sha256(path: Path) -> str:
 ./build_experiment_manifest.py:60:def git_revision() -> str | None:
 ./build_experiment_manifest.py:70:def extract_configuration(path: Path) -> dict[str, object]:
 ./build_experiment_manifest.py:79:def command_output(command: list[str]) -> str | None:
 ./build_experiment_manifest.py:86:def main() -> None:
-./local_projection_optimizer_study.py:18:def _sha256(path: Path) -> str:
-./local_projection_optimizer_study.py:26:def _terminal_problems(
-./local_projection_optimizer_study.py:48:def _random_problems(
-./local_projection_optimizer_study.py:61:def run(args: argparse.Namespace) -> None:
-./local_projection_optimizer_study.py:200:def parser() -> argparse.ArgumentParser:
+./mature_da_study.py:11:def tensor_stats(a,domain):
+./mature_da_study.py:28:def main():
+./mature_forecast_validation.py:11:def sample_q1(solver,state,n,rng):
+./mature_forecast_validation.py:23:def main():
 ./local_projection_study.py:21:def _sha256(path: Path) -> str:
 ./local_projection_study.py:29:def _marginal_tv(
 ./local_projection_study.py:44:def _difference_report(
 ./local_projection_study.py:66:def run(args: argparse.Namespace) -> None:
 ./local_projection_study.py:204:def parser() -> argparse.ArgumentParser:
-./mature_da_study.py:11:def tensor_stats(a,domain):
-./mature_da_study.py:28:def main():
-./mature_forecast_validation.py:11:def sample_q1(solver,state,n,rng):
-./mature_forecast_validation.py:23:def main():
+./local_projection_optimizer_study.py:18:def _sha256(path: Path) -> str:
+./local_projection_optimizer_study.py:26:def _terminal_problems(
+./local_projection_optimizer_study.py:48:def _random_problems(
+./local_projection_optimizer_study.py:61:def run(args: argparse.Namespace) -> None:
+./local_projection_optimizer_study.py:200:def parser() -> argparse.ArgumentParser:
 scripts/verify_math.py:16:def main() -> int:
 tests/test_validation.py:4:class TestAnalyticBenchmarks(unittest.TestCase):
 tests/test_validation.py:6:    def setUpClass(cls):
@@ -176,8 +177,9 @@ tests/test_solver_smoke.py:7:class TestSolverSmoke(unittest.TestCase):
 tests/test_solver_smoke.py:9:    def setUpClass(cls):
 tests/test_solver_smoke.py:11:    def test_forecast_probability_invariants(self):
 tests/test_solver_smoke.py:22:    def test_structured_roundtrip_conserves_mass(self):
-tests/test_solver_smoke.py:26:    def test_refined_structured_roundtrip_preserves_q1_shape(self):
-tests/test_solver_smoke.py:34:    def test_checkpoint_and_da_continuity_without_gaussianisation(self):
+tests/test_solver_smoke.py:26:    def test_forecast_ksp_tolerances_are_configurable(self):
+tests/test_solver_smoke.py:34:    def test_refined_structured_roundtrip_preserves_q1_shape(self):
+tests/test_solver_smoke.py:42:    def test_checkpoint_and_da_continuity_without_gaussianisation(self):
 scripts/run_experiment.py:22:def package_version(name: str) -> str | None:
 scripts/run_experiment.py:29:def git_text(*args: str) -> str:
 scripts/run_experiment.py:35:def main(config_path: Path) -> int:
@@ -271,37 +273,37 @@ lorenz_fpe/core.py:361:    def project_cell_averages(w: np.ndarray, volumes: np.
 lorenz_fpe/core.py:412:    def apply(self, state: DensityState) -> LimiterReport:
 lorenz_fpe/core.py:553:class FokkerPlanckSolver:
 lorenz_fpe/core.py:556:    def __init__(
-lorenz_fpe/core.py:651:    def _cell_volumes(self) -> np.ndarray:
-lorenz_fpe/core.py:658:    def _integral(self, expr: ufl.core.expr.Expr, quadrature_degree: int | None = None) -> float:
-lorenz_fpe/core.py:664:    def gaussian_expression(self, mean: Iterable[float], covariance: np.ndarray):
-lorenz_fpe/core.py:674:    def project_expression(
-lorenz_fpe/core.py:716:    def gaussian_interpolated(self, mean: Iterable[float], covariance: np.ndarray,
-lorenz_fpe/core.py:724:        def values(x: np.ndarray) -> np.ndarray:
-lorenz_fpe/core.py:734:    def gaussian_projected(self, mean: Iterable[float], covariance: np.ndarray,
-lorenz_fpe/core.py:743:    def gaussian(self, mean: Iterable[float], covariance: np.ndarray, label: str = "gaussian") -> DensityState:
-lorenz_fpe/core.py:751:    def sample_density(self, state: DensityState, count: int,
-lorenz_fpe/core.py:799:    def sample_q1_density(self, state: DensityState, count: int,
-lorenz_fpe/core.py:806:    def load_native(self, path: Path) -> DensityState:
-lorenz_fpe/core.py:818:    def from_structured(self, density: np.ndarray, time_value: float = 0.0,
-lorenz_fpe/core.py:862:    def mixture(self, means: list[Iterable[float]], covariances: list[np.ndarray], weights: Iterable[float]) -> DensityState:
-lorenz_fpe/core.py:869:        def values(x: np.ndarray) -> np.ndarray:
-lorenz_fpe/core.py:879:    def normalize(self, state: DensityState) -> float:
-lorenz_fpe/core.py:887:    def mass(self, state: DensityState) -> float:
-lorenz_fpe/core.py:890:    def step(self, state: DensityState) -> DensityState:
-lorenz_fpe/core.py:929:    def limiter_stage_states(self, time_value: float) -> dict[str,DensityState]:
-lorenz_fpe/core.py:941:    def limiter_history_summary(self) -> dict[str,object]:
-lorenz_fpe/core.py:969:    def forecast(self, posterior: DensityState, t0: float, t1: float, progress: bool = False) -> DensityState:
-lorenz_fpe/core.py:994:    def cell_averages(self, state: DensityState) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-lorenz_fpe/core.py:1003:    def structured_export(self, state: DensityState, subcells_per_cell: int = 1) -> np.ndarray:
-lorenz_fpe/core.py:1031:    def diagnostics(self, state: DensityState) -> dict[str, object]:
-lorenz_fpe/core.py:1077:class ObservationModel:
-lorenz_fpe/core.py:1083:    def named(cls, name: str, variance: float = 4.0) -> "ObservationModel":
-lorenz_fpe/core.py:1092:    def observe(self, state: np.ndarray, rng: np.random.Generator) -> np.ndarray:
-lorenz_fpe/core.py:1097:class BayesianAnalysis:
-lorenz_fpe/core.py:1098:    def __init__(self, solver: FokkerPlanckSolver, observation_model: ObservationModel,
-lorenz_fpe/core.py:1130:    def update(self, forecast: DensityState, observation: np.ndarray) -> tuple[DensityState, dict[str,object]]:
-lorenz_fpe/core.py:1170:class TruthSimulator:
-lorenz_fpe/core.py:1171:    def __init__(self, model: Lorenz63Model, dt: float = 2.5e-4):
-lorenz_fpe/core.py:1174:    def simulate(self, initial: Iterable[float], times: Iterable[float], seed: int) -> np.ndarray:
-lorenz_fpe/core.py:1185:def solver_metadata(solver: FokkerPlanckSolver) -> dict[str, object]:
-lorenz_fpe/core.py:1217:def write_json(path: Path, obj: object) -> None:
+lorenz_fpe/core.py:655:    def _cell_volumes(self) -> np.ndarray:
+lorenz_fpe/core.py:662:    def _integral(self, expr: ufl.core.expr.Expr, quadrature_degree: int | None = None) -> float:
+lorenz_fpe/core.py:668:    def gaussian_expression(self, mean: Iterable[float], covariance: np.ndarray):
+lorenz_fpe/core.py:678:    def project_expression(
+lorenz_fpe/core.py:720:    def gaussian_interpolated(self, mean: Iterable[float], covariance: np.ndarray,
+lorenz_fpe/core.py:728:        def values(x: np.ndarray) -> np.ndarray:
+lorenz_fpe/core.py:738:    def gaussian_projected(self, mean: Iterable[float], covariance: np.ndarray,
+lorenz_fpe/core.py:747:    def gaussian(self, mean: Iterable[float], covariance: np.ndarray, label: str = "gaussian") -> DensityState:
+lorenz_fpe/core.py:755:    def sample_density(self, state: DensityState, count: int,
+lorenz_fpe/core.py:803:    def sample_q1_density(self, state: DensityState, count: int,
+lorenz_fpe/core.py:810:    def load_native(self, path: Path) -> DensityState:
+lorenz_fpe/core.py:822:    def from_structured(self, density: np.ndarray, time_value: float = 0.0,
+lorenz_fpe/core.py:866:    def mixture(self, means: list[Iterable[float]], covariances: list[np.ndarray], weights: Iterable[float]) -> DensityState:
+lorenz_fpe/core.py:873:        def values(x: np.ndarray) -> np.ndarray:
+lorenz_fpe/core.py:883:    def normalize(self, state: DensityState) -> float:
+lorenz_fpe/core.py:891:    def mass(self, state: DensityState) -> float:
+lorenz_fpe/core.py:894:    def step(self, state: DensityState) -> DensityState:
+lorenz_fpe/core.py:933:    def limiter_stage_states(self, time_value: float) -> dict[str,DensityState]:
+lorenz_fpe/core.py:945:    def limiter_history_summary(self) -> dict[str,object]:
+lorenz_fpe/core.py:973:    def forecast(self, posterior: DensityState, t0: float, t1: float, progress: bool = False) -> DensityState:
+lorenz_fpe/core.py:998:    def cell_averages(self, state: DensityState) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+lorenz_fpe/core.py:1007:    def structured_export(self, state: DensityState, subcells_per_cell: int = 1) -> np.ndarray:
+lorenz_fpe/core.py:1035:    def diagnostics(self, state: DensityState) -> dict[str, object]:
+lorenz_fpe/core.py:1081:class ObservationModel:
+lorenz_fpe/core.py:1087:    def named(cls, name: str, variance: float = 4.0) -> "ObservationModel":
+lorenz_fpe/core.py:1096:    def observe(self, state: np.ndarray, rng: np.random.Generator) -> np.ndarray:
+lorenz_fpe/core.py:1101:class BayesianAnalysis:
+lorenz_fpe/core.py:1102:    def __init__(self, solver: FokkerPlanckSolver, observation_model: ObservationModel,
+lorenz_fpe/core.py:1134:    def update(self, forecast: DensityState, observation: np.ndarray) -> tuple[DensityState, dict[str,object]]:
+lorenz_fpe/core.py:1174:class TruthSimulator:
+lorenz_fpe/core.py:1175:    def __init__(self, model: Lorenz63Model, dt: float = 2.5e-4):
+lorenz_fpe/core.py:1178:    def simulate(self, initial: Iterable[float], times: Iterable[float], seed: int) -> np.ndarray:
+lorenz_fpe/core.py:1189:def solver_metadata(solver: FokkerPlanckSolver) -> dict[str, object]:
+lorenz_fpe/core.py:1224:def write_json(path: Path, obj: object) -> None:

@@ -23,6 +23,14 @@ class TestSolverSmoke(unittest.TestCase):
         q=self.s.gaussian((1,1,20),np.diag([9,9,25])); a=self.s.structured_export(q)
         r=self.s.from_structured(a)
         self.assertLess(abs(self.s.mass(q)-self.s.mass(r)),1e-12)
+    def test_forecast_ksp_tolerances_are_configurable(self):
+        solver=FokkerPlanckSolver(
+            Lorenz63Model(),Domain(cells=(2,2,2)),.01,
+            ksp_rtol=1e-12,ksp_atol=1e-15,
+        )
+        rtol,atol,_,_=solver.ksp.getTolerances()
+        self.assertEqual(rtol,1e-12)
+        self.assertEqual(atol,1e-15)
     def test_refined_structured_roundtrip_preserves_q1_shape(self):
         q=self.s.gaussian((1,1,20),np.diag([9,9,25])); a=self.s.structured_export(q,2)
         r=self.s.from_structured(a); difference=q.function-r.function

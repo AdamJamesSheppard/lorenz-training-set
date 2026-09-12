@@ -4,6 +4,29 @@ Decisions here are dated and revisable. Add a new entry that marks an older
 decision `superseded`, `narrowed`, or `confirmed` rather than rewriting history
 to make the current direction look inevitable.
 
+## 2026-09-12 - Run one tighter-solve local-QP refinement before AFC
+
+Narrow the 2026-09-11 decision that made operator-level AFC the immediate next
+experiment. The local-QP dynamic run reduced the global-scaling density
+discrepancy by about 20.8 times, kept every step positive, and showed a mean
+correction proportional to the timestep across the three tested levels. Those
+facts support one further falsification test before undertaking the larger AFC
+redesign; they do not establish convergence.
+
+Rerun full, half, quarter, and new eighth timestep branches with forecast KSP
+`rtol=1e-12` and `atol=1e-15`. Rerunning all four levels controls the comparison
+after changing solver tolerances and tests whether the prior absolute mass
+failures were linear-solve effects. Retain the existing positivity, correction
+mass, covariance, adjacent-density, and absolute-mass gates. The decisive
+temporal condition is
+`L1(quarter,eighth) < L1(half,quarter)`, equivalently positive observed order
+on the final three levels. Passing advances the candidate only to spatial and
+full-SPD testing; it does not authorize dataset generation or prove an
+asymptotic rate. Failure returns priority to adaptive constraint generation or
+operator-level low-order/AFC correction, according to the resulting failure
+mode. The exact predeclaration is
+`experiments/local-q2-cn-tight-ksp-refinement.yaml`.
+
 ## 2026-09-11 - Run a terminal-state local-QP isolation study before in-loop AFC
 
 Implement a cell-local mass-matrix projection of Q2 coefficients onto fixed

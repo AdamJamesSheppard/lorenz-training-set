@@ -1,6 +1,6 @@
 # Project state
 
-Updated: 2026-09-11
+Updated: 2026-09-12
 
 ## Objective
 
@@ -83,28 +83,33 @@ next experiment.
    blocker; the tested post-step method fails positive temporal order.
 7. A positive low-order update and pairwise local correction for the full-SPD
    drift--diffusion operator remain unimplemented.
+8. One controlled eighth-timestep local-QP diagnostic is predeclared to decide
+   whether the observed density plateau persists under tighter linear solves.
 
 ## Near-term research portfolio
 
 The living plan is in `docs/RESEARCH_DIRECTIONS.md` and
 `experiments/method-selection-research.yaml`. Current high-value branches are:
 
-1. Derive and test a positive,
+1. Run the predeclared tight-KSP full/half/quarter/eighth local-QP diagnostic.
+   A positive order over the final three levels advances only to spatial and
+   full-SPD testing; another plateau shifts work to adaptive constraints or AFC.
+2. Derive and test a positive,
    mass-conservative low-order update for the full
    drift-diffusion/no-flux operator; this is the prerequisite for local convex
    or algebraic correction.
-2. Pair the successful unlimited Crank--Nicolson high-order path with that local
+3. Pair the successful unlimited Crank--Nicolson high-order path with that local
    correction and re-evaluate whole-trajectory invariants; global polynomial
    scaling and post-step local QP remain controlled comparators.
-3. If the local correction fails, prototype a
+4. If the local correction fails, prototype a
    full-SPD positive finite-volume/flux method.
    Directional FCDF and complete-flux methods remain a separate diagonal-noise
    branch rather than the general production target.
-4. Develop a dynamically scaled whole-space Hermite solver as an independent
+5. Develop a dynamically scaled whole-space Hermite solver as an independent
    high-order reference after the Q2 gate.
-5. Investigate covariance-targeted goal-oriented/nonuniform resolution and a
+6. Investigate covariance-targeted goal-oriented/nonuniform resolution and a
    genuinely high-order independent deterministic reference.
-6. Regenerate and test mature DA states only after the initialization,
+7. Regenerate and test mature DA states only after the initialization,
    analysis, and positivity path used to produce them is acceptable.
 
 `experiments/mature-state-decision.yaml` remains a later certification stage,

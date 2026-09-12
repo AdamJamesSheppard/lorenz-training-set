@@ -7,7 +7,7 @@ documentation, experiment, or architecture when a better-supported direction
 emerges; see `AGENTS.md` and `docs/RESEARCH_DIRECTIONS.md` for the maintenance
 and comparison policy.
 
-> **Current method-selection status (2026-09-11): `INSUFFICIENT_EVIDENCE`.**
+> **Current method-selection status (2026-09-12): `INSUFFICIENT_EVIDENCE`.**
 > Do not generate a large training dataset. The authoritative corrected
 > evidence is [METHOD_SELECTION_REPORT.md](METHOD_SELECTION_REPORT.md).
 > Older readiness files and the sample dataset remain as audit history.
@@ -17,9 +17,9 @@ and comparison policy.
 > gate. An offline Stage-1-plus-local-QP correction is substantially less
 > intrusive in the terminal-state test. The completed in-loop three-timestep
 > diagnostic remains positive and accurate, but fails its positive observed
-> timestep-order gate and two absolute mass gates. It is retained as a strong
-> comparator; an operator-level positive full-SPD low-order/local-flux or AFC
-> method is now the leading correction branch.
+> timestep-order gate and two absolute mass gates. A controlled tight-solve
+> eighth-timestep diagnostic is predeclared before choosing between adaptive
+> local-QP constraints and an operator-level full-SPD local-flux/AFC method.
 
 This project implements the forecast step of a continuous-discrete Bayesian
 filter for the stochastic Lorenz-63 model.  It uses modern DOLFINx 0.11, UFL,
