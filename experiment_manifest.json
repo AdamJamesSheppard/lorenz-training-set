@@ -1,8 +1,8 @@
 {
-  "created_utc": "2026-09-12T00:13:15.513936+00:00",
-  "decision": "INSUFFICIENT_EVIDENCE",
+  "created_utc": "2026-09-12T18:56:29.522642+00:00",
+  "decision": "TEMPORAL_POSITIVITY_CERTIFIED",
   "workspace": "/mnt/large storage/Important/Derby Masters/Original Dissertation Royal Holloway/FENICS Code/NewTest",
-  "git_revision": "83978df470b79a93bc6b11f79afd4f83d0ceac55",
+  "git_revision": "6ae6b1ed9e0d4b70d59794567124f442f696b339",
   "version_fallback": "SHA-256 file hashes are authoritative when git_revision is null.",
   "software": {
     "python": "3.12.13 | packaged by conda-forge | (main, Mar  5 2026, 16:50:00) [GCC 14.3.0]",
@@ -19,7 +19,7 @@
   },
   "code_sha256": {
     "benchmark_scaling.py": "470f1a01360aac016bf51c4bb03a64f88acfb8cb5a8c6d0d7d9fd2b28e92b447",
-    "build_experiment_manifest.py": "7f2323b38ddb4136505f34f44fd03109468d65fe56f262597b18b2599cb8067b",
+    "build_experiment_manifest.py": "18afe6924d8468c2bfe8250d3d07ea59d135b2f45cb652c4c5d49557717fedac",
     "generate_dataset.py": "81074edffe3a6f6bebcec4a623bc46604c5ea5158d371d74fddc54f47b6227d9",
     "independent_reference_study.py": "6d8d03c43cc826a8272be0186633d0894e021dd2ced89b19abe44a7550569e17",
     "local_projection_optimizer_study.py": "a5759444688b360c2005906f6e03f6381e2a4f5004f6773238b067df315a68fc",
@@ -34,7 +34,7 @@
     "mature_forecast_validation.py": "0e53932d5ceda3f611c0decc2eac5861ae84023720011946d7733a16dc4a4465",
     "mc_timestep_repair.py": "077d5c9e9f277f1cfb210649f2da3526c2d7437d8bc17fdea661730e64c8b2b5",
     "resplit_dataset.py": "11587c66f55020daff7171e500230ff315fd5b17e781e4b653e2a8d8130267bf",
-    "same_mesh_q2_study.py": "65732c42476f6b89f7e48b02c423a6ac4f6bd4126cdd5bbc27123a0585b68807",
+    "same_mesh_q2_study.py": "ff9ced4378d349350275045523876370f32e09ab2a8d8d98849d5e6833476250",
     "solver.py": "5060082cc7e6ad1671c5fe35d2ada34fb38bb4930b720a606ab02b0c66e48d36",
     "tests/__init__.py": "3b2bec5485bb3fb3bb29a41ff8b1d86feb92bbc6587a20491c94a0b29d2a195b",
     "tests/mpi_probe_worker.py": "f568a7e9937e7a0d7888b6fb85255eba63e3c711b635e6cbe1231fb000a87c74",
@@ -42,6 +42,7 @@
     "tests/test_limiter.py": "703d5eca288e21b30b915ff22c5116ddf0ff3575cda5a3e7332e4b52037079f8",
     "tests/test_mpi_consistency.py": "c8e3a7c194efd163ffb1e84c799a9f80fdbb32e512762a050fe7f46a4e454e8c",
     "tests/test_solver_smoke.py": "db2cffe6d15bf914069ddfdb75ee6a0d79e65e4d29e99e539a0dadd6f57e51b5",
+    "tests/test_spatial_experiment.py": "6d34eb9772708c86683e69b9eecebef19fb755aea9eb957b3b77f4d4565ca363",
     "tests/test_validation.py": "a4bd400fa133c4f72ec590d19502b46b6c617332939a27860f5e8da7d445c05b",
     "validate.py": "57214698ba0734874482948206d8ca905c441fab42958b72a13d8640bb168e2f",
     "validation_repair.py": "4ddd57a3ba81b7809526f4d3aa8bf1e332d39a56f95d24bd26212ddb3d1f25cb"
@@ -298,11 +299,11 @@
       }
     },
     "METHOD_SELECTION_REPORT.md": {
-      "sha256": "7711cb1678b0ea45ad58bb2f8d81b15727733c0aed381b297c9d72176be879e9",
+      "sha256": "982e5463dff9c1af711820e1e3e13f9ee3d3e9212230d6d159d2077f44f131a0",
       "configuration": {}
     },
     "method_selection_report.json": {
-      "sha256": "2b3859fe0fb6cc5eec2151732abad280083ef059cfd6643614c38d9306598684",
+      "sha256": "4d9e14df70d5539002fde54eac3a0465c1f03cb944e80667b14995d7080d6d40",
       "configuration": {}
     },
     "same_mesh_q2_falsification_report.json": {
@@ -474,6 +475,31 @@
           "optimizer_ftol": 1e-10,
           "bootstrap_seed": 20261910,
           "bootstrap_replicates": 200
+        }
+      }
+    },
+    "local_q2_tight_refinement_report.json": {
+      "sha256": "80e734376f60a0aa4106fbf117a0e6f2af92b5bcb81fab355c2e0cc378dfe97a",
+      "configuration": {
+        "configuration": {
+          "cells": [
+            30,
+            36,
+            36
+          ],
+          "timesteps": [
+            0.000625,
+            0.0003125,
+            0.00015625,
+            7.8125e-05
+          ],
+          "final_time": 0.05,
+          "degree": 2,
+          "theta": 0.5,
+          "positivity_method": "global conservative average repair followed by local mass-matrix QP",
+          "optimizer_backend": "osqp",
+          "ksp_rtol": 1e-12,
+          "ksp_atol": 1e-15
         }
       }
     }
