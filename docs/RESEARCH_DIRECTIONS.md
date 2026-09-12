@@ -19,26 +19,22 @@ attribution is `NUMERICAL`, not a theorem. The central problem is now local
 positivity enforcement that preserves substantially more of the accurate
 unlimited trajectory.
 
-The terminal-state isolation result is favourable: Stage-1 average repair plus
-the local QP is fully certified, gives covariance error about `0.00588`, and
-uses about 17% of the scalar-scaling mass-matrix objective. A reduced
-fixed-matrix OSQP implementation then passed its optimizer gate and enabled the
-three-level dynamic run. That run remains fully positive with covariance error
-about `0.0075`, and both adjacent density differences pass `0.0025`; however,
-they plateau near `5.3e-4`, giving observed order `-0.0488`. A controlled
-tight-linear-solve eighth-step diagnostic is now predeclared because the local
-QP improved the global-scaling discrepancy by about 20.8 times and its mean
-per-step correction scales approximately with `dt`. This is the final temporal
-falsification before adaptive constraints or operator-level AFC takes priority.
+The local-QP isolation and optimizer gates passed. The subsequent tight
+full/half/quarter/eighth run is fully positive with covariance error near
+`0.0075`; its final density difference falls from `5.418e-4` to `1.620e-4`,
+giving observed order `1.741`. All 1,200 steps pass the predeclared positivity,
+mass, optimizer and density gates. The candidate is now frozen for a
+constant-ratio spatial study. One fine-level temporal order remains numerical
+evidence rather than proof of an asymptotic rate.
 
 ## Active branches
 
 | Branch | Why it matters now | Switch/stop evidence |
 |---|---|---|
-| Local minimum-change Q2 projection | It is much less destructive than scalar scaling and passed positivity, covariance and density-size gates dynamically. | Run the predeclared tight-KSP eighth-step test; require the final adjacent difference to decrease. Passing advances only to spatial/full-SPD tests. |
+| Local minimum-change Q2 projection | It passed the tight four-level startup-state temporal/positivity gates and is the leading admissible candidate. | Run the predeclared `20x24x24 -> 30x36x36 -> 45x54x54` spatial study; passing advances to full-SPD and mature-state tests. |
 | Positive low-order full-SPD operator | Supplies the invariant-domain baseline required by defensible local convex/AFC correction. | Must preserve mass, positivity and no-flux boundaries for 3-D Lorenz drift plus full SPD diffusion before antidiffusive fluxes are introduced. |
 | Adaptive Q2 Bernstein diagnosis | Separates a sufficient positivity certificate from witnessed negativity and unresolved near-zero cases. | Use as a diagnostic; reject it as a production decision procedure if unresolved cells dominate or correction remains intrusive. |
-| Adaptive local-QP constraints | May remove unnecessary fixed-Bernstein restrictions while retaining the minimum-change architecture. | Prioritize if the eighth-step difference plateaus and diagnostics attribute material correction to sufficient-only fixed constraints. |
+| Adaptive local-QP constraints | May remove unnecessary fixed-Bernstein restrictions while retaining the minimum-change architecture. | Hold while the frozen fixed-constraint candidate undergoes spatial and generalization tests; revive if those diagnostics attribute failure to excessive correction. |
 | Local AFC/convex high-order DG | Limits conservative antidiffusive fluxes locally instead of scaling a completed polynomial globally. | Unlimited CN passed and global correction failed; begin from a validated positive low-order full-SPD update if the remaining post-step tests fail. |
 | Positive full-tensor finite volume | Provides an operator-level positivity fallback with substantially different numerical principles. | Prioritize if corrected/AFC Q2 fails; require genuine 3-D convection-diffusion, no-flux and high-Peclet validation. |
 | FCDF or directional complete flux | Directly targets drift-diffusion flux and high-Peclet numerical diffusion. | Keep as an identity/diagonal `B` special-case branch; present FCDF proof is directional and its 2026 evidence is lower-dimensional. |

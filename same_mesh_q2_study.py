@@ -46,21 +46,74 @@ def _marginal_tv(cell_averages: np.ndarray, particles: np.ndarray,
     return result
 
 
+def _sample_truncated_gaussian(
+    mean: np.ndarray,
+    covariance: np.ndarray,
+    bounds: tuple[tuple[float, float], ...],
+    count: int,
+    rng: np.random.Generator,
+) -> tuple[np.ndarray, int]:
+    """Sample one common continuous Gaussian law conditioned on the box."""
+    accepted: list[np.ndarray] = []
+    accepted_count = 0
+    proposed = 0
+    while accepted_count < count:
+        batch_size = max(1024, 2 * (count - accepted_count))
+        batch = rng.multivariate_normal(mean, covariance, size=batch_size)
+        inside = np.ones(batch_size, dtype=bool)
+        for axis, (lo, hi) in enumerate(bounds):
+            inside &= (batch[:, axis] >= lo) & (batch[:, axis] <= hi)
+        kept = batch[inside]
+        if kept.size:
+            accepted.append(kept)
+            accepted_count += len(kept)
+        proposed += batch_size
+    return np.concatenate(accepted, axis=0)[:count], proposed
+
+
 def prepare_reference(args: argparse.Namespace) -> None:
     if MPI.COMM_WORLD.size!=1:
         raise SystemExit("reference preparation must run on one rank")
     output=args.output.resolve(); output.mkdir(parents=True,exist_ok=False)
     domain=Domain(cells=tuple(args.cells)); model=Lorenz63Model()
     solver=FokkerPlanckSolver(model,domain,args.dt,degree=1)
-    initial=solver.gaussian_projected(
-        (1.0,1.0,20.0),np.diag([4.0,4.0,9.0]),quadrature_degree=14,
-        apply_limiter=True,
-    )
-    grid=solver.structured_export(initial,3)
-    grid_path=output/"initial_q1_subcell_averages.npy"; np.save(grid_path,grid)
+    mean=np.asarray(args.mean,dtype=float)
+    covariance=np.diag(np.square(np.asarray(args.std,dtype=float)))
     rng=np.random.default_rng(args.seed)
-    particles0=solver.sample_density(initial,args.particles,rng)
-    sampling=dict(solver.last_sampling_report)
+    artifacts={}
+    if args.continuous_gaussian:
+        particles0,proposals=_sample_truncated_gaussian(
+            mean,covariance,domain.bounds,args.particles,rng
+        )
+        sampling={
+            "method":"analytic_gaussian_conditioned_on_domain_by_rejection",
+            "samples":args.particles,
+            "proposals":proposals,
+            "acceptance_rate":args.particles/proposals,
+        }
+        initialization={
+            "method":"common_continuous_truncated_gaussian",
+            "mean":mean.tolist(),
+            "covariance":covariance.tolist(),
+            "domain_bounds":[list(item) for item in domain.bounds],
+        }
+        initial_diagnostics={
+            "sample_mean":particles0.mean(0).tolist(),
+            "sample_covariance":np.cov(particles0,rowvar=False).tolist(),
+        }
+    else:
+        initial=solver.gaussian_projected(
+            mean,covariance,quadrature_degree=14,apply_limiter=True,
+        )
+        grid=solver.structured_export(initial,3)
+        grid_path=output/"initial_q1_subcell_averages.npy"; np.save(grid_path,grid)
+        particles0=solver.sample_density(initial,args.particles,rng)
+        sampling=dict(solver.last_sampling_report)
+        initialization=solver.last_initialization_report
+        initial_diagnostics=solver.diagnostics(initial)
+        artifacts[grid_path.name]={
+            "sha256":_sha256(grid_path),"bytes":grid_path.stat().st_size
+        }
     started=time.perf_counter()
     particles=_propagate_particles(model,particles0,args.t_final,args.mc_dt,rng)
     propagation_seconds=time.perf_counter()-started
@@ -68,12 +121,12 @@ def prepare_reference(args: argparse.Namespace) -> None:
     report={
         "configuration":{"cells":list(args.cells),"dt":args.dt,"t_final":args.t_final,
             "particles":args.particles,"mc_dt":args.mc_dt,"seed":args.seed},
-        "initialization":solver.last_initialization_report,
-        "initial_diagnostics":solver.diagnostics(initial),"native_sampling":sampling,
+        "initialization":initialization,
+        "initial_diagnostics":initial_diagnostics,"native_sampling":sampling,
         "mc":{"mean":particles.mean(0).tolist(),"covariance":np.cov(particles,rowvar=False).tolist(),
             "propagation_seconds":propagation_seconds},
         "artifacts":{
-            grid_path.name:{"sha256":_sha256(grid_path),"bytes":grid_path.stat().st_size},
+            **artifacts,
             particle_path.name:{"sha256":_sha256(particle_path),"bytes":particle_path.stat().st_size},
         },
     }
@@ -105,17 +158,48 @@ def run_forecast(args: argparse.Namespace) -> None:
         apply_positivity=not args.disable_positivity,
         **solver_options,
     )
-    grid=np.load(args.initial_grid)
-    initial=solver.from_structured(grid,apply_limiter=False)
-    initial_diagnostics=solver.diagnostics(initial)
-    represented=solver.structured_export(initial,3)
-    if rank==0:
-        embedding={"maximum_subcell_average_error":float(np.max(np.abs(represented-grid))),
-            "relative_l2_subcell_average_error":float(
-                np.linalg.norm(represented-grid)/max(np.linalg.norm(grid),np.finfo(float).tiny)
-            )}
-    else:
+    initial_projection=None
+    if args.initialization == "gaussian_projected":
+        initial_covariance=np.diag(np.square(np.asarray(args.std,dtype=float)))
+        initial=solver.gaussian_projected(
+            args.mean,initial_covariance,
+            quadrature_degree=args.initial_quadrature_degree,apply_limiter=False,
+        )
+        if args.local_projection:
+            initial,initial_projection=solver.local_projector.project_state(
+                initial,repair_cell_averages=True,adaptive_skip=True
+            )
+        elif solver.apply_positivity:
+            initial_projection=asdict(solver.limiter.apply(initial))
         embedding=None
+    else:
+        if args.initial_grid is None:
+            raise ValueError("--initial-grid is required for structured initialization")
+        grid=np.load(args.initial_grid)
+        initial=solver.from_structured(grid,apply_limiter=False)
+        represented=solver.structured_export(initial,3)
+        if rank==0:
+            embedding={"maximum_subcell_average_error":float(np.max(np.abs(represented-grid))),
+                "relative_l2_subcell_average_error":float(
+                    np.linalg.norm(represented-grid)/max(np.linalg.norm(grid),np.finfo(float).tiny)
+                )}
+        else:
+            embedding=None
+    initial_diagnostics=solver.diagnostics(initial)
+    if args.initialization == "gaussian_projected" and rank==0:
+        represented_covariance=np.asarray(initial_diagnostics["covariance"])
+        embedding={
+            "source":"common_continuous_truncated_gaussian",
+            "mass":initial_diagnostics["mass"],
+            "mean_error":(
+                np.asarray(initial_diagnostics["mean"])-np.asarray(args.mean)
+            ).tolist(),
+            "normalized_covariance_error":float(
+                np.linalg.norm(represented_covariance-initial_covariance,"fro")
+                /np.linalg.norm(initial_covariance,"fro")
+            ),
+            "local_projection":initial_projection,
+        }
 
     steps=round(args.t_final/args.dt)
     if not math.isclose(steps*args.dt,args.t_final,abs_tol=1e-14):
@@ -155,7 +239,7 @@ def run_forecast(args: argparse.Namespace) -> None:
         stages={name:state.copy(name) for name in ("raw","stage1","final")}
     stage_diagnostics={name:solver.diagnostics(stage) for name,stage in stages.items()}
     stage_cells={name:solver.structured_export(stage,1) for name,stage in stages.items()}
-    final_subcells=solver.structured_export(stages["final"],3)
+    final_subcells=solver.structured_export(stages["final"],args.export_subcells)
     final_subcells_path=output/"final_q2_subcell_averages.npy"
     if rank==0:
         np.save(final_subcells_path,final_subcells)
@@ -216,6 +300,10 @@ def run_forecast(args: argparse.Namespace) -> None:
                     if args.local_projection else None),
                 "local_maximum_iterations":(args.local_maximum_iterations
                     if args.local_projection else None),
+                "initialization":args.initialization,
+                "initial_mean":list(args.mean),"initial_standard_deviation":list(args.std),
+                "initial_quadrature_degree":args.initial_quadrature_degree,
+                "export_subcells_per_cell":args.export_subcells,
                 "bootstrap_replicates":args.bootstrap,
                 "bootstrap_seed":bootstrap_seed,"seed":args.seed},
             "initial_embedding":embedding,"initial_diagnostics":initial_diagnostics,
@@ -297,6 +385,9 @@ def parser() -> argparse.ArgumentParser:
     prep=sub.add_parser("prepare",parents=[common])
     prep.add_argument("--particles",type=int,default=200000)
     prep.add_argument("--mc-dt",type=float,default=.000125)
+    prep.add_argument("--mean",type=float,nargs=3,default=(1.0,1.0,20.0))
+    prep.add_argument("--std",type=float,nargs=3,default=(2.0,2.0,3.0))
+    prep.add_argument("--continuous-gaussian",action="store_true")
     run=sub.add_parser("forecast",parents=[common])
     run.add_argument("--branch",required=True)
     run.add_argument("--degree",type=int,choices=(1,2),required=True)
@@ -305,7 +396,13 @@ def parser() -> argparse.ArgumentParser:
     run.add_argument("--ksp-atol",type=float,default=1.0e-13)
     run.add_argument("--certificate-mode",choices=("fixed","adaptive"),default="fixed")
     run.add_argument("--certificate-max-depth",type=int,default=4)
-    run.add_argument("--initial-grid",type=Path,required=True)
+    run.add_argument("--initialization",choices=("structured","gaussian_projected"),
+                     default="structured")
+    run.add_argument("--initial-grid",type=Path)
+    run.add_argument("--mean",type=float,nargs=3,default=(1.0,1.0,20.0))
+    run.add_argument("--std",type=float,nargs=3,default=(2.0,2.0,3.0))
+    run.add_argument("--initial-quadrature-degree",type=int,default=14)
+    run.add_argument("--export-subcells",type=int,default=3)
     run.add_argument("--mc-particles",type=Path,required=True)
     run.add_argument("--bootstrap",type=int,default=200)
     run.add_argument("--disable-positivity",action="store_true")

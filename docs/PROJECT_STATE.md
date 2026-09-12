@@ -16,7 +16,7 @@ next experiment.
 
 ## Current decision
 
-- Method-selection classification: `INSUFFICIENT_EVIDENCE`.
+- Method-selection classification: `TEMPORAL_POSITIVITY_CERTIFIED`.
 - Large neural-operator dataset generation: `NO`.
 - Controlled baseline: Q1 DG, upwind advection, SIPG diffusion, backward
   Euler, quadrature-14 L2 initialization and projected Bayesian analysis,
@@ -24,19 +24,20 @@ next experiment.
 - Strongest observed numerical trajectory: unlimited same-mesh Q2 with
   Crank--Nicolson. It passes the controlled timestep gates but is not an
   admissible density because it contains genuine negative mass.
-- Most accurate tested non-negative in-loop trajectory: same-mesh Q2
-  Crank--Nicolson with Stage-1 average repair and local QP. It fails positive
-  observed timestep order and is not a certified production method.
+- Leading admissible candidate: same-mesh Q2 Crank--Nicolson with Stage-1
+  average repair and local QP. The tight four-level startup-state diagnostic
+  passes every predeclared temporal, positivity and mass gate. Production
+  certification still requires spatial, full-SPD, mature-state and domain tests.
 - The corrected production-scale run reproduces the earlier Q2 accuracy and
   timestep results while satisfying cell-average and scaling-factor invariants.
   Adaptive Q2 passes its full-step branch gates but fails the half-step mass
   and cross-timestep density gates.
-- The completed in-loop Stage-1-plus-local-QP Crank--Nicolson diagnostic is
-  non-negative and has covariance errors about `0.0075`. Both adjacent density
-  differences pass `0.0025`, but they plateau at `5.24e-4` and `5.42e-4`, so
-  observed order is `-0.0488`; the full and quarter levels also narrowly miss
-  the absolute `1e-10` mass gate. This post-step correction does not advance to
-  dataset certification.
+- The tight full/half/quarter/eighth diagnostic has density differences
+  `5.238e-4`, `5.418e-4`, and `1.620e-4`. The final ratio gives observed order
+  `1.741`; all 1,200 timesteps are whole-cell Bernstein-certified with zero
+  measured negative mass, optimizer failure or fallback. Absolute mass errors
+  are at most `1.87e-11`. This advances the candidate to spatial refinement,
+  while one fine-level order estimate does not prove asymptotic second order.
 
 ## Latest validated evidence
 
@@ -62,6 +63,10 @@ next experiment.
 - Applying the current adaptive global limiter to Crank--Nicolson increases the
   timestep density difference to `L1>=0.01088` and gives full-step mass error
   `1.27e-10`; that correction architecture is rejected for production Q2.
+- With tighter KSP tolerances and an eighth-timestep level, repeated local-QP
+  correction passes all predeclared dynamic gates. Covariance errors remain
+  between `0.007488` and `0.007519`; the quarter/eighth density difference is
+  `1.620e-4`, and the corresponding observed order is `1.741`.
 
 ## Active blockers
 
@@ -71,45 +76,41 @@ next experiment.
    covariance discrepancy.
 3. The independent finite-volume hierarchy is not converged enough to define a
    full-density truth error.
-4. Crank--Nicolson resolves the controlled unlimited temporal gate, while the
-   global limiter destroys that result. A positive low-order full-SPD operator
-   needed for local convex correction remains unimplemented and unvalidated.
+4. Spatial convergence of the positive local-QP Q2--Crank--Nicolson trajectory
+   has not been measured on a common continuous initial law.
 5. In the terminal unlimited CN states, about 17,500 of 38,880 cells have
    negative averages. Their total negative average mass is only about
    `4.34e-6`, but a mass-preserving cell-local polynomial projection is
    mathematically infeasible in each such cell.
 6. The reduced fixed-matrix OSQP backend passed a 2,413-problem SLSQP comparison
-   and a 10x projection-speed gate. Optimizer cost is no longer the active
-   blocker; the tested post-step method fails positive temporal order.
-7. A positive low-order update and pairwise local correction for the full-SPD
-   drift--diffusion operator remain unimplemented.
-8. One controlled eighth-timestep local-QP diagnostic is predeclared to decide
-   whether the observed density plateau persists under tighter linear solves.
+   and a 10x projection-speed gate. Optimizer cost and startup-state temporal
+   positivity are no longer the active blockers.
+7. Full-SPD diffusion, mature corrected states, and finite-domain sensitivity
+   remain unvalidated for the leading candidate.
+8. A converged independent deterministic full-density reference remains absent.
 
 ## Near-term research portfolio
 
 The living plan is in `docs/RESEARCH_DIRECTIONS.md` and
 `experiments/method-selection-research.yaml`. Current high-value branches are:
 
-1. Run the predeclared tight-KSP full/half/quarter/eighth local-QP diagnostic.
-   A positive order over the final three levels advances only to spatial and
-   full-SPD testing; another plateau shifts work to adaptive constraints or AFC.
-2. Derive and test a positive,
-   mass-conservative low-order update for the full
-   drift-diffusion/no-flux operator; this is the prerequisite for local convex
-   or algebraic correction.
-3. Pair the successful unlimited Crank--Nicolson high-order path with that local
-   correction and re-evaluate whole-trajectory invariants; global polynomial
-   scaling and post-step local QP remain controlled comparators.
-4. If the local correction fails, prototype a
-   full-SPD positive finite-volume/flux method.
-   Directional FCDF and complete-flux methods remain a separate diagonal-noise
-   branch rather than the general production target.
-5. Develop a dynamically scaled whole-space Hermite solver as an independent
+1. Run `experiments/local-q2-cn-spatial-refinement.yaml`: the frozen candidate
+   on `20x24x24`, `30x36x36`, and `45x54x54` at `dt=1.5625e-4`, using one
+   continuous Gaussian law and exact conservative comparisons on a common
+   `180x216x216` grid.
+2. If the finest spatial difference is below `8.1e-4`, repeat the two finest
+   meshes at `dt=7.8125e-5` before interpreting spatial order.
+3. If spatial refinement passes, test a deliberately non-diagonal full-SPD
+   diffusion tensor without changing the correction architecture.
+4. Then validate a corrected mature Lorenz state and domain-size sensitivity.
+5. If one of these gates fails, diagnose adaptive constraints or an
+   operator-level positive low-order/AFC correction against the frozen local-QP
+   comparator.
+6. Develop a dynamically scaled whole-space Hermite solver as an independent
    high-order reference after the Q2 gate.
-6. Investigate covariance-targeted goal-oriented/nonuniform resolution and a
+7. Investigate covariance-targeted goal-oriented/nonuniform resolution and a
    genuinely high-order independent deterministic reference.
-7. Regenerate and test mature DA states only after the initialization,
+8. Regenerate and test mature DA states only after the initialization,
    analysis, and positivity path used to produce them is acceptable.
 
 `experiments/mature-state-decision.yaml` remains a later certification stage,

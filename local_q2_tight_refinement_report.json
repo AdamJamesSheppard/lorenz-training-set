@@ -1,0 +1,54 @@
+{
+  "classification": "PASSED_PREDECLARED_DYNAMIC_GATES",
+  "scope": "startup-state temporal and positivity diagnostic",
+  "run": "runs/local-q2-cn-tight-ksp-refinement/20260912T003213Z",
+  "git_commit": "7226fdc8c322c5ed23bf067162fbe0c4db9bf479",
+  "configuration": {
+    "cells": [30, 36, 36],
+    "timesteps": [0.000625, 0.0003125, 0.00015625, 0.000078125],
+    "final_time": 0.05,
+    "degree": 2,
+    "theta": 0.5,
+    "positivity_method": "global conservative average repair followed by local mass-matrix QP",
+    "optimizer_backend": "osqp",
+    "ksp_rtol": 1e-12,
+    "ksp_atol": 1e-15
+  },
+  "covariance_errors": [
+    0.007508531359559082,
+    0.007488068594265795,
+    0.007516086751036719,
+    0.007518623023794992
+  ],
+  "marginal_total_variation_distances": [
+    [0.003571631999773082, 0.0008960519804078242, 0.0016754139529582214],
+    [0.0036119282050037127, 0.0008853213682697924, 0.0016755513325391208],
+    [0.0036263374774774225, 0.0008849859286016166, 0.0016748121174044897],
+    [0.0036339319597833474, 0.0008851225523680651, 0.0016746909011262094]
+  ],
+  "adjacent_density_l1": [
+    0.0005237945675142644,
+    0.0005418088190267773,
+    0.0001620359073001956
+  ],
+  "consecutive_observed_orders": [
+    -0.0487827794993958,
+    1.741470325456745
+  ],
+  "absolute_mass_errors": [
+    8.326672684688674e-14,
+    3.3018032752352156e-13,
+    8.266720641358916e-13,
+    1.8698820269946737e-11
+  ],
+  "maximum_projection_mass_change": 9.103828801926284e-15,
+  "total_timesteps": 1200,
+  "all_timesteps_whole_cell_positivity_certified": true,
+  "maximum_measured_negative_mass": 0.0,
+  "optimizer_failures": 0,
+  "scaling_fallbacks": 0,
+  "all_predeclared_gates_passed": true,
+  "dataset_generation_authorized": false,
+  "next_required_gate": "spatial_refinement",
+  "interpretation": "The finest consecutive comparison has positive order and all predeclared dynamic gates pass. One fine-level order estimate does not prove asymptotic second-order convergence."
+}

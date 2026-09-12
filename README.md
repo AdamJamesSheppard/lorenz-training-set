@@ -7,19 +7,16 @@ documentation, experiment, or architecture when a better-supported direction
 emerges; see `AGENTS.md` and `docs/RESEARCH_DIRECTIONS.md` for the maintenance
 and comparison policy.
 
-> **Current method-selection status (2026-09-12): `INSUFFICIENT_EVIDENCE`.**
+> **Current method-selection status (2026-09-12): `TEMPORAL_POSITIVITY_CERTIFIED`.**
 > Do not generate a large training dataset. The authoritative corrected
 > evidence is [METHOD_SELECTION_REPORT.md](METHOD_SELECTION_REPORT.md).
 > Older readiness files and the sample dataset remain as audit history.
-> Q1 is the controlled baseline. Unlimited Q2--Crank--Nicolson is the most
-> accurate observed trajectory but contains genuine negative mass; adaptive
-> global correction restores non-negativity while failing the density timestep
-> gate. An offline Stage-1-plus-local-QP correction is substantially less
-> intrusive in the terminal-state test. The completed in-loop three-timestep
-> diagnostic remains positive and accurate, but fails its positive observed
-> timestep-order gate and two absolute mass gates. A controlled tight-solve
-> eighth-timestep diagnostic is predeclared before choosing between adaptive
-> local-QP constraints and an operator-level full-SPD local-flux/AFC method.
+> Q1 remains the controlled baseline. The tight four-level in-loop local-QP
+> Q2--Crank--Nicolson diagnostic passes its predeclared temporal, positivity and
+> mass gates, including zero measured negative mass over 1,200 timesteps and a
+> finest observed order of `1.741`. This certifies the startup-state temporal
+> and positivity stage only. Spatial, full-SPD, mature-state and domain gates
+> remain before any production dataset can be authorized.
 
 This project implements the forecast step of a continuous-discrete Bayesian
 filter for the stochastic Lorenz-63 model.  It uses modern DOLFINx 0.11, UFL,
@@ -84,9 +81,8 @@ MPI forecast:
 ```
 
 The following is an **exploratory** DA command, not an approved production
-dataset command.  The current accuracy closure is `INSUFFICIENT_EVIDENCE`, so do not scale
-this up until a finer solver configuration passes the configuration-level
-covariance and limiter gates:
+dataset command. The current status is `TEMPORAL_POSITIVITY_CERTIFIED`; do not
+scale this up until spatial, full-SPD, mature-state and domain gates pass:
 
 ```bash
 ./scripts/run-in-env python generate_dataset.py \

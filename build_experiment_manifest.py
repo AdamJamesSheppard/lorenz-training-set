@@ -46,6 +46,7 @@ EVIDENCE = (
     "local_q2_projection_performance_report.json",
     "local_q2_optimizer_validation_report.json",
     "local_q2_dynamic_projection_report.json",
+    "local_q2_tight_refinement_report.json",
 )
 
 
@@ -86,9 +87,12 @@ def command_output(command: list[str]) -> str | None:
 def main() -> None:
     code = sorted({p for pattern in CODE_GLOBS for p in ROOT.glob(pattern) if p.is_file()})
     evidence = [ROOT / name for name in EVIDENCE if (ROOT / name).is_file()]
+    current_decision = json.loads(
+        (ROOT / "method_selection_report.json").read_text()
+    )["classification"]
     manifest = {
         "created_utc": datetime.now(timezone.utc).isoformat(),
-        "decision": "INSUFFICIENT_EVIDENCE",
+        "decision": current_decision,
         "workspace": str(ROOT),
         "git_revision": git_revision(),
         "version_fallback": "SHA-256 file hashes are authoritative when git_revision is null.",

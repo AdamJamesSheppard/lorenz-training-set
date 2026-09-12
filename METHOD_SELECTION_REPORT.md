@@ -2,8 +2,10 @@
 
 ## Decision
 
-**Classification: `INSUFFICIENT_EVIDENCE`.** No current method is certified to
-generate a large neural-operator training set.
+**Classification: `TEMPORAL_POSITIVITY_CERTIFIED`.** The local-QP
+Q2--Crank--Nicolson candidate has passed its startup-state temporal, positivity
+and mass gates. Spatial, full-SPD, mature-state and domain certification remain
+mandatory before generating a large neural-operator training set.
 
 The controlled same-mesh and two-timestep experiments have been completed.
 They overturn the old equal-DOF ranking: corrected Q1 is now the controlled
@@ -20,7 +22,7 @@ in-loop trajectory is Stage-1 average repair plus the local QP (`E_cov` about
 | Q2, unlimited backward Euler | `0.00726675` | negative and density timestep gate fails |
 | Q2, unlimited Crank--Nicolson | `0.00371110` | temporal gates pass; negative mass makes it inadmissible |
 | Q2, Crank--Nicolson, adaptive global limiter | `0.0219156` | non-negative; density timestep gate fails |
-| Q2, Crank--Nicolson, Stage-1 plus local QP | `0.0075085` | non-negative; positive observed-order and two mass gates fail |
+| Q2, Crank--Nicolson, Stage-1 plus local QP | `0.0075085` | tight four-level dynamic gates pass; spatial certification pending |
 
 The common 200,000-path Monte Carlo covariance bootstrap p95 is
 `0.00628239`. The unlimited Crank--Nicolson discrepancy lies below this measured
@@ -44,7 +46,7 @@ certification, and cross-timestep `L1=3.94e-5`. Its mass-matrix correction
 objective is about 17% of matched scalar scaling. Purely cell-local repair is
 incomplete because about 17,500 raw cells have negative averages.
 
-The predeclared three-level **in-loop Stage-1 plus local-QP
+The historical three-level **in-loop Stage-1 plus local-QP
 Q2--Crank--Nicolson trajectory** is complete. A reduced fixed-matrix OSQP
 backend passed a 2,413-cell SLSQP comparison and reduced the matched three-step
 projection time by a factor of `10.78`. Across all 560 production-mesh steps,
@@ -52,21 +54,23 @@ every final state was Bernstein-certified, negative mass was zero, no optimizer
 fallback occurred, and covariance error stayed near `0.0075`. The adjacent
 density differences, `5.24e-4` and `5.42e-4`, both pass their absolute gate but
 do not decrease; observed order is `-0.0488`. Full and quarter levels also have
-absolute mass errors `1.25e-10` and `2.75e-10`, above the `1e-10` gate, even
-though each projection changes incoming mass by at most `8e-15`.
+absolute mass errors `1.25e-10` and `2.75e-10`, above the `1e-10` gate. A
+subsequent tight-solve four-level diagnostic supersedes that method decision:
+its final two differences are `5.418e-4` and `1.620e-4`, giving observed order
+`1.741`; all 1,200 steps pass positivity and mass gates with no optimizer
+failure or fallback. The candidate therefore advances to spatial refinement.
 
-The aggregate classification is therefore `FAILED_PREDECLARED_DYNAMIC_GATES`.
-No threshold was relaxed after seeing the result. The local QP remains a strong
-controlled comparator, while the next correction branch moves to a genuinely
-positive, mass-conservative low-order update and local flux/AFC treatment for
-the 3-D Lorenz drift--diffusion/full-SPD/reflecting-flux operator. Sections
-18--24 record the experimental sequence.
+The aggregate classification is `TEMPORAL_POSITIVITY_CERTIFIED`; no threshold
+was relaxed after seeing the result. This remains narrower than production
+certification. The next predeclared experiment freezes the solver and measures
+spatial refinement on `20x24x24`, `30x36x36`, and `45x54x54` meshes from one
+continuous initial law. Sections 18--25 record the experimental sequence.
 
 Role assignments are separate:
 
 | Role | Decision |
 |---|---|
-| Production reference solver | **Unfilled.** The leading research path pairs the accurate unlimited Q2--Crank--Nicolson operator with a positive full-SPD low-order update and local conservative flux/AFC correction. Post-step local QP is retained as the strongest current non-negative comparator. |
+| Production reference solver | **Unfilled.** Local-QP Q2--Crank--Nicolson is the leading admissible candidate after passing startup-state temporal/positivity gates; spatial, full-SPD, mature-state and domain evidence remain required. |
 | Independent verification solver | **Develop alongside correction work:** a dynamically scaled, translated whole-space Hermite-Galerkin solver, checked by mode decay and moment convergence, plus Monte Carlo for moments. Spectral positivity is not assumed. |
 | Current baseline | Q1 upwind/SIPG, backward Euler, quadrature-14 L2 initialization, projected Bayesian analysis and conservative postprocessing. It is a controlled comparator rather than a production selection. |
 
@@ -867,6 +871,44 @@ constraints or an operator-level positive low-order/AFC correction.
 Evidence: [`local_q2_optimizer_validation_report.json`](local_q2_optimizer_validation_report.json),
 [`local_q2_projection_performance_report.json`](local_q2_projection_performance_report.json),
 and [`local_q2_dynamic_projection_report.json`](local_q2_dynamic_projection_report.json).
+
+## 25. Tight four-level decision and spatial promotion (2026-09-12)
+
+The predeclared tight-KSP full/half/quarter/eighth run completed at
+`30x36x36`. Its adjacent conservative density differences are `5.238e-4`,
+`5.418e-4`, and `1.620e-4`. The first consecutive order remains `-0.0488`,
+while the decisive final order is `1.741`. This is evidence of a decreasing
+fine-level temporal difference, not a proof of asymptotic second-order
+convergence.
+
+All 1,200 completed timesteps are whole-cell Bernstein-certified. Measured
+negative mass, optimizer failures and scalar fallbacks are zero. Maximum
+projection-induced mass change is `9.11e-15`, and the largest terminal absolute
+mass error is `1.87e-11`. Covariance discrepancies remain between `0.007488`
+and `0.007519`. Every predeclared dynamic gate passes, so the project status is
+promoted to `TEMPORAL_POSITIVITY_CERTIFIED`; large dataset generation remains
+unauthorized.
+
+The next experiment is predeclared in
+`experiments/local-q2-cn-spatial-refinement.yaml`. It holds Q2 DG,
+Crank--Nicolson, the local QP, OSQP tolerances, Bernstein certificate, domain,
+noise and boundary treatment fixed. The mesh sequence is `20x24x24`,
+`30x36x36`, and `45x54x54`, with constant refinement ratio `3/2` and
+`dt=1.5625e-4`. Each mesh independently projects the same continuous finite-box
+Gaussian. Exact polynomial averages use 9, 6, and 4 subvoxels per physical cell
+axis so every final density is compared on the same `180x216x216` grid without
+interpolation.
+
+The primary spatial gates require the second mesh-pair L1 difference to be
+smaller than the first and the observed constant-ratio spatial order to be
+positive. Positivity, mass and optimizer invariants apply at every mesh. If the
+finest spatial difference is below `8.1e-4`, the two finest meshes must be
+repeated at `dt=7.8125e-5` before interpreting spatial order. A passing spatial
+study advances the candidate to full-SPD and mature-state testing.
+
+Evidence: [`local_q2_tight_refinement_report.json`](local_q2_tight_refinement_report.json)
+and immutable run
+`runs/local-q2-cn-tight-ksp-refinement/20260912T003213Z`.
 
 ## Sources
 

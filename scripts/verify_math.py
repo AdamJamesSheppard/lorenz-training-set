@@ -25,6 +25,9 @@ def main() -> int:
     dynamic_projection = json.loads(
         (ROOT / "local_q2_dynamic_projection_report.json").read_text()
     )
+    tight_refinement = json.loads(
+        (ROOT / "local_q2_tight_refinement_report.json").read_text()
+    )
     diffusion = Lorenz63Model().diffusion
 
     mass_errors = [abs(float(row["mass_error"])) for row in boundary["rows"]]
@@ -70,12 +73,23 @@ def main() -> int:
             and optimizer_validation["result"]["osqp_failures"] == 0
             and optimizer_validation["result"]["objective_bound_violations"] == 0
         ),
-        "dynamic_local_qp_decision_consistent": bool(
+        "historical_three_level_local_qp_consistent": bool(
             dynamic_projection["classification"] == "FAILED_PREDECLARED_DYNAMIC_GATES"
             and dynamic_projection["trajectory_invariants"]
             ["all_560_steps_whole_cell_positivity_certified"]
             and dynamic_projection["timestep_comparison"]["observed_order"] <= 0.0
             and not dynamic_projection["decision"]["dataset_generation_authorized"]
+        ),
+        "tight_four_level_local_qp_consistent": bool(
+            tight_refinement["classification"] == "PASSED_PREDECLARED_DYNAMIC_GATES"
+            and tight_refinement["all_predeclared_gates_passed"]
+            and tight_refinement["all_timesteps_whole_cell_positivity_certified"]
+            and tight_refinement["maximum_measured_negative_mass"] == 0.0
+            and tight_refinement["optimizer_failures"] == 0
+            and tight_refinement["scaling_fallbacks"] == 0
+            and tight_refinement["consecutive_observed_orders"][-1] > 0.0
+            and not tight_refinement["dataset_generation_authorized"]
+            and classification == "TEMPORAL_POSITIVITY_CERTIFIED"
         ),
     }
     result = {
@@ -104,6 +118,10 @@ def main() -> int:
             ],
             "dynamic_local_qp_observed_order": dynamic_projection
             ["timestep_comparison"]["observed_order"],
+            "tight_local_qp_covariance_errors": tight_refinement["covariance_errors"],
+            "tight_local_qp_timestep_l1": tight_refinement["adjacent_density_l1"],
+            "tight_local_qp_finest_observed_order": tight_refinement
+            ["consecutive_observed_orders"][-1],
         },
         "interpretation": (
             "The tested invariants and evidence consistency pass. Production certification is "

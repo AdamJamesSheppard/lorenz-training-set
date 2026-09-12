@@ -37,7 +37,7 @@ def main(config_path: Path) -> int:
     config = yaml.safe_load(source.read_text())
     kind=config.get("kind")
     if kind not in {
-        "forecast", "same_mesh_q2_study", "local_projection_study",
+        "forecast", "same_mesh_q2_study", "spatial_q2_study", "local_projection_study",
         "local_projection_optimizer_validation",
     }:
         raise SystemExit(
@@ -81,22 +81,28 @@ def main(config_path: Path) -> int:
         if ranks > 1:
             command = ["mpiexec", "-n", str(ranks), *command]
         commands.append(("forecast",command,run_dir))
-    elif kind == "same_mesh_q2_study":
+    elif kind in {"same_mesh_q2_study", "spatial_q2_study"}:
         study=config["study"]
         common=["--cells",*map(str,study["cells"]),"--dt",str(study["dt"]),
             "--t-final",str(study["final_time"]),"--seed",str(study["seed"])]
         reference=run_dir/"reference"
-        commands.append(("reference",[
+        reference_command=[
             sys.executable,str(ROOT/"same_mesh_q2_study.py"),"prepare",*common,
             "--particles",str(study["monte_carlo_paths"]),"--mc-dt",str(study["mc_dt"]),
             "--output",str(reference),
-        ],ROOT))
+            "--mean",*map(str,study.get("initial_mean",[1.0,1.0,20.0])),
+            "--std",*map(str,study.get("initial_standard_deviation",[2.0,2.0,3.0])),
+        ]
+        if study.get("initialization") == "gaussian_projected":
+            reference_command.append("--continuous-gaussian")
+        commands.append(("reference",reference_command,ROOT))
         initial_grid=reference/"initial_q1_subcell_averages.npy"
         particles=reference/"mc_final_particles.npy"
         for branch in study["branches"]:
             branch_dir=run_dir/str(branch["name"])
             branch_dt=branch.get("dt",study["dt"])
-            branch_common=["--cells",*map(str,study["cells"]),"--dt",str(branch_dt),
+            branch_cells=branch.get("cells",study["cells"])
+            branch_common=["--cells",*map(str,branch_cells),"--dt",str(branch_dt),
                 "--t-final",str(study["final_time"]),"--seed",str(study["seed"])]
             branch_command=[
                 sys.executable,str(ROOT/"same_mesh_q2_study.py"),"forecast",*branch_common,
@@ -106,9 +112,16 @@ def main(config_path: Path) -> int:
                 "--ksp-atol",str(branch.get("ksp_atol",study.get("ksp_atol",1.0e-13))),
                 "--certificate-mode",str(branch.get("certificate_mode","fixed")),
                 "--certificate-max-depth",str(study["certificate_max_depth"]),
-                "--initial-grid",str(initial_grid),"--mc-particles",str(particles),
+                "--initialization",str(study.get("initialization","structured")),
+                "--mean",*map(str,study.get("initial_mean",[1.0,1.0,20.0])),
+                "--std",*map(str,study.get("initial_standard_deviation",[2.0,2.0,3.0])),
+                "--initial-quadrature-degree",str(study.get("initial_quadrature_degree",14)),
+                "--export-subcells",str(branch.get("export_subcells",3)),
+                "--mc-particles",str(particles),
                 "--bootstrap",str(study["bootstrap_replicates"]),"--output",str(branch_dir),
             ]
+            if study.get("initialization","structured") == "structured":
+                branch_command.extend(["--initial-grid",str(initial_grid)])
             if not branch.get("apply_positivity",True):
                 branch_command.append("--disable-positivity")
             if branch.get("positivity_method") == "local_qp":
@@ -200,7 +213,7 @@ def main(config_path: Path) -> int:
         if completed.returncode:
             returncode=completed.returncode
             break
-    if returncode == 0 and kind == "same_mesh_q2_study":
+    if returncode == 0 and kind in {"same_mesh_q2_study", "spatial_q2_study"}:
         pairwise=[]
         observed_order = None
         observed_orders = []
@@ -244,8 +257,9 @@ def main(config_path: Path) -> int:
             for first_item, second_item in zip(pairwise[:-1], pairwise[1:]):
                 first = float(first_item["subcell_average_l1_lower_bound"])
                 second = float(second_item["subcell_average_l1_lower_bound"])
+                refinement_ratio = float(study.get("comparison_refinement_ratio",2.0))
                 value = (
-                    float(np.log2(first / second))
+                    float(np.log(first / second)/np.log(refinement_ratio))
                     if first > 0.0 and second > 0.0 else None
                 )
                 observed_orders.append({
@@ -255,10 +269,12 @@ def main(config_path: Path) -> int:
                     "observed_order": value,
                 })
             observed_order = observed_orders[-1]["observed_order"]
-            (run_dir / "observed_timestep_order.json").write_text(
+            order_kind = "spatial" if kind == "spatial_q2_study" else "timestep"
+            (run_dir / f"observed_{order_kind}_order.json").write_text(
                 json.dumps({
                     **observed_orders[-1],
                     "observed_order": observed_order,
+                    "refinement_ratio": refinement_ratio,
                     "all_consecutive_orders": observed_orders,
                     "interpretation": "Consecutive-level numerical diagnostic; no asymptotic-regime proof.",
                 }, indent=2) + "\n"
@@ -279,6 +295,7 @@ def main(config_path: Path) -> int:
                     default=0.0,
                 )
                 final_diagnostics = branch_report["final_stage_diagnostics"]["final"]
+                history = branch_report["limiter_history"]
                 covariance = branch_report["comparisons_to_common_mc"]["final"][
                     "covariance_accuracy"
                 ]
@@ -294,12 +311,20 @@ def main(config_path: Path) -> int:
                     ) <= float(decision_specification["maximum_negative_mass"]),
                     "absolute_mass_error": abs(float(final_diagnostics["mass"]) - 1.0)
                     <= float(decision_specification["maximum_absolute_mass_error"]),
-                    "covariance_error_to_mc_p95_ratio": float(
+                    "zero_optimizer_failures": all(
+                        int(step.get("counts",{}).get("OPTIMIZER_FAILED",0)) == 0
+                        for step in steps
+                    ),
+                    "zero_scaling_fallbacks": all(
+                        int(step.get("scaling_fallback_cells",0)) == 0 for step in steps
+                    ),
+                }
+                if "maximum_covariance_error_to_mc_p95_ratio" in decision_specification:
+                    branch_gates["covariance_error_to_mc_p95_ratio"] = float(
                         covariance["pde_error_to_mc_noise_p95_ratio"]
                     ) <= float(
                         decision_specification["maximum_covariance_error_to_mc_p95_ratio"]
-                    ),
-                }
+                    )
                 branch_results.append({
                     "branch": branch_name,
                     "measured": {
@@ -310,18 +335,31 @@ def main(config_path: Path) -> int:
                         "covariance_error_to_mc_p95_ratio": float(
                             covariance["pde_error_to_mc_noise_p95_ratio"]
                         ),
+                        "mean_relative_l1_correction":float(
+                            history["relative_l1_correction"]["mean"]
+                        ),
+                        "optimizer_failures":sum(
+                            int(step.get("counts",{}).get("OPTIMIZER_FAILED",0))
+                            for step in steps
+                        ),
+                        "scaling_fallback_cells":sum(
+                            int(step.get("scaling_fallback_cells",0)) for step in steps
+                        ),
                     },
                     "gates": branch_gates,
                     "passes": all(branch_gates.values()),
                 })
-            pairwise_gates = {
-                item["name"]: (
-                    float(item["subcell_average_l1_lower_bound"])
+            pairwise_gates = {}
+            for item in pairwise:
+                within_optional_limit = (
+                    "maximum_adjacent_density_l1" not in decision_specification
+                    or float(item["subcell_average_l1_lower_bound"])
                     <= float(decision_specification["maximum_adjacent_density_l1"])
+                )
+                pairwise_gates[item["name"]] = (
+                    within_optional_limit
                     and all(bool(value) for value in item["passes"].values())
                 )
-                for item in pairwise
-            }
             positive_order_required = bool(
                 decision_specification.get("require_positive_observed_order", False)
             )
@@ -329,29 +367,70 @@ def main(config_path: Path) -> int:
                 not positive_order_required
                 or (observed_order is not None and observed_order > 0.0)
             )
+            decreasing_gate = (
+                kind != "spatial_q2_study" or len(pairwise) < 2
+                or float(pairwise[-1]["subcell_average_l1_lower_bound"])
+                < float(pairwise[-2]["subcell_average_l1_lower_bound"])
+            )
             all_passed = (
                 all(item["passes"] for item in branch_results)
                 and all(pairwise_gates.values())
                 and order_gate
+                and decreasing_gate
             )
-            scientific_decision = {
-                "classification": (
+            if kind == "spatial_q2_study":
+                finest_difference = (
+                    float(pairwise[-1]["subcell_average_l1_lower_bound"])
+                    if pairwise else None
+                )
+                safeguard_threshold = float(
+                    decision_specification.get("temporal_safeguard_threshold",-np.inf)
+                )
+                temporal_safeguard_required = bool(
+                    finest_difference is not None
+                    and finest_difference < safeguard_threshold
+                )
+                classification = (
+                    "FAILED_PREDECLARED_SPATIAL_GATES" if not all_passed else
+                    "PASSED_SPATIAL_GATES_REQUIRES_TEMPORAL_SAFEGUARD"
+                    if temporal_safeguard_required else
+                    "PASSED_PREDECLARED_SPATIAL_GATES"
+                )
+            else:
+                finest_difference = None
+                temporal_safeguard_required = False
+                classification = (
                     "PASSED_PREDECLARED_DYNAMIC_GATES"
                     if all_passed else "FAILED_PREDECLARED_DYNAMIC_GATES"
-                ),
+                )
+            scientific_decision = {
+                "classification": classification,
                 "all_gates_passed": all_passed,
                 "branch_results": branch_results,
                 "pairwise_density_gates": pairwise_gates,
-                "observed_timestep_order": observed_order,
+                "observed_order_kind": (
+                    "spatial" if kind == "spatial_q2_study" else "timestep"
+                ),
+                "observed_order": observed_order,
                 "all_consecutive_observed_orders": observed_orders,
                 "positive_observed_order_gate": order_gate,
+                "decreasing_finest_difference_gate": decreasing_gate,
+                "temporal_safeguard_required": temporal_safeguard_required,
+                "finest_density_l1": finest_difference,
                 "thresholds": decision_specification,
                 "dataset_generation_authorized": False,
                 "interpretation": (
+                    "Spatial diagnostic only; passing advances the candidate to full-SPD and "
+                    "mature-state certification."
+                    if kind == "spatial_q2_study" else
                     "Startup-state dynamic diagnostic only; passing advances the candidate to "
                     "spatial, full-SPD, and mature-state certification."
                 ),
             }
+            scientific_decision[
+                "observed_spatial_order"
+                if kind == "spatial_q2_study" else "observed_timestep_order"
+            ] = observed_order
             (run_dir / "scientific_decision.json").write_text(
                 json.dumps(scientific_decision, indent=2) + "\n"
             )

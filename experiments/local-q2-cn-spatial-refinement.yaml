@@ -1,0 +1,83 @@
+id: local-q2-cn-spatial-refinement
+kind: spatial_q2_study
+status: predeclared_diagnostic
+study:
+  cells: [20, 24, 24]
+  comparison_refinement_ratio: 1.5
+  dt: 0.00015625
+  final_time: 0.05
+  seed: 20260910
+  monte_carlo_paths: 200000
+  mc_dt: 0.000125
+  bootstrap_replicates: 200
+  certificate_max_depth: 4
+  ksp_rtol: 1.0e-12
+  ksp_atol: 1.0e-15
+  initialization: gaussian_projected
+  initial_mean: [1.0, 1.0, 20.0]
+  initial_standard_deviation: [2.0, 2.0, 3.0]
+  initial_quadrature_degree: 14
+  common_comparison_grid: [180, 216, 216]
+  branches:
+    - name: q2_local_qp_cn_20x24x24
+      cells: [20, 24, 24]
+      export_subcells: 9
+      degree: 2
+      theta: 0.5
+      positivity_method: local_qp
+      optimizer_backend: osqp
+      optimizer_ftol: 1.0e-10
+      maximum_iterations: 10000
+      archive_raw: false
+    - name: q2_local_qp_cn_30x36x36
+      cells: [30, 36, 36]
+      export_subcells: 6
+      degree: 2
+      theta: 0.5
+      positivity_method: local_qp
+      optimizer_backend: osqp
+      optimizer_ftol: 1.0e-10
+      maximum_iterations: 10000
+      archive_raw: false
+    - name: q2_local_qp_cn_45x54x54
+      cells: [45, 54, 54]
+      export_subcells: 4
+      degree: 2
+      theta: 0.5
+      positivity_method: local_qp
+      optimizer_backend: osqp
+      optimizer_ftol: 1.0e-10
+      maximum_iterations: 10000
+      archive_raw: false
+  pairwise_comparisons:
+    - name: local_qp_cn_20_to_30
+      baseline: q2_local_qp_cn_20x24x24
+      challenger: q2_local_qp_cn_30x36x36
+    - name: local_qp_cn_30_to_45
+      baseline: q2_local_qp_cn_30x36x36
+      challenger: q2_local_qp_cn_45x54x54
+execution:
+  mpi_ranks: 8
+  numerical_threads: 1
+scientific_decision:
+  maximum_step_mass_change: 1.0e-12
+  maximum_absolute_mass_error: 1.0e-10
+  maximum_negative_mass: 1.0e-13
+  require_positive_observed_order: true
+  temporal_safeguard_threshold: 0.00081
+  safeguard_dt: 0.000078125
+research_gates:
+  - All meshes project the same continuous Gaussian law independently into Q2.
+  - Exact DG averages from all meshes are exported conservatively on the common 180x216x216 grid.
+  - The 30-to-45 L1 difference is smaller than the 20-to-30 L1 difference.
+  - The constant-ratio observed spatial order is positive.
+  - Every completed step is whole-cell Bernstein-certified with zero measured negative mass.
+  - Projection preserves incoming mass to 1e-12 and final absolute mass error is at most 1e-10.
+  - No optimizer failure or scalar fallback is accepted.
+  - If the 30-to-45 L1 difference is below 8.1e-4, repeat the 30 and 45 meshes at dt=7.8125e-5.
+  - Covariance error, marginal TVs, correction strength, projected-cell count and cost are diagnostics rather than monotonic gates.
+  - Passing advances only to full-SPD and mature-state testing; dataset generation remains unauthorized.
+notes:
+  - Q2 DG, Crank--Nicolson, local-QP mathematics, Bernstein certificate, OSQP settings, domain, noise and boundary treatment are frozen from the temporal study.
+  - The analytic finite-box Gaussian is common across meshes; no earlier discrete Q2 result is reused.
+  - The common grid uses 9, 6 and 4 exact subcell averages per physical cell axis.

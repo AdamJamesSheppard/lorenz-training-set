@@ -4,6 +4,21 @@ Decisions here are dated and revisable. Add a new entry that marks an older
 decision `superseded`, `narrowed`, or `confirmed` rather than rewriting history
 to make the current direction look inevitable.
 
+## 2026-09-12 - Promote local-QP CN to spatial certification
+
+The tight full/half/quarter/eighth diagnostic passes all predeclared dynamic
+gates. Adjacent density differences are `5.238e-4`, `5.418e-4`, and
+`1.620e-4`; the final consecutive order is `1.741`. All 1,200 timesteps are
+whole-cell Bernstein-certified, with zero measured negative mass, optimizer
+failure or fallback. Maximum terminal mass error is `1.87e-11`.
+
+This supersedes the three-level decision that retained local QP only as a
+comparator and narrows the active classification to
+`TEMPORAL_POSITIVITY_CERTIFIED`. Dataset generation remains unauthorized.
+Freeze the solver and run the predeclared constant-ratio spatial hierarchy in
+`experiments/local-q2-cn-spatial-refinement.yaml`; use its temporal safeguard
+before interpreting a finest spatial difference below `8.1e-4`.
+
 ## 2026-09-12 - Run one tighter-solve local-QP refinement before AFC
 
 Narrow the 2026-09-11 decision that made operator-level AFC the immediate next
