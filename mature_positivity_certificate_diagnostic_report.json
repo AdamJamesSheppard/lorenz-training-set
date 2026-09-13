@@ -1,0 +1,77 @@
+{
+  "classification": "CERTIFICATE_OVERCONSERVATISM_HYPOTHESIS_REJECTED",
+  "method_status": "FULL_SPD_DIFFUSION_CERTIFIED",
+  "production_dataset_authorized": false,
+  "next_required_gate": "MATURE_STATE",
+  "run": "runs/mature-positivity-certificate-diagnostic/20260913T200251Z",
+  "comparison": {
+    "current_certificate_depth": 4,
+    "deeper_certificate_depth": 8,
+    "meshes": [[20, 24, 24], [30, 36, 36], [45, 54, 54]],
+    "snapshot_times": [0.0, 0.0125, 0.025, 0.05],
+    "same_raw_polynomial_for_each_method": true,
+    "mixture_sha256": "8d39b72d3b46ad8c9f6634bc8a92edc36c6c1cbc170b5f81edfac6d6877261f0"
+  },
+  "aggregate": {
+    "mean_fraction_of_depth4_noncertified_cells_rescued_by_depth8": 0.0003118718374322337,
+    "maximum_fraction_of_depth4_noncertified_cells_rescued_by_depth8": 0.0007874704698573804,
+    "mean_l1_correction_reduction_from_depth8": 0.00778702028636578,
+    "maximum_l1_correction_reduction_from_depth8": 0.02889297660010215,
+    "scalar_to_current_qp_l1_ratio_minimum": 1.96384036328926,
+    "scalar_to_current_qp_l1_ratio_mean": 5.023323381407371,
+    "scalar_to_current_qp_l1_ratio_maximum": 6.702437059422446,
+    "total_branch_wall_seconds": 5891.993215283961,
+    "optimizer_failures": 0,
+    "fallbacks": 0
+  },
+  "branches": [
+    {
+      "cells": [20, 24, 24],
+      "initial_depth4_counts": {"CERTIFIED_NONNEGATIVE": 1382, "WITNESSED_NEGATIVE": 10126, "UNRESOLVED": 12},
+      "initial_depth8_counts": {"CERTIFIED_NONNEGATIVE": 1382, "WITNESSED_NEGATIVE": 10126, "UNRESOLVED": 12},
+      "initial_l1_current": 0.3801098145566953,
+      "initial_l1_depth8": 0.3801098145566953,
+      "forecast_l1_current": [0.003199104180214824, 0.002955683272719988, 0.002736545505139213],
+      "forecast_l1_depth8": [0.0031567149912256993, 0.0029556413230512404, 0.002736289717936624],
+      "maximum_rescued_fraction": 0.0007874704698573804,
+      "wall_seconds": 552.2006267660181
+    },
+    {
+      "cells": [30, 36, 36],
+      "initial_depth4_counts": {"CERTIFIED_NONNEGATIVE": 5192, "WITNESSED_NEGATIVE": 33670, "UNRESOLVED": 18},
+      "initial_depth8_counts": {"CERTIFIED_NONNEGATIVE": 5192, "WITNESSED_NEGATIVE": 33670, "UNRESOLVED": 18},
+      "initial_l1_current": 0.15803936327736054,
+      "initial_l1_depth8": 0.15803936327736054,
+      "forecast_l1_current": [0.0028657416257442912, 0.0026624694446044884, 0.002580961399112625],
+      "forecast_l1_depth8": [0.00285529333166162, 0.0026592063482952437, 0.002547517110649794],
+      "maximum_rescued_fraction": 0.0007244127082686536,
+      "wall_seconds": 2173.816219399974
+    },
+    {
+      "cells": [45, 54, 54],
+      "initial_depth4_counts": {"CERTIFIED_NONNEGATIVE": 19020, "WITNESSED_NEGATIVE": 112132, "UNRESOLVED": 68},
+      "initial_depth8_counts": {"CERTIFIED_NONNEGATIVE": 19038, "WITNESSED_NEGATIVE": 112134, "UNRESOLVED": 48},
+      "initial_l1_current": 0.031311808123947585,
+      "initial_l1_depth8": 0.03119103658752125,
+      "forecast_l1_current": [0.0015246442338559267, 0.0019868320867042315, 0.0023495315113503676],
+      "forecast_l1_depth8": [0.0014882915816656617, 0.0019755801591167144, 0.0022816465523717187],
+      "maximum_rescued_fraction": 0.00036678459810341797,
+      "wall_seconds": 3165.9763691179687
+    }
+  ],
+  "predeclared_rule": {
+    "support": "At least 5 percent of depth-4 non-certified cells rescued and at least 25 percent mean L1 reduction.",
+    "reject": "Less than 1 percent rescued or less than 10 percent mean L1 reduction.",
+    "outcome": "REJECT"
+  },
+  "scientific_interpretation": "The mature raw Q2 polynomials are overwhelmingly witnessed negative rather than merely unresolved by a conservative depth-4 certificate. Deeper subdivision cannot materially reduce the correction. The local QP remains substantially less intrusive than scalar limiting.",
+  "artifact_sha256": {
+    "config.yaml": "054c542f69fec5846130246ee7f6ebca6871caea8910e1e75f131222a4d39a39",
+    "provenance.json": "f309888c6c8480c1edd936ddc24f01e2dd06d38d320a7cfb3319fc6dbb264b9a",
+    "status.json": "2acfe01f61691c8202536b3c2b6525143150a9636afe18fd7a662b76df3ac80b",
+    "certificate_diagnostic_20x24x24/report.json": "781829a11523885f5ab80dfb536deec6fca0604c8d51ec7e48f2bcce4defd111",
+    "certificate_diagnostic_30x36x36/report.json": "79d17358373d51cff82d1cf9dab36682c08de0a197f9f1ae52cefb4ca4eeefa5",
+    "certificate_diagnostic_45x54x54/report.json": "94f4cb2c96406b954bfdb1c49e2f2537970c5af1994cc998e7e88e1283ab259e"
+  },
+  "decision": "Do not rerun the mature hierarchy with deeper certification. Prioritize an operator-level positive low-order or flux-corrected treatment, while retaining the current local QP and failed mature hierarchy as comparators."
+}

@@ -136,17 +136,18 @@ The living plan is in `docs/RESEARCH_DIRECTIONS.md` and
    `experiments/mature-positivity-certificate-diagnostic.yaml` compares the
    current depth-4 certificate, depth 8 and scalar limiting on identical raw
    initialization and forecast polynomials.
-2. Distinguish insufficient mature-law resolution from a correction architecture
-   that remains active at practical meshes. Any rerun must be separately
-   predeclared and retain the failed hierarchy as its comparator.
+2. The completed diagnostic rejects insufficient certificate depth: at most
+   `0.0788%` of depth-4 non-certified cells are rescued at depth 8, and the
+   largest L1 reduction is `2.89%`. Prioritize a conservative positive low-order
+   or local flux-corrected full-SPD update against the frozen local-QP comparator.
 3. Record temporal/spatial density differences, covariance and marginal TVs,
    correction L1/L2, negative-average and projected probability mass, projected
    cell count, optimizer performance and conservation.
 4. Only after a mature-state pass, run aligned-box domain-size sensitivity at
    approximately fixed physical resolution.
-5. If one of these gates fails, diagnose adaptive constraints or an
-   operator-level positive low-order/AFC correction against the frozen local-QP
-   comparator.
+5. Do not spend another hierarchy on deeper Bernstein certification; witnessed
+   polynomial negativity, rather than unresolved bounds, dominates every saved
+   mature snapshot.
 6. Develop a dynamically scaled whole-space Hermite solver as an independent
    high-order reference after the Q2 gate.
 7. Investigate covariance-targeted goal-oriented/nonuniform resolution and a

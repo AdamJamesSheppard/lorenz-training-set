@@ -51,6 +51,7 @@ EVIDENCE = (
     "local_q2_full_spd_control_report.json",
     "local_q2_full_spd_spatial_report.json",
     "local_q2_mature_bimodal_report.json",
+    "mature_positivity_certificate_diagnostic_report.json",
 )
 
 

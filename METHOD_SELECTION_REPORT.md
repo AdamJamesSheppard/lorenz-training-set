@@ -1029,6 +1029,36 @@ Evidence: [`local_q2_mature_bimodal_report.json`](local_q2_mature_bimodal_report
 and immutable run
 `runs/local-q2-cn-full-spd-mature-bimodal/20260913T185157Z`.
 
+## 29. Frozen-polynomial certificate-depth audit
+
+The predeclared depth-4 versus depth-8 comparison rejects the hypothesis that
+the mature failure is primarily caused by an insufficiently deep Bernstein
+certificate. Across initialization and three forecast snapshots on every mesh,
+depth 8 rescues at most `0.0788%` of depth-4 non-certified cells. Its mean L1
+correction reduction is `0.779%`; the largest reduction is `2.89%`, below the
+predeclared 10% rejection boundary.
+
+The classification is decisive because almost all non-certified polynomials
+have an evaluated negative witness, while unresolved cells are negligible. At
+the finest final snapshot, for example, depth 4 reports 130,873 witnessed
+negative cells and 39 unresolved cells; depth 8 reports 130,881 witnessed
+negative cells and zero unresolved cells. Recursive enclosure tightening cannot
+remove genuine negative point values.
+
+The local QP still dominates the scalar control. Scalar limiting produces
+between `1.96x` and `6.70x` its L1 change, with a mean ratio `5.02x`. All offline
+QP comparisons have zero optimizer failures and fallbacks.
+
+This narrows the diagnosis from certificate conservatism to actual negativity
+of the projected and evolved Q2 polynomials at practical mature-state meshes.
+Further depth increases are low value. The next branch should test an
+operator-level positive low-order or local flux-corrected full-SPD update, with
+the current local QP and failed mature hierarchy retained as frozen comparators.
+
+Evidence: [`mature_positivity_certificate_diagnostic_report.json`](mature_positivity_certificate_diagnostic_report.json)
+and immutable run
+`runs/mature-positivity-certificate-diagnostic/20260913T200251Z`.
+
 ## Sources
 
 [^1]: C. Liu, J. Hu, W. T. Taitano and X. Zhang, [“An optimization-based positivity-preserving limiter in semi-implicit discontinuous Galerkin schemes solving Fokker–Planck equations”](https://www.math.purdue.edu/~zhan1966/research/paper/DG_anisotropic_Fokker_Planck.pdf), *Computers & Mathematics with Applications* (2025).

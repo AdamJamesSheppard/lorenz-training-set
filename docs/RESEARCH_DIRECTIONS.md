@@ -33,6 +33,10 @@ is still a mature later-time or post-analysis Lorenz density. The first bimodal
 hierarchy failed only its fixed mean-correction gate: corrections decrease
 `0.003047 -> 0.002789 -> 0.001840` but remain above `0.001`; its observed
 common-grid rate is only `0.42695`.
+The follow-up same-polynomial audit rejects depth-4 certificate conservatism as
+the dominant cause: depth 8 rescues at most `0.0788%` of non-certified cells and
+reduces L1 correction by at most `2.89%`. Almost all rejected cells have direct
+negative witnesses.
 
 ## Active branches
 
@@ -41,8 +45,8 @@ common-grid rate is only `0.42695`.
 | Local minimum-change Q2 projection | It passed temporal/positivity, identity-noise spatial and non-diagonal full-SPD spatial gates, but the first mature bimodal hierarchy failed the mean-correction gate. | Diagnose resolution versus correction architecture using the frozen failed comparator; passing a separately predeclared mature gate advances to domain sensitivity. |
 | Positive low-order full-SPD operator | Supplies the invariant-domain baseline required by defensible local convex/AFC correction. | Must preserve mass, positivity and no-flux boundaries for 3-D Lorenz drift plus full SPD diffusion before antidiffusive fluxes are introduced. |
 | Adaptive Q2 Bernstein diagnosis | Separates a sufficient positivity certificate from witnessed negativity and unresolved near-zero cases. | Use as a diagnostic; reject it as a production decision procedure if unresolved cells dominate or correction remains intrusive. |
-| Adaptive local-QP constraints | May remove unnecessary fixed-Bernstein restrictions while retaining the minimum-change architecture. | Revive now as a controlled explanation for the mature-state correction failure; require the same positivity and full-density gates. |
-| Local AFC/convex high-order DG | Limits conservative antidiffusive fluxes locally instead of scaling a completed polynomial globally. | Unlimited CN passed and global correction failed; begin from a validated positive low-order full-SPD update if the remaining post-step tests fail. |
+| Adaptive local-QP constraints | May remove unnecessary fixed-Bernstein restrictions while retaining the minimum-change architecture. | Deprioritize: depth 8 barely changes the mature correction because witnessed negativity dominates. |
+| Local AFC/convex high-order DG | Limits conservative antidiffusive fluxes locally instead of correcting a completed polynomial. | Promote: build a validated positive low-order full-SPD update and compare against the frozen mature local-QP failure. |
 | Positive full-tensor finite volume | Provides an operator-level positivity fallback with substantially different numerical principles. | Prioritize if corrected/AFC Q2 fails; require genuine 3-D convection-diffusion, no-flux and high-Peclet validation. |
 | FCDF or directional complete flux | Directly targets drift-diffusion flux and high-Peclet numerical diffusion. | Keep as an identity/diagonal `B` special-case branch; present FCDF proof is directional and its 2026 evidence is lower-dimensional. |
 | Characteristic/semi-Lagrangian methods | Could reduce upwind transport diffusion substantially. | Require a defensible 3-D diffusion, positivity, conservation, and reflecting-boundary treatment. |

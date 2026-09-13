@@ -27,6 +27,13 @@ three meshes (`0.003047`, `0.002789`, `0.001840`). Mature-state and domain
 evidence remain required, and this candidate is not enabled during production
 propagation.
 
+A subsequent same-polynomial audit increases recursive certificate depth from
+4 to 8. It rescues at most `0.0788%` of non-certified cells and reduces L1
+correction by at most `2.89%`; almost every rejected polynomial has a direct
+negative witness. Certificate conservatism is therefore not the dominant mature
+failure mechanism. Scalar limiting remains substantially more intrusive than
+the local QP.
+
 > This audit originally covered Q1. The experimental Q2/Q3 path now uses
 > Bernstein coefficients on `2x2x2` control subcells. An experimental adaptive
 > branch now uses recursive tensor-Bernstein subdivision to avoid some false

@@ -4,6 +4,28 @@ Decisions here are dated and revisable. Add a new entry that marks an older
 decision `superseded`, `narrowed`, or `confirmed` rather than rewriting history
 to make the current direction look inevitable.
 
+## 2026-09-13 - Reject certificate depth as mature-state failure cause
+
+**Decision.** Deprioritize deeper Bernstein subdivision and promote an
+operator-level positive low-order/AFC treatment as the next research branch.
+Retain `FULL_SPD_DIFFUSION_CERTIFIED`, `NEXT_REQUIRED_GATE = MATURE_STATE`, and
+no production dataset authorization.
+
+**Evidence.** On identical raw initialization and forecast polynomials across
+all three meshes, increasing adaptive certification depth from 4 to 8 rescues
+at most `0.0788%` of depth-4 non-certified cells. Mean L1 correction reduction
+is `0.779%` and the maximum is `2.89%`, triggering the predeclared rejection
+rule. Almost every non-certified cell is `WITNESSED_NEGATIVE`; unresolved cells
+are negligible. The local QP remains useful as a comparator because scalar
+limiting changes L1 by `1.96x` to `6.70x` more.
+
+**Consequence.** Do not rerun the mature hierarchy with deeper certificates.
+The next controlled implementation should prevent or locally correct the
+negative update at operator/flux level, then compare accuracy and correction
+against the immutable mature local-QP failure.
+
+**Evidence file.** `mature_positivity_certificate_diagnostic_report.json`.
+
 ## 2026-09-13 - Retain mature-state gate after bimodal failure
 
 **Decision.** Keep `METHOD_STATUS = FULL_SPD_DIFFUSION_CERTIFIED`, keep

@@ -30,7 +30,7 @@
       "monte_carlo_200000_cpu_sampling_propagation_histogram_seconds": 3.369948232000722,
       "scope": "One 0.05 forecast interval; MC figure excludes principled bandwidth selection and accuracy certification."
     },
-    "principal_remaining_limitation": "The first mature bimodal hierarchy converges slowly at observed common-grid rate 0.42695 and exceeds the 0.001 mean relative L1 correction gate on every mesh. Finite-domain and independently resolved full-density evidence also remain absent."
+    "principal_remaining_limitation": "The first mature bimodal hierarchy converges slowly at observed common-grid rate 0.42695 and exceeds the 0.001 mean relative L1 correction gate on every mesh. A same-polynomial depth-4/depth-8 audit rejects certificate depth as the cause: the raw Q2 polynomials are overwhelmingly witnessed negative. Finite-domain and independently resolved full-density evidence also remain absent."
   },
   "pde": {
     "linear_in_density": true,
@@ -331,6 +331,18 @@
     "failed_gate": "Mean relative L1 correction exceeds the fixed 0.001 limit on every mesh despite decreasing under refinement.",
     "decision": "Retain FULL_SPD_DIFFUSION_CERTIFIED and MATURE_STATE as the next required gate; dataset generation remains unauthorized."
   },
+  "mature_positivity_certificate_diagnostic": {
+    "evidence": "mature_positivity_certificate_diagnostic_report.json",
+    "run": "runs/mature-positivity-certificate-diagnostic/20260913T200251Z",
+    "status": "CERTIFICATE_OVERCONSERVATISM_HYPOTHESIS_REJECTED",
+    "current_depth": 4,
+    "deep_depth": 8,
+    "maximum_rescued_fraction": 0.0007874704698573804,
+    "mean_l1_reduction": 0.00778702028636578,
+    "maximum_l1_reduction": 0.02889297660010215,
+    "scalar_to_local_qp_l1_ratio_range": [1.96384036328926, 6.702437059422446],
+    "decision": "Deeper Bernstein certification does not explain or repair the mature-state correction. Prioritize an operator-level positive low-order or flux-corrected treatment; retain local QP as comparator."
+  },
   "fixed_q2_raw_archive": {
     "archive": "../sources/upload/newtest_08.zip",
     "scope": "q2_fixed_subcell raw_before_correction ranks 0002 through 0006",
@@ -340,10 +352,10 @@
     "numerical_decision_changed": false
   },
   "smallest_additional_experiment_required": {
-    "name": "mature_state_local_q2_cn_full_spd",
-    "description": "Project one common mature later-time or post-analysis Lorenz density conservatively onto each tested mesh and propagate it with the certified full-SPD candidate, including Bayesian analysis when posteriors are dataset inputs.",
-    "decision_rule": "Require temporal and spatial density stability, covariance and marginal accuracy, controlled correction norms and negative-average mass, zero optimizer failures/fallbacks, conservation, and explicit projected probability mass as well as projected-cell count.",
-    "configuration": "experiments/mature-state-decision.yaml"
+    "name": "operator_level_positive_mature_control",
+    "description": "Construct a conservative positive low-order or flux-corrected full-SPD update and compare it with the frozen local-QP mature failure on identical raw states and forecast intervals.",
+    "decision_rule": "Require positivity and conservation without fallback, lower correction and projected probability mass than the local-QP comparator, and no degradation of common-grid density, covariance, marginal or lobe accuracy.",
+    "reference_configuration": "experiments/mature-state-decision.yaml"
   },
   "reproducibility": {
     "python": "3.12.13",
@@ -385,6 +397,7 @@
     "local_q2_spatial_refinement_report.json",
     "local_q2_full_spd_control_report.json",
     "local_q2_full_spd_spatial_report.json",
-    "local_q2_mature_bimodal_report.json"
+    "local_q2_mature_bimodal_report.json",
+    "mature_positivity_certificate_diagnostic_report.json"
   ]
 }

@@ -40,6 +40,9 @@ def main() -> int:
     mature_bimodal = json.loads(
         (ROOT / "local_q2_mature_bimodal_report.json").read_text()
     )
+    mature_certificate = json.loads(
+        (ROOT / "mature_positivity_certificate_diagnostic_report.json").read_text()
+    )
     diffusion = Lorenz63Model().diffusion
 
     mass_errors = [abs(float(row["mass_error"])) for row in boundary["rows"]]
@@ -196,6 +199,21 @@ def main() -> int:
             and decision.get("production_dataset_authorized") is False
             and decision.get("next_required_gate") == "MATURE_STATE"
         ),
+        "mature_certificate_diagnostic_consistent": bool(
+            mature_certificate["classification"]
+            == "CERTIFICATE_OVERCONSERVATISM_HYPOTHESIS_REJECTED"
+            and mature_certificate["predeclared_rule"]["outcome"] == "REJECT"
+            and mature_certificate["aggregate"]
+            ["maximum_fraction_of_depth4_noncertified_cells_rescued_by_depth8"]
+            < 0.01
+            and mature_certificate["aggregate"]
+            ["maximum_l1_correction_reduction_from_depth8"] < 0.10
+            and mature_certificate["aggregate"]["optimizer_failures"] == 0
+            and mature_certificate["aggregate"]["fallbacks"] == 0
+            and classification == "FULL_SPD_DIFFUSION_CERTIFIED"
+            and decision.get("production_dataset_authorized") is False
+            and decision.get("next_required_gate") == "MATURE_STATE"
+        ),
     }
     result = {
         "passed": all(checks.values()),
@@ -253,6 +271,12 @@ def main() -> int:
             "mature_bimodal_mean_relative_l1_corrections": mature_bimodal[
                 "failed_gate"
             ]["observed"],
+            "mature_certificate_maximum_rescued_fraction": mature_certificate[
+                "aggregate"
+            ]["maximum_fraction_of_depth4_noncertified_cells_rescued_by_depth8"],
+            "mature_certificate_maximum_l1_reduction": mature_certificate[
+                "aggregate"
+            ]["maximum_l1_correction_reduction_from_depth8"],
         },
         "interpretation": (
             "The tested invariants and evidence consistency pass. Production certification is "
