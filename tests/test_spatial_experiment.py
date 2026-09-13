@@ -3,7 +3,12 @@ from pathlib import Path
 import numpy as np
 import yaml
 
-from same_mesh_q2_study import _model, _sample_truncated_gaussian
+from same_mesh_q2_study import (
+    _condition_mixture_on_z,
+    _model,
+    _sample_truncated_gaussian,
+    _sample_truncated_mixture,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -65,3 +70,37 @@ def test_full_spd_predeclarations_reconstruct_diffusion_and_fix_reference_seed()
         assert study["bootstrap_seed"] == 20261910
     assert len(controlled["study"]["branches"]) == 1
     assert len(hierarchy["study"]["branches"]) == 3
+
+
+def test_mature_bimodal_predeclaration_is_full_spd_and_common_grid():
+    config = yaml.safe_load(
+        (ROOT / "experiments/mature-state-decision.yaml").read_text()
+    )
+    study=config["study"]
+    expected=np.array([[1.0,0.4,0.2],[0.4,1.0,0.3],[0.2,0.3,1.0]])
+    assert config["kind"] == "mature_full_spd_q2_study"
+    assert study["initialization"] == "mixture_projected"
+    assert np.allclose(_model(study["noise_matrix"]).diffusion,expected,atol=1e-14)
+    assert study["monte_carlo_paths"] == 1_000_000
+    assert study["bootstrap_replicates"] == 1_000
+    assert study["observation_variance"] > 0.0
+    for branch in study["branches"]:
+        assert tuple(np.asarray(branch["cells"])*branch["export_subcells"]) == tuple(
+            study["common_comparison_grid"]
+        )
+
+
+def test_z_conditioning_and_truncated_mixture_sampling_preserve_lobe_symmetry():
+    reflection=np.diag([-1.0,-1.0,1.0])
+    mean=np.array([8.0,8.0,25.0]); covariance=np.diag([2.0,2.0,3.0])
+    mixture={"weights":[0.5,0.5],"means":[mean.tolist(),(reflection@mean).tolist()],
+             "covariances":[covariance.tolist(),(reflection@covariance@reflection).tolist()],
+             "construction":"test"}
+    posterior=_condition_mixture_on_z(mixture,24.0,4.0)
+    assert np.allclose(posterior["weights"],[0.5,0.5])
+    samples,proposals=_sample_truncated_mixture(
+        posterior,((-30.0,30.0),(-40.0,40.0),(-10.0,70.0)),5000,
+        np.random.default_rng(14),
+    )
+    assert proposals>=len(samples)
+    assert abs(np.mean(samples[:,0]>0.0)-0.5)<0.04

@@ -338,6 +338,7 @@ class LocalPolynomialProjector:
         scaling_objective = 0.0
         objective_bound_violations = 0
         scaling_fallback_cells = 0
+        projected_probability_mass = 0.0
         optimizer_messages: dict[str, int] = {}
 
         for cell, dofs in enumerate(limiter.cell_dofs):
@@ -371,6 +372,7 @@ class LocalPolynomialProjector:
                 if result.status == "PROJECTED":
                     iterations.append(result.iterations)
                 volume = float(limiter.cell_volumes[cell])
+                projected_probability_mass += volume * max(float(average), 0.0)
                 objective += volume * result.objective
                 scaling_objective += volume * result.scaling_objective
                 if result.objective > result.scaling_objective + 1.0e-8 * max(1.0, result.scaling_objective):
@@ -389,6 +391,7 @@ class LocalPolynomialProjector:
                 self._warm_starts[cell] = fallback / average if average > 0.0 else None
                 self._warm_dual_starts[cell] = None
                 volume = float(limiter.cell_volumes[cell])
+                projected_probability_mass += volume * max(float(average), 0.0)
                 objective += volume * result.scaling_objective
                 scaling_objective += volume * result.scaling_objective
                 scaling_fallback_cells += 1
@@ -446,6 +449,9 @@ class LocalPolynomialProjector:
             "objective_bound_violations": int(limiter.comm.allreduce(objective_bound_violations, op=MPI.SUM)),
             "scaling_fallback_cells": int(limiter.comm.allreduce(scaling_fallback_cells, op=MPI.SUM)),
             "optimizer_invoked_cells": int(limiter.comm.allreduce(len(iterations), op=MPI.SUM)),
+            "projected_probability_mass": _global_sum(
+                limiter.comm, projected_probability_mass
+            ),
             "optimizer_iterations_mean": float(
                 _global_sum(limiter.comm, float(sum(iterations))) /
                 max(1, limiter.comm.allreduce(len(iterations), op=MPI.SUM))
@@ -518,6 +524,7 @@ class LocalProjectionFokkerPlanckSolver(FokkerPlanckSolver):
             "local_qp_l1_correction",
             "local_qp_l2_correction",
             "raw_negative_cell_average_mass",
+            "projected_probability_mass",
             "scaling_fallback_cells",
             "wall_seconds",
         )

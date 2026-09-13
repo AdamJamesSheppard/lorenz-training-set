@@ -306,6 +306,9 @@ class TestQ2Properties(unittest.TestCase):
         self.assertEqual(report["scaling_fallback_cells"], 1)
         self.assertEqual(report["optimizer_invoked_cells"], 1)
         self.assertEqual(report["optimizer_iterations_mean"], 7.0)
+        self.assertAlmostEqual(
+            report["projected_probability_mass"], report["mass_after"], places=12
+        )
         self.assertGreaterEqual(
             solver.limiter.control_coefficients(
                 corrected.function.x.array[solver.V.dofmap.cell_dofs(0)]

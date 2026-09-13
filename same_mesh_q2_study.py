@@ -14,6 +14,7 @@ from pathlib import Path
 
 import numpy as np
 from mpi4py import MPI
+from scipy.ndimage import gaussian_filter
 
 from lorenz_fpe import (
     DensityState,
@@ -78,17 +79,202 @@ def _sample_truncated_gaussian(
     return np.concatenate(accepted, axis=0)[:count], proposed
 
 
+def _sample_truncated_mixture(
+    mixture: dict[str, object], bounds: tuple[tuple[float, float], ...],
+    count: int, rng: np.random.Generator,
+) -> tuple[np.ndarray, int]:
+    """Draw from a Gaussian mixture conditioned on the computational box."""
+    weights=np.asarray(mixture["weights"],dtype=float); weights/=weights.sum()
+    means=np.asarray(mixture["means"],dtype=float)
+    covariances=np.asarray(mixture["covariances"],dtype=float)
+    accepted=[]; have=0; proposed=0
+    while have<count:
+        batch=max(4096,2*(count-have))
+        labels=rng.choice(len(weights),size=batch,p=weights)
+        values=np.empty((batch,3),dtype=float)
+        for label in np.unique(labels):
+            mask=labels==label
+            values[mask]=rng.multivariate_normal(
+                means[label],covariances[label],size=int(mask.sum())
+            )
+        inside=np.ones(batch,dtype=bool)
+        for axis,(lo,hi) in enumerate(bounds):
+            inside&=(values[:,axis]>=lo)&(values[:,axis]<=hi)
+        kept=values[inside]
+        if len(kept):
+            accepted.append(kept); have+=len(kept)
+        proposed+=batch
+    return np.concatenate(accepted)[:count],proposed
+
+
+def _symmetric_mature_mixture(
+    particles: np.ndarray, components_per_lobe: int,
+    rng: np.random.Generator,
+) -> dict[str, object]:
+    """Fit one lobe by k-means and mirror it under Lorenz symmetry."""
+    positive=np.asarray(particles[particles[:,0]>0.0],dtype=float)
+    if len(positive)<100*components_per_lobe:
+        raise RuntimeError("Spin-up ensemble did not populate the positive Lorenz lobe")
+    fit=positive[rng.choice(len(positive),size=min(100000,len(positive)),replace=False)]
+    centres=np.empty((components_per_lobe,3),dtype=float)
+    centres[0]=fit[rng.integers(len(fit))]
+    distance=np.sum((fit-centres[0])**2,axis=1)
+    for j in range(1,components_per_lobe):
+        probabilities=distance/distance.sum()
+        centres[j]=fit[rng.choice(len(fit),p=probabilities)]
+        distance=np.minimum(distance,np.sum((fit-centres[j])**2,axis=1))
+    for _ in range(40):
+        labels=np.argmin(np.sum((fit[:,None,:]-centres[None,:,:])**2,axis=2),axis=1)
+        updated=np.stack([
+            fit[labels==j].mean(0) if np.any(labels==j) else centres[j]
+            for j in range(components_per_lobe)
+        ])
+        if np.max(np.linalg.norm(updated-centres,axis=1))<1.0e-6:
+            centres=updated; break
+        centres=updated
+    labels=np.argmin(np.sum((positive[:,None,:]-centres[None,:,:])**2,axis=2),axis=1)
+    means=[]; covariances=[]; weights=[]
+    for j in range(components_per_lobe):
+        cluster=positive[labels==j]
+        if len(cluster)<10:
+            continue
+        covariance=np.cov(cluster,rowvar=False)
+        eigenvalues,eigenvectors=np.linalg.eigh(covariance)
+        covariance=(eigenvectors*np.maximum(eigenvalues,0.25))@eigenvectors.T
+        means.append(cluster.mean(0)); covariances.append(covariance)
+        weights.append(len(cluster)/(2.0*len(positive)))
+    symmetry=np.diag([-1.0,-1.0,1.0])
+    mirrored_means=[symmetry@mean for mean in means]
+    mirrored_covariances=[symmetry@covariance@symmetry for covariance in covariances]
+    return {
+        "weights":(weights+weights),
+        "means":[value.tolist() for value in means+mirrored_means],
+        "covariances":[value.tolist() for value in covariances+mirrored_covariances],
+        "construction":"positive-x spin-up clusters mirrored by (x,y,z)->(-x,-y,z)",
+    }
+
+
+def _condition_mixture_on_z(
+    mixture: dict[str, object], observation: float, variance: float,
+) -> dict[str, object]:
+    """Apply a scalar Gaussian z likelihood analytically to every component."""
+    weights=np.asarray(mixture["weights"],dtype=float)
+    means=np.asarray(mixture["means"],dtype=float)
+    covariances=np.asarray(mixture["covariances"],dtype=float)
+    updated_means=[]; updated_covariances=[]; updated_weights=[]
+    for weight,mean,covariance in zip(weights,means,covariances):
+        innovation_variance=float(covariance[2,2]+variance)
+        gain=covariance[:,2]/innovation_variance
+        updated_means.append(mean+gain*(observation-mean[2]))
+        updated_covariances.append(
+            covariance-np.outer(covariance[:,2],covariance[2,:])/innovation_variance
+        )
+        likelihood=np.exp(-0.5*(observation-mean[2])**2/innovation_variance)/math.sqrt(
+            2.0*np.pi*innovation_variance
+        )
+        updated_weights.append(weight*likelihood)
+    updated_weights=np.asarray(updated_weights); updated_weights/=updated_weights.sum()
+    return {
+        "weights":updated_weights.tolist(),
+        "means":[value.tolist() for value in updated_means],
+        "covariances":[value.tolist() for value in updated_covariances],
+        "construction":mixture["construction"],
+        "analysis":{"observation_operator":"z","observation":observation,
+                    "variance":variance,"method":"analytic Gaussian-mixture conditioning"},
+    }
+
+
+def _lobe_probabilities_grid(cell_averages: np.ndarray, domain: Domain) -> dict[str,float]:
+    probability=np.asarray(cell_averages,dtype=float)*domain.volume/cell_averages.size
+    x=np.linspace(domain.bounds[0][0],domain.bounds[0][1],cell_averages.shape[0],endpoint=False)
+    x+=(domain.bounds[0][1]-domain.bounds[0][0])/(2*cell_averages.shape[0])
+    return {"negative_x":float(probability[x<0].sum()),
+            "positive_x":float(probability[x>0].sum())}
+
+
+def _lobe_probabilities_particles(particles: np.ndarray) -> dict[str,float]:
+    return {"negative_x":float(np.mean(particles[:,0]<0.0)),
+            "positive_x":float(np.mean(particles[:,0]>0.0))}
+
+
+def _coarsen_averages(values: np.ndarray, shape: tuple[int,int,int]) -> np.ndarray:
+    factors=tuple(got//want for got,want in zip(values.shape,shape))
+    if any(want*factor!=got for got,want,factor in zip(values.shape,shape,factors)):
+        raise ValueError(f"Cannot coarsen {values.shape} exactly to {shape}")
+    return values.reshape(
+        shape[0],factors[0],shape[1],factors[1],shape[2],factors[2]
+    ).mean(axis=(1,3,5))
+
+
+def _joint_density_comparison(
+    values: np.ndarray, particles: np.ndarray, domain: Domain,
+    shape: tuple[int,int,int], smoothing_sigma: float,
+) -> dict[str,float]:
+    numerical=_coarsen_averages(values,shape)
+    numerical_probability=numerical*domain.volume/numerical.size
+    histogram,_=np.histogramdd(particles,bins=shape,range=domain.bounds)
+    sampled_probability=histogram/len(particles)
+    numerical_smoothed=gaussian_filter(numerical_probability,smoothing_sigma,mode="constant")
+    sampled_smoothed=gaussian_filter(sampled_probability,smoothing_sigma,mode="constant")
+    l1=float(np.abs(numerical_smoothed-sampled_smoothed).sum())
+    return {"smoothed_probability_l1":l1,"smoothed_total_variation":0.5*l1,
+            "mc_probability_inside_domain":float(histogram.sum()/len(particles)),
+            "grid":list(shape),"gaussian_smoothing_sigma_in_voxels":smoothing_sigma}
+
+
 def prepare_reference(args: argparse.Namespace) -> None:
     if MPI.COMM_WORLD.size!=1:
         raise SystemExit("reference preparation must run on one rank")
     output=args.output.resolve(); output.mkdir(parents=True,exist_ok=False)
     domain=Domain(cells=tuple(args.cells)); model=_model(args.noise_matrix)
     solver=FokkerPlanckSolver(model,domain,args.dt,degree=1)
-    mean=np.asarray(args.mean,dtype=float)
-    covariance=np.diag(np.square(np.asarray(args.std,dtype=float)))
     rng=np.random.default_rng(args.seed)
     artifacts={}
-    if args.continuous_gaussian:
+    if args.mature_mixture:
+        equilibrium=math.sqrt(model.beta*(model.rho-1.0))
+        half=args.spinup_particles//2
+        positive=rng.multivariate_normal(
+            [equilibrium,equilibrium,model.rho-1.0],np.diag([4.0,4.0,4.0]),size=half
+        )
+        negative=positive.copy(); negative[:,:2]*=-1.0
+        spinup_initial=np.concatenate([positive,negative],axis=0)
+        spinup_started=time.perf_counter()
+        spinup=_propagate_particles(
+            model,spinup_initial,args.spinup_time,args.spinup_dt,rng
+        )
+        spinup_seconds=time.perf_counter()-spinup_started
+        prior_mixture=_symmetric_mature_mixture(
+            spinup,args.components_per_lobe,rng
+        )
+        mixture=_condition_mixture_on_z(
+            prior_mixture,args.observation_z,args.observation_variance
+        )
+        mixture_path=output/"mature_mixture.json"
+        write_json(mixture_path,mixture)
+        particles0,proposals=_sample_truncated_mixture(
+            mixture,domain.bounds,args.particles,rng
+        )
+        sampling={"method":"analytic Gaussian mixture conditioned on domain by rejection",
+                  "samples":args.particles,"proposals":proposals,
+                  "acceptance_rate":args.particles/proposals}
+        initialization={
+            "method":"independent stochastic spin-up, symmetric Gaussian-mixture fit, z-only analysis",
+            "spinup_particles":args.spinup_particles,"spinup_time":args.spinup_time,
+            "spinup_dt":args.spinup_dt,"spinup_seconds":spinup_seconds,
+            "components_per_lobe":args.components_per_lobe,
+            "mixture_components":len(mixture["weights"]),
+            "analysis":mixture["analysis"],
+            "domain_bounds":[list(item) for item in domain.bounds],
+        }
+        initial_diagnostics={"sample_mean":particles0.mean(0).tolist(),
+            "sample_covariance":np.cov(particles0,rowvar=False).tolist(),
+            "lobe_probabilities":_lobe_probabilities_particles(particles0)}
+        artifacts[mixture_path.name]={
+            "sha256":_sha256(mixture_path),"bytes":mixture_path.stat().st_size
+        }
+    elif args.continuous_gaussian:
+        mean=np.asarray(args.mean,dtype=float)
+        covariance=np.diag(np.square(np.asarray(args.std,dtype=float)))
         particles0,proposals=_sample_truncated_gaussian(
             mean,covariance,domain.bounds,args.particles,rng
         )
@@ -109,6 +295,8 @@ def prepare_reference(args: argparse.Namespace) -> None:
             "sample_covariance":np.cov(particles0,rowvar=False).tolist(),
         }
     else:
+        mean=np.asarray(args.mean,dtype=float)
+        covariance=np.diag(np.square(np.asarray(args.std,dtype=float)))
         initial=solver.gaussian_projected(
             mean,covariance,quadrature_degree=14,apply_limiter=True,
         )
@@ -121,6 +309,11 @@ def prepare_reference(args: argparse.Namespace) -> None:
         artifacts[grid_path.name]={
             "sha256":_sha256(grid_path),"bytes":grid_path.stat().st_size
         }
+    initial_particle_path=output/"mc_initial_particles.npy"
+    np.save(initial_particle_path,particles0)
+    artifacts[initial_particle_path.name]={
+        "sha256":_sha256(initial_particle_path),"bytes":initial_particle_path.stat().st_size
+    }
     started=time.perf_counter()
     particles=_propagate_particles(model,particles0,args.t_final,args.mc_dt,rng)
     propagation_seconds=time.perf_counter()-started
@@ -128,6 +321,7 @@ def prepare_reference(args: argparse.Namespace) -> None:
     report={
         "configuration":{"cells":list(args.cells),"dt":args.dt,"t_final":args.t_final,
             "particles":args.particles,"mc_dt":args.mc_dt,"seed":args.seed,
+            "mature_mixture":bool(args.mature_mixture),
             "noise_matrix":np.asarray(model.B,dtype=float).tolist(),
             "diffusion_matrix":model.diffusion.tolist()},
         "initialization":initialization,
@@ -181,7 +375,7 @@ def run_forecast(args: argparse.Namespace) -> None:
         elif solver.apply_positivity:
             initial_projection=asdict(solver.limiter.apply(initial))
         embedding=None
-    else:
+    elif args.initialization == "structured":
         if args.initial_grid is None:
             raise ValueError("--initial-grid is required for structured initialization")
         grid=np.load(args.initial_grid)
@@ -194,6 +388,30 @@ def run_forecast(args: argparse.Namespace) -> None:
                 )}
         else:
             embedding=None
+    else:
+        if args.mixture is None:
+            raise ValueError("--mixture is required for mixture_projected initialization")
+        mixture=json.loads(args.mixture.read_text())
+        expression=sum(
+            float(weight)*solver.gaussian_expression(mean,np.asarray(covariance,dtype=float))
+            for weight,mean,covariance in zip(
+                mixture["weights"],mixture["means"],mixture["covariances"]
+            )
+        )
+        initial=solver.project_expression(
+            expression,"mature_mixture_l2_projected",
+            quadrature_degree=args.initial_quadrature_degree,
+            normalize=True,apply_limiter=False,
+        )
+        if args.local_projection:
+            initial,initial_projection=solver.local_projector.project_state(
+                initial,repair_cell_averages=True,adaptive_skip=True
+            )
+        elif solver.apply_positivity:
+            initial_projection=asdict(solver.limiter.apply(initial))
+        embedding={"source":"frozen analytic mature Gaussian mixture",
+                   "mixture_sha256":_sha256(args.mixture),
+                   "local_projection":initial_projection} if rank==0 else None
     initial_diagnostics=solver.diagnostics(initial)
     if args.initialization == "gaussian_projected" and rank==0:
         represented_covariance=np.asarray(initial_diagnostics["covariance"])
@@ -209,6 +427,28 @@ def run_forecast(args: argparse.Namespace) -> None:
             ),
             "local_projection":initial_projection,
         }
+    initial_cells=solver.structured_export(initial,1)
+    initial_subcells=solver.structured_export(initial,args.export_subcells)
+    initial_particles=(np.load(args.initial_mc_particles)
+                       if rank==0 and args.initial_mc_particles is not None else None)
+    if rank==0 and initial_particles is not None:
+        initial_covariance=covariance_accuracy(
+            np.asarray(initial_diagnostics["covariance"]),initial_particles,
+            args.bootstrap_seed,args.bootstrap,
+        )
+        embedding.update({
+            "mass":initial_diagnostics["mass"],
+            "covariance_accuracy":initial_covariance,
+            "marginal_total_variation_distance":_marginal_tv(
+                initial_cells,initial_particles,domain
+            ),
+            "lobe_probabilities":_lobe_probabilities_grid(initial_subcells,domain),
+            "mc_lobe_probabilities":_lobe_probabilities_particles(initial_particles),
+            "joint_density":_joint_density_comparison(
+                initial_subcells,initial_particles,domain,
+                tuple(args.density_metric_grid),args.density_smoothing_sigma,
+            ),
+        })
 
     steps=round(args.t_final/args.dt)
     if not math.isclose(steps*args.dt,args.t_final,abs_tol=1e-14):
@@ -261,7 +501,18 @@ def run_forecast(args: argparse.Namespace) -> None:
                 bootstrap_seed,args.bootstrap,
             ),
             "marginal_total_variation_distance":_marginal_tv(values,particles,domain),
+            "lobe_probabilities":_lobe_probabilities_grid(values,domain),
+            "mc_lobe_probabilities":_lobe_probabilities_particles(particles),
         } for name,values in stage_cells.items()}
+        comparisons["final"]["joint_density"]=_joint_density_comparison(
+            final_subcells,particles,domain,tuple(args.density_metric_grid),
+            args.density_smoothing_sigma,
+        )
+        comparisons["final"]["maximum_lobe_probability_error"]=max(
+            abs(comparisons["final"]["lobe_probabilities"][key]
+                -comparisons["final"]["mc_lobe_probabilities"][key])
+            for key in ("negative_x","positive_x")
+        )
     else:
         comparisons=None
 
@@ -310,11 +561,14 @@ def run_forecast(args: argparse.Namespace) -> None:
                 "local_maximum_iterations":(args.local_maximum_iterations
                     if args.local_projection else None),
                 "initialization":args.initialization,
+                "mixture_sha256":(_sha256(args.mixture) if args.mixture else None),
                 "initial_mean":list(args.mean),"initial_standard_deviation":list(args.std),
                 "initial_quadrature_degree":args.initial_quadrature_degree,
                 "export_subcells_per_cell":args.export_subcells,
                 "bootstrap_replicates":args.bootstrap,
                 "bootstrap_seed":bootstrap_seed,"seed":args.seed,
+                "density_metric_grid":list(args.density_metric_grid),
+                "density_smoothing_sigma":args.density_smoothing_sigma,
                 "noise_matrix":np.asarray(model.B,dtype=float).tolist(),
                 "diffusion_matrix":model.diffusion.tolist()},
             "initial_embedding":embedding,"initial_diagnostics":initial_diagnostics,
@@ -400,6 +654,13 @@ def parser() -> argparse.ArgumentParser:
     prep.add_argument("--mean",type=float,nargs=3,default=(1.0,1.0,20.0))
     prep.add_argument("--std",type=float,nargs=3,default=(2.0,2.0,3.0))
     prep.add_argument("--continuous-gaussian",action="store_true")
+    prep.add_argument("--mature-mixture",action="store_true")
+    prep.add_argument("--spinup-particles",type=int,default=200000)
+    prep.add_argument("--spinup-time",type=float,default=2.0)
+    prep.add_argument("--spinup-dt",type=float,default=0.001)
+    prep.add_argument("--components-per-lobe",type=int,default=8)
+    prep.add_argument("--observation-z",type=float,default=25.0)
+    prep.add_argument("--observation-variance",type=float,default=16.0)
     run=sub.add_parser("forecast",parents=[common])
     run.add_argument("--branch",required=True)
     run.add_argument("--degree",type=int,choices=(1,2),required=True)
@@ -408,9 +669,12 @@ def parser() -> argparse.ArgumentParser:
     run.add_argument("--ksp-atol",type=float,default=1.0e-13)
     run.add_argument("--certificate-mode",choices=("fixed","adaptive"),default="fixed")
     run.add_argument("--certificate-max-depth",type=int,default=4)
-    run.add_argument("--initialization",choices=("structured","gaussian_projected"),
+    run.add_argument("--initialization",choices=("structured","gaussian_projected",
+                                                  "mixture_projected"),
                      default="structured")
     run.add_argument("--initial-grid",type=Path)
+    run.add_argument("--mixture",type=Path)
+    run.add_argument("--initial-mc-particles",type=Path)
     run.add_argument("--mean",type=float,nargs=3,default=(1.0,1.0,20.0))
     run.add_argument("--std",type=float,nargs=3,default=(2.0,2.0,3.0))
     run.add_argument("--initial-quadrature-degree",type=int,default=14)
@@ -418,6 +682,8 @@ def parser() -> argparse.ArgumentParser:
     run.add_argument("--mc-particles",type=Path,required=True)
     run.add_argument("--bootstrap",type=int,default=200)
     run.add_argument("--bootstrap-seed",type=int,default=20261910)
+    run.add_argument("--density-metric-grid",type=int,nargs=3,default=(20,24,24))
+    run.add_argument("--density-smoothing-sigma",type=float,default=0.75)
     run.add_argument("--disable-positivity",action="store_true")
     run.add_argument("--local-projection",action="store_true")
     run.add_argument("--local-optimizer-backend",choices=("osqp","slsqp"),default="osqp")

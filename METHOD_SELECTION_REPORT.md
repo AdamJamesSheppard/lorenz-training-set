@@ -985,6 +985,15 @@ negative-average and projected probability mass, projected-cell counts,
 optimizer performance and conservation. Domain-size sensitivity follows a
 mature-state pass.
 
+The frozen first case is an ambiguous bimodal posterior. An independent
+full-SPD stochastic ensemble is spun up, fitted by a symmetry-preserving
+16-component Gaussian mixture and conditioned analytically with a z-only
+likelihood. The same mixture is projected into all three meshes. The run also
+records initial projection error, smoothed joint-density TV on a fixed grid and
+positive/negative-x lobe probabilities. A pass requires decreasing deterministic
+mesh differences and mean QP corrections, in addition to the established mass,
+positivity, optimizer and distributional gates.
+
 Evidence: [`local_q2_full_spd_spatial_report.json`](local_q2_full_spd_spatial_report.json)
 and immutable run
 `runs/local-q2-cn-full-spd-spatial-refinement/20260913T135455Z`.

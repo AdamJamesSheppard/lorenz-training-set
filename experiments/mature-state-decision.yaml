@@ -1,51 +1,110 @@
-id: mature-state-method-decision
-kind: research_plan
-status: predeclared_next_gate
-purpose: Test the full-SPD-certified local-QP Q2 Crank--Nicolson candidate on representative mature Lorenz densities.
-candidate:
-  method: Q2 DG Crank--Nicolson with Stage-1 average repair and local mass-matrix QP
-  meshes: [[20, 24, 24], [30, 36, 36], [45, 54, 54]]
+id: local-q2-cn-full-spd-mature-bimodal
+kind: mature_full_spd_q2_study
+status: predeclared_executable_next_gate
+purpose: Test the full-SPD-certified local-QP Q2 Crank--Nicolson candidate on one independently constructed, z-conditioned bimodal Lorenz law.
+study:
+  cells: [20, 24, 24]
+  comparison_refinement_ratio: 1.5
   dt: 0.00015625
-  temporal_safeguard_dt: 0.000078125
-  diffusion_matrix: [[1.0, 0.4, 0.2], [0.4, 1.0, 0.3], [0.2, 0.3, 1.0]]
-  noise_matrix:
-    - [1.4142135623730951, 0.0, 0.0]
-    - [0.5656854249492381, 1.2961481396815722, 0.0]
-    - [0.28284271247461906, 0.3394673699166024, 1.3434142714594956]
-reference:
+  final_time: 0.05
+  seed: 20260920
   monte_carlo_paths: 1000000
+  mc_dt: 0.000125
   bootstrap_replicates: 1000
-  bootstrap_seed: 20261910
-  common_random_numbers_across_meshes: true
-  primary_convergence_evidence: deterministic common-grid mesh-to-mesh L1 differences
-mature_state_generation:
-  source: later-time or post-analysis density from the accepted full-SPD model
-  required_features: [lobe_stretching, filamentation, multimodality, low_density_tails]
-  projection: one common mature state projected conservatively onto every tested mesh
-  include_bayesian_analysis: true
-  selection_rule: freeze the state and its provenance before candidate outcomes are inspected
-required_diagnostics:
-  - temporal and spatial common-grid density differences
-  - covariance error and marginal total-variation distances
-  - correction L1 and L2 norms
-  - negative cell-average mass before Stage 1
-  - projected probability mass and projected-cell count
-  - optimizer failures, fallbacks, iterations and runtime
-  - mass conservation, boundary probability and linear residual
-acceptance_gates:
-  every_step_whole_cell_positive: true
-  maximum_negative_mass: 1.0e-13
+  bootstrap_seed: 20261920
+  certificate_max_depth: 4
+  ksp_rtol: 1.0e-12
+  ksp_atol: 1.0e-15
+  initialization: mixture_projected
+  initial_quadrature_degree: 14
+  common_comparison_grid: [180, 216, 216]
+  density_metric_grid: [20, 24, 24]
+  density_smoothing_sigma: 0.75
+  spinup_particles: 200000
+  spinup_time: 2.0
+  spinup_dt: 0.001
+  components_per_lobe: 8
+  observation_z: 25.0
+  observation_variance: 16.0
+  noise_matrix:
+    - 1.4142135623730951
+    - 0.0
+    - 0.0
+    - 0.5656854249492381
+    - 1.2961481396815722
+    - 0.0
+    - 0.28284271247461906
+    - 0.3394673699166024
+    - 1.3434142714594956
+  branches:
+    - name: mature_bimodal_q2_local_qp_20x24x24
+      cells: [20, 24, 24]
+      export_subcells: 9
+      degree: 2
+      theta: 0.5
+      positivity_method: local_qp
+      optimizer_backend: osqp
+      optimizer_ftol: 1.0e-10
+      maximum_iterations: 10000
+      archive_raw: false
+    - name: mature_bimodal_q2_local_qp_30x36x36
+      cells: [30, 36, 36]
+      export_subcells: 6
+      degree: 2
+      theta: 0.5
+      positivity_method: local_qp
+      optimizer_backend: osqp
+      optimizer_ftol: 1.0e-10
+      maximum_iterations: 10000
+      archive_raw: false
+    - name: mature_bimodal_q2_local_qp_45x54x54
+      cells: [45, 54, 54]
+      export_subcells: 4
+      degree: 2
+      theta: 0.5
+      positivity_method: local_qp
+      optimizer_backend: osqp
+      optimizer_ftol: 1.0e-10
+      maximum_iterations: 10000
+      archive_raw: false
+  pairwise_comparisons:
+    - name: mature_bimodal_20_to_30
+      baseline: mature_bimodal_q2_local_qp_20x24x24
+      challenger: mature_bimodal_q2_local_qp_30x36x36
+    - name: mature_bimodal_30_to_45
+      baseline: mature_bimodal_q2_local_qp_30x36x36
+      challenger: mature_bimodal_q2_local_qp_45x54x54
+execution:
+  mpi_ranks: 8
+  numerical_threads: 1
+scientific_decision:
+  maximum_step_mass_change: 1.0e-12
   maximum_absolute_mass_error: 1.0e-10
-  optimizer_failures: 0
-  optimizer_fallbacks: 0
-  covariance_normalized_frobenius_max: 0.03
-  forecast_limiter_relative_l1_mean_max: 0.001
-  forecast_limiter_relative_l1_max: 0.005
-  analysis_limiter_relative_l1_max: 0.005
-  dt_halving_covariance_change_max: 0.003
-  dt_halving_l1_change_max: 0.0025
-  require_decreasing_mesh_l1_differences: true
-  require_positive_observed_spatial_order: true
-decision_rule: A complete pass advances the frozen mature-state case to aligned-box domain sensitivity; dataset generation remains unauthorized.
+  maximum_negative_mass: 1.0e-13
+  maximum_normalized_covariance_error: 0.08
+  maximum_covariance_error_to_mc_p95_ratio: 5.0
+  maximum_mean_relative_l1_correction: 0.001
+  maximum_relative_l1_correction: 0.005
+  maximum_off_diagonal_correlation_error: 0.08
+  maximum_marginal_tv: 0.05
+  maximum_lobe_probability_error: 0.025
+  maximum_smoothed_joint_tv: 0.15
+  maximum_initial_projection_joint_tv: 0.10
+  require_positive_observed_order: true
+  require_decreasing_correction: true
+research_gates:
+  - The initial law is fitted from an independent full-SPD stochastic ensemble after spin-up, symmetrized across Lorenz lobes, then conditioned analytically using a z-only likelihood.
+  - The frozen analytic Gaussian mixture is projected independently onto every Q2 mesh; its hash and pre-forecast projection discrepancies are recorded.
+  - Exact DG averages from all meshes are exported conservatively on the common 180x216x216 grid.
+  - The 30-to-45 L1 difference must be smaller than the 20-to-30 difference and the observed spatial rate must be positive.
+  - Mean QP correction must decrease strictly across the three meshes.
+  - Every completed step must be whole-cell Bernstein-certified with zero measured negative mass.
+  - Projection must preserve incoming mass to 1e-12 and final absolute mass error must be at most 1e-10.
+  - No optimizer failure or scalar fallback is accepted.
+  - Covariance, marginal, lobe-probability and smoothed joint-density errors must stay within the frozen limits.
+decision_rule: A complete pass advances the frozen candidate to aligned-box domain-truncation sensitivity; dataset generation remains unauthorized.
 revision_policy: Revise gates only with documented rationale before inspecting outcomes; never relax a criterion to rescue a completed run.
-warning: This is a predeclared research plan. The current experiment runner does not yet execute this kind.
+notes:
+  - The first mature gate deliberately uses the discriminating ambiguous bimodal posterior. A single-lobe posterior is a later confirmation case.
+  - The smoothed joint-density comparison uses one fixed coarse 3-D grid for every mesh; deterministic common-grid mesh differences remain the primary convergence evidence.
+  - The observed spatial rate is numerical evidence and is not a formal-order theorem.

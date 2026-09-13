@@ -123,11 +123,11 @@ NEXT_REQUIRED_GATE = MATURE_STATE
 The living plan is in `docs/RESEARCH_DIRECTIONS.md` and
 `experiments/method-selection-research.yaml`. Current high-value branches are:
 
-1. Update `experiments/mature-state-decision.yaml` for the certified local-QP
-   Q2--Crank--Nicolson full-SPD candidate and freeze its gates before execution.
-2. Project one common later-time or post-analysis density conservatively onto
-   every mesh, including Bayesian analysis when such posteriors are dataset
-   inputs.
+1. Execute the frozen `experiments/mature-state-decision.yaml` bimodal case for
+   the certified local-QP Q2--Crank--Nicolson full-SPD candidate.
+2. Use the independently spun-up, symmetry-preserving Gaussian-mixture law and
+   its z-only analysis posterior on every mesh; retain its immutable hash and
+   pre-forecast projection diagnostics.
 3. Record temporal/spatial density differences, covariance and marginal TVs,
    correction L1/L2, negative-average and projected probability mass, projected
    cell count, optimizer performance and conservation.
@@ -143,10 +143,9 @@ The living plan is in `docs/RESEARCH_DIRECTIONS.md` and
 8. Regenerate and test mature DA states only after the initialization,
    analysis, and positivity path used to produce them is acceptable.
 
-`experiments/mature-state-decision.yaml` remains a later certification stage,
-but it now permits any candidate that survives the earlier controlled method
-comparison. Threshold changes must be justified and versioned before the runs
-they assess.
+`experiments/mature-state-decision.yaml` is executable and frozen for the first,
+ambiguous bimodal mature-state hierarchy. Threshold changes must be justified
+and versioned before the runs they assess.
 
 ## Production diffusion scope
 

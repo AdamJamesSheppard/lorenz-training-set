@@ -95,6 +95,12 @@ scale this up until mature-state and domain gates pass:
   --obs-interval 0.05 --cells 30 36 36 --dt 0.000625
 ```
 
+Run the frozen mature bimodal certification hierarchy locally with:
+
+```bash
+./scripts/run-experiment experiments/mature-state-decision.yaml
+```
+
 Run validation and tests:
 
 ```bash
