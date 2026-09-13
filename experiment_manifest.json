@@ -1,8 +1,8 @@
 {
-  "created_utc": "2026-09-13T18:51:47.945545+00:00",
+  "created_utc": "2026-09-13T19:53:12.160098+00:00",
   "decision": "FULL_SPD_DIFFUSION_CERTIFIED",
   "workspace": "/mnt/large storage/Important/Derby Masters/Original Dissertation Royal Holloway/FENICS Code/NewTest",
-  "git_revision": "e81e4fd59805cf22d51fb4e1dd83ab0becbad18f",
+  "git_revision": "d1328d71958bf7d5cbf38dbaf0c5370b4f79718d",
   "version_fallback": "SHA-256 file hashes are authoritative when git_revision is null.",
   "software": {
     "python": "3.12.13 | packaged by conda-forge | (main, Mar  5 2026, 16:50:00) [GCC 14.3.0]",
@@ -19,7 +19,7 @@
   },
   "code_sha256": {
     "benchmark_scaling.py": "470f1a01360aac016bf51c4bb03a64f88acfb8cb5a8c6d0d7d9fd2b28e92b447",
-    "build_experiment_manifest.py": "16a195fbc791e7f21c7d3452dfd4d843db89060b5652a675adc589d8e4ff2ad0",
+    "build_experiment_manifest.py": "8963a169f70b75edf243e240837eb8ea384475366987c086b247c06bf42b4475",
     "generate_dataset.py": "81074edffe3a6f6bebcec4a623bc46604c5ea5158d371d74fddc54f47b6227d9",
     "independent_reference_study.py": "6d8d03c43cc826a8272be0186633d0894e021dd2ced89b19abe44a7550569e17",
     "local_projection_optimizer_study.py": "a5759444688b360c2005906f6e03f6381e2a4f5004f6773238b067df315a68fc",
@@ -49,7 +49,7 @@
   },
   "evidence": {
     "POSITIVITY_AUDIT.md": {
-      "sha256": "9d79d140ecb85c5a3fc5f19548dd86cb337215a800a2e1cae6e0f952ad9bd74c",
+      "sha256": "6d29c565a917788152766106f8e3b2388d857f203c37c42f16ee3bf3e460a8ab",
       "configuration": {}
     },
     "PRODUCTION_READINESS.md": {
@@ -299,11 +299,11 @@
       }
     },
     "METHOD_SELECTION_REPORT.md": {
-      "sha256": "ecaccc09d9f18ca5d082c8586494f117d4f79cca4eff429e3a5fa76f06ef58cd",
+      "sha256": "37d69d120b32ff107a74d1e0143fac61ad4610237dd65ef7f07af4c3b6140eea",
       "configuration": {}
     },
     "method_selection_report.json": {
-      "sha256": "7a53fab3d3cd02ec068319ab0ffa8481547a714663d28d5704ebdcf9b57af1a3",
+      "sha256": "2e9036a61970b8e61d18f7ddff662e0d4461c47da44db937ecf3be4564a89466",
       "configuration": {}
     },
     "same_mesh_q2_falsification_report.json": {
@@ -630,6 +630,42 @@
             0.811320901375,
             1.607467358252
           ]
+        }
+      }
+    },
+    "local_q2_mature_bimodal_report.json": {
+      "sha256": "54228f21da6172bc5cb7b7d3bd0fbfd0492e4f7c2b4a05d4b9a686f30279b258",
+      "configuration": {
+        "configuration": {
+          "meshes": [
+            [
+              20,
+              24,
+              24
+            ],
+            [
+              30,
+              36,
+              36
+            ],
+            [
+              45,
+              54,
+              54
+            ]
+          ],
+          "dt": 0.00015625,
+          "final_time": 0.05,
+          "particles": 1000000,
+          "bootstrap_replicates": 1000,
+          "bootstrap_seed": 20261920,
+          "spinup_particles": 200000,
+          "spinup_time": 2.0,
+          "mixture_components": 16,
+          "observation_operator": "z",
+          "observation": 25.0,
+          "observation_variance": 16.0,
+          "mixture_sha256": "8d39b72d3b46ad8c9f6634bc8a92edc36c6c1cbc170b5f81edfac6d6877261f0"
         }
       }
     }
