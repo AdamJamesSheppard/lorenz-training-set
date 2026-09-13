@@ -47,5 +47,7 @@
   reconstructing side-by-side MP4s from immutable per-timestep coefficient
   archives and terminal PNG summaries from completed run exports. The script
   records the distinction between pre-correction histories and terminal
-  corrected arrays in its generated `inventory.json`. SHA-256:
-  `4278c9ce8bc7893caf701e85dd8b62314376750f093f207faed2f6ebdb01d7f0`.
+  corrected arrays in its generated `inventory.json`. A deterministic Lorenz
+  orbit is drawn as explicitly labelled geometric context because the archived
+  forecasts last only `0.05` time units and do not traverse the attractor.
+  SHA-256: `973ef411f078629ad166e52912e481609e242a04b3a32164be7b61c53f8a0636`.
