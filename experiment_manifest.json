@@ -1,8 +1,8 @@
 {
-  "created_utc": "2026-09-12T18:56:29.522642+00:00",
-  "decision": "TEMPORAL_POSITIVITY_CERTIFIED",
+  "created_utc": "2026-09-13T13:34:26.630776+00:00",
+  "decision": "SPATIAL_POSITIVITY_CERTIFIED",
   "workspace": "/mnt/large storage/Important/Derby Masters/Original Dissertation Royal Holloway/FENICS Code/NewTest",
-  "git_revision": "6ae6b1ed9e0d4b70d59794567124f442f696b339",
+  "git_revision": "c573c7aa1d93bba866069bd5b6d92a9f784425a6",
   "version_fallback": "SHA-256 file hashes are authoritative when git_revision is null.",
   "software": {
     "python": "3.12.13 | packaged by conda-forge | (main, Mar  5 2026, 16:50:00) [GCC 14.3.0]",
@@ -14,12 +14,12 @@
     "osqp": "1.1.3",
     "mpi_library": "Open MPI v5.0.10, package: Open MPI conda@9ee00b64ad27 Distribution, ident: 5.0.10, repo rev: v5.0.10, Feb 23, 2026\u0000",
     "manifest_mpi_size": 1,
-    "cpu": "Architecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           48 bits physical, 48 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  16\nOn-line CPU(s) list:                     0-15\nVendor ID:                               AuthenticAMD\nModel name:                              AMD Ryzen 7 9800X3D 8-Core Processor\nCPU family:                              26\nModel:                                   68\nThread(s) per core:                      2\nCore(s) per socket:                      8\nSocket(s):                               1\nStepping:                                0\nFrequency boost:                         enabled\nCPU(s) scaling MHz:                      99%\nCPU max MHz:                             5271.6221\nCPU min MHz:                             603.3790\nBogoMIPS:                                9381.75\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good amd_lbr_v2 nopl xtopology nonstop_tsc cpuid extd_apicid aperfmperf rapl pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpuid_fault cpb cat_l3 cdp_l3 hw_pstate ssbd mba perfmon_v2 ibrs ibpb stibp ibrs_enhanced vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a avx512f avx512dq adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local user_shstk avx_vnni avx512_bf16 clzero irperf xsaveerptr rdpru wbnoinvd cppc arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload vgif v_spec_ctrl vnmi avx512vbmi umip pku ospke avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid bus_lock_detect movdiri movdir64b overflow_recov succor smca fsrm avx512_vp2intersect flush_l1d amd_lbr_pmc_freeze\nVirtualization:                          AMD-V\nL1d cache:                               384 KiB (8 instances)\nL1i cache:                               256 KiB (8 instances)\nL2 cache:                                8 MiB (8 instances)\nL3 cache:                                96 MiB (1 instance)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-15\nVulnerability Gather data sampling:      Not affected\nVulnerability Ghostwrite:                Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Old microcode:             Not affected\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Not affected\nVulnerability Spec rstack overflow:      Mitigation; IBPB on VMEXIT only\nVulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; Enhanced / Automatic IBRS; IBPB conditional; STIBP always-on; PBRSB-eIBRS Not affected; BHI Not affected\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Not affected\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Mitigation; IBPB on VMEXIT",
+    "cpu": "Architecture:                            x86_64\nCPU op-mode(s):                          32-bit, 64-bit\nAddress sizes:                           48 bits physical, 48 bits virtual\nByte Order:                              Little Endian\nCPU(s):                                  16\nOn-line CPU(s) list:                     0-15\nVendor ID:                               AuthenticAMD\nModel name:                              AMD Ryzen 7 9800X3D 8-Core Processor\nCPU family:                              26\nModel:                                   68\nThread(s) per core:                      2\nCore(s) per socket:                      8\nSocket(s):                               1\nStepping:                                0\nFrequency boost:                         enabled\nCPU(s) scaling MHz:                      94%\nCPU max MHz:                             5271.6221\nCPU min MHz:                             603.3790\nBogoMIPS:                                9381.75\nFlags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good amd_lbr_v2 nopl xtopology nonstop_tsc cpuid extd_apicid aperfmperf rapl pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpuid_fault cpb cat_l3 cdp_l3 hw_pstate ssbd mba perfmon_v2 ibrs ibpb stibp ibrs_enhanced vmmcall fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a avx512f avx512dq adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local user_shstk avx_vnni avx512_bf16 clzero irperf xsaveerptr rdpru wbnoinvd cppc arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload vgif v_spec_ctrl vnmi avx512vbmi umip pku ospke avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid bus_lock_detect movdiri movdir64b overflow_recov succor smca fsrm avx512_vp2intersect flush_l1d amd_lbr_pmc_freeze\nVirtualization:                          AMD-V\nL1d cache:                               384 KiB (8 instances)\nL1i cache:                               256 KiB (8 instances)\nL2 cache:                                8 MiB (8 instances)\nL3 cache:                                96 MiB (1 instance)\nNUMA node(s):                            1\nNUMA node0 CPU(s):                       0-15\nVulnerability Gather data sampling:      Not affected\nVulnerability Ghostwrite:                Not affected\nVulnerability Indirect target selection: Not affected\nVulnerability Itlb multihit:             Not affected\nVulnerability L1tf:                      Not affected\nVulnerability Mds:                       Not affected\nVulnerability Meltdown:                  Not affected\nVulnerability Mmio stale data:           Not affected\nVulnerability Old microcode:             Not affected\nVulnerability Reg file data sampling:    Not affected\nVulnerability Retbleed:                  Not affected\nVulnerability Spec rstack overflow:      Mitigation; IBPB on VMEXIT only\nVulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:                Mitigation; Enhanced / Automatic IBRS; IBPB conditional; STIBP always-on; PBRSB-eIBRS Not affected; BHI Not affected\nVulnerability Srbds:                     Not affected\nVulnerability Tsa:                       Not affected\nVulnerability Tsx async abort:           Not affected\nVulnerability Vmscape:                   Mitigation; IBPB on VMEXIT",
     "gpu": "NVIDIA GeForce RTX 4070, 12282 MiB"
   },
   "code_sha256": {
     "benchmark_scaling.py": "470f1a01360aac016bf51c4bb03a64f88acfb8cb5a8c6d0d7d9fd2b28e92b447",
-    "build_experiment_manifest.py": "18afe6924d8468c2bfe8250d3d07ea59d135b2f45cb652c4c5d49557717fedac",
+    "build_experiment_manifest.py": "34852f8342c8a4265d599087bd72ce34024c445d7bfe3b4813afb11248ddbbaf",
     "generate_dataset.py": "81074edffe3a6f6bebcec4a623bc46604c5ea5158d371d74fddc54f47b6227d9",
     "independent_reference_study.py": "6d8d03c43cc826a8272be0186633d0894e021dd2ced89b19abe44a7550569e17",
     "local_projection_optimizer_study.py": "a5759444688b360c2005906f6e03f6381e2a4f5004f6773238b067df315a68fc",
@@ -34,7 +34,7 @@
     "mature_forecast_validation.py": "0e53932d5ceda3f611c0decc2eac5861ae84023720011946d7733a16dc4a4465",
     "mc_timestep_repair.py": "077d5c9e9f277f1cfb210649f2da3526c2d7437d8bc17fdea661730e64c8b2b5",
     "resplit_dataset.py": "11587c66f55020daff7171e500230ff315fd5b17e781e4b653e2a8d8130267bf",
-    "same_mesh_q2_study.py": "ff9ced4378d349350275045523876370f32e09ab2a8d8d98849d5e6833476250",
+    "same_mesh_q2_study.py": "916367bb3ede06037ba95a4d7282fcdd91bb68957bb8c6db39e5451ab5735d84",
     "solver.py": "5060082cc7e6ad1671c5fe35d2ada34fb38bb4930b720a606ab02b0c66e48d36",
     "tests/__init__.py": "3b2bec5485bb3fb3bb29a41ff8b1d86feb92bbc6587a20491c94a0b29d2a195b",
     "tests/mpi_probe_worker.py": "f568a7e9937e7a0d7888b6fb85255eba63e3c711b635e6cbe1231fb000a87c74",
@@ -42,14 +42,14 @@
     "tests/test_limiter.py": "703d5eca288e21b30b915ff22c5116ddf0ff3575cda5a3e7332e4b52037079f8",
     "tests/test_mpi_consistency.py": "c8e3a7c194efd163ffb1e84c799a9f80fdbb32e512762a050fe7f46a4e454e8c",
     "tests/test_solver_smoke.py": "db2cffe6d15bf914069ddfdb75ee6a0d79e65e4d29e99e539a0dadd6f57e51b5",
-    "tests/test_spatial_experiment.py": "6d34eb9772708c86683e69b9eecebef19fb755aea9eb957b3b77f4d4565ca363",
+    "tests/test_spatial_experiment.py": "2cca9a1ee523db07a11751736ab762cc4612373d5016a1152d4100fc084ba15b",
     "tests/test_validation.py": "a4bd400fa133c4f72ec590d19502b46b6c617332939a27860f5e8da7d445c05b",
     "validate.py": "57214698ba0734874482948206d8ca905c441fab42958b72a13d8640bb168e2f",
     "validation_repair.py": "4ddd57a3ba81b7809526f4d3aa8bf1e332d39a56f95d24bd26212ddb3d1f25cb"
   },
   "evidence": {
     "POSITIVITY_AUDIT.md": {
-      "sha256": "3f29efeb2b044651bedabd5305857d04987bea2eac2fa2dbf23b1b71f40114b3",
+      "sha256": "739f97cb0ef6b7ff7306b84497728f4c361e5b5fae11b5d3acf2ab1e51d317c3",
       "configuration": {}
     },
     "PRODUCTION_READINESS.md": {
@@ -299,11 +299,11 @@
       }
     },
     "METHOD_SELECTION_REPORT.md": {
-      "sha256": "982e5463dff9c1af711820e1e3e13f9ee3d3e9212230d6d159d2077f44f131a0",
+      "sha256": "a03ef112df2f94f72988aa0e7de082732191e6b65cb8d82191f1a1872537b329",
       "configuration": {}
     },
     "method_selection_report.json": {
-      "sha256": "4d9e14df70d5539002fde54eac3a0465c1f03cb944e80667b14995d7080d6d40",
+      "sha256": "d72ce490464bd49be798c7920561c4edb59e763117aa557e9709ee85840167c6",
       "configuration": {}
     },
     "same_mesh_q2_falsification_report.json": {
@@ -500,6 +500,40 @@
           "optimizer_backend": "osqp",
           "ksp_rtol": 1e-12,
           "ksp_atol": 1e-15
+        }
+      }
+    },
+    "local_q2_spatial_refinement_report.json": {
+      "sha256": "dee2fe4735b6491019a926bda9159c9a6cbc85f15927274cc4d3749747c5e0fe",
+      "configuration": {
+        "configuration": {
+          "meshes": [
+            [
+              20,
+              24,
+              24
+            ],
+            [
+              30,
+              36,
+              36
+            ],
+            [
+              45,
+              54,
+              54
+            ]
+          ],
+          "refinement_ratio": 1.5,
+          "dt": 0.00015625,
+          "final_time": 0.05,
+          "common_comparison_grid": [
+            180,
+            216,
+            216
+          ],
+          "diffusion": "identity-noise D=I/2",
+          "initial_law": "one continuous finite-box Gaussian projected independently into Q2"
         }
       }
     }
