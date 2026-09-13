@@ -7,16 +7,17 @@ documentation, experiment, or architecture when a better-supported direction
 emerges; see `AGENTS.md` and `docs/RESEARCH_DIRECTIONS.md` for the maintenance
 and comparison policy.
 
-> **Current method-selection status (2026-09-12): `TEMPORAL_POSITIVITY_CERTIFIED`.**
+> **Current method-selection status (2026-09-13): `SPATIAL_POSITIVITY_CERTIFIED`.**
 > Do not generate a large training dataset. The authoritative corrected
 > evidence is [METHOD_SELECTION_REPORT.md](METHOD_SELECTION_REPORT.md).
 > Older readiness files and the sample dataset remain as audit history.
 > Q1 remains the controlled baseline. The tight four-level in-loop local-QP
 > Q2--Crank--Nicolson diagnostic passes its predeclared temporal, positivity and
 > mass gates, including zero measured negative mass over 1,200 timesteps and a
-> finest observed order of `1.741`. This certifies the startup-state temporal
-> and positivity stage only. Spatial, full-SPD, mature-state and domain gates
-> remain before any production dataset can be authorized.
+> finest temporal observed order of `1.741`. The subsequent identity-noise
+> spatial hierarchy passes with observed common-grid rate `3.403`, recorded as
+> numerical evidence rather than a formal-order proof. Full-SPD, mature-state
+> and domain gates remain before any production dataset can be authorized.
 
 This project implements the forecast step of a continuous-discrete Bayesian
 filter for the stochastic Lorenz-63 model.  It uses modern DOLFINx 0.11, UFL,
@@ -81,8 +82,8 @@ MPI forecast:
 ```
 
 The following is an **exploratory** DA command, not an approved production
-dataset command. The current status is `TEMPORAL_POSITIVITY_CERTIFIED`; do not
-scale this up until spatial, full-SPD, mature-state and domain gates pass:
+dataset command. The current status is `SPATIAL_POSITIVITY_CERTIFIED`; do not
+scale this up until full-SPD, mature-state and domain gates pass:
 
 ```bash
 ./scripts/run-in-env python generate_dataset.py \

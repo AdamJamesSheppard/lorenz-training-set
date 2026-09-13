@@ -1,6 +1,6 @@
 # Project state
 
-Updated: 2026-09-12
+Updated: 2026-09-13
 
 ## Objective
 
@@ -16,7 +16,14 @@ next experiment.
 
 ## Current decision
 
-- Method-selection classification: `TEMPORAL_POSITIVITY_CERTIFIED`.
+```ini
+METHOD_STATUS = SPATIAL_POSITIVITY_CERTIFIED
+PRODUCTION_DATASET_AUTHORIZED = false
+NEXT_REQUIRED_GATE = FULL_SPD_DIFFUSION
+```
+
+- Method-selection classification: `SPATIAL_POSITIVITY_CERTIFIED`.
+- Next required gate: `FULL_SPD_DIFFUSION`.
 - Large neural-operator dataset generation: `NO`.
 - Controlled baseline: Q1 DG, upwind advection, SIPG diffusion, backward
   Euler, quadrature-14 L2 initialization and projected Bayesian analysis,
@@ -26,8 +33,9 @@ next experiment.
   admissible density because it contains genuine negative mass.
 - Leading admissible candidate: same-mesh Q2 Crank--Nicolson with Stage-1
   average repair and local QP. The tight four-level startup-state diagnostic
-  passes every predeclared temporal, positivity and mass gate. Production
-  certification still requires spatial, full-SPD, mature-state and domain tests.
+  passes every predeclared temporal, positivity, mass and identity-noise spatial
+  gate. Production certification still requires full-SPD, mature-state and
+  domain tests.
 - The corrected production-scale run reproduces the earlier Q2 accuracy and
   timestep results while satisfying cell-average and scaling-factor invariants.
   Adaptive Q2 passes its full-step branch gates but fails the half-step mass
@@ -36,8 +44,13 @@ next experiment.
   `5.238e-4`, `5.418e-4`, and `1.620e-4`. The final ratio gives observed order
   `1.741`; all 1,200 timesteps are whole-cell Bernstein-certified with zero
   measured negative mass, optimizer failure or fallback. Absolute mass errors
-  are at most `1.87e-11`. This advances the candidate to spatial refinement,
+  are at most `1.87e-11`. This advanced the candidate to spatial refinement,
   while one fine-level order estimate does not prove asymptotic second order.
+- The completed `20x24x24 -> 30x36x36 -> 45x54x54` identity-noise hierarchy
+  has common-grid L1 differences `0.141394` and `0.0355845`, giving observed
+  rate `3.4026`. All 960 steps are whole-cell certified with zero measured
+  negative mass, optimizer failure or fallback. This is an observed common-grid
+  rate rather than a proved formal order.
 
 ## Latest validated evidence
 
@@ -67,17 +80,22 @@ next experiment.
   correction passes all predeclared dynamic gates. Covariance errors remain
   between `0.007488` and `0.007519`; the quarter/eighth density difference is
   `1.620e-4`, and the corresponding observed order is `1.741`.
+- Identity-noise spatial refinement passes every predeclared gate. Covariance
+  discrepancies decrease from `0.03033` to `0.005209` to `0.002340`; the
+  finest value lies below the 200,000-path bootstrap p95 `0.006491`, so further
+  covariance improvement is unresolved by that reference. The deterministic
+  common-grid density differences remain the primary convergence evidence.
 
 ## Active blockers
 
 1. No corrected mature-posterior forecast is validated near production
    resolution.
-2. Spatial transport error and positivity enforcement dominate the remaining
-   covariance discrepancy.
+2. Full-SPD mixed diffusion has not yet been tested with the certified
+   positivity architecture.
 3. The independent finite-volume hierarchy is not converged enough to define a
    full-density truth error.
-4. Spatial convergence of the positive local-QP Q2--Crank--Nicolson trajectory
-   has not been measured on a common continuous initial law.
+4. The identity-noise spatial hierarchy passed, but its observed rate `3.4026`
+   is not a theorem or proof of an asymptotic formal order.
 5. In the terminal unlimited CN states, about 17,500 of 38,880 cells have
    negative averages. Their total negative average mass is only about
    `4.34e-6`, but a mass-preserving cell-local polynomial projection is
@@ -94,15 +112,17 @@ next experiment.
 The living plan is in `docs/RESEARCH_DIRECTIONS.md` and
 `experiments/method-selection-research.yaml`. Current high-value branches are:
 
-1. Run `experiments/local-q2-cn-spatial-refinement.yaml`: the frozen candidate
-   on `20x24x24`, `30x36x36`, and `45x54x54` at `dt=1.5625e-4`, using one
-   continuous Gaussian law and exact conservative comparisons on a common
-   `180x216x216` grid.
-2. If the finest spatial difference is below `8.1e-4`, repeat the two finest
-   meshes at `dt=7.8125e-5` before interpreting spatial order.
-3. If spatial refinement passes, test a deliberately non-diagonal full-SPD
-   diffusion tensor without changing the correction architecture.
-4. Then validate a corrected mature Lorenz state and domain-size sensitivity.
+1. Run `experiments/local-q2-cn-full-spd-controlled.yaml` at `30x36x36` under
+   the predeclared non-diagonal diffusion tensor without changing the correction
+   architecture.
+2. Conditional on that pass, run
+   `experiments/local-q2-cn-full-spd-spatial-refinement.yaml` on the complete
+   `20x24x24 -> 30x36x36 -> 45x54x54` hierarchy.
+3. Use one million common-random-number particles, 1,000 bootstrap replicates
+   and one fixed bootstrap seed; retain deterministic mesh-to-mesh L1 as the
+   primary convergence evidence.
+4. Then validate a corrected mature Lorenz state, including the Bayesian
+   analysis step, followed by aligned-box domain-size sensitivity.
 5. If one of these gates fails, diagnose adaptive constraints or an
    operator-level positive low-order/AFC correction against the frozen local-QP
    comparator.

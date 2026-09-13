@@ -1,6 +1,6 @@
 # Research directions
 
-Updated: 2026-09-12
+Updated: 2026-09-13
 
 This is a living portfolio, not a queue that must be executed in order. Agents
 are welcome to add, remove, split, merge, or re-rank branches as the production
@@ -24,14 +24,16 @@ full/half/quarter/eighth run is fully positive with covariance error near
 `0.0075`; its final density difference falls from `5.418e-4` to `1.620e-4`,
 giving observed order `1.741`. All 1,200 steps pass the predeclared positivity,
 mass, optimizer and density gates. The candidate is now frozen for a
-constant-ratio spatial study. One fine-level temporal order remains numerical
-evidence rather than proof of an asymptotic rate.
+constant-ratio spatial study. That identity-noise hierarchy also passed, with
+common-grid density differences `0.141394` and `0.0355845` and observed rate
+`3.4026`. This rate remains numerical evidence rather than a formal-order proof.
+The immediate gate is the predeclared full-SPD control and spatial hierarchy.
 
 ## Active branches
 
 | Branch | Why it matters now | Switch/stop evidence |
 |---|---|---|
-| Local minimum-change Q2 projection | It passed the tight four-level startup-state temporal/positivity gates and is the leading admissible candidate. | Run the predeclared `20x24x24 -> 30x36x36 -> 45x54x54` spatial study; passing advances to full-SPD and mature-state tests. |
+| Local minimum-change Q2 projection | It passed the tight temporal/positivity study and identity-noise spatial hierarchy, so it is the leading admissible candidate. | Run the predeclared full-SPD control, then the conditional `20x24x24 -> 30x36x36 -> 45x54x54` full-SPD hierarchy; passing advances to mature-state tests. |
 | Positive low-order full-SPD operator | Supplies the invariant-domain baseline required by defensible local convex/AFC correction. | Must preserve mass, positivity and no-flux boundaries for 3-D Lorenz drift plus full SPD diffusion before antidiffusive fluxes are introduced. |
 | Adaptive Q2 Bernstein diagnosis | Separates a sufficient positivity certificate from witnessed negativity and unresolved near-zero cases. | Use as a diagnostic; reject it as a production decision procedure if unresolved cells dominate or correction remains intrusive. |
 | Adaptive local-QP constraints | May remove unnecessary fixed-Bernstein restrictions while retaining the minimum-change architecture. | Hold while the frozen fixed-constraint candidate undergoes spatial and generalization tests; revive if those diagnostics attribute failure to excessive correction. |

@@ -64,9 +64,11 @@ hidden. `LocalProjectionFokkerPlanckSolver` is an experimental propagation
 candidate that first applies the globally conservative average repair and then
 this local QP after each Q2--Crank--Nicolson solve. A reduced null-space form
 uses one fixed Hessian and inequality matrix with cell-dependent lower bounds.
-The implementation passed its QP-equivalence tests but failed the predeclared
-dynamic evidence gates because its adjacent density differences did not show
-positive observed order and two levels missed the absolute mass tolerance.
+The implementation passed its QP-equivalence tests, the superseding tight
+four-level temporal/positivity gate, and the identity-noise spatial hierarchy.
+Its observed common-grid spatial rate `3.4026` is numerical evidence rather
+than a proved formal order. Full-SPD, mature-state and domain certification
+remain pending.
 
 ## Executable invariants
 

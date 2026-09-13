@@ -1,0 +1,73 @@
+{
+  "classification": "PASSED_PREDECLARED_SPATIAL_GATES",
+  "method_status": "SPATIAL_POSITIVITY_CERTIFIED",
+  "production_dataset_authorized": false,
+  "next_required_gate": "FULL_SPD_DIFFUSION",
+  "run": "runs/local-q2-cn-spatial-refinement/20260912T194930Z",
+  "configuration": {
+    "meshes": [[20, 24, 24], [30, 36, 36], [45, 54, 54]],
+    "refinement_ratio": 1.5,
+    "dt": 0.00015625,
+    "final_time": 0.05,
+    "common_comparison_grid": [180, 216, 216],
+    "diffusion": "identity-noise D=I/2",
+    "initial_law": "one continuous finite-box Gaussian projected independently into Q2"
+  },
+  "density_l1_differences": [0.14139417962007356, 0.03558452871271594],
+  "observed_common_grid_spatial_rate": 3.4026124710433194,
+  "rate_interpretation": "Observed common-grid numerical rate; not a proved formal order or an asymptotic-regime proof.",
+  "branches": [
+    {
+      "cells": [20, 24, 24],
+      "absolute_mass_error": 9.904743691890872e-12,
+      "maximum_measured_negative_mass": 0.0,
+      "covariance_error": 0.030330771112117298,
+      "marginal_tvs": [0.00974611240369977, 0.0030841933654765655, 0.003751610927983394],
+      "mean_relative_l1_correction": 0.0005764000245071201,
+      "maximum_relative_l1_correction": 0.003288063318687303,
+      "optimizer_invocations": 439832,
+      "optimizer_failures": 0,
+      "fallbacks": 0,
+      "forecast_seconds": 185.71587716400973
+    },
+    {
+      "cells": [30, 36, 36],
+      "absolute_mass_error": 8.246736626915663e-13,
+      "maximum_measured_negative_mass": 0.0,
+      "covariance_error": 0.00520875785398566,
+      "marginal_tvs": [0.0023125876408841427, 0.0029382725648944064, 0.0013465117339630259],
+      "mean_relative_l1_correction": 0.00008022927558144481,
+      "maximum_relative_l1_correction": 0.0009555322725460405,
+      "optimizer_invocations": 2292445,
+      "optimizer_failures": 0,
+      "fallbacks": 0,
+      "forecast_seconds": 1025.7524684600066
+    },
+    {
+      "cells": [45, 54, 54],
+      "absolute_mass_error": 1.19625420680336e-11,
+      "maximum_measured_negative_mass": 0.0,
+      "covariance_error": 0.0023399078304645006,
+      "marginal_tvs": [0.0026839787188608195, 0.0031837886577335086, 0.0024564673384152294],
+      "mean_relative_l1_correction": 0.00000863920772142838,
+      "maximum_relative_l1_correction": 0.00007010543297649165,
+      "optimizer_invocations": 6860085,
+      "optimizer_failures": 0,
+      "fallbacks": 0,
+      "forecast_seconds": 3811.7186585490126
+    }
+  ],
+  "all_960_steps_whole_cell_positive": true,
+  "maximum_measured_negative_mass": 0.0,
+  "optimizer_failures": 0,
+  "total_fallbacks": 0,
+  "all_predeclared_gates_passed": true,
+  "dataset_generation_authorized": false,
+  "artifact_sha256": {
+    "config.yaml": "98bd7fc21898d43004117cff74d8197e50c4e9774279682d043995f9dfb1c170",
+    "scientific_decision.json": "38c61743ae9a2acf7bd3db176dc42bbdcfd26526285546ce000023b2ad4d15f5",
+    "pairwise_comparisons.json": "dede59f8f4222f94bfe74ff1ece191a631917cbfef3af21f6d236887f9124098",
+    "observed_spatial_order.json": "c52840a27ea2d38e49170a04da48b0b80878292b1c7b34a156654c1269d1e2ab",
+    "status.json": "2acfe01f61691c8202536b3c2b6525143150a9636afe18fd7a662b76df3ac80b"
+  }
+}

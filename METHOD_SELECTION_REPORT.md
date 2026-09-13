@@ -2,10 +2,11 @@
 
 ## Decision
 
-**Classification: `TEMPORAL_POSITIVITY_CERTIFIED`.** The local-QP
-Q2--Crank--Nicolson candidate has passed its startup-state temporal, positivity
-and mass gates. Spatial, full-SPD, mature-state and domain certification remain
-mandatory before generating a large neural-operator training set.
+**Classification: `SPATIAL_POSITIVITY_CERTIFIED`.** The local-QP
+Q2--Crank--Nicolson candidate has passed its startup-state temporal, positivity,
+mass and identity-noise spatial gates. Full-SPD, mature-state and domain
+certification remain mandatory before generating a large neural-operator
+training set.
 
 The controlled same-mesh and two-timestep experiments have been completed.
 They overturn the old equal-DOF ranking: corrected Q1 is now the controlled
@@ -22,7 +23,7 @@ in-loop trajectory is Stage-1 average repair plus the local QP (`E_cov` about
 | Q2, unlimited backward Euler | `0.00726675` | negative and density timestep gate fails |
 | Q2, unlimited Crank--Nicolson | `0.00371110` | temporal gates pass; negative mass makes it inadmissible |
 | Q2, Crank--Nicolson, adaptive global limiter | `0.0219156` | non-negative; density timestep gate fails |
-| Q2, Crank--Nicolson, Stage-1 plus local QP | `0.0075085` | tight four-level dynamic gates pass; spatial certification pending |
+| Q2, Crank--Nicolson, Stage-1 plus local QP | `0.0075085` | temporal and identity-noise spatial gates pass; full-SPD pending |
 
 The common 200,000-path Monte Carlo covariance bootstrap p95 is
 `0.00628239`. The unlimited Crank--Nicolson discrepancy lies below this measured
@@ -60,17 +61,18 @@ its final two differences are `5.418e-4` and `1.620e-4`, giving observed order
 `1.741`; all 1,200 steps pass positivity and mass gates with no optimizer
 failure or fallback. The candidate therefore advances to spatial refinement.
 
-The aggregate classification is `TEMPORAL_POSITIVITY_CERTIFIED`; no threshold
-was relaxed after seeing the result. This remains narrower than production
-certification. The next predeclared experiment freezes the solver and measures
-spatial refinement on `20x24x24`, `30x36x36`, and `45x54x54` meshes from one
-continuous initial law. Sections 18--25 record the experimental sequence.
+The aggregate classification is `SPATIAL_POSITIVITY_CERTIFIED`; no threshold
+was relaxed after seeing the identity-noise spatial result. This remains
+narrower than production certification. The next predeclared experiment freezes
+the solver and measures a non-diagonal full-SPD control at `30x36x36`, followed
+conditionally by the `20x24x24`, `30x36x36`, and `45x54x54` hierarchy. Sections
+18--26 record the experimental sequence.
 
 Role assignments are separate:
 
 | Role | Decision |
 |---|---|
-| Production reference solver | **Unfilled.** Local-QP Q2--Crank--Nicolson is the leading admissible candidate after passing startup-state temporal/positivity gates; spatial, full-SPD, mature-state and domain evidence remain required. |
+| Production reference solver | **Unfilled.** Local-QP Q2--Crank--Nicolson is the leading admissible candidate after passing startup-state temporal/positivity and identity-noise spatial gates; full-SPD, mature-state and domain evidence remain required. |
 | Independent verification solver | **Develop alongside correction work:** a dynamically scaled, translated whole-space Hermite-Galerkin solver, checked by mode decay and moment convergence, plus Monte Carlo for moments. Spectral positivity is not assumed. |
 | Current baseline | Q1 upwind/SIPG, backward Euler, quadrature-14 L2 initialization, projected Bayesian analysis and conservative postprocessing. It is a controlled comparator rather than a production selection. |
 
@@ -909,6 +911,45 @@ study advances the candidate to full-SPD and mature-state testing.
 Evidence: [`local_q2_tight_refinement_report.json`](local_q2_tight_refinement_report.json)
 and immutable run
 `runs/local-q2-cn-tight-ksp-refinement/20260912T003213Z`.
+
+## 26. Identity-noise spatial decision and full-SPD predeclaration (2026-09-13)
+
+The frozen candidate completed the predeclared `20x24x24`, `30x36x36`, and
+`45x54x54` spatial hierarchy at `dt=1.5625e-4`. Exact conservative comparisons
+on the common `180x216x216` grid give L1 differences `0.141394` and `0.0355845`.
+Their ratio yields observed spatial rate `3.4026`. This is an observed
+common-grid rate; it is neither a proved formal order nor proof that the meshes
+are asymptotic.
+
+All 960 completed steps are whole-cell Bernstein-certified. Measured negative
+mass, optimizer failures and scalar fallbacks are zero, and maximum terminal
+absolute mass error is `1.20e-11`. Covariance discrepancies decrease from
+`0.03033` to `0.005209` to `0.002340`. The finest discrepancy lies below the
+200,000-path bootstrap p95 `0.006491`, so the current reference cannot resolve
+further covariance improvement. Deterministic mesh-to-mesh L1 differences
+remain the primary convergence evidence.
+
+The method status is promoted to `SPATIAL_POSITIVITY_CERTIFIED`; dataset
+generation remains unauthorized. The next required gate is
+`FULL_SPD_DIFFUSION`. The predeclared tensor and factor are
+
+\[
+D=\begin{pmatrix}1&0.4&0.2\\0.4&1&0.3\\0.2&0.3&1\end{pmatrix},
+\qquad D=\tfrac12BB^T,
+\]
+
+with eigenvalues approximately `(0.581212, 0.811321, 1.607467)`. First run the
+frozen method at `30x36x36`; a pass authorizes the complete spatial hierarchy
+under the same tensor. The strengthened common reference uses one million
+particles, 1,000 bootstrap replicates and fixed bootstrap seed `20261910`.
+Predeclared gates cover every-step positivity, mass, optimizer/fallback counts,
+fixed covariance and correlation thresholds, correction strength, decreasing
+common-grid L1 differences and positive spatial order.
+
+Evidence: [`local_q2_spatial_refinement_report.json`](local_q2_spatial_refinement_report.json),
+immutable run `runs/local-q2-cn-spatial-refinement/20260912T194930Z`, and
+configurations [`experiments/local-q2-cn-full-spd-controlled.yaml`](experiments/local-q2-cn-full-spd-controlled.yaml)
+and [`experiments/local-q2-cn-full-spd-spatial-refinement.yaml`](experiments/local-q2-cn-full-spd-spatial-refinement.yaml).
 
 ## Sources
 

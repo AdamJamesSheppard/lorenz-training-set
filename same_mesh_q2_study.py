@@ -34,6 +34,13 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _model(noise_matrix: list[float] | tuple[float, ...] | None) -> Lorenz63Model:
+    if noise_matrix is None:
+        return Lorenz63Model()
+    matrix = np.asarray(noise_matrix, dtype=float).reshape(3, 3)
+    return Lorenz63Model(B=tuple(tuple(float(value) for value in row) for row in matrix))
+
+
 def _marginal_tv(cell_averages: np.ndarray, particles: np.ndarray,
                  domain: Domain) -> list[float]:
     probability=cell_averages*domain.volume/np.prod(domain.cells)
@@ -75,7 +82,7 @@ def prepare_reference(args: argparse.Namespace) -> None:
     if MPI.COMM_WORLD.size!=1:
         raise SystemExit("reference preparation must run on one rank")
     output=args.output.resolve(); output.mkdir(parents=True,exist_ok=False)
-    domain=Domain(cells=tuple(args.cells)); model=Lorenz63Model()
+    domain=Domain(cells=tuple(args.cells)); model=_model(args.noise_matrix)
     solver=FokkerPlanckSolver(model,domain,args.dt,degree=1)
     mean=np.asarray(args.mean,dtype=float)
     covariance=np.diag(np.square(np.asarray(args.std,dtype=float)))
@@ -120,7 +127,9 @@ def prepare_reference(args: argparse.Namespace) -> None:
     particle_path=output/"mc_final_particles.npy"; np.save(particle_path,particles)
     report={
         "configuration":{"cells":list(args.cells),"dt":args.dt,"t_final":args.t_final,
-            "particles":args.particles,"mc_dt":args.mc_dt,"seed":args.seed},
+            "particles":args.particles,"mc_dt":args.mc_dt,"seed":args.seed,
+            "noise_matrix":np.asarray(model.B,dtype=float).tolist(),
+            "diffusion_matrix":model.diffusion.tolist()},
         "initialization":initialization,
         "initial_diagnostics":initial_diagnostics,"native_sampling":sampling,
         "mc":{"mean":particles.mean(0).tolist(),"covariance":np.cov(particles,rowvar=False).tolist(),
@@ -140,7 +149,7 @@ def run_forecast(args: argparse.Namespace) -> None:
     if rank==0:
         output.mkdir(parents=True,exist_ok=False)
     comm.barrier()
-    domain=Domain(cells=tuple(args.cells)); model=Lorenz63Model()
+    domain=Domain(cells=tuple(args.cells)); model=_model(args.noise_matrix)
     solver_class = LocalProjectionFokkerPlanckSolver if args.local_projection else FokkerPlanckSolver
     solver_options = {}
     if args.local_projection:
@@ -245,7 +254,7 @@ def run_forecast(args: argparse.Namespace) -> None:
         np.save(final_subcells_path,final_subcells)
     particles=np.load(args.mc_particles) if rank==0 else None
     if rank==0:
-        bootstrap_seed=args.seed+1000
+        bootstrap_seed=args.bootstrap_seed
         comparisons={name:{
             "covariance_accuracy":covariance_accuracy(
                 np.asarray(stage_diagnostics[name]["covariance"]),particles,
@@ -305,7 +314,9 @@ def run_forecast(args: argparse.Namespace) -> None:
                 "initial_quadrature_degree":args.initial_quadrature_degree,
                 "export_subcells_per_cell":args.export_subcells,
                 "bootstrap_replicates":args.bootstrap,
-                "bootstrap_seed":bootstrap_seed,"seed":args.seed},
+                "bootstrap_seed":bootstrap_seed,"seed":args.seed,
+                "noise_matrix":np.asarray(model.B,dtype=float).tolist(),
+                "diffusion_matrix":model.diffusion.tolist()},
             "initial_embedding":embedding,"initial_diagnostics":initial_diagnostics,
             "final_stage_diagnostics":stage_diagnostics,"comparisons_to_common_mc":comparisons,
             "limiter_history":history,
@@ -381,6 +392,7 @@ def parser() -> argparse.ArgumentParser:
     common.add_argument("--dt",type=float,default=.000625)
     common.add_argument("--t-final",type=float,default=.05)
     common.add_argument("--seed",type=int,default=20260910)
+    common.add_argument("--noise-matrix",type=float,nargs=9)
     common.add_argument("--output",type=Path,required=True)
     prep=sub.add_parser("prepare",parents=[common])
     prep.add_argument("--particles",type=int,default=200000)
@@ -405,6 +417,7 @@ def parser() -> argparse.ArgumentParser:
     run.add_argument("--export-subcells",type=int,default=3)
     run.add_argument("--mc-particles",type=Path,required=True)
     run.add_argument("--bootstrap",type=int,default=200)
+    run.add_argument("--bootstrap-seed",type=int,default=20261910)
     run.add_argument("--disable-positivity",action="store_true")
     run.add_argument("--local-projection",action="store_true")
     run.add_argument("--local-optimizer-backend",choices=("osqp","slsqp"),default="osqp")

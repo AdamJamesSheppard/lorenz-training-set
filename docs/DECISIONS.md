@@ -4,6 +4,25 @@ Decisions here are dated and revisable. Add a new entry that marks an older
 decision `superseded`, `narrowed`, or `confirmed` rather than rewriting history
 to make the current direction look inevitable.
 
+## 2026-09-13 - Promote local-QP CN to full-SPD certification
+
+The predeclared identity-noise spatial hierarchy passes. Exact common-grid L1
+differences decrease from `0.141394` to `0.0355845`, giving observed rate
+`3.4026`. All 960 timesteps are whole-cell Bernstein-certified with zero
+measured negative mass, optimizer failure or fallback; maximum final mass error
+is `1.20e-11`. Treat `3.4026` as an observed common-grid rate rather than a
+proved formal order.
+
+This supersedes the spatial-pending portion of the 2026-09-12 decision and sets
+the status to `SPATIAL_POSITIVITY_CERTIFIED`. Dataset generation remains
+unauthorized. The next gate is `FULL_SPD_DIFFUSION`: first run the frozen
+candidate at `30x36x36`, then conditionally run the complete spatial hierarchy
+under the predeclared non-diagonal diffusion tensor. The strengthened reference
+uses one million common-random-number particles, 1,000 bootstrap replicates and
+one fixed bootstrap seed. Exact specifications are
+`experiments/local-q2-cn-full-spd-controlled.yaml` and
+`experiments/local-q2-cn-full-spd-spatial-refinement.yaml`.
+
 ## 2026-09-12 - Promote local-QP CN to spatial certification
 
 The tight full/half/quarter/eighth diagnostic passes all predeclared dynamic

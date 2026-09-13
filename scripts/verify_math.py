@@ -28,6 +28,9 @@ def main() -> int:
     tight_refinement = json.loads(
         (ROOT / "local_q2_tight_refinement_report.json").read_text()
     )
+    spatial_refinement = json.loads(
+        (ROOT / "local_q2_spatial_refinement_report.json").read_text()
+    )
     diffusion = Lorenz63Model().diffusion
 
     mass_errors = [abs(float(row["mass_error"])) for row in boundary["rows"]]
@@ -89,7 +92,31 @@ def main() -> int:
             and tight_refinement["scaling_fallbacks"] == 0
             and tight_refinement["consecutive_observed_orders"][-1] > 0.0
             and not tight_refinement["dataset_generation_authorized"]
-            and classification == "TEMPORAL_POSITIVITY_CERTIFIED"
+            and classification in {
+                "TEMPORAL_POSITIVITY_CERTIFIED", "SPATIAL_POSITIVITY_CERTIFIED"
+            }
+        ),
+        "spatial_local_qp_consistent": bool(
+            spatial_refinement["classification"]
+            == "PASSED_PREDECLARED_SPATIAL_GATES"
+            and spatial_refinement["method_status"]
+            == "SPATIAL_POSITIVITY_CERTIFIED"
+            and not spatial_refinement["production_dataset_authorized"]
+            and spatial_refinement["next_required_gate"] == "FULL_SPD_DIFFUSION"
+            and spatial_refinement["density_l1_differences"][1]
+            < spatial_refinement["density_l1_differences"][0]
+            and spatial_refinement["observed_common_grid_spatial_rate"] > 0.0
+            and all(
+                branch["maximum_measured_negative_mass"] == 0.0
+                and branch["absolute_mass_error"] <= 1.0e-10
+                and branch["optimizer_failures"] == 0
+                and branch["fallbacks"] == 0
+                for branch in spatial_refinement["branches"]
+            )
+            and classification == "SPATIAL_POSITIVITY_CERTIFIED"
+            and decision.get("method_status") == "SPATIAL_POSITIVITY_CERTIFIED"
+            and decision.get("production_dataset_authorized") is False
+            and decision.get("next_required_gate") == "FULL_SPD_DIFFUSION"
         ),
     }
     result = {
@@ -122,6 +149,13 @@ def main() -> int:
             "tight_local_qp_timestep_l1": tight_refinement["adjacent_density_l1"],
             "tight_local_qp_finest_observed_order": tight_refinement
             ["consecutive_observed_orders"][-1],
+            "spatial_local_qp_density_l1": spatial_refinement
+            ["density_l1_differences"],
+            "spatial_local_qp_observed_common_grid_rate": spatial_refinement
+            ["observed_common_grid_spatial_rate"],
+            "spatial_local_qp_covariance_errors": [
+                branch["covariance_error"] for branch in spatial_refinement["branches"]
+            ],
         },
         "interpretation": (
             "The tested invariants and evidence consistency pass. Production certification is "

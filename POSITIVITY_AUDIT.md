@@ -14,13 +14,15 @@ Negative cell averages are a declared infeasibility outcome because no
 non-negative polynomial can have a negative integral. The optional hybrid
 diagnostic first applies the incumbent global conservative average projection,
 then replaces Stage-2 scalar scaling by the local QP. The same hybrid is wired
-as an explicitly experimental Q2 propagation strategy for a predeclared
-three-timestep test. The mass equality is eliminated in a fixed null-space
+as an explicitly experimental Q2 propagation strategy. The mass equality is eliminated in a fixed null-space
 basis, after which OSQP reuses the same reduced Hessian and inequality matrix
 for every cell. SLSQP remains available as an oracle. Accepted outputs undergo
 the same full-constraint, average and scalar-objective-bound checks. The
-completed dynamic run certified all 560 steps, but failed positive observed
-timestep order and is not enabled during production propagation.
+historical three-level run certified all 560 steps but failed positive observed
+timestep order. The superseding tight four-level run and identity-noise spatial
+hierarchy pass their predeclared positivity, conservation and convergence gates.
+Full-SPD, mature-state and domain evidence remain required, and this candidate
+is not enabled during production propagation.
 
 > This audit originally covered Q1. The experimental Q2/Q3 path now uses
 > Bernstein coefficients on `2x2x2` control subcells. An experimental adaptive

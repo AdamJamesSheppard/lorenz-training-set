@@ -1,9 +1,12 @@
 {
-  "report_date": "2026-09-12",
-  "classification": "TEMPORAL_POSITIVITY_CERTIFIED",
+  "report_date": "2026-09-13",
+  "classification": "SPATIAL_POSITIVITY_CERTIFIED",
+  "method_status": "SPATIAL_POSITIVITY_CERTIFIED",
+  "production_dataset_authorized": false,
+  "next_required_gate": "FULL_SPD_DIFFUSION",
   "large_neural_operator_dataset": "NO",
   "recommended": {
-    "production_forecast_generator": "No method is production certified. Stage-1 average repair plus local mass-matrix QP applied after every Q2 Crank--Nicolson step passes the predeclared four-level startup-state temporal, positivity and mass gates. Freeze this candidate and advance it to controlled spatial refinement; dataset generation remains blocked pending spatial, full-SPD, mature-state and domain evidence.",
+    "production_forecast_generator": "No method is production certified. Stage-1 average repair plus local mass-matrix QP applied after every Q2 Crank--Nicolson step passes the predeclared startup-state temporal, positivity and identity-noise spatial gates. Freeze this candidate and advance it to controlled full-SPD diffusion; dataset generation remains blocked pending full-SPD, mature-state and domain evidence.",
     "independent_validator": "Develop a dynamically scaled and translated whole-space Hermite-Galerkin reference alongside the positivity-correction work, validated by mode-tail and moment convergence; retain exact-native-law Monte Carlo for moment uncertainty and the independent FV hierarchy for current triangulation.",
     "neural_operator_target_representation": "If a pilot is run: float64 exact conservative subcell averages; Q1 requires 2 subcells per native cell per axis (60x72x72 for the tested 30x36x36 mesh).",
     "expected_covariance_error": {
@@ -27,7 +30,7 @@
       "monte_carlo_200000_cpu_sampling_propagation_histogram_seconds": 3.369948232000722,
       "scope": "One 0.05 forecast interval; MC figure excludes principled bandwidth selection and accuracy certification."
     },
-    "principal_remaining_limitation": "Temporal refinement has exposed one positive fine-level order but has not proved asymptotic second-order convergence. Spatial convergence of the positive Q2--Crank--Nicolson trajectory is unmeasured, and full-SPD, corrected mature-posterior, finite-domain and independent full-density-reference evidence remain absent."
+    "principal_remaining_limitation": "The observed identity-noise common-grid spatial rate 3.4026 is numerical evidence rather than a proved formal order. Full-SPD diffusion, corrected mature-posterior, finite-domain and independently resolved full-density evidence remain absent."
   },
   "pde": {
     "linear_in_density": true,
@@ -258,15 +261,25 @@
     "absolute_mass_errors": [8.326672684688674e-14, 3.3018032752352156e-13, 8.266720641358916e-13, 1.8698820269946737e-11],
     "decision": "Advance the frozen candidate to controlled spatial refinement. The positive final order is one fine-level estimate rather than proof of asymptotic second-order convergence. Dataset generation remains unauthorized."
   },
-  "predeclared_spatial_refinement": {
+  "executed_spatial_refinement": {
+    "evidence": "local_q2_spatial_refinement_report.json",
+    "run": "runs/local-q2-cn-spatial-refinement/20260912T194930Z",
+    "status": "PASSED_PREDECLARED_SPATIAL_GATES",
     "configuration": "experiments/local-q2-cn-spatial-refinement.yaml",
     "meshes": [[20, 24, 24], [30, 36, 36], [45, 54, 54]],
     "refinement_ratio": 1.5,
     "dt": 0.00015625,
     "common_comparison_grid": [180, 216, 216],
     "initial_law": "one continuous finite-box Gaussian projected independently into Q2 on every mesh",
-    "primary_gate": "The fine mesh-pair L1 difference must be smaller than the coarse pair and the observed spatial order must be positive.",
-    "temporal_safeguard": "If the 30-to-45 L1 difference is below 8.1e-4, repeat the two finest meshes at dt=7.8125e-5."
+    "density_l1_differences": [0.14139417962007356, 0.03558452871271594],
+    "observed_common_grid_rate": 3.4026124710433194,
+    "rate_interpretation": "Observed common-grid numerical rate, not a proved formal order.",
+    "covariance_errors": [0.030330771112117298, 0.00520875785398566, 0.0023399078304645006],
+    "all_960_steps_whole_cell_positive": true,
+    "maximum_measured_negative_mass": 0.0,
+    "optimizer_failures": 0,
+    "fallbacks": 0,
+    "decision": "Advance the frozen candidate to full-SPD certification. Dataset generation remains unauthorized."
   },
   "fixed_q2_raw_archive": {
     "archive": "../sources/upload/newtest_08.zip",
@@ -277,9 +290,11 @@
     "numerical_decision_changed": false
   },
   "smallest_additional_experiment_required": {
-    "name": "local_q2_cn_spatial_refinement",
-    "description": "Run the frozen local-QP Q2 Crank--Nicolson candidate on the constant-ratio 20x24x24, 30x36x36 and 45x54x54 hierarchy at dt=1.5625e-4 from one common continuous initial law.",
-    "decision_rule": "Require decreasing exact common-grid L1 differences, positive observed spatial order, every-step whole-cell positivity, final mass error at most 1e-10 and zero optimizer failures or fallbacks. Invoke the predeclared temporal safeguard when the finest spatial difference is below 8.1e-4."
+    "name": "local_q2_cn_full_spd_control_then_spatial_refinement",
+    "description": "Run the frozen local-QP Q2 Crank--Nicolson candidate first on 30x36x36 and, conditional on passing, on the 20x24x24, 30x36x36 and 45x54x54 hierarchy under the fixed non-diagonal SPD diffusion tensor.",
+    "decision_rule": "Require every-step whole-cell positivity, mass error at most 1e-10, zero optimizer failures or fallbacks, fixed covariance/correlation and correction-strength gates, then decreasing common-grid L1 differences and positive observed spatial order.",
+    "controlled_configuration": "experiments/local-q2-cn-full-spd-controlled.yaml",
+    "hierarchy_configuration": "experiments/local-q2-cn-full-spd-spatial-refinement.yaml"
   },
   "reproducibility": {
     "python": "3.12.13",
@@ -317,6 +332,7 @@
     "local_q2_projection_performance_report.json",
     "local_q2_optimizer_validation_report.json",
     "local_q2_dynamic_projection_report.json",
-    "local_q2_tight_refinement_report.json"
+    "local_q2_tight_refinement_report.json",
+    "local_q2_spatial_refinement_report.json"
   ]
 }

@@ -39,10 +39,9 @@ Read deeper documentation only when it is relevant to the task.
 - Use the evidence labels in `docs/CLAIMS.md`.
 - Cite assumption IDs from `docs/assumptions.yaml` when they matter.
 - Do not claim novelty without a literature search.
-- The current method status is `TEMPORAL_POSITIVITY_CERTIFIED`; do not generate
-  a large training dataset until the predeclared spatial, full-SPD,
-  mature-state and domain gates pass and the project state is explicitly
-  updated.
+- The current method status is `SPATIAL_POSITIVITY_CERTIFIED`; do not generate
+  a large training dataset until the predeclared full-SPD, mature-state and
+  domain gates pass and the project state is explicitly updated.
 
 ## Living research policy
 

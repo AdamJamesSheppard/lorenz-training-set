@@ -1,0 +1,66 @@
+id: local-q2-cn-full-spd-controlled
+kind: full_spd_q2_study
+status: predeclared_diagnostic
+study:
+  cells: [30, 36, 36]
+  dt: 0.00015625
+  final_time: 0.05
+  seed: 20260910
+  monte_carlo_paths: 1000000
+  mc_dt: 0.000125
+  bootstrap_replicates: 1000
+  bootstrap_seed: 20261910
+  certificate_max_depth: 4
+  ksp_rtol: 1.0e-12
+  ksp_atol: 1.0e-15
+  initialization: gaussian_projected
+  initial_mean: [1.0, 1.0, 20.0]
+  initial_standard_deviation: [2.0, 2.0, 3.0]
+  initial_quadrature_degree: 14
+  noise_matrix:
+    - 1.4142135623730951
+    - 0.0
+    - 0.0
+    - 0.5656854249492381
+    - 1.2961481396815722
+    - 0.0
+    - 0.28284271247461906
+    - 0.3394673699166024
+    - 1.3434142714594956
+  branches:
+    - name: q2_local_qp_cn_full_spd_30x36x36
+      cells: [30, 36, 36]
+      export_subcells: 6
+      degree: 2
+      theta: 0.5
+      positivity_method: local_qp
+      optimizer_backend: osqp
+      optimizer_ftol: 1.0e-10
+      maximum_iterations: 10000
+      archive_raw: false
+execution:
+  mpi_ranks: 8
+  numerical_threads: 1
+scientific_decision:
+  maximum_step_mass_change: 1.0e-12
+  maximum_absolute_mass_error: 1.0e-10
+  maximum_negative_mass: 1.0e-13
+  maximum_normalized_covariance_error: 0.02
+  maximum_mean_relative_l1_correction: 0.00025
+  maximum_relative_l1_correction: 0.003
+  maximum_off_diagonal_covariance_error: 0.05
+  maximum_off_diagonal_correlation_error: 0.02
+research_gates:
+  - The configured noise factor reconstructs the fixed full-SPD diffusion tensor to roundoff.
+  - Every completed step is whole-cell Bernstein-certified with zero measured negative mass.
+  - Projection preserves incoming mass to 1e-12 and final absolute mass error is at most 1e-10.
+  - No optimizer failure or scalar fallback is accepted.
+  - Normalized covariance discrepancy is at most 0.02 against the fixed common Monte Carlo reference.
+  - Mean and maximum relative L1 corrections are at most 2.5e-4 and 3e-3 respectively.
+  - Maximum absolute off-diagonal covariance and correlation errors are at most 0.05 and 0.02.
+  - Passing authorizes the predeclared full-SPD spatial hierarchy, not dataset generation.
+notes:
+  - D is [[1,0.4,0.2],[0.4,1,0.3],[0.2,0.3,1]] and D=BB^T/2.
+  - The particle count is 1e6 and the bootstrap uses 1000 replicates with one fixed seed.
+  - The 0.02 covariance gate is an absolute normalized threshold; the bootstrap noise ratio remains diagnostic.
+
