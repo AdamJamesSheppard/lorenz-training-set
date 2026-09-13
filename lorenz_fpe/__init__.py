@@ -11,9 +11,11 @@ from .core import (
     TruthSimulator,
 )
 from .local_projection import LocalPolynomialProjector, LocalProjectionFokkerPlanckSolver
+from .afc import AFCProjectionFokkerPlanckSolver
 
 __all__ = [
     "BayesianAnalysis",
+    "AFCProjectionFokkerPlanckSolver",
     "DensityState",
     "Domain",
     "FokkerPlanckSolver",

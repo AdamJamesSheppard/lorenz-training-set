@@ -1,0 +1,121 @@
+id: mature-full-spd-afc-update
+kind: mature_afc_q2_study
+status: predeclared_executable_mature_update_comparator
+purpose: Separate mature-state initialization error from dynamic positivity error by replacing per-step average repair with a positive low-order/AFC update while retaining the same Q2-CN target, full-SPD tensor, law, timestep, and meshes.
+study:
+  cells: [20, 24, 24]
+  comparison_refinement_ratio: 1.5
+  dt: 0.00015625
+  final_time: 0.05
+  seed: 20260920
+  monte_carlo_paths: 1000000
+  mc_dt: 0.000125
+  bootstrap_replicates: 1000
+  bootstrap_seed: 20261920
+  certificate_max_depth: 4
+  ksp_rtol: 1.0e-12
+  ksp_atol: 1.0e-15
+  initialization: mixture_projected
+  initial_quadrature_degree: 14
+  common_comparison_grid: [180, 216, 216]
+  density_metric_grid: [20, 24, 24]
+  density_smoothing_sigma: 0.75
+  reference_reuse: runs/local-q2-cn-full-spd-mature-bimodal/20260913T185157Z/reference
+  spinup_particles: 200000
+  spinup_time: 2.0
+  spinup_dt: 0.001
+  components_per_lobe: 8
+  observation_z: 25.0
+  observation_variance: 16.0
+  noise_matrix:
+    - 1.4142135623730951
+    - 0.0
+    - 0.0
+    - 0.5656854249492381
+    - 1.2961481396815722
+    - 0.0
+    - 0.28284271247461906
+    - 0.3394673699166024
+    - 1.3434142714594956
+  branches:
+    - name: mature_bimodal_q2_afc_20x24x24
+      cells: [20, 24, 24]
+      export_subcells: 9
+      degree: 2
+      theta: 0.5
+      positivity_method: afc_local_qp
+      optimizer_backend: osqp
+      optimizer_ftol: 1.0e-10
+      maximum_iterations: 10000
+      archive_raw: false
+      comparator_report: runs/local-q2-cn-full-spd-mature-bimodal/20260913T185157Z/mature_bimodal_q2_local_qp_20x24x24/report.json
+    - name: mature_bimodal_q2_afc_30x36x36
+      cells: [30, 36, 36]
+      export_subcells: 6
+      degree: 2
+      theta: 0.5
+      positivity_method: afc_local_qp
+      optimizer_backend: osqp
+      optimizer_ftol: 1.0e-10
+      maximum_iterations: 10000
+      archive_raw: false
+      comparator_report: runs/local-q2-cn-full-spd-mature-bimodal/20260913T185157Z/mature_bimodal_q2_local_qp_30x36x36/report.json
+    - name: mature_bimodal_q2_afc_45x54x54
+      cells: [45, 54, 54]
+      export_subcells: 4
+      degree: 2
+      theta: 0.5
+      positivity_method: afc_local_qp
+      optimizer_backend: osqp
+      optimizer_ftol: 1.0e-10
+      maximum_iterations: 10000
+      archive_raw: false
+      comparator_report: runs/local-q2-cn-full-spd-mature-bimodal/20260913T185157Z/mature_bimodal_q2_local_qp_45x54x54/report.json
+  pairwise_comparisons:
+    - name: mature_afc_20_to_30
+      baseline: mature_bimodal_q2_afc_20x24x24
+      challenger: mature_bimodal_q2_afc_30x36x36
+    - name: mature_afc_30_to_45
+      baseline: mature_bimodal_q2_afc_30x36x36
+      challenger: mature_bimodal_q2_afc_45x54x54
+execution:
+  mpi_ranks: 8
+  numerical_threads: 1
+scientific_decision:
+  maximum_step_mass_change: 1.0e-12
+  maximum_absolute_mass_error: 1.0e-10
+  maximum_negative_mass: 1.0e-13
+  maximum_normalized_covariance_error: 0.08
+  maximum_covariance_error_to_mc_p95_ratio: 5.0
+  maximum_mean_relative_l1_correction: 0.0008
+  maximum_relative_l1_correction: 0.005
+  maximum_off_diagonal_correlation_error: 0.08
+  maximum_marginal_tv: 0.05
+  maximum_lobe_probability_error: 0.025
+  maximum_smoothed_joint_tv: 0.15
+  maximum_initial_projection_joint_tv: 0.10
+  maximum_low_order_cfl: 1.0
+  maximum_afc_average_conservation_error: 1.0e-12
+  comparator_limits:
+    maximum_covariance_error_increase: 0.001
+    maximum_lobe_error_increase: 0.001
+    maximum_joint_tv_increase: 0.005
+    maximum_marginal_tv_increase: 0.005
+  require_positive_observed_order: true
+  require_decreasing_correction: true
+research_gates:
+  - Reuse the immutable independent Monte Carlo particles and analytic mature mixture from the completed mature-state hierarchy.
+  - Project that same mixture once with the incumbent local QP on each mesh before either update architecture; initialization correction is reported separately and excluded from the dynamic-correction mean.
+  - Keep Q2, Crank--Nicolson, the full-SPD tensor, timestep, forecast horizon, mesh hierarchy, comparison grids, bootstrap seed, and Monte Carlo reference fixed.
+  - The low-order cell-average graph update must be conservative and positive under its recorded CFL bound.
+  - Limited algebraic antidiffusion must preserve mass while moving toward the raw Q2-CN cell averages.
+  - The remaining cell-local QP may change higher modes but must preserve the AFC cell average.
+  - Mean total dynamic correction must be below 0.0008 and decrease strictly under refinement.
+  - The 30-to-45 L1 difference must be smaller than the 20-to-30 difference and the common-grid observed rate must be positive.
+  - Every completed step must be whole-cell Bernstein-certified with zero measured negative mass, optimizer failures, and fallbacks.
+  - Covariance, lobe, marginal, and joint-density errors may not exceed the frozen incumbent comparator by their predeclared increments.
+decision_rule: A complete pass certifies the AFC update for the mature bimodal gate and advances to domain sensitivity. Any failed frozen gate keeps MATURE_STATE open and identifies whether the failure is update positivity, polynomial representation, or under-resolution.
+revision_policy: Revise gates only with documented rationale before inspecting outcomes; never relax a criterion to rescue a completed run.
+notes:
+  - The AFC average limiter uses a conservative complete-graph algebraic decomposition; it is an experimental comparator and is not represented as identical to a published edge-local AFC construction.
+  - The observed common-grid rate is numerical evidence, not a formal-order theorem.

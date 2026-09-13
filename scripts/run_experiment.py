@@ -38,7 +38,7 @@ def main(config_path: Path) -> int:
     kind=config.get("kind")
     if kind not in {
         "forecast", "same_mesh_q2_study", "spatial_q2_study", "full_spd_q2_study",
-        "mature_full_spd_q2_study",
+        "mature_full_spd_q2_study", "mature_afc_q2_study",
         "mature_positivity_diagnostic",
         "local_projection_study",
         "local_projection_optimizer_validation",
@@ -85,33 +85,38 @@ def main(config_path: Path) -> int:
             command = ["mpiexec", "-n", str(ranks), *command]
         commands.append(("forecast",command,run_dir))
     elif kind in {"same_mesh_q2_study", "spatial_q2_study", "full_spd_q2_study",
-                  "mature_full_spd_q2_study"}:
+                  "mature_full_spd_q2_study", "mature_afc_q2_study"}:
         study=config["study"]
         common=["--cells",*map(str,study["cells"]),"--dt",str(study["dt"]),
             "--t-final",str(study["final_time"]),"--seed",str(study["seed"])]
-        reference=run_dir/"reference"
-        reference_command=[
-            sys.executable,str(ROOT/"same_mesh_q2_study.py"),"prepare",*common,
-            "--particles",str(study["monte_carlo_paths"]),"--mc-dt",str(study["mc_dt"]),
-            "--output",str(reference),
-            "--mean",*map(str,study.get("initial_mean",[1.0,1.0,20.0])),
-            "--std",*map(str,study.get("initial_standard_deviation",[2.0,2.0,3.0])),
-        ]
-        if "noise_matrix" in study:
-            reference_command.extend(["--noise-matrix", *map(str, study["noise_matrix"])])
-        if study.get("initialization") == "gaussian_projected":
-            reference_command.append("--continuous-gaussian")
-        if study.get("initialization") == "mixture_projected":
-            reference_command.extend([
-                "--mature-mixture",
-                "--spinup-particles",str(study["spinup_particles"]),
-                "--spinup-time",str(study["spinup_time"]),
-                "--spinup-dt",str(study["spinup_dt"]),
-                "--components-per-lobe",str(study["components_per_lobe"]),
-                "--observation-z",str(study["observation_z"]),
-                "--observation-variance",str(study["observation_variance"]),
-            ])
-        commands.append(("reference",reference_command,ROOT))
+        if "reference_reuse" in study:
+            reference = ROOT / str(study["reference_reuse"])
+            if not (reference / "reference.json").is_file():
+                raise SystemExit(f"reused reference is incomplete: {reference}")
+        else:
+            reference=run_dir/"reference"
+            reference_command=[
+                sys.executable,str(ROOT/"same_mesh_q2_study.py"),"prepare",*common,
+                "--particles",str(study["monte_carlo_paths"]),"--mc-dt",str(study["mc_dt"]),
+                "--output",str(reference),
+                "--mean",*map(str,study.get("initial_mean",[1.0,1.0,20.0])),
+                "--std",*map(str,study.get("initial_standard_deviation",[2.0,2.0,3.0])),
+            ]
+            if "noise_matrix" in study:
+                reference_command.extend(["--noise-matrix", *map(str, study["noise_matrix"])])
+            if study.get("initialization") == "gaussian_projected":
+                reference_command.append("--continuous-gaussian")
+            if study.get("initialization") == "mixture_projected":
+                reference_command.extend([
+                    "--mature-mixture",
+                    "--spinup-particles",str(study["spinup_particles"]),
+                    "--spinup-time",str(study["spinup_time"]),
+                    "--spinup-dt",str(study["spinup_dt"]),
+                    "--components-per-lobe",str(study["components_per_lobe"]),
+                    "--observation-z",str(study["observation_z"]),
+                    "--observation-variance",str(study["observation_variance"]),
+                ])
+            commands.append(("reference",reference_command,ROOT))
         initial_grid=reference/"initial_q1_subcell_averages.npy"
         particles=reference/"mc_final_particles.npy"
         initial_particles=reference/"mc_initial_particles.npy"
@@ -156,6 +161,13 @@ def main(config_path: Path) -> int:
             if branch.get("positivity_method") == "local_qp":
                 branch_command.extend([
                     "--local-projection",
+                    "--local-optimizer-backend", str(branch.get("optimizer_backend", "osqp")),
+                    "--local-optimizer-ftol", str(branch.get("optimizer_ftol", 1.0e-10)),
+                    "--local-maximum-iterations", str(branch.get("maximum_iterations", 10_000)),
+                ])
+            elif branch.get("positivity_method") == "afc_local_qp":
+                branch_command.extend([
+                    "--afc-projection",
                     "--local-optimizer-backend", str(branch.get("optimizer_backend", "osqp")),
                     "--local-optimizer-ftol", str(branch.get("optimizer_ftol", 1.0e-10)),
                     "--local-maximum-iterations", str(branch.get("maximum_iterations", 10_000)),
@@ -264,7 +276,7 @@ def main(config_path: Path) -> int:
             break
     if returncode == 0 and kind in {
         "same_mesh_q2_study", "spatial_q2_study", "full_spd_q2_study",
-        "mature_full_spd_q2_study",
+        "mature_full_spd_q2_study", "mature_afc_q2_study",
     }:
         pairwise=[]
         observed_order = None
@@ -323,7 +335,7 @@ def main(config_path: Path) -> int:
             observed_order = observed_orders[-1]["observed_order"]
             order_kind = (
                 "spatial" if kind in {"spatial_q2_study", "full_spd_q2_study",
-                                      "mature_full_spd_q2_study"}
+                                      "mature_full_spd_q2_study", "mature_afc_q2_study"}
                 else "timestep"
             )
             (run_dir / f"observed_{order_kind}_order.json").write_text(
@@ -439,6 +451,59 @@ def main(config_path: Path) -> int:
                             decision_specification["maximum_off_diagonal_correlation_error"]
                         )
                     )
+                comparator_measured = None
+                if "comparator_report" in branch:
+                    comparator_report = json.loads(
+                        (ROOT / str(branch["comparator_report"])).read_text()
+                    )
+                    comparator_final = comparator_report["comparisons_to_common_mc"]["final"]
+                    comparator_covariance = float(
+                        comparator_final["covariance_accuracy"]["normalized_frobenius_error"]
+                    )
+                    comparator_lobes = float(comparator_final["maximum_lobe_probability_error"])
+                    comparator_joint = float(
+                        comparator_final["joint_density"]["smoothed_total_variation"]
+                    )
+                    comparator_marginals = float(max(
+                        comparator_final["marginal_total_variation_distance"]
+                    ))
+                    comparator_measured = {
+                        "normalized_covariance_error": comparator_covariance,
+                        "maximum_lobe_probability_error": comparator_lobes,
+                        "smoothed_joint_total_variation": comparator_joint,
+                        "maximum_marginal_total_variation": comparator_marginals,
+                        "covariance_error_change": float(
+                            covariance["normalized_frobenius_error"]
+                        ) - comparator_covariance,
+                        "lobe_error_change": lobe_error - comparator_lobes,
+                        "joint_tv_change": joint_tv - comparator_joint,
+                        "maximum_marginal_tv_change": float(marginal_tvs.max()) - comparator_marginals,
+                    }
+                    comparator_limits = decision_specification.get("comparator_limits", {})
+                    branch_gates["no_covariance_degradation"] = (
+                        comparator_measured["covariance_error_change"]
+                        <= float(comparator_limits.get("maximum_covariance_error_increase", np.inf))
+                    )
+                    branch_gates["no_lobe_degradation"] = (
+                        comparator_measured["lobe_error_change"]
+                        <= float(comparator_limits.get("maximum_lobe_error_increase", np.inf))
+                    )
+                    branch_gates["no_joint_tv_degradation"] = (
+                        comparator_measured["joint_tv_change"]
+                        <= float(comparator_limits.get("maximum_joint_tv_increase", np.inf))
+                    )
+                    branch_gates["no_marginal_tv_degradation"] = (
+                        comparator_measured["maximum_marginal_tv_change"]
+                        <= float(comparator_limits.get("maximum_marginal_tv_increase", np.inf))
+                    )
+                if "maximum_low_order_cfl" in decision_specification:
+                    branch_gates["positive_low_order_cfl"] = float(
+                        history["low_order_maximum_cfl"]
+                    ) <= float(decision_specification["maximum_low_order_cfl"])
+                if "maximum_afc_average_conservation_error" in decision_specification:
+                    branch_gates["afc_average_conservation"] = float(
+                        history["maximum_afc_average_conservation_error"]
+                    ) <= float(decision_specification["maximum_afc_average_conservation_error"])
                 branch_results.append({
                     "branch": branch_name,
                     "measured": {
@@ -481,6 +546,14 @@ def main(config_path: Path) -> int:
                         "scaling_fallback_cells":sum(
                             int(step.get("scaling_fallback_cells",0)) for step in steps
                         ),
+                        "comparator": comparator_measured,
+                        "low_order_maximum_cfl": history.get("low_order_maximum_cfl"),
+                        "minimum_antidiffusive_gain_fraction": history.get(
+                            "minimum_antidiffusive_gain_fraction"
+                        ),
+                        "maximum_afc_average_conservation_error": history.get(
+                            "maximum_afc_average_conservation_error"
+                        ),
                     },
                     "gates": branch_gates,
                     "passes": all(branch_gates.values()),
@@ -505,7 +578,7 @@ def main(config_path: Path) -> int:
             )
             decreasing_gate = (
                 kind not in {"spatial_q2_study", "full_spd_q2_study",
-                             "mature_full_spd_q2_study"}
+                             "mature_full_spd_q2_study", "mature_afc_q2_study"}
                 or len(pairwise) < 2
                 or float(pairwise[-1]["subcell_average_l1_lower_bound"])
                 < float(pairwise[-2]["subcell_average_l1_lower_bound"])
@@ -559,7 +632,7 @@ def main(config_path: Path) -> int:
                         "PASSED_PREDECLARED_FULL_SPD_CONTROL_GATES"
                         if all_passed else "FAILED_PREDECLARED_FULL_SPD_CONTROL_GATES"
                     )
-            elif kind == "mature_full_spd_q2_study":
+            elif kind in {"mature_full_spd_q2_study", "mature_afc_q2_study"}:
                 finest_difference = (
                     float(pairwise[-1]["subcell_average_l1_lower_bound"])
                     if pairwise else None
@@ -583,7 +656,7 @@ def main(config_path: Path) -> int:
                 "pairwise_density_gates": pairwise_gates,
                 "observed_order_kind": (
                     "spatial" if kind in {"spatial_q2_study", "full_spd_q2_study",
-                                          "mature_full_spd_q2_study"}
+                                          "mature_full_spd_q2_study", "mature_afc_q2_study"}
                     else "timestep"
                 ),
                 "observed_order": observed_order,
@@ -605,7 +678,7 @@ def main(config_path: Path) -> int:
                     if kind == "full_spd_q2_study" else
                     "Mature bimodal full-SPD diagnostic; passing advances the candidate to "
                     "aligned-box domain-truncation sensitivity."
-                    if kind == "mature_full_spd_q2_study" else
+                    if kind in {"mature_full_spd_q2_study", "mature_afc_q2_study"} else
                     "Startup-state dynamic diagnostic only; passing advances the candidate to "
                     "spatial, full-SPD, and mature-state certification."
                 ),
@@ -613,7 +686,7 @@ def main(config_path: Path) -> int:
             scientific_decision[
                 "observed_spatial_order"
                 if kind in {"spatial_q2_study", "full_spd_q2_study",
-                            "mature_full_spd_q2_study"}
+                            "mature_full_spd_q2_study", "mature_afc_q2_study"}
                 else "observed_timestep_order"
             ] = observed_order
             (run_dir / "scientific_decision.json").write_text(

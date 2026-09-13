@@ -17,6 +17,7 @@ from mpi4py import MPI
 from scipy.ndimage import gaussian_filter
 
 from lorenz_fpe import (
+    AFCProjectionFokkerPlanckSolver,
     DensityState,
     Domain,
     FokkerPlanckSolver,
@@ -339,14 +340,20 @@ def prepare_reference(args: argparse.Namespace) -> None:
 
 def run_forecast(args: argparse.Namespace) -> None:
     comm=MPI.COMM_WORLD; rank=comm.rank
+    if args.local_projection and args.afc_projection:
+        raise ValueError("Choose exactly one local-QP update architecture")
     output=args.output.resolve()
     if rank==0:
         output.mkdir(parents=True,exist_ok=False)
     comm.barrier()
     domain=Domain(cells=tuple(args.cells)); model=_model(args.noise_matrix)
-    solver_class = LocalProjectionFokkerPlanckSolver if args.local_projection else FokkerPlanckSolver
+    solver_class = (
+        AFCProjectionFokkerPlanckSolver if args.afc_projection else
+        LocalProjectionFokkerPlanckSolver if args.local_projection else
+        FokkerPlanckSolver
+    )
     solver_options = {}
-    if args.local_projection:
+    if args.local_projection or args.afc_projection:
         solver_options = {
             "local_optimizer_backend": args.local_optimizer_backend,
             "local_optimizer_ftol": args.local_optimizer_ftol,
@@ -368,7 +375,7 @@ def run_forecast(args: argparse.Namespace) -> None:
             args.mean,initial_covariance,
             quadrature_degree=args.initial_quadrature_degree,apply_limiter=False,
         )
-        if args.local_projection:
+        if args.local_projection or args.afc_projection:
             initial,initial_projection=solver.local_projector.project_state(
                 initial,repair_cell_averages=True,adaptive_skip=True
             )
@@ -403,7 +410,7 @@ def run_forecast(args: argparse.Namespace) -> None:
             quadrature_degree=args.initial_quadrature_degree,
             normalize=True,apply_limiter=False,
         )
-        if args.local_projection:
+        if args.local_projection or args.afc_projection:
             initial,initial_projection=solver.local_projector.project_state(
                 initial,repair_cell_averages=True,adaptive_skip=True
             )
@@ -413,6 +420,13 @@ def run_forecast(args: argparse.Namespace) -> None:
                    "mixture_sha256":_sha256(args.mixture),
                    "local_projection":initial_projection} if rank==0 else None
     initial_diagnostics=solver.diagnostics(initial)
+    n_owned_initial=solver.V.dofmap.index_map.size_local*solver.V.dofmap.index_map_bs
+    initial_state_sha256_by_rank=comm.gather(
+        hashlib.sha256(
+            np.asarray(initial.function.x.array[:n_owned_initial],dtype=np.float64).tobytes()
+        ).hexdigest(),
+        root=0,
+    )
     if args.initialization == "gaussian_projected" and rank==0:
         represented_covariance=np.asarray(initial_diagnostics["covariance"])
         embedding={
@@ -466,7 +480,7 @@ def run_forecast(args: argparse.Namespace) -> None:
         step_seconds.append(time.perf_counter()-step_started)
         if raw_archive is not None:
             source=(solver.limiter.last_raw_coefficients
-                    if (solver.apply_positivity or args.local_projection)
+                    if (solver.apply_positivity or args.local_projection or args.afc_projection)
                     else state.function.x.array)
             raw_archive[step]=source[:n_owned]
             if (step+1)%10==0:
@@ -478,7 +492,7 @@ def run_forecast(args: argparse.Namespace) -> None:
         raw_archive.flush(); del raw_archive
     forecast_seconds=time.perf_counter()-started
 
-    if args.local_projection:
+    if args.local_projection or args.afc_projection:
         if solver.last_unlimited_state is None:
             raise RuntimeError("Local projection did not retain the unlimited state")
         stages=solver.limiter_stage_states(state.time)
@@ -519,7 +533,7 @@ def run_forecast(args: argparse.Namespace) -> None:
     artifacts=[]
     if args.degree>=2:
         classification_source=(solver.limiter.last_raw_coefficients
-                               if (solver.apply_positivity or args.local_projection)
+                               if (solver.apply_positivity or args.local_projection or args.afc_projection)
                                else state.function.x.array)
         records=solver.limiter.classification_records(classification_source)
         records_path=output/f"final_raw_cell_classification_rank{rank:04d}.json"
@@ -537,10 +551,13 @@ def run_forecast(args: argparse.Namespace) -> None:
     if rank==0:
         gathered_artifacts[0].append({"path":final_subcells_path.name,
             "sha256":_sha256(final_subcells_path),"bytes":final_subcells_path.stat().st_size})
-        history=(solver.local_projection_history_summary() if args.local_projection
+        history=(solver.local_projection_history_summary()
+                 if (args.local_projection or args.afc_projection)
                  else solver.limiter_history_summary())
         corrected=comparisons["final"]["covariance_accuracy"]
-        positivity_enabled=bool(solver.apply_positivity or args.local_projection)
+        positivity_enabled=bool(
+            solver.apply_positivity or args.local_projection or args.afc_projection
+        )
         mean_l1=(history["relative_l1_correction"]["mean"] if positivity_enabled else 0.0)
         maximum_l1=(history["relative_l1_correction"]["maximum"] if positivity_enabled else 0.0)
         report={
@@ -551,15 +568,17 @@ def run_forecast(args: argparse.Namespace) -> None:
                 "certificate_mode":args.certificate_mode,
                 "certificate_max_depth":args.certificate_max_depth,
                 "positivity_applied_each_step":positivity_enabled,
-                "positivity_method":("global_average_repair_then_local_qp"
-                    if args.local_projection else
+                "positivity_method":(
+                    "positive_p0_graph_update_then_limited_antidiffusion_then_local_qp"
+                    if args.afc_projection else
+                    "global_average_repair_then_local_qp" if args.local_projection else
                     ("global_average_repair_then_scaling" if solver.apply_positivity else "none")),
                 "local_optimizer_backend":(args.local_optimizer_backend
-                    if args.local_projection else None),
+                    if (args.local_projection or args.afc_projection) else None),
                 "local_optimizer_ftol":(args.local_optimizer_ftol
-                    if args.local_projection else None),
+                    if (args.local_projection or args.afc_projection) else None),
                 "local_maximum_iterations":(args.local_maximum_iterations
-                    if args.local_projection else None),
+                    if (args.local_projection or args.afc_projection) else None),
                 "initialization":args.initialization,
                 "mixture_sha256":(_sha256(args.mixture) if args.mixture else None),
                 "initial_mean":list(args.mean),"initial_standard_deviation":list(args.std),
@@ -572,9 +591,11 @@ def run_forecast(args: argparse.Namespace) -> None:
                 "noise_matrix":np.asarray(model.B,dtype=float).tolist(),
                 "diffusion_matrix":model.diffusion.tolist()},
             "initial_embedding":embedding,"initial_diagnostics":initial_diagnostics,
+            "initial_state_sha256_by_rank":initial_state_sha256_by_rank,
             "final_stage_diagnostics":stage_diagnostics,"comparisons_to_common_mc":comparisons,
             "limiter_history":history,
-            "limiter_steps":(solver.local_projection_history if args.local_projection else
+            "limiter_steps":(solver.local_projection_history
+                if (args.local_projection or args.afc_projection) else
                 [asdict(item) for item in solver.limiter_history]),
             "timing":{"forecast_seconds":forecast_seconds,
                 "maximum_step_seconds":maximum_step_seconds,"mean_step_seconds":mean_step_seconds,
@@ -686,6 +707,7 @@ def parser() -> argparse.ArgumentParser:
     run.add_argument("--density-smoothing-sigma",type=float,default=0.75)
     run.add_argument("--disable-positivity",action="store_true")
     run.add_argument("--local-projection",action="store_true")
+    run.add_argument("--afc-projection",action="store_true")
     run.add_argument("--local-optimizer-backend",choices=("osqp","slsqp"),default="osqp")
     run.add_argument("--local-optimizer-ftol",type=float,default=1.0e-10)
     run.add_argument("--local-maximum-iterations",type=int,default=10_000)
