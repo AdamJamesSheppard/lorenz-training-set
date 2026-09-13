@@ -41,3 +41,11 @@
   comparator, why the current Q2 result is inconclusive, and which challenger
   families remain open. The conversation is evidence context, not canonical
   state; current conclusions belong in the living documents above.
+# External visualization utility
+
+- `../sources/animate_fokker_planck_runs.py` (2026-09-13): local utility for
+  reconstructing side-by-side MP4s from immutable per-timestep coefficient
+  archives and terminal PNG summaries from completed run exports. The script
+  records the distinction between pre-correction histories and terminal
+  corrected arrays in its generated `inventory.json`. SHA-256:
+  `4278c9ce8bc7893caf701e85dd8b62314376750f093f207faed2f6ebdb01d7f0`.
