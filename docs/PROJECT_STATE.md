@@ -132,7 +132,10 @@ The living plan is in `docs/RESEARCH_DIRECTIONS.md` and
 
 1. Diagnose the failed mature bimodal result without relaxing its frozen gates.
    The initial Q2 projection requires relative corrections of `0.380`, `0.158`
-   and `0.0313`, and forecast QP acts on most probability mass.
+   and `0.0313`, and forecast QP acts on most probability mass. The frozen
+   `experiments/mature-positivity-certificate-diagnostic.yaml` compares the
+   current depth-4 certificate, depth 8 and scalar limiting on identical raw
+   initialization and forecast polynomials.
 2. Distinguish insufficient mature-law resolution from a correction architecture
    that remains active at practical meshes. Any rerun must be separately
    predeclared and retain the failed hierarchy as its comparator.

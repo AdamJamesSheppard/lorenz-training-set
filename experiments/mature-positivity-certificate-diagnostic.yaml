@@ -1,0 +1,51 @@
+id: mature-positivity-certificate-diagnostic
+kind: mature_positivity_diagnostic
+status: predeclared_executable_diagnostic
+purpose: Determine whether depth-4 Bernstein certification over-corrects saved mature raw Q2 polynomials that deeper subdivision can certify unchanged.
+study:
+  mixture: runs/local-q2-cn-full-spd-mature-bimodal/20260913T185157Z/reference/mature_mixture.json
+  mixture_sha256: 8d39b72d3b46ad8c9f6634bc8a92edc36c6c1cbc170b5f81edfac6d6877261f0
+  dt: 0.00015625
+  times: [0.0125, 0.025, 0.05]
+  quadrature_degree: 14
+  current_depth: 4
+  deep_depth: 8
+  noise_matrix:
+    - 1.4142135623730951
+    - 0.0
+    - 0.0
+    - 0.5656854249492381
+    - 1.2961481396815722
+    - 0.0
+    - 0.28284271247461906
+    - 0.3394673699166024
+    - 1.3434142714594956
+  branches:
+    - name: certificate_diagnostic_20x24x24
+      cells: [20, 24, 24]
+    - name: certificate_diagnostic_30x36x36
+      cells: [30, 36, 36]
+    - name: certificate_diagnostic_45x54x54
+      cells: [45, 54, 54]
+execution:
+  mpi_ranks: 8
+  numerical_threads: 1
+comparisons:
+  - current depth-4 adaptive certification followed by fixed-constraint local QP
+  - depth-8 adaptive certification followed by the identical fixed-constraint local QP
+  - global cell-average repair plus scalar Bernstein limiter control
+required_diagnostics:
+  - L1 and mass-matrix-equivalent L2 correction on identical raw polynomials
+  - probability mass contained in QP-projected cells and projected-cell count
+  - covariance, marginal and lobe-probability changes caused by correction
+  - depth-4 unresolved cells that depth 8 certifies without correction
+  - initialization and forecast snapshots at 0.0125, 0.025 and 0.05
+predeclared_interpretation:
+  certificate_overcorrection_supported: Depth 8 rescues at least 5 percent of depth-4 non-certified cells and reduces mean snapshot L1 correction by at least 25 percent without positivity, mass, optimizer or fallback failure.
+  certificate_overcorrection_rejected: Depth 8 rescues less than 1 percent of depth-4 non-certified cells or reduces mean snapshot L1 correction by less than 10 percent.
+  otherwise: Inconclusive; retain both certificate depth and genuinely negative-polynomial hypotheses.
+decision_scope: Diagnostic only. Do not change method status, mature-state status, gates or dataset authorization directly from this run.
+notes:
+  - The existing method already uses adaptive subdivision through depth 4 before invoking its fixed QP; this experiment tests whether that depth is insufficient.
+  - Every comparison at a snapshot starts from the identical unlimited polynomial.
+  - The scalar limiter is a control and cannot earn mature-state certification in this diagnostic.

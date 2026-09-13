@@ -1021,7 +1021,9 @@ remaining materially active on the tested mature law.
 The project remains `FULL_SPD_DIFFUSION_CERTIFIED`; `MATURE_STATE` remains the
 next gate. Domain sensitivity and pilot data remain blocked. A follow-up should
 separate resolution error from correction-architecture error and must retain
-this failed run under its original thresholds.
+this failed run under its original thresholds. The immediate frozen diagnostic
+is `experiments/mature-positivity-certificate-diagnostic.yaml`, comparing
+certification depths 4 and 8 with scalar limiting on identical raw polynomials.
 
 Evidence: [`local_q2_mature_bimodal_report.json`](local_q2_mature_bimodal_report.json)
 and immutable run
