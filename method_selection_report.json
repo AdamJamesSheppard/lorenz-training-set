@@ -281,6 +281,22 @@
     "fallbacks": 0,
     "decision": "Advance the frozen candidate to full-SPD certification. Dataset generation remains unauthorized."
   },
+  "full_spd_control": {
+    "evidence": "local_q2_full_spd_control_report.json",
+    "run": "runs/local-q2-cn-full-spd-controlled/20260913T133432Z",
+    "status": "PASSED_PREDECLARED_FULL_SPD_CONTROL_GATES",
+    "configuration": "experiments/local-q2-cn-full-spd-controlled.yaml",
+    "normalized_covariance_error": 0.004163483676974257,
+    "maximum_off_diagonal_covariance_error": 0.003805506293795038,
+    "maximum_off_diagonal_correlation_error": 0.007067231774316007,
+    "mean_relative_l1_correction": 0.00007612366346579737,
+    "maximum_relative_l1_correction": 0.0009660378685474097,
+    "maximum_measured_negative_mass": 0.0,
+    "absolute_mass_error": 3.8622438580659946e-12,
+    "optimizer_failures": 0,
+    "fallbacks": 0,
+    "decision": "Execute the predeclared full-SPD spatial hierarchy; dataset generation remains unauthorized."
+  },
   "fixed_q2_raw_archive": {
     "archive": "../sources/upload/newtest_08.zip",
     "scope": "q2_fixed_subcell raw_before_correction ranks 0002 through 0006",
@@ -333,6 +349,7 @@
     "local_q2_optimizer_validation_report.json",
     "local_q2_dynamic_projection_report.json",
     "local_q2_tight_refinement_report.json",
-    "local_q2_spatial_refinement_report.json"
+    "local_q2_spatial_refinement_report.json",
+    "local_q2_full_spd_control_report.json"
   ]
 }

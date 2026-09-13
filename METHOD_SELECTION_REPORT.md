@@ -946,7 +946,17 @@ Predeclared gates cover every-step positivity, mass, optimizer/fallback counts,
 fixed covariance and correlation thresholds, correction strength, decreasing
 common-grid L1 differences and positive spatial order.
 
+The controlled `30x36x36` branch has now completed and passes all fixed gates.
+Normalized covariance error is `0.004163`; maximum absolute off-diagonal
+covariance and correlation errors are `0.003806` and `0.007067`; mean and
+maximum relative L1 corrections are `7.61e-5` and `9.66e-4`. All 320 steps are
+whole-cell certified, measured negative mass is zero, final mass error is
+`3.86e-12`, and optimizer failures and fallbacks are zero. This result activates
+the already-predeclared full-SPD spatial hierarchy while leaving dataset
+generation unauthorized.
+
 Evidence: [`local_q2_spatial_refinement_report.json`](local_q2_spatial_refinement_report.json),
+[`local_q2_full_spd_control_report.json`](local_q2_full_spd_control_report.json),
 immutable run `runs/local-q2-cn-spatial-refinement/20260912T194930Z`, and
 configurations [`experiments/local-q2-cn-full-spd-controlled.yaml`](experiments/local-q2-cn-full-spd-controlled.yaml)
 and [`experiments/local-q2-cn-full-spd-spatial-refinement.yaml`](experiments/local-q2-cn-full-spd-spatial-refinement.yaml).

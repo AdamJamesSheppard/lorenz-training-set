@@ -31,6 +31,9 @@ def main() -> int:
     spatial_refinement = json.loads(
         (ROOT / "local_q2_spatial_refinement_report.json").read_text()
     )
+    full_spd_control = json.loads(
+        (ROOT / "local_q2_full_spd_control_report.json").read_text()
+    )
     diffusion = Lorenz63Model().diffusion
 
     mass_errors = [abs(float(row["mass_error"])) for row in boundary["rows"]]
@@ -118,6 +121,21 @@ def main() -> int:
             and decision.get("production_dataset_authorized") is False
             and decision.get("next_required_gate") == "FULL_SPD_DIFFUSION"
         ),
+        "full_spd_control_consistent": bool(
+            full_spd_control["classification"]
+            == "PASSED_PREDECLARED_FULL_SPD_CONTROL_GATES"
+            and full_spd_control["all_320_steps_whole_cell_positive"]
+            and full_spd_control["maximum_measured_negative_mass"] == 0.0
+            and full_spd_control["absolute_mass_error"] <= 1.0e-10
+            and full_spd_control["normalized_covariance_error"] <= 0.02
+            and full_spd_control["maximum_off_diagonal_covariance_error"] <= 0.05
+            and full_spd_control["maximum_off_diagonal_correlation_error"] <= 0.02
+            and full_spd_control["mean_relative_l1_correction"] <= 2.5e-4
+            and full_spd_control["maximum_relative_l1_correction"] <= 3.0e-3
+            and full_spd_control["optimizer_failures"] == 0
+            and full_spd_control["fallbacks"] == 0
+            and not full_spd_control["production_dataset_authorized"]
+        ),
     }
     result = {
         "passed": all(checks.values()),
@@ -156,6 +174,10 @@ def main() -> int:
             "spatial_local_qp_covariance_errors": [
                 branch["covariance_error"] for branch in spatial_refinement["branches"]
             ],
+            "full_spd_control_covariance_error": full_spd_control
+            ["normalized_covariance_error"],
+            "full_spd_control_mean_relative_l1_correction": full_spd_control
+            ["mean_relative_l1_correction"],
         },
         "interpretation": (
             "The tested invariants and evidence consistency pass. Production certification is "

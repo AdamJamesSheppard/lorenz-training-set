@@ -85,6 +85,11 @@ NEXT_REQUIRED_GATE = FULL_SPD_DIFFUSION
   finest value lies below the 200,000-path bootstrap p95 `0.006491`, so further
   covariance improvement is unresolved by that reference. The deterministic
   common-grid density differences remain the primary convergence evidence.
+- The controlled `30x36x36` full-SPD run passes every predeclared gate:
+  covariance discrepancy `0.004163`, maximum off-diagonal covariance error
+  `0.003806`, mean correction `7.61e-5`, zero measured negative mass, zero
+  optimizer failure/fallback and absolute mass error `3.86e-12`. This authorizes
+  the already-predeclared full-SPD spatial hierarchy.
 
 ## Active blockers
 

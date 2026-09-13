@@ -48,6 +48,7 @@ EVIDENCE = (
     "local_q2_dynamic_projection_report.json",
     "local_q2_tight_refinement_report.json",
     "local_q2_spatial_refinement_report.json",
+    "local_q2_full_spd_control_report.json",
 )
 
 

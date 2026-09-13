@@ -23,6 +23,13 @@ one fixed bootstrap seed. Exact specifications are
 `experiments/local-q2-cn-full-spd-controlled.yaml` and
 `experiments/local-q2-cn-full-spd-spatial-refinement.yaml`.
 
+The controlled `30x36x36` run subsequently passed all of its fixed gates:
+normalized covariance error `0.004163`, maximum off-diagonal covariance and
+correlation errors `0.003806` and `0.007067`, mean relative L1 correction
+`7.61e-5`, zero measured negative mass, zero optimizer failure/fallback and
+absolute mass error `3.86e-12`. This activates the conditional full-SPD spatial
+hierarchy without changing production authorization.
+
 ## 2026-09-12 - Promote local-QP CN to spatial certification
 
 The tight full/half/quarter/eighth diagnostic passes all predeclared dynamic
