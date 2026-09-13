@@ -1,8 +1,8 @@
 {
-  "created_utc": "2026-09-13T15:31:25.284054+00:00",
+  "created_utc": "2026-09-13T18:51:47.945545+00:00",
   "decision": "FULL_SPD_DIFFUSION_CERTIFIED",
   "workspace": "/mnt/large storage/Important/Derby Masters/Original Dissertation Royal Holloway/FENICS Code/NewTest",
-  "git_revision": "cc5eb35f3317d0a057e0935a1f51f0a8ae824c75",
+  "git_revision": "e81e4fd59805cf22d51fb4e1dd83ab0becbad18f",
   "version_fallback": "SHA-256 file hashes are authoritative when git_revision is null.",
   "software": {
     "python": "3.12.13 | packaged by conda-forge | (main, Mar  5 2026, 16:50:00) [GCC 14.3.0]",
@@ -28,21 +28,21 @@
     "lorenz_fpe/core.py": "089ff205f3669cf750e45ad96fee3729309c48aad634604ff492e04278a60c31",
     "lorenz_fpe/dataset.py": "3e9a28938499e018d810f12cb15e6fcd3358dbdd94df13d3fa67283262a71a4e",
     "lorenz_fpe/finite_volume.py": "2bec80ae17ac8d926c0badb7d2da7a5755ff4138ffeccc077a6b6b61a0f7d367",
-    "lorenz_fpe/local_projection.py": "a2cf6844012b1b2f1de01887caa444607a5e0c1c834a1c4d0107d1a75a260646",
+    "lorenz_fpe/local_projection.py": "d42e52231acaa915662cb0cd04ffbb9bd2a8f0e3935b3091ea7ecd16524899e0",
     "lorenz_fpe/validation.py": "7e3258874f6cd1e5234d96b942c37faed93f1d6547743b50d3fb0c2cf9f605e7",
     "mature_da_study.py": "9870d6a87f554a25d3a402a2c9fc6ed5fdd3a42316c7059cd27b9790bbe1775e",
     "mature_forecast_validation.py": "0e53932d5ceda3f611c0decc2eac5861ae84023720011946d7733a16dc4a4465",
     "mc_timestep_repair.py": "077d5c9e9f277f1cfb210649f2da3526c2d7437d8bc17fdea661730e64c8b2b5",
     "resplit_dataset.py": "11587c66f55020daff7171e500230ff315fd5b17e781e4b653e2a8d8130267bf",
-    "same_mesh_q2_study.py": "916367bb3ede06037ba95a4d7282fcdd91bb68957bb8c6db39e5451ab5735d84",
+    "same_mesh_q2_study.py": "79574ff3dbef4a6604fa3b3ce9750d6f04efaa5f91d2caf318f29ff6d0060da3",
     "solver.py": "5060082cc7e6ad1671c5fe35d2ada34fb38bb4930b720a606ab02b0c66e48d36",
     "tests/__init__.py": "3b2bec5485bb3fb3bb29a41ff8b1d86feb92bbc6587a20491c94a0b29d2a195b",
     "tests/mpi_probe_worker.py": "f568a7e9937e7a0d7888b6fb85255eba63e3c711b635e6cbe1231fb000a87c74",
-    "tests/test_accuracy_repairs.py": "b6a0b51acfb219bbdf063bec2610b89d915807f55215ae78b2a7a0b1b20ef426",
+    "tests/test_accuracy_repairs.py": "cffecde6ad039a97eec76e487334b48f7ffdfd6c6d1970efe83b785612929409",
     "tests/test_limiter.py": "703d5eca288e21b30b915ff22c5116ddf0ff3575cda5a3e7332e4b52037079f8",
     "tests/test_mpi_consistency.py": "c8e3a7c194efd163ffb1e84c799a9f80fdbb32e512762a050fe7f46a4e454e8c",
     "tests/test_solver_smoke.py": "db2cffe6d15bf914069ddfdb75ee6a0d79e65e4d29e99e539a0dadd6f57e51b5",
-    "tests/test_spatial_experiment.py": "2cca9a1ee523db07a11751736ab762cc4612373d5016a1152d4100fc084ba15b",
+    "tests/test_spatial_experiment.py": "541cd2c8f44ad6d762d84df080ec05759fb55414734db69797f7c2b4df3afe9e",
     "tests/test_validation.py": "a4bd400fa133c4f72ec590d19502b46b6c617332939a27860f5e8da7d445c05b",
     "validate.py": "57214698ba0734874482948206d8ca905c441fab42958b72a13d8640bb168e2f",
     "validation_repair.py": "4ddd57a3ba81b7809526f4d3aa8bf1e332d39a56f95d24bd26212ddb3d1f25cb"
@@ -299,7 +299,7 @@
       }
     },
     "METHOD_SELECTION_REPORT.md": {
-      "sha256": "2662e5f76b4ac9ed7d999ae92dd26d217c4b90edf262b0c01040f1bcc45525b2",
+      "sha256": "ecaccc09d9f18ca5d082c8586494f117d4f79cca4eff429e3a5fa76f06ef58cd",
       "configuration": {}
     },
     "method_selection_report.json": {
