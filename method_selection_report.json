@@ -6,7 +6,7 @@
   "next_required_gate": "MATURE_STATE",
   "large_neural_operator_dataset": "NO",
   "recommended": {
-    "production_forecast_generator": "No method is production certified. Stage-1 average repair plus local mass-matrix QP applied after every Q2 Crank--Nicolson step passes the predeclared startup-state temporal, identity-noise spatial and full-SPD spatial/positivity gates. Freeze this candidate and advance it to mature-state testing; dataset generation remains blocked pending mature-state and domain evidence.",
+    "production_forecast_generator": "No method is production certified. Stage-1 average repair plus local mass-matrix QP applied after every Q2 Crank--Nicolson step passes the startup-state temporal, identity-noise spatial and full-SPD spatial/positivity gates. Its first bimodal mature-state hierarchy fails the fixed mean-correction gate, so mature-state certification remains open and dataset generation remains blocked.",
     "independent_validator": "Develop a dynamically scaled and translated whole-space Hermite-Galerkin reference alongside the positivity-correction work, validated by mode-tail and moment convergence; retain exact-native-law Monte Carlo for moment uncertainty and the independent FV hierarchy for current triangulation.",
     "neural_operator_target_representation": "If a pilot is run: float64 exact conservative subcell averages; Q1 requires 2 subcells per native cell per axis (60x72x72 for the tested 30x36x36 mesh).",
     "expected_covariance_error": {
@@ -30,7 +30,7 @@
       "monte_carlo_200000_cpu_sampling_propagation_histogram_seconds": 3.369948232000722,
       "scope": "One 0.05 forecast interval; MC figure excludes principled bandwidth selection and accuracy certification."
     },
-    "principal_remaining_limitation": "The full-SPD observed common-grid spatial rate 3.4215 is numerical evidence rather than a proved formal order. Corrected mature-posterior, finite-domain and independently resolved full-density evidence remain absent."
+    "principal_remaining_limitation": "The first mature bimodal hierarchy converges slowly at observed common-grid rate 0.42695 and exceeds the 0.001 mean relative L1 correction gate on every mesh. Finite-domain and independently resolved full-density evidence also remain absent."
   },
   "pde": {
     "linear_in_density": true,
@@ -313,6 +313,24 @@
     "fallbacks": 0,
     "decision": "Advance the frozen candidate to mature-state certification. Dataset generation remains unauthorized."
   },
+  "mature_bimodal_refinement": {
+    "evidence": "local_q2_mature_bimodal_report.json",
+    "run": "runs/local-q2-cn-full-spd-mature-bimodal/20260913T185157Z",
+    "status": "FAILED_PREDECLARED_MATURE_BIMODAL_GATES",
+    "configuration": "experiments/mature-state-decision.yaml",
+    "density_l1_differences": [0.42059044627096376, 0.3537343560981054],
+    "observed_common_grid_rate": 0.4269499892565609,
+    "mean_relative_l1_corrections": [0.003046612457591409, 0.0027886060328537582, 0.0018403616370209139],
+    "normalized_covariance_errors": [0.005843964614024628, 0.003635506730207504, 0.0008579019866892474],
+    "smoothed_joint_tvs": [0.021017423333177722, 0.01370072598074774, 0.005184068378290943],
+    "maximum_lobe_probability_errors": [0.0004223650865852746, 0.00042195943438116945, 0.00024610041690503737],
+    "all_960_steps_whole_cell_positive": true,
+    "maximum_measured_negative_mass": 0.0,
+    "optimizer_failures": 0,
+    "fallbacks": 0,
+    "failed_gate": "Mean relative L1 correction exceeds the fixed 0.001 limit on every mesh despite decreasing under refinement.",
+    "decision": "Retain FULL_SPD_DIFFUSION_CERTIFIED and MATURE_STATE as the next required gate; dataset generation remains unauthorized."
+  },
   "fixed_q2_raw_archive": {
     "archive": "../sources/upload/newtest_08.zip",
     "scope": "q2_fixed_subcell raw_before_correction ranks 0002 through 0006",
@@ -366,6 +384,7 @@
     "local_q2_tight_refinement_report.json",
     "local_q2_spatial_refinement_report.json",
     "local_q2_full_spd_control_report.json",
-    "local_q2_full_spd_spatial_report.json"
+    "local_q2_full_spd_spatial_report.json",
+    "local_q2_mature_bimodal_report.json"
   ]
 }

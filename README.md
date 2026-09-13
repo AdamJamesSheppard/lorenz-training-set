@@ -18,8 +18,10 @@ and comparison policy.
 > spatial hierarchy passes with observed common-grid rate `3.403`, recorded as
 > numerical evidence rather than a formal-order proof. The non-diagonal
 > full-SPD hierarchy also passes, with observed common-grid rate `3.421` and
-> zero measured negative mass over 960 steps. Mature-state and domain gates
-> remain before any production dataset can be authorized.
+> zero measured negative mass over 960 steps. The first mature bimodal hierarchy
+> remains positive and convergent but fails its fixed mean-correction gate on
+> every mesh. Mature-state and domain gates remain before any production dataset
+> can be authorized.
 
 This project implements the forecast step of a continuous-discrete Bayesian
 filter for the stochastic Lorenz-63 model.  It uses modern DOLFINx 0.11, UFL,

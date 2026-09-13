@@ -998,6 +998,35 @@ Evidence: [`local_q2_full_spd_spatial_report.json`](local_q2_full_spd_spatial_re
 and immutable run
 `runs/local-q2-cn-full-spd-spatial-refinement/20260913T135455Z`.
 
+## 28. First mature bimodal hierarchy: failed correction-strength gate
+
+The frozen full-SPD mature bimodal run completed successfully as an executable
+experiment but is classified `FAILED_PREDECLARED_MATURE_BIMODAL_GATES`.
+Common-grid L1 differences decrease from `0.420590` to `0.353734`, giving the
+positive but slow observed rate `0.426950`. This is numerical evidence only.
+
+All 960 steps are whole-cell Bernstein-certified. Measured negative mass,
+optimizer failures and fallbacks are zero; maximum absolute final mass error is
+`4.01e-12`. Normalized covariance errors decrease `0.005844 -> 0.003636 ->
+0.000858`; smoothed joint TVs decrease `0.02102 -> 0.01370 -> 0.005184`, and
+maximum lobe-probability error is at most `0.000423`.
+
+The sole formal gate failure is mean relative L1 correction. It decreases
+`0.003047 -> 0.002789 -> 0.001840`, but every branch exceeds the frozen `0.001`
+limit. The common initial mixture itself requires corrections `0.380 -> 0.158 ->
+0.0313`, and the per-step QP acts on mean probability mass `0.9986`, `0.9988`
+and `0.9425`. Thus the positivity projection is shrinking with refinement while
+remaining materially active on the tested mature law.
+
+The project remains `FULL_SPD_DIFFUSION_CERTIFIED`; `MATURE_STATE` remains the
+next gate. Domain sensitivity and pilot data remain blocked. A follow-up should
+separate resolution error from correction-architecture error and must retain
+this failed run under its original thresholds.
+
+Evidence: [`local_q2_mature_bimodal_report.json`](local_q2_mature_bimodal_report.json)
+and immutable run
+`runs/local-q2-cn-full-spd-mature-bimodal/20260913T185157Z`.
+
 ## Sources
 
 [^1]: C. Liu, J. Hu, W. T. Taitano and X. Zhang, [“An optimization-based positivity-preserving limiter in semi-implicit discontinuous Galerkin schemes solving Fokker–Planck equations”](https://www.math.purdue.edu/~zhan1966/research/paper/DG_anisotropic_Fokker_Planck.pdf), *Computers & Mathematics with Applications* (2025).

@@ -37,6 +37,9 @@ def main() -> int:
     full_spd_spatial = json.loads(
         (ROOT / "local_q2_full_spd_spatial_report.json").read_text()
     )
+    mature_bimodal = json.loads(
+        (ROOT / "local_q2_mature_bimodal_report.json").read_text()
+    )
     diffusion = Lorenz63Model().diffusion
 
     mass_errors = [abs(float(row["mass_error"])) for row in boundary["rows"]]
@@ -173,6 +176,26 @@ def main() -> int:
             and decision.get("method_status") == "FULL_SPD_DIFFUSION_CERTIFIED"
             and decision.get("next_required_gate") == "MATURE_STATE"
         ),
+        "mature_bimodal_failure_consistent": bool(
+            mature_bimodal["classification"]
+            == "FAILED_PREDECLARED_MATURE_BIMODAL_GATES"
+            and mature_bimodal["all_960_steps_whole_cell_positive"]
+            and mature_bimodal["maximum_measured_negative_mass"] == 0.0
+            and mature_bimodal["optimizer_failures"] == 0
+            and mature_bimodal["total_fallbacks"] == 0
+            and mature_bimodal["density_l1_differences"][1]
+            < mature_bimodal["density_l1_differences"][0]
+            and mature_bimodal["observed_common_grid_spatial_rate"] > 0.0
+            and mature_bimodal["decreasing_mean_qp_correction_gate"]
+            and all(
+                value > mature_bimodal["failed_gate"]["threshold"]
+                for value in mature_bimodal["failed_gate"]["observed"]
+            )
+            and classification == "FULL_SPD_DIFFUSION_CERTIFIED"
+            and decision.get("method_status") == "FULL_SPD_DIFFUSION_CERTIFIED"
+            and decision.get("production_dataset_authorized") is False
+            and decision.get("next_required_gate") == "MATURE_STATE"
+        ),
     }
     result = {
         "passed": all(checks.values()),
@@ -223,6 +246,13 @@ def main() -> int:
                 branch["normalized_covariance_error"]
                 for branch in full_spd_spatial["branches"]
             ],
+            "mature_bimodal_density_l1": mature_bimodal["density_l1_differences"],
+            "mature_bimodal_observed_common_grid_rate": mature_bimodal[
+                "observed_common_grid_spatial_rate"
+            ],
+            "mature_bimodal_mean_relative_l1_corrections": mature_bimodal[
+                "failed_gate"
+            ]["observed"],
         },
         "interpretation": (
             "The tested invariants and evidence consistency pass. Production certification is "

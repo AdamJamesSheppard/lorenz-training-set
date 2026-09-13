@@ -4,6 +4,27 @@ Decisions here are dated and revisable. Add a new entry that marks an older
 decision `superseded`, `narrowed`, or `confirmed` rather than rewriting history
 to make the current direction look inevitable.
 
+## 2026-09-13 - Retain mature-state gate after bimodal failure
+
+**Decision.** Keep `METHOD_STATUS = FULL_SPD_DIFFUSION_CERTIFIED`, keep
+`PRODUCTION_DATASET_AUTHORIZED = false`, and keep
+`NEXT_REQUIRED_GATE = MATURE_STATE`.
+
+**Evidence.** The first full-SPD mature bimodal hierarchy completes all 960
+steps with zero measured negative mass, optimizer failures or fallbacks. Density
+differences decrease `0.42059 -> 0.35373`, giving observed common-grid rate
+`0.42695`; covariance, marginal, lobe and smoothed joint-density gates pass.
+Mean relative L1 corrections decrease `0.003047 -> 0.002789 -> 0.001840`, but
+all exceed the predeclared `0.001` limit. Initial projection corrections are
+also material: `0.380`, `0.158` and `0.0313`.
+
+**Consequence.** Do not advance to domain sensitivity or a pilot dataset.
+Diagnose whether the frozen mature law requires finer/nonuniform resolution or
+whether the positivity architecture remains too active in this regime. Preserve
+the failed run as the comparator and predeclare any follow-up before execution.
+
+**Evidence file.** `local_q2_mature_bimodal_report.json`.
+
 ## 2026-09-13 - Promote local-QP CN to mature-state certification
 
 The predeclared non-diagonal full-SPD hierarchy passes. Common-grid L1

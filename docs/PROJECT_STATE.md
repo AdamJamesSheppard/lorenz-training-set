@@ -96,13 +96,20 @@ NEXT_REQUIRED_GATE = MATURE_STATE
   off-diagonal covariance and correlation errors remain within their fixed
   limits. All 960 steps are certified with zero measured negative mass,
   optimizer failure or fallback.
+- The first mature bimodal full-SPD hierarchy completes but fails its
+  predeclared scientific decision. All invariant, covariance, marginal,
+  joint-density, lobe-probability and convergence gates pass. Mean relative L1
+  corrections decrease `0.003047 -> 0.002789 -> 0.001840`, but every value
+  exceeds the fixed `0.001` gate. Common-grid differences decrease only
+  `0.42059 -> 0.35373`, with observed rate `0.42695`.
 
 ## Active blockers
 
 1. No corrected mature-posterior forecast is validated near production
    resolution.
-2. The certified startup-state/full-SPD result has not been tested on mature,
-   filamented or post-analysis densities.
+2. The certified startup-state/full-SPD result has not passed on mature,
+   filamented or post-analysis densities; the first bimodal hierarchy fails the
+   frozen mean-correction gate.
 3. The independent finite-volume hierarchy is not converged enough to define a
    full-density truth error.
 4. The identity-noise spatial hierarchy passed, but its observed rate `3.4026`
@@ -123,15 +130,16 @@ NEXT_REQUIRED_GATE = MATURE_STATE
 The living plan is in `docs/RESEARCH_DIRECTIONS.md` and
 `experiments/method-selection-research.yaml`. Current high-value branches are:
 
-1. Execute the frozen `experiments/mature-state-decision.yaml` bimodal case for
-   the certified local-QP Q2--Crank--Nicolson full-SPD candidate.
-2. Use the independently spun-up, symmetry-preserving Gaussian-mixture law and
-   its z-only analysis posterior on every mesh; retain its immutable hash and
-   pre-forecast projection diagnostics.
+1. Diagnose the failed mature bimodal result without relaxing its frozen gates.
+   The initial Q2 projection requires relative corrections of `0.380`, `0.158`
+   and `0.0313`, and forecast QP acts on most probability mass.
+2. Distinguish insufficient mature-law resolution from a correction architecture
+   that remains active at practical meshes. Any rerun must be separately
+   predeclared and retain the failed hierarchy as its comparator.
 3. Record temporal/spatial density differences, covariance and marginal TVs,
    correction L1/L2, negative-average and projected probability mass, projected
    cell count, optimizer performance and conservation.
-4. After a mature-state pass, run aligned-box domain-size sensitivity at
+4. Only after a mature-state pass, run aligned-box domain-size sensitivity at
    approximately fixed physical resolution.
 5. If one of these gates fails, diagnose adaptive constraints or an
    operator-level positive low-order/AFC correction against the frozen local-QP

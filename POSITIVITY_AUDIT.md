@@ -21,8 +21,11 @@ the same full-constraint, average and scalar-objective-bound checks. The
 historical three-level run certified all 560 steps but failed positive observed
 timestep order. The superseding tight four-level run and identity-noise spatial
 hierarchy and non-diagonal full-SPD hierarchy pass their predeclared positivity,
-conservation and convergence gates. Mature-state and domain evidence remain
-required, and this candidate is not enabled during production propagation.
+conservation and convergence gates. The first mature bimodal hierarchy remains
+positive and conservative but fails its mean relative L1 correction gate on all
+three meshes (`0.003047`, `0.002789`, `0.001840`). Mature-state and domain
+evidence remain required, and this candidate is not enabled during production
+propagation.
 
 > This audit originally covered Q1. The experimental Q2/Q3 path now uses
 > Bernstein coefficients on `2x2x2` control subcells. An experimental adaptive
