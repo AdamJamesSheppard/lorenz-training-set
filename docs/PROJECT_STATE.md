@@ -17,13 +17,13 @@ next experiment.
 ## Current decision
 
 ```ini
-METHOD_STATUS = SPATIAL_POSITIVITY_CERTIFIED
+METHOD_STATUS = FULL_SPD_DIFFUSION_CERTIFIED
 PRODUCTION_DATASET_AUTHORIZED = false
-NEXT_REQUIRED_GATE = FULL_SPD_DIFFUSION
+NEXT_REQUIRED_GATE = MATURE_STATE
 ```
 
-- Method-selection classification: `SPATIAL_POSITIVITY_CERTIFIED`.
-- Next required gate: `FULL_SPD_DIFFUSION`.
+- Method-selection classification: `FULL_SPD_DIFFUSION_CERTIFIED`.
+- Next required gate: `MATURE_STATE`.
 - Large neural-operator dataset generation: `NO`.
 - Controlled baseline: Q1 DG, upwind advection, SIPG diffusion, backward
   Euler, quadrature-14 L2 initialization and projected Bayesian analysis,
@@ -34,8 +34,8 @@ NEXT_REQUIRED_GATE = FULL_SPD_DIFFUSION
 - Leading admissible candidate: same-mesh Q2 Crank--Nicolson with Stage-1
   average repair and local QP. The tight four-level startup-state diagnostic
   passes every predeclared temporal, positivity, mass and identity-noise spatial
-  gate. Production certification still requires full-SPD, mature-state and
-  domain tests.
+  gate. The subsequent non-diagonal full-SPD hierarchy also passes. Production
+  certification still requires mature-state and domain tests.
 - The corrected production-scale run reproduces the earlier Q2 accuracy and
   timestep results while satisfying cell-average and scaling-factor invariants.
   Adaptive Q2 passes its full-step branch gates but fails the half-step mass
@@ -90,13 +90,19 @@ NEXT_REQUIRED_GATE = FULL_SPD_DIFFUSION
   `0.003806`, mean correction `7.61e-5`, zero measured negative mass, zero
   optimizer failure/fallback and absolute mass error `3.86e-12`. This authorizes
   the already-predeclared full-SPD spatial hierarchy.
+- The complete full-SPD hierarchy passes every predeclared gate. Common-grid L1
+  differences decrease from `0.139500` to `0.0348401`, giving observed rate
+  `3.4215`. Covariance discrepancies are `0.02879`, `0.004163`, and `0.002261`;
+  off-diagonal covariance and correlation errors remain within their fixed
+  limits. All 960 steps are certified with zero measured negative mass,
+  optimizer failure or fallback.
 
 ## Active blockers
 
 1. No corrected mature-posterior forecast is validated near production
    resolution.
-2. Full-SPD mixed diffusion has not yet been tested with the certified
-   positivity architecture.
+2. The certified startup-state/full-SPD result has not been tested on mature,
+   filamented or post-analysis densities.
 3. The independent finite-volume hierarchy is not converged enough to define a
    full-density truth error.
 4. The identity-noise spatial hierarchy passed, but its observed rate `3.4026`
@@ -108,8 +114,8 @@ NEXT_REQUIRED_GATE = FULL_SPD_DIFFUSION
 6. The reduced fixed-matrix OSQP backend passed a 2,413-problem SLSQP comparison
    and a 10x projection-speed gate. Optimizer cost and startup-state temporal
    positivity are no longer the active blockers.
-7. Full-SPD diffusion, mature corrected states, and finite-domain sensitivity
-   remain unvalidated for the leading candidate.
+7. Mature corrected states and finite-domain sensitivity remain unvalidated for
+   the leading candidate.
 8. A converged independent deterministic full-density reference remains absent.
 
 ## Near-term research portfolio
@@ -117,17 +123,16 @@ NEXT_REQUIRED_GATE = FULL_SPD_DIFFUSION
 The living plan is in `docs/RESEARCH_DIRECTIONS.md` and
 `experiments/method-selection-research.yaml`. Current high-value branches are:
 
-1. Run `experiments/local-q2-cn-full-spd-controlled.yaml` at `30x36x36` under
-   the predeclared non-diagonal diffusion tensor without changing the correction
-   architecture.
-2. Conditional on that pass, run
-   `experiments/local-q2-cn-full-spd-spatial-refinement.yaml` on the complete
-   `20x24x24 -> 30x36x36 -> 45x54x54` hierarchy.
-3. Use one million common-random-number particles, 1,000 bootstrap replicates
-   and one fixed bootstrap seed; retain deterministic mesh-to-mesh L1 as the
-   primary convergence evidence.
-4. Then validate a corrected mature Lorenz state, including the Bayesian
-   analysis step, followed by aligned-box domain-size sensitivity.
+1. Update `experiments/mature-state-decision.yaml` for the certified local-QP
+   Q2--Crank--Nicolson full-SPD candidate and freeze its gates before execution.
+2. Project one common later-time or post-analysis density conservatively onto
+   every mesh, including Bayesian analysis when such posteriors are dataset
+   inputs.
+3. Record temporal/spatial density differences, covariance and marginal TVs,
+   correction L1/L2, negative-average and projected probability mass, projected
+   cell count, optimizer performance and conservation.
+4. After a mature-state pass, run aligned-box domain-size sensitivity at
+   approximately fixed physical resolution.
 5. If one of these gates fails, diagnose adaptive constraints or an
    operator-level positive low-order/AFC correction against the frozen local-QP
    comparator.

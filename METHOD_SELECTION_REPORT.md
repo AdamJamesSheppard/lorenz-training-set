@@ -2,10 +2,10 @@
 
 ## Decision
 
-**Classification: `SPATIAL_POSITIVITY_CERTIFIED`.** The local-QP
+**Classification: `FULL_SPD_DIFFUSION_CERTIFIED`.** The local-QP
 Q2--Crank--Nicolson candidate has passed its startup-state temporal, positivity,
-mass and identity-noise spatial gates. Full-SPD, mature-state and domain
-certification remain mandatory before generating a large neural-operator
+identity-noise spatial and non-diagonal full-SPD spatial gates. Mature-state and
+domain certification remain mandatory before generating a large neural-operator
 training set.
 
 The controlled same-mesh and two-timestep experiments have been completed.
@@ -23,7 +23,7 @@ in-loop trajectory is Stage-1 average repair plus the local QP (`E_cov` about
 | Q2, unlimited backward Euler | `0.00726675` | negative and density timestep gate fails |
 | Q2, unlimited Crank--Nicolson | `0.00371110` | temporal gates pass; negative mass makes it inadmissible |
 | Q2, Crank--Nicolson, adaptive global limiter | `0.0219156` | non-negative; density timestep gate fails |
-| Q2, Crank--Nicolson, Stage-1 plus local QP | `0.0075085` | temporal and identity-noise spatial gates pass; full-SPD pending |
+| Q2, Crank--Nicolson, Stage-1 plus local QP | `0.0075085` | temporal, identity-noise spatial and full-SPD spatial gates pass; mature-state pending |
 
 The common 200,000-path Monte Carlo covariance bootstrap p95 is
 `0.00628239`. The unlimited Crank--Nicolson discrepancy lies below this measured
@@ -61,18 +61,17 @@ its final two differences are `5.418e-4` and `1.620e-4`, giving observed order
 `1.741`; all 1,200 steps pass positivity and mass gates with no optimizer
 failure or fallback. The candidate therefore advances to spatial refinement.
 
-The aggregate classification is `SPATIAL_POSITIVITY_CERTIFIED`; no threshold
-was relaxed after seeing the identity-noise spatial result. This remains
-narrower than production certification. The next predeclared experiment freezes
-the solver and measures a non-diagonal full-SPD control at `30x36x36`, followed
-conditionally by the `20x24x24`, `30x36x36`, and `45x54x54` hierarchy. Sections
-18--26 record the experimental sequence.
+The aggregate classification is `FULL_SPD_DIFFUSION_CERTIFIED`; no threshold
+was relaxed after seeing the full-SPD result. This remains narrower than
+production certification. The next experiment must freeze the surviving method
+and measure a common mature later-time or post-analysis state before domain
+sensitivity. Sections 18--27 record the experimental sequence.
 
 Role assignments are separate:
 
 | Role | Decision |
 |---|---|
-| Production reference solver | **Unfilled.** Local-QP Q2--Crank--Nicolson is the leading admissible candidate after passing startup-state temporal/positivity and identity-noise spatial gates; full-SPD, mature-state and domain evidence remain required. |
+| Production reference solver | **Unfilled.** Local-QP Q2--Crank--Nicolson is the leading admissible candidate after passing startup-state temporal/positivity, identity-noise spatial and full-SPD spatial gates; mature-state and domain evidence remain required. |
 | Independent verification solver | **Develop alongside correction work:** a dynamically scaled, translated whole-space Hermite-Galerkin solver, checked by mode decay and moment convergence, plus Monte Carlo for moments. Spectral positivity is not assumed. |
 | Current baseline | Q1 upwind/SIPG, backward Euler, quadrature-14 L2 initialization, projected Bayesian analysis and conservative postprocessing. It is a controlled comparator rather than a production selection. |
 
@@ -960,6 +959,35 @@ Evidence: [`local_q2_spatial_refinement_report.json`](local_q2_spatial_refinemen
 immutable run `runs/local-q2-cn-spatial-refinement/20260912T194930Z`, and
 configurations [`experiments/local-q2-cn-full-spd-controlled.yaml`](experiments/local-q2-cn-full-spd-controlled.yaml)
 and [`experiments/local-q2-cn-full-spd-spatial-refinement.yaml`](experiments/local-q2-cn-full-spd-spatial-refinement.yaml).
+
+## 27. Full-SPD spatial certification (2026-09-13)
+
+The conditional non-diagonal full-SPD hierarchy completed successfully on
+`20x24x24`, `30x36x36`, and `45x54x54`. Conservative common-grid L1 differences
+are `0.139500` and `0.0348401`. Their ratio gives observed spatial rate `3.4215`.
+This is a common-grid numerical rate, without a formal-order or asymptotic-regime
+claim.
+
+All 960 steps are whole-cell Bernstein-certified. Measured negative mass,
+optimizer failures and scalar fallbacks are zero; maximum absolute mass error is
+`3.87e-12`. Normalized covariance discrepancies are `0.02879`, `0.004163`, and
+`0.002261`. The finest value is below the strengthened one-million-particle
+bootstrap p95 `0.002735`. Maximum off-diagonal correlation error decreases from
+`0.0551` to `0.00707` to `0.00178`; all fixed covariance, correlation and
+correction-strength gates pass. Total branch forecast time is `4,817 s` across
+8,881,349 local optimizer invocations.
+
+The method status advances to `FULL_SPD_DIFFUSION_CERTIFIED`; dataset generation
+remains unauthorized. The next required gate is `MATURE_STATE`, using one common
+conservatively projected later-time or post-analysis Lorenz density and measuring
+spatial/temporal differences, covariance, marginal TVs, correction norms,
+negative-average and projected probability mass, projected-cell counts,
+optimizer performance and conservation. Domain-size sensitivity follows a
+mature-state pass.
+
+Evidence: [`local_q2_full_spd_spatial_report.json`](local_q2_full_spd_spatial_report.json)
+and immutable run
+`runs/local-q2-cn-full-spd-spatial-refinement/20260913T135455Z`.
 
 ## Sources
 

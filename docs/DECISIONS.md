@@ -4,6 +4,23 @@ Decisions here are dated and revisable. Add a new entry that marks an older
 decision `superseded`, `narrowed`, or `confirmed` rather than rewriting history
 to make the current direction look inevitable.
 
+## 2026-09-13 - Promote local-QP CN to mature-state certification
+
+The predeclared non-diagonal full-SPD hierarchy passes. Common-grid L1
+differences decrease from `0.139500` to `0.0348401`, yielding observed rate
+`3.4215`. All 960 steps are whole-cell certified with zero measured negative
+mass, optimizer failure or fallback. Maximum absolute mass error is `3.87e-12`.
+Normalized covariance discrepancies decrease from `0.02879` to `0.004163` to
+`0.002261`; off-diagonal covariance and correlation errors remain within their
+fixed gates. The finest covariance discrepancy is below the strengthened
+one-million-particle bootstrap p95 `0.002735`.
+
+This confirms the full-SPD direction in the earlier 2026-09-13 decision and
+sets status `FULL_SPD_DIFFUSION_CERTIFIED`. Treat `3.4215` as an observed
+common-grid rate rather than a proved formal order. Dataset generation remains
+unauthorized. The next required gate is a mature later-time or post-analysis
+density, followed by domain-size sensitivity.
+
 ## 2026-09-13 - Promote local-QP CN to full-SPD certification
 
 The predeclared identity-noise spatial hierarchy passes. Exact common-grid L1

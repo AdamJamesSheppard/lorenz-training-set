@@ -1,38 +1,51 @@
 id: mature-state-method-decision
 kind: research_plan
-status: planned
-purpose: Select or reject candidate production methods on regenerated mature DA states.
-fixed_setup:
-  projected_analysis_trajectories: 4
-  cycles: 20
-  provisional_burn_in: 12
-  observation: xz
-  baseline_cells: [30, 36, 36]
-  baseline_dt: 0.000625
-  monte_carlo_paths: 200000
-  finite_volume_refinement_factors: [2, 4]
-state_selection:
-  - narrow
-  - broad
-  - skewed
-  - anisotropic
-required_comparisons:
-  - Q1 baseline and one finer aligned Q1 mesh as comparators
-  - every candidate that passes the preceding applicability and startup-state gates
-  - exact-native-law Monte Carlo with bootstrap uncertainty
-  - common-random-number Monte Carlo timestep refinement
-  - independent finite-volume factors 2 and 4
-  - boundary/domain sensitivity
+status: predeclared_next_gate
+purpose: Test the full-SPD-certified local-QP Q2 Crank--Nicolson candidate on representative mature Lorenz densities.
+candidate:
+  method: Q2 DG Crank--Nicolson with Stage-1 average repair and local mass-matrix QP
+  meshes: [[20, 24, 24], [30, 36, 36], [45, 54, 54]]
+  dt: 0.00015625
+  temporal_safeguard_dt: 0.000078125
+  diffusion_matrix: [[1.0, 0.4, 0.2], [0.4, 1.0, 0.3], [0.2, 0.3, 1.0]]
+  noise_matrix:
+    - [1.4142135623730951, 0.0, 0.0]
+    - [0.5656854249492381, 1.2961481396815722, 0.0]
+    - [0.28284271247461906, 0.3394673699166024, 1.3434142714594956]
+reference:
+  monte_carlo_paths: 1000000
+  bootstrap_replicates: 1000
+  bootstrap_seed: 20261910
+  common_random_numbers_across_meshes: true
+  primary_convergence_evidence: deterministic common-grid mesh-to-mesh L1 differences
+mature_state_generation:
+  source: later-time or post-analysis density from the accepted full-SPD model
+  required_features: [lobe_stretching, filamentation, multimodality, low_density_tails]
+  projection: one common mature state projected conservatively onto every tested mesh
+  include_bayesian_analysis: true
+  selection_rule: freeze the state and its provenance before candidate outcomes are inspected
+required_diagnostics:
+  - temporal and spatial common-grid density differences
+  - covariance error and marginal total-variation distances
+  - correction L1 and L2 norms
+  - negative cell-average mass before Stage 1
+  - projected probability mass and projected-cell count
+  - optimizer failures, fallbacks, iterations and runtime
+  - mass conservation, boundary probability and linear residual
 acceptance_gates:
+  every_step_whole_cell_positive: true
+  maximum_negative_mass: 1.0e-13
+  maximum_absolute_mass_error: 1.0e-10
+  optimizer_failures: 0
+  optimizer_fallbacks: 0
   covariance_normalized_frobenius_max: 0.03
-  covariance_error_to_mc_noise_ratio_max: 5.0
   forecast_limiter_relative_l1_mean_max: 0.001
   forecast_limiter_relative_l1_max: 0.005
   analysis_limiter_relative_l1_max: 0.005
   dt_halving_covariance_change_max: 0.003
   dt_halving_l1_change_max: 0.0025
-  expanded_domain_covariance_change_max: 0.005
-  expanded_domain_marginal_tv_change_max: 0.005
-decision_rule: Select no method unless every applicable gate passes on startup and mature states; among passing methods compare full-density accuracy, robustness, wall time, memory, and implementation risk.
-revision_policy: Gates are provisional and evidence-derived; revise only with documented rationale before inspecting the candidate outcomes, never to rescue a failed run.
-warning: Expensive plan; scripts/run-experiment intentionally accepts only kind=forecast.
+  require_decreasing_mesh_l1_differences: true
+  require_positive_observed_spatial_order: true
+decision_rule: A complete pass advances the frozen mature-state case to aligned-box domain sensitivity; dataset generation remains unauthorized.
+revision_policy: Revise gates only with documented rationale before inspecting outcomes; never relax a criterion to rescue a completed run.
+warning: This is a predeclared research plan. The current experiment runner does not yet execute this kind.

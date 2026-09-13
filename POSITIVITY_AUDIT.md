@@ -20,9 +20,9 @@ for every cell. SLSQP remains available as an oracle. Accepted outputs undergo
 the same full-constraint, average and scalar-objective-bound checks. The
 historical three-level run certified all 560 steps but failed positive observed
 timestep order. The superseding tight four-level run and identity-noise spatial
-hierarchy pass their predeclared positivity, conservation and convergence gates.
-Full-SPD, mature-state and domain evidence remain required, and this candidate
-is not enabled during production propagation.
+hierarchy and non-diagonal full-SPD hierarchy pass their predeclared positivity,
+conservation and convergence gates. Mature-state and domain evidence remain
+required, and this candidate is not enabled during production propagation.
 
 > This audit originally covered Q1. The experimental Q2/Q3 path now uses
 > Bernstein coefficients on `2x2x2` control subcells. An experimental adaptive

@@ -1,12 +1,12 @@
 {
   "report_date": "2026-09-13",
-  "classification": "SPATIAL_POSITIVITY_CERTIFIED",
-  "method_status": "SPATIAL_POSITIVITY_CERTIFIED",
+  "classification": "FULL_SPD_DIFFUSION_CERTIFIED",
+  "method_status": "FULL_SPD_DIFFUSION_CERTIFIED",
   "production_dataset_authorized": false,
-  "next_required_gate": "FULL_SPD_DIFFUSION",
+  "next_required_gate": "MATURE_STATE",
   "large_neural_operator_dataset": "NO",
   "recommended": {
-    "production_forecast_generator": "No method is production certified. Stage-1 average repair plus local mass-matrix QP applied after every Q2 Crank--Nicolson step passes the predeclared startup-state temporal, positivity and identity-noise spatial gates. Freeze this candidate and advance it to controlled full-SPD diffusion; dataset generation remains blocked pending full-SPD, mature-state and domain evidence.",
+    "production_forecast_generator": "No method is production certified. Stage-1 average repair plus local mass-matrix QP applied after every Q2 Crank--Nicolson step passes the predeclared startup-state temporal, identity-noise spatial and full-SPD spatial/positivity gates. Freeze this candidate and advance it to mature-state testing; dataset generation remains blocked pending mature-state and domain evidence.",
     "independent_validator": "Develop a dynamically scaled and translated whole-space Hermite-Galerkin reference alongside the positivity-correction work, validated by mode-tail and moment convergence; retain exact-native-law Monte Carlo for moment uncertainty and the independent FV hierarchy for current triangulation.",
     "neural_operator_target_representation": "If a pilot is run: float64 exact conservative subcell averages; Q1 requires 2 subcells per native cell per axis (60x72x72 for the tested 30x36x36 mesh).",
     "expected_covariance_error": {
@@ -30,7 +30,7 @@
       "monte_carlo_200000_cpu_sampling_propagation_histogram_seconds": 3.369948232000722,
       "scope": "One 0.05 forecast interval; MC figure excludes principled bandwidth selection and accuracy certification."
     },
-    "principal_remaining_limitation": "The observed identity-noise common-grid spatial rate 3.4026 is numerical evidence rather than a proved formal order. Full-SPD diffusion, corrected mature-posterior, finite-domain and independently resolved full-density evidence remain absent."
+    "principal_remaining_limitation": "The full-SPD observed common-grid spatial rate 3.4215 is numerical evidence rather than a proved formal order. Corrected mature-posterior, finite-domain and independently resolved full-density evidence remain absent."
   },
   "pde": {
     "linear_in_density": true,
@@ -297,6 +297,22 @@
     "fallbacks": 0,
     "decision": "Execute the predeclared full-SPD spatial hierarchy; dataset generation remains unauthorized."
   },
+  "full_spd_spatial_refinement": {
+    "evidence": "local_q2_full_spd_spatial_report.json",
+    "run": "runs/local-q2-cn-full-spd-spatial-refinement/20260913T135455Z",
+    "status": "PASSED_PREDECLARED_FULL_SPD_SPATIAL_GATES",
+    "configuration": "experiments/local-q2-cn-full-spd-spatial-refinement.yaml",
+    "meshes": [[20, 24, 24], [30, 36, 36], [45, 54, 54]],
+    "density_l1_differences": [0.1394998501257142, 0.03484007642808543],
+    "observed_common_grid_rate": 3.4214909087894996,
+    "rate_interpretation": "Observed common-grid numerical rate, not a proved formal order.",
+    "normalized_covariance_errors": [0.02878777239883862, 0.0041634836762628, 0.0022613104423359386],
+    "all_960_steps_whole_cell_positive": true,
+    "maximum_measured_negative_mass": 0.0,
+    "optimizer_failures": 0,
+    "fallbacks": 0,
+    "decision": "Advance the frozen candidate to mature-state certification. Dataset generation remains unauthorized."
+  },
   "fixed_q2_raw_archive": {
     "archive": "../sources/upload/newtest_08.zip",
     "scope": "q2_fixed_subcell raw_before_correction ranks 0002 through 0006",
@@ -306,11 +322,10 @@
     "numerical_decision_changed": false
   },
   "smallest_additional_experiment_required": {
-    "name": "local_q2_cn_full_spd_control_then_spatial_refinement",
-    "description": "Run the frozen local-QP Q2 Crank--Nicolson candidate first on 30x36x36 and, conditional on passing, on the 20x24x24, 30x36x36 and 45x54x54 hierarchy under the fixed non-diagonal SPD diffusion tensor.",
-    "decision_rule": "Require every-step whole-cell positivity, mass error at most 1e-10, zero optimizer failures or fallbacks, fixed covariance/correlation and correction-strength gates, then decreasing common-grid L1 differences and positive observed spatial order.",
-    "controlled_configuration": "experiments/local-q2-cn-full-spd-controlled.yaml",
-    "hierarchy_configuration": "experiments/local-q2-cn-full-spd-spatial-refinement.yaml"
+    "name": "mature_state_local_q2_cn_full_spd",
+    "description": "Project one common mature later-time or post-analysis Lorenz density conservatively onto each tested mesh and propagate it with the certified full-SPD candidate, including Bayesian analysis when posteriors are dataset inputs.",
+    "decision_rule": "Require temporal and spatial density stability, covariance and marginal accuracy, controlled correction norms and negative-average mass, zero optimizer failures/fallbacks, conservation, and explicit projected probability mass as well as projected-cell count.",
+    "configuration": "experiments/mature-state-decision.yaml"
   },
   "reproducibility": {
     "python": "3.12.13",
@@ -350,6 +365,7 @@
     "local_q2_dynamic_projection_report.json",
     "local_q2_tight_refinement_report.json",
     "local_q2_spatial_refinement_report.json",
-    "local_q2_full_spd_control_report.json"
+    "local_q2_full_spd_control_report.json",
+    "local_q2_full_spd_spatial_report.json"
   ]
 }

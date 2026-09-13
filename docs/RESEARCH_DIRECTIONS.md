@@ -26,14 +26,16 @@ giving observed order `1.741`. All 1,200 steps pass the predeclared positivity,
 mass, optimizer and density gates. The candidate is now frozen for a
 constant-ratio spatial study. That identity-noise hierarchy also passed, with
 common-grid density differences `0.141394` and `0.0355845` and observed rate
-`3.4026`. This rate remains numerical evidence rather than a formal-order proof.
-The immediate gate is the predeclared full-SPD control and spatial hierarchy.
+`3.4026`. The subsequent non-diagonal full-SPD hierarchy also passes, with L1
+differences `0.139500` and `0.0348401` and observed rate `3.4215`. These rates
+remain numerical evidence rather than formal-order proofs. The immediate gate
+is a mature later-time or post-analysis Lorenz density.
 
 ## Active branches
 
 | Branch | Why it matters now | Switch/stop evidence |
 |---|---|---|
-| Local minimum-change Q2 projection | It passed the tight temporal/positivity study and identity-noise spatial hierarchy, so it is the leading admissible candidate. | Run the predeclared full-SPD control, then the conditional `20x24x24 -> 30x36x36 -> 45x54x54` full-SPD hierarchy; passing advances to mature-state tests. |
+| Local minimum-change Q2 projection | It passed the temporal/positivity, identity-noise spatial and non-diagonal full-SPD spatial gates, so it is the leading admissible candidate. | Test one conservatively shared mature later-time or post-analysis state, including analysis when relevant; passing advances to domain sensitivity. |
 | Positive low-order full-SPD operator | Supplies the invariant-domain baseline required by defensible local convex/AFC correction. | Must preserve mass, positivity and no-flux boundaries for 3-D Lorenz drift plus full SPD diffusion before antidiffusive fluxes are introduced. |
 | Adaptive Q2 Bernstein diagnosis | Separates a sufficient positivity certificate from witnessed negativity and unresolved near-zero cases. | Use as a diagnostic; reject it as a production decision procedure if unresolved cells dominate or correction remains intrusive. |
 | Adaptive local-QP constraints | May remove unnecessary fixed-Bernstein restrictions while retaining the minimum-change architecture. | Hold while the frozen fixed-constraint candidate undergoes spatial and generalization tests; revive if those diagnostics attribute failure to excessive correction. |

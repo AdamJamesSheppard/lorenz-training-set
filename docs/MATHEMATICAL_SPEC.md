@@ -65,10 +65,10 @@ candidate that first applies the globally conservative average repair and then
 this local QP after each Q2--Crank--Nicolson solve. A reduced null-space form
 uses one fixed Hessian and inequality matrix with cell-dependent lower bounds.
 The implementation passed its QP-equivalence tests, the superseding tight
-four-level temporal/positivity gate, and the identity-noise spatial hierarchy.
-Its observed common-grid spatial rate `3.4026` is numerical evidence rather
-than a proved formal order. Full-SPD, mature-state and domain certification
-remain pending.
+four-level temporal/positivity gate, the identity-noise spatial hierarchy, and
+the non-diagonal full-SPD spatial hierarchy. Its observed common-grid spatial
+rates `3.4026` and `3.4215` are numerical evidence rather than proved formal
+orders. Mature-state and domain certification remain pending.
 
 ## Executable invariants
 

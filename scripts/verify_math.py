@@ -34,6 +34,9 @@ def main() -> int:
     full_spd_control = json.loads(
         (ROOT / "local_q2_full_spd_control_report.json").read_text()
     )
+    full_spd_spatial = json.loads(
+        (ROOT / "local_q2_full_spd_spatial_report.json").read_text()
+    )
     diffusion = Lorenz63Model().diffusion
 
     mass_errors = [abs(float(row["mass_error"])) for row in boundary["rows"]]
@@ -96,7 +99,9 @@ def main() -> int:
             and tight_refinement["consecutive_observed_orders"][-1] > 0.0
             and not tight_refinement["dataset_generation_authorized"]
             and classification in {
-                "TEMPORAL_POSITIVITY_CERTIFIED", "SPATIAL_POSITIVITY_CERTIFIED"
+                "TEMPORAL_POSITIVITY_CERTIFIED",
+                "SPATIAL_POSITIVITY_CERTIFIED",
+                "FULL_SPD_DIFFUSION_CERTIFIED",
             }
         ),
         "spatial_local_qp_consistent": bool(
@@ -116,10 +121,14 @@ def main() -> int:
                 and branch["fallbacks"] == 0
                 for branch in spatial_refinement["branches"]
             )
-            and classification == "SPATIAL_POSITIVITY_CERTIFIED"
-            and decision.get("method_status") == "SPATIAL_POSITIVITY_CERTIFIED"
+            and classification in {
+                "SPATIAL_POSITIVITY_CERTIFIED", "FULL_SPD_DIFFUSION_CERTIFIED"
+            }
+            and decision.get("method_status") in {
+                "SPATIAL_POSITIVITY_CERTIFIED", "FULL_SPD_DIFFUSION_CERTIFIED"
+            }
             and decision.get("production_dataset_authorized") is False
-            and decision.get("next_required_gate") == "FULL_SPD_DIFFUSION"
+            and decision.get("next_required_gate") in {"FULL_SPD_DIFFUSION", "MATURE_STATE"}
         ),
         "full_spd_control_consistent": bool(
             full_spd_control["classification"]
@@ -135,6 +144,34 @@ def main() -> int:
             and full_spd_control["optimizer_failures"] == 0
             and full_spd_control["fallbacks"] == 0
             and not full_spd_control["production_dataset_authorized"]
+        ),
+        "full_spd_spatial_consistent": bool(
+            full_spd_spatial["classification"]
+            == "PASSED_PREDECLARED_FULL_SPD_SPATIAL_GATES"
+            and full_spd_spatial["method_status"] == "FULL_SPD_DIFFUSION_CERTIFIED"
+            and full_spd_spatial["all_960_steps_whole_cell_positive"]
+            and full_spd_spatial["maximum_measured_negative_mass"] == 0.0
+            and full_spd_spatial["density_l1_differences"][1]
+            < full_spd_spatial["density_l1_differences"][0]
+            and full_spd_spatial["observed_common_grid_spatial_rate"] > 0.0
+            and all(
+                branch["maximum_measured_negative_mass"] == 0.0
+                and branch["absolute_mass_error"] <= 1.0e-10
+                and branch["normalized_covariance_error"] <= 0.04
+                and branch["mean_relative_l1_correction"] <= 1.0e-3
+                and branch["maximum_relative_l1_correction"] <= 5.0e-3
+                and branch["maximum_off_diagonal_covariance_error"] <= 0.25
+                and branch["maximum_off_diagonal_correlation_error"] <= 0.08
+                and branch["optimizer_failures"] == 0
+                and branch["fallbacks"] == 0
+                for branch in full_spd_spatial["branches"]
+            )
+            and full_spd_spatial["optimizer_failures"] == 0
+            and full_spd_spatial["total_fallbacks"] == 0
+            and not full_spd_spatial["production_dataset_authorized"]
+            and classification == "FULL_SPD_DIFFUSION_CERTIFIED"
+            and decision.get("method_status") == "FULL_SPD_DIFFUSION_CERTIFIED"
+            and decision.get("next_required_gate") == "MATURE_STATE"
         ),
     }
     result = {
@@ -178,6 +215,14 @@ def main() -> int:
             ["normalized_covariance_error"],
             "full_spd_control_mean_relative_l1_correction": full_spd_control
             ["mean_relative_l1_correction"],
+            "full_spd_spatial_density_l1": full_spd_spatial
+            ["density_l1_differences"],
+            "full_spd_spatial_observed_common_grid_rate": full_spd_spatial
+            ["observed_common_grid_spatial_rate"],
+            "full_spd_spatial_covariance_errors": [
+                branch["normalized_covariance_error"]
+                for branch in full_spd_spatial["branches"]
+            ],
         },
         "interpretation": (
             "The tested invariants and evidence consistency pass. Production certification is "
