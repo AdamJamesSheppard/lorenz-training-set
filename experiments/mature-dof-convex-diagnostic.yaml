@@ -1,0 +1,40 @@
+id: mature-dof-convex-diagnostic
+kind: mature_dof_convex_diagnostic
+status: predeclared_executable_diagnostic
+purpose: Determine whether direct conservative limiting of Q2 Bernstein degrees of freedom can halve the modification required by the incumbent cell-local QP on the same mature high-order target.
+study:
+  mixture: runs/local-q2-cn-full-spd-mature-bimodal/20260913T185157Z/reference/mature_mixture.json
+  mixture_sha256: 8d39b72d3b46ad8c9f6634bc8a92edc36c6c1cbc170b5f81edfac6d6877261f0
+  dt: 0.00015625
+  quadrature_degree: 14
+  noise_matrix:
+    - 1.4142135623730951
+    - 0.0
+    - 0.0
+    - 0.5656854249492381
+    - 1.2961481396815722
+    - 0.0
+    - 0.28284271247461906
+    - 0.3394673699166024
+    - 1.3434142714594956
+  branches:
+    - name: dof_convex_45x54x54
+      cells: [45, 54, 54]
+    - name: dof_convex_targeted_finer_60x72x72
+      cells: [60, 72, 72]
+execution:
+  mpi_ranks: 8
+  numerical_threads: 1
+predeclared_gates:
+  maximum_dof_to_qp_l1_ratio: 0.5
+  maximum_mass_change: 1.0e-12
+  whole_cell_positivity_required: true
+  zero_measured_negative_mass_required: true
+  covariance_lobe_and_marginal_changes_must_not_exceed_current_qp: true
+research_design:
+  - Evaluate the frozen mature analytic law before propagation and one raw Q2-CN step from the common incumbent-positive initial state.
+  - Compare both limiters against exactly the same raw Q2 polynomial in each case.
+  - The prototype projects whole-cell Q2 Bernstein DOFs onto a mass-conserving nonnegative simplex; this is a convex DOF diagnostic, not a claimed implementation of the published hyperbolic subcell-flux algorithm.
+  - Include the certified finest mesh and one targeted uniformly finer mesh to test whether raw negativity and correction fall rapidly with resolution.
+decision_rule: Pursue a full in-loop subcell convex-limited operator only if the prototype needs less than half the incumbent QP L1 correction while preserving mass, positivity, covariance, marginals, and lobe probabilities.
+decision_scope: Diagnostic only. MATURE_STATE remains open and dataset generation remains unauthorized regardless of outcome.

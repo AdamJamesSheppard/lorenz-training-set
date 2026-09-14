@@ -40,6 +40,7 @@ def main(config_path: Path) -> int:
         "forecast", "same_mesh_q2_study", "spatial_q2_study", "full_spd_q2_study",
         "mature_full_spd_q2_study", "mature_afc_q2_study",
         "mature_positivity_diagnostic",
+        "mature_dof_convex_diagnostic",
         "local_projection_study",
         "local_projection_optimizer_validation",
     }:
@@ -193,6 +194,23 @@ def main(config_path: Path) -> int:
                 "--quadrature-degree",str(study["quadrature_degree"]),
                 "--current-depth",str(study["current_depth"]),
                 "--deep-depth",str(study["deep_depth"]),
+            ]
+            branch_ranks=int(branch.get("mpi_ranks",ranks))
+            if branch_ranks>1:
+                command=["mpiexec","-n",str(branch_ranks),*command]
+            commands.append((str(branch["name"]),command,ROOT))
+    elif kind == "mature_dof_convex_diagnostic":
+        study=config["study"]
+        for branch in study["branches"]:
+            command=[
+                sys.executable,str(ROOT/"mature_dof_convex_diagnostic.py"),
+                "--output",str(run_dir/str(branch["name"])),
+                "--mixture",str(ROOT/str(study["mixture"])),
+                "--expected-mixture-sha256",str(study["mixture_sha256"]),
+                "--cells",*map(str,branch["cells"]),
+                "--dt",str(study["dt"]),
+                "--noise-matrix",*map(str,study["noise_matrix"]),
+                "--quadrature-degree",str(study["quadrature_degree"]),
             ]
             branch_ranks=int(branch.get("mpi_ranks",ranks))
             if branch_ranks>1:
