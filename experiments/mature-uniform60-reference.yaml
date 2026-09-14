@@ -1,0 +1,61 @@
+id: mature-full-spd-uniform60-reference
+kind: mature_full_spd_q2_study
+status: predeclared_executable_reference
+purpose: Produce the uniform 60x72x72 Q2-CN local-QP mature full-SPD reference required before evaluating adaptive h-refinement efficiency.
+study:
+  cells: [60, 72, 72]
+  dt: 0.00015625
+  final_time: 0.05
+  seed: 20260920
+  monte_carlo_paths: 1000000
+  mc_dt: 0.000125
+  bootstrap_replicates: 1000
+  bootstrap_seed: 20261920
+  certificate_max_depth: 4
+  ksp_rtol: 1.0e-12
+  ksp_atol: 1.0e-15
+  initialization: mixture_projected
+  initial_quadrature_degree: 14
+  common_comparison_grid: [180, 216, 216]
+  density_metric_grid: [20, 24, 24]
+  density_smoothing_sigma: 0.75
+  reference_reuse: runs/local-q2-cn-full-spd-mature-bimodal/20260913T185157Z/reference
+  noise_matrix:
+    - 1.4142135623730951
+    - 0.0
+    - 0.0
+    - 0.5656854249492381
+    - 1.2961481396815722
+    - 0.0
+    - 0.28284271247461906
+    - 0.3394673699166024
+    - 1.3434142714594956
+  branches:
+    - name: mature_bimodal_q2_local_qp_60x72x72
+      cells: [60, 72, 72]
+      export_subcells: 3
+      degree: 2
+      theta: 0.5
+      positivity_method: local_qp
+      optimizer_backend: osqp
+      optimizer_ftol: 1.0e-10
+      maximum_iterations: 10000
+      archive_raw: false
+execution:
+  mpi_ranks: 8
+  numerical_threads: 1
+reference_requirements:
+  maximum_step_mass_change: 1.0e-12
+  maximum_absolute_mass_error: 1.0e-10
+  maximum_negative_mass: 1.0e-13
+  zero_optimizer_failures: true
+  zero_scaling_fallbacks: true
+  whole_cell_positivity_at_every_step: true
+  record_initial_and_dynamic_qp_correction: true
+  record_covariance_marginal_joint_tv_and_lobe_statistics: true
+  dataset_generation_authorized: false
+notes:
+  - This run is a reference artifact, not a mature-state certification decision by itself.
+  - It reuses the frozen analytic mixture, Monte Carlo particles, bootstrap seed, full-SPD tensor, timestep, and forecast horizon.
+  - The common 180x216x216 export grid aligns exactly with the 60x72x72 mesh.
+  - A genuine adaptive comparison remains contingent on a conforming/nonconforming hexahedral refinement implementation; DOLFINx 0.11 refines simplicial meshes only.
