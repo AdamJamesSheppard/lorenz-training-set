@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 import numpy as np
@@ -88,6 +89,30 @@ def test_mature_bimodal_predeclaration_is_full_spd_and_common_grid():
         assert tuple(np.asarray(branch["cells"])*branch["export_subcells"]) == tuple(
             study["common_comparison_grid"]
         )
+
+
+def test_fine_graded_predeclaration_aligns_both_comparators_to_common_grid():
+    config=yaml.safe_load(
+        (ROOT/"experiments/mature-graded-fine-comparison.yaml").read_text()
+    )
+    design=json.loads(
+        (ROOT/"experiments/mature-graded-fine-axes.json").read_text()
+    )
+    branch=config["study"]["branches"][0]
+    assert config["kind"]=="mature_graded_q2_study"
+    assert tuple(branch["cells"])==(58,68,56)
+    assert tuple(branch["common_export_grid"])==(180,216,216)
+    assert branch["comparator_report"]
+    assert branch["secondary_comparator_report"]
+    for name,count in zip(("x","y","z"),branch["cells"]):
+        edges=design["edge_indices"][name]
+        assert len(edges)==count+1
+        assert all(right>left for left,right in zip(edges,edges[1:]))
+        assert set(np.diff(edges))=={2,6}
+    dof_ratio=np.prod(branch["cells"])/np.prod((60,72,72))
+    assert dof_ratio<=config["scientific_decision"]["comparator_limits"][
+        "maximum_dg_dof_ratio"
+    ]
 
 
 def test_z_conditioning_and_truncated_mixture_sampling_preserve_lobe_symmetry():

@@ -2,11 +2,13 @@
 
 ## Decision
 
-**Classification: `FULL_SPD_DIFFUSION_CERTIFIED`.** The local-QP
-Q2--Crank--Nicolson candidate has passed its startup-state temporal, positivity,
-identity-noise spatial and non-diagonal full-SPD spatial gates. Mature-state and
-domain certification remain mandatory before generating a large neural-operator
-training set.
+**Classification: `MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED`.**
+The local-QP Q2--Crank--Nicolson candidate has passed its startup-state
+temporal/positivity, identity-noise spatial, non-diagonal full-SPD spatial, and
+mature-state positivity/statistical gates. Mature full-density convergence and
+domain sensitivity remain mandatory before generating a large neural-operator
+training set. Static grading is supported as an efficiency mechanism while its
+separate predeclared `0.0008` correction failure remains recorded.
 
 The controlled same-mesh and two-timestep experiments have been completed.
 They overturn the old equal-DOF ranking: corrected Q1 is now the controlled
@@ -23,7 +25,7 @@ in-loop trajectory is Stage-1 average repair plus the local QP (`E_cov` about
 | Q2, unlimited backward Euler | `0.00726675` | negative and density timestep gate fails |
 | Q2, unlimited Crank--Nicolson | `0.00371110` | temporal gates pass; negative mass makes it inadmissible |
 | Q2, Crank--Nicolson, adaptive global limiter | `0.0219156` | non-negative; density timestep gate fails |
-| Q2, Crank--Nicolson, Stage-1 plus local QP | `0.0075085` | temporal, identity-noise spatial and full-SPD spatial gates pass; mature-state pending |
+| Q2, Crank--Nicolson, Stage-1 plus local QP | `0.0075085` | temporal, identity-noise spatial, full-SPD spatial and mature positivity/statistical gates pass; mature density convergence open |
 
 The common 200,000-path Monte Carlo covariance bootstrap p95 is
 `0.00628239`. The unlimited Crank--Nicolson discrepancy lies below this measured
@@ -61,17 +63,17 @@ its final two differences are `5.418e-4` and `1.620e-4`, giving observed order
 `1.741`; all 1,200 steps pass positivity and mass gates with no optimizer
 failure or fallback. The candidate therefore advances to spatial refinement.
 
-The aggregate classification is `FULL_SPD_DIFFUSION_CERTIFIED`; no threshold
-was relaxed after seeing the full-SPD result. This remains narrower than
-production certification. The next experiment must freeze the surviving method
-and measure a common mature later-time or post-analysis state before domain
-sensitivity. Sections 18--27 record the experimental sequence.
+The aggregate classification is
+`MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED`; no historical threshold
+was rewritten. This remains narrower than production certification. The next
+experiment freezes the surviving method and increases resolution only in the
+mature lobe bands to resolve full-density convergence before domain sensitivity.
 
 Role assignments are separate:
 
 | Role | Decision |
 |---|---|
-| Production reference solver | **Unfilled.** Local-QP Q2--Crank--Nicolson is the leading admissible candidate after passing startup-state temporal/positivity, identity-noise spatial and full-SPD spatial gates; mature-state and domain evidence remain required. |
+| Production reference solver | **Unfilled.** Local-QP Q2--Crank--Nicolson is the leading admissible candidate after passing startup-state temporal/positivity, identity-noise spatial, full-SPD spatial and mature positivity/statistical gates; mature full-density convergence and domain evidence remain required. |
 | Independent verification solver | **Develop alongside correction work:** a dynamically scaled, translated whole-space Hermite-Galerkin solver, checked by mode decay and moment convergence, plus Monte Carlo for moments. Spectral positivity is not assumed. |
 | Current baseline | Q1 upwind/SIPG, backward Euler, quadrature-14 L2 initialization, projected Bayesian analysis and conservative postprocessing. It is a controlled comparator rather than a production selection. |
 
@@ -1058,6 +1060,42 @@ the current local QP and failed mature hierarchy retained as frozen comparators.
 Evidence: [`mature_positivity_certificate_diagnostic_report.json`](mature_positivity_certificate_diagnostic_report.json)
 and immutable run
 `runs/mature-positivity-certificate-diagnostic/20260913T200251Z`.
+
+## 30. Uniform-60 mature-state gate
+
+The uniform `60x72x72` run changes the mature-state classification. Its mean
+relative L1 correction is `0.0008313`, below the original predeclared `0.001`
+mature criterion. All 320 steps are whole-cell positive with zero measured
+negative mass, optimizer failure or fallback. Final normalized covariance error
+is `0.001082`; marginal, smoothed joint-TV and lobe-probability gates pass.
+
+The method therefore passes mature-state positivity and statistical gates.
+Full-density convergence remains open because the preceding `45 -> 60`
+common-grid difference is `0.20997`, and uniform-60 costs 8.40 million DG
+unknowns, 69.4 minutes and approximately 6.05 GiB peak memory per rank.
+
+## 31. Static graded-hexahedral efficiency result
+
+The predeclared `44x52x46` static graded run reproduces uniform-60 to
+common-grid `L1=0.001688`. It uses 2.84 million DG unknowns and takes 32.6
+minutes with approximately 2.32 GiB peak memory per rank: reductions of
+`66.2%`, `53.0%` and `61.7%`, respectively. Positivity, conservation,
+optimizer, covariance, joint-TV and lobe statistics pass.
+
+Its mean correction `0.0008384` exceeds the branch-specific `0.0008` target, so
+`FAILED_PREDECLARED_MATURE_GRADED_EFFICIENCY_GATES` remains the immutable
+formal classification. The near equality with uniform-60 correction
+`0.0008313` shows that grading reproduced the unresolved uniform solution rather
+than creating material extra correction. A stored marginal-degradation failure
+mixed different histogram resolutions; matched-grid recomputation gives a
+maximum increase of `1.75e-4`, within the `0.005` limit.
+
+Static grading is consequently validated for efficiency but is not promoted to
+full density certification. The next predeclared run is the `58x68x56` finer
+graded mesh in `experiments/mature-graded-fine-comparison.yaml`, compared with
+both uniform-60 and the first graded result.
+
+Evidence: [`mature_graded_efficiency_report.json`](mature_graded_efficiency_report.json).
 
 ## Sources
 

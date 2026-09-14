@@ -1,0 +1,93 @@
+id: mature-full-spd-graded-fine-comparison
+kind: mature_graded_q2_study
+status: predeclared_executable_density_convergence_gate
+purpose: Test mature-density convergence by refining the validated graded lobe bands beyond uniform-60 resolution while retaining coarse exterior slabs.
+study:
+  cells: [58, 68, 56]
+  axis_coordinates: experiments/mature-graded-fine-axes.json
+  dt: 0.00015625
+  final_time: 0.05
+  seed: 20260920
+  monte_carlo_paths: 1000000
+  mc_dt: 0.000125
+  bootstrap_replicates: 1000
+  bootstrap_seed: 20261920
+  certificate_max_depth: 4
+  ksp_rtol: 1.0e-12
+  ksp_atol: 1.0e-15
+  initialization: mixture_projected
+  initial_quadrature_degree: 14
+  common_comparison_grid: [180, 216, 216]
+  density_metric_grid: [20, 24, 24]
+  density_smoothing_sigma: 0.75
+  reference_reuse: runs/local-q2-cn-full-spd-mature-bimodal/20260913T185157Z/reference
+  noise_matrix:
+    - 1.4142135623730951
+    - 0.0
+    - 0.0
+    - 0.5656854249492381
+    - 1.2961481396815722
+    - 0.0
+    - 0.28284271247461906
+    - 0.3394673699166024
+    - 1.3434142714594956
+  branches:
+    - name: mature_bimodal_q2_local_qp_graded58x68x56
+      cells: [58, 68, 56]
+      axis_coordinates: experiments/mature-graded-fine-axes.json
+      common_export_grid: [180, 216, 216]
+      export_subcells: 3
+      degree: 2
+      theta: 0.5
+      positivity_method: local_qp
+      optimizer_backend: osqp
+      optimizer_ftol: 1.0e-10
+      maximum_iterations: 10000
+      archive_raw: false
+      comparator_report: runs/mature-full-spd-uniform60-reference/20260914T190730Z/mature_bimodal_q2_local_qp_60x72x72/report.json
+      secondary_comparator_name: graded44x52x46
+      secondary_comparator_report: runs/mature-full-spd-graded-static-comparison/20260914T210354Z/mature_bimodal_q2_local_qp_graded44x52x46/report.json
+execution:
+  mpi_ranks: 8
+  numerical_threads: 1
+scientific_decision:
+  maximum_step_mass_change: 1.0e-12
+  maximum_absolute_mass_error: 1.0e-10
+  maximum_negative_mass: 1.0e-13
+  maximum_normalized_covariance_error: 0.08
+  maximum_covariance_error_to_mc_p95_ratio: 5.0
+  maximum_mean_relative_l1_correction: 0.0008
+  maximum_relative_l1_correction: 0.005
+  maximum_off_diagonal_correlation_error: 0.08
+  maximum_marginal_tv: 0.05
+  maximum_lobe_probability_error: 0.025
+  maximum_smoothed_joint_tv: 0.15
+  maximum_initial_projection_joint_tv: 0.10
+  comparator_limits:
+    maximum_common_grid_density_l1: 0.104985685
+    maximum_covariance_error_increase: 0.005
+    maximum_lobe_error_increase: 0.005
+    maximum_joint_tv_increase: 0.005
+    maximum_marginal_tv_increase: 0.005
+    maximum_dg_dof_ratio: 0.75
+    maximum_forecast_runtime_ratio: 0.90
+    maximum_peak_rank_memory_ratio: 0.90
+  secondary_comparator_limits:
+    maximum_common_grid_density_l1: 0.104985685
+    maximum_covariance_error_increase: 0.005
+    maximum_lobe_error_increase: 0.005
+    maximum_joint_tv_increase: 0.005
+    maximum_marginal_tv_increase: 0.005
+research_gates:
+  - The fine lobe bands use common-grid span two, compared with span three for uniform-60 and the first graded mesh; exterior slabs retain the validated span-six cells.
+  - D_60,gf and D_g,gf are computed conservatively on the frozen 180x216x216 grid.
+  - Each new density difference must be below half the prior D_45,60 value of 0.20997137; D_60,gf below 0.001688331 is additionally recorded as a strong reference-stability diagnostic rather than a mandatory gate.
+  - Mean dynamic local-QP correction must fall below the previously declared 0.0008 target.
+  - Covariance, matched-grid marginal TV, joint TV and lobe probability may not degrade by more than 0.005 from either comparator.
+  - The fine graded branch must retain an efficiency advantage: at most 75 percent of uniform-60 DG unknowns and 90 percent of its runtime and peak per-rank memory.
+  - Whole-cell positivity, zero measured negative mass, mass conservation and zero optimizer failures or fallbacks remain mandatory.
+decision_rule: A complete pass supports mature-density convergence under targeted refinement. The strong D_60,gf stability diagnostic determines whether one further graded level is needed before aligned-box domain sensitivity.
+notes:
+  - Static grading is already validated for efficiency by the 44x52x46 result despite its formal 0.0008 correction-gate failure.
+  - This branch has 220864 cells and 5963328 discontinuous Q2 degrees of freedom, 71.01 percent of uniform-60.
+  - Dataset generation remains unauthorized regardless of this run; domain-size sensitivity is still required.

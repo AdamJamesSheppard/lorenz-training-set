@@ -1,12 +1,14 @@
 {
-  "report_date": "2026-09-13",
-  "classification": "FULL_SPD_DIFFUSION_CERTIFIED",
-  "method_status": "FULL_SPD_DIFFUSION_CERTIFIED",
+  "report_date": "2026-09-15",
+  "classification": "MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED",
+  "method_status": "MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED",
   "production_dataset_authorized": false,
-  "next_required_gate": "MATURE_STATE",
+  "next_required_gate": "MATURE_DENSITY_CONVERGENCE",
+  "mature_density_convergence": "OPEN",
+  "mature_graded_efficiency": "SUPPORTED_NOT_CERTIFIED",
   "large_neural_operator_dataset": "NO",
   "recommended": {
-    "production_forecast_generator": "No method is production certified. Stage-1 average repair plus local mass-matrix QP applied after every Q2 Crank--Nicolson step passes the startup-state temporal, identity-noise spatial and full-SPD spatial/positivity gates. Its first bimodal mature-state hierarchy fails the fixed mean-correction gate, so mature-state certification remains open and dataset generation remains blocked.",
+    "production_forecast_generator": "No method is production certified. Stage-1 average repair plus local mass-matrix QP applied after every Q2 Crank--Nicolson step passes startup-state temporal, identity-noise spatial, full-SPD spatial, and mature-state positivity/statistical gates at uniform-60 resolution. Static grading reproduces uniform-60 efficiently. Full mature-density spatial convergence and domain sensitivity remain open, so dataset generation remains blocked.",
     "independent_validator": "Develop a dynamically scaled and translated whole-space Hermite-Galerkin reference alongside the positivity-correction work, validated by mode-tail and moment convergence; retain exact-native-law Monte Carlo for moment uncertainty and the independent FV hierarchy for current triangulation.",
     "neural_operator_target_representation": "If a pilot is run: float64 exact conservative subcell averages; Q1 requires 2 subcells per native cell per axis (60x72x72 for the tested 30x36x36 mesh).",
     "expected_covariance_error": {
@@ -15,7 +17,7 @@
       "best_nonnegative_q2_crank_nicolson_normalized_frobenius": 0.007488068593775589,
       "mc_bootstrap_p95": 0.006282392718324663,
       "interpretation": "The unlimited covariance discrepancy is below the measured MC bootstrap p95, so it is not statistically resolved by this 200000-path reference. This does not certify the true PDE error.",
-      "mature_corrected_production_resolution": null
+      "mature_corrected_production_resolution": [60, 72, 72]
     },
     "expected_full_density_error": {
       "certified_value": null,
@@ -30,7 +32,7 @@
       "monte_carlo_200000_cpu_sampling_propagation_histogram_seconds": 3.369948232000722,
       "scope": "One 0.05 forecast interval; MC figure excludes principled bandwidth selection and accuracy certification."
     },
-    "principal_remaining_limitation": "The first mature bimodal hierarchy converges slowly at observed common-grid rate 0.42695 and exceeds the 0.001 mean relative L1 correction gate on every mesh. A same-polynomial depth-4/depth-8 audit rejects certificate depth as the cause: the raw Q2 polynomials are overwhelmingly witnessed negative. Finite-domain and independently resolved full-density evidence also remain absent."
+    "principal_remaining_limitation": "Uniform-60 and its static graded reproduction pass the original mature 0.001 correction, positivity, covariance, marginal, joint-TV and lobe gates, but the preceding 45-to-60 full-density L1 difference is still 0.20997. A finer graded comparison must determine whether the mature density is entering a resolved regime. Finite-domain sensitivity and independently resolved full-density evidence remain absent."
   },
   "pde": {
     "linear_in_density": true,
@@ -137,9 +139,14 @@
   "adaptivity": {
     "installed_dolfinx": "0.11.0",
     "runtime_probe": "dolfinx.mesh.refine on a hexahedral box fails for both uniform and marked-edge calls with RuntimeError: Refinement only defined for simplices",
-    "status": "not implemented",
-    "alternatives": ["tetrahedral h-adaptivity with a new positivity proof", "structured local refinement outside the current Domain/export assumptions", "p-adaptivity", "domain decomposition"],
-    "reason": "Changing topology would invalidate the present tensor-product Bernstein control and conservative tensor interface unless redesigned."
+    "status": "static tensor grading validated for efficiency",
+    "implemented_path": "Conforming axis-aligned hexahedral topology with nonuniform tensor coordinate arrays and exact conservative export to an aligned uniform comparison grid.",
+    "validated_cells": [44, 52, 46],
+    "density_l1_vs_uniform60": 0.0016883310457080601,
+    "dof_reduction_fraction": 0.6616255144032922,
+    "runtime_reduction_fraction": 0.5295354094452672,
+    "memory_reduction_fraction": 0.6165572578439762,
+    "qualification": "The branch formally misses its separate 0.0008 correction target; static grading itself reproduces uniform-60 accurately and efficiently. Dynamic nonconforming AMR remains unimplemented."
   },
   "characteristic_challenger": {
     "status": "not implemented",
@@ -154,7 +161,7 @@
     "forecast_limiter_relative_l1_mean": 0.08683595314063548,
     "analysis_limiter_relative_l1_mean": 0.3626621371308765,
     "analysis_limiter_relative_l1_p95": 0.6614391153992543,
-    "interpretation": "An operational distribution appears at this coarse configuration, but the numerical posterior family is not accurate enough to validate as production input. No corrected mature forecast at 30x36x36 or finer exists."
+    "interpretation": "This exploratory coarse DA family remains unsuitable as production input. A separate analytic mature posterior forecast now passes positivity and statistical gates at uniform-60 and graded resolution; operational repeated-analysis posteriors still require later validation."
   },
   "error_budget": {
     "initial_representation_covariance": 0.00683499658458859,
@@ -329,7 +336,22 @@
     "optimizer_failures": 0,
     "fallbacks": 0,
     "failed_gate": "Mean relative L1 correction exceeds the fixed 0.001 limit on every mesh despite decreasing under refinement.",
-    "decision": "Retain FULL_SPD_DIFFUSION_CERTIFIED and MATURE_STATE as the next required gate; dataset generation remains unauthorized."
+    "decision": "This historical hierarchy remains a valid predeclared failure. Later uniform-60 evidence passes the original 0.001 mature correction threshold, so the current gate is mature-density convergence rather than basic mature-state admissibility."
+  },
+  "mature_uniform60_and_graded_efficiency": {
+    "evidence": "mature_graded_efficiency_report.json",
+    "uniform60_run": "runs/mature-full-spd-uniform60-reference/20260914T190730Z",
+    "graded_run": "runs/mature-full-spd-graded-static-comparison/20260914T210354Z",
+    "status": "MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED",
+    "mature_density_convergence": "OPEN",
+    "mature_graded_efficiency": "SUPPORTED_NOT_CERTIFIED",
+    "uniform60_mean_relative_l1_correction": 0.0008312575245351539,
+    "graded_mean_relative_l1_correction": 0.0008383666457061889,
+    "density_l1_graded_vs_uniform60": 0.0016883310457080601,
+    "prior_density_l1_45_vs_60": 0.20997137,
+    "graded_dg_dofs": 2841696,
+    "uniform60_dg_dofs": 8398080,
+    "decision": "Validate static grading for efficiency while retaining its formal 0.0008 correction-gate failure. Run the finer graded density-convergence comparison; production data remain unauthorized."
   },
   "mature_positivity_certificate_diagnostic": {
     "evidence": "mature_positivity_certificate_diagnostic_report.json",
@@ -352,10 +374,10 @@
     "numerical_decision_changed": false
   },
   "smallest_additional_experiment_required": {
-    "name": "operator_level_positive_mature_control",
-    "description": "Construct a conservative positive low-order or flux-corrected full-SPD update and compare it with the frozen local-QP mature failure on identical raw states and forecast intervals.",
-    "decision_rule": "Require positivity and conservation without fallback, lower correction and projected probability mass than the local-QP comparator, and no degradation of common-grid density, covariance, marginal or lobe accuracy.",
-    "reference_configuration": "experiments/mature-state-decision.yaml"
+    "name": "mature_graded_fine_density_convergence",
+    "description": "Refine the validated graded lobe bands beyond uniform-60 resolution while retaining coarse exterior slabs, then compare conservatively with uniform-60 and the first graded solution.",
+    "decision_rule": "Require positivity and conservation without fallback, mean correction below 0.0008, decreasing density difference relative to the prior 45-to-60 comparison, stable statistics, and retained runtime/memory advantage.",
+    "reference_configuration": "experiments/mature-graded-fine-comparison.yaml"
   },
   "reproducibility": {
     "python": "3.12.13",
@@ -398,6 +420,7 @@
     "local_q2_full_spd_control_report.json",
     "local_q2_full_spd_spatial_report.json",
     "local_q2_mature_bimodal_report.json",
-    "mature_positivity_certificate_diagnostic_report.json"
+    "mature_positivity_certificate_diagnostic_report.json",
+    "mature_graded_efficiency_report.json"
   ]
 }

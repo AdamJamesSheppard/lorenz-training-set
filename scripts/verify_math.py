@@ -43,6 +43,9 @@ def main() -> int:
     mature_certificate = json.loads(
         (ROOT / "mature_positivity_certificate_diagnostic_report.json").read_text()
     )
+    mature_graded = json.loads(
+        (ROOT / "mature_graded_efficiency_report.json").read_text()
+    )
     diffusion = Lorenz63Model().diffusion
 
     mass_errors = [abs(float(row["mass_error"])) for row in boundary["rows"]]
@@ -108,6 +111,7 @@ def main() -> int:
                 "TEMPORAL_POSITIVITY_CERTIFIED",
                 "SPATIAL_POSITIVITY_CERTIFIED",
                 "FULL_SPD_DIFFUSION_CERTIFIED",
+                "MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED",
             }
         ),
         "spatial_local_qp_consistent": bool(
@@ -128,13 +132,17 @@ def main() -> int:
                 for branch in spatial_refinement["branches"]
             )
             and classification in {
-                "SPATIAL_POSITIVITY_CERTIFIED", "FULL_SPD_DIFFUSION_CERTIFIED"
+                "SPATIAL_POSITIVITY_CERTIFIED", "FULL_SPD_DIFFUSION_CERTIFIED",
+                "MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED",
             }
             and decision.get("method_status") in {
-                "SPATIAL_POSITIVITY_CERTIFIED", "FULL_SPD_DIFFUSION_CERTIFIED"
+                "SPATIAL_POSITIVITY_CERTIFIED", "FULL_SPD_DIFFUSION_CERTIFIED",
+                "MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED",
             }
             and decision.get("production_dataset_authorized") is False
-            and decision.get("next_required_gate") in {"FULL_SPD_DIFFUSION", "MATURE_STATE"}
+            and decision.get("next_required_gate") in {
+                "FULL_SPD_DIFFUSION", "MATURE_STATE", "MATURE_DENSITY_CONVERGENCE"
+            }
         ),
         "full_spd_control_consistent": bool(
             full_spd_control["classification"]
@@ -175,9 +183,14 @@ def main() -> int:
             and full_spd_spatial["optimizer_failures"] == 0
             and full_spd_spatial["total_fallbacks"] == 0
             and not full_spd_spatial["production_dataset_authorized"]
-            and classification == "FULL_SPD_DIFFUSION_CERTIFIED"
-            and decision.get("method_status") == "FULL_SPD_DIFFUSION_CERTIFIED"
-            and decision.get("next_required_gate") == "MATURE_STATE"
+            and classification in {
+                "FULL_SPD_DIFFUSION_CERTIFIED",
+                "MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED",
+            }
+            and decision.get("method_status") == classification
+            and decision.get("next_required_gate") in {
+                "MATURE_STATE", "MATURE_DENSITY_CONVERGENCE"
+            }
         ),
         "mature_bimodal_failure_consistent": bool(
             mature_bimodal["classification"]
@@ -194,10 +207,15 @@ def main() -> int:
                 value > mature_bimodal["failed_gate"]["threshold"]
                 for value in mature_bimodal["failed_gate"]["observed"]
             )
-            and classification == "FULL_SPD_DIFFUSION_CERTIFIED"
-            and decision.get("method_status") == "FULL_SPD_DIFFUSION_CERTIFIED"
+            and classification in {
+                "FULL_SPD_DIFFUSION_CERTIFIED",
+                "MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED",
+            }
+            and decision.get("method_status") == classification
             and decision.get("production_dataset_authorized") is False
-            and decision.get("next_required_gate") == "MATURE_STATE"
+            and decision.get("next_required_gate") in {
+                "MATURE_STATE", "MATURE_DENSITY_CONVERGENCE"
+            }
         ),
         "mature_certificate_diagnostic_consistent": bool(
             mature_certificate["classification"]
@@ -210,9 +228,53 @@ def main() -> int:
             ["maximum_l1_correction_reduction_from_depth8"] < 0.10
             and mature_certificate["aggregate"]["optimizer_failures"] == 0
             and mature_certificate["aggregate"]["fallbacks"] == 0
-            and classification == "FULL_SPD_DIFFUSION_CERTIFIED"
+            and classification in {
+                "FULL_SPD_DIFFUSION_CERTIFIED",
+                "MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED",
+            }
             and decision.get("production_dataset_authorized") is False
-            and decision.get("next_required_gate") == "MATURE_STATE"
+            and decision.get("next_required_gate") in {
+                "MATURE_STATE", "MATURE_DENSITY_CONVERGENCE"
+            }
+        ),
+        "mature_uniform60_and_graded_efficiency_consistent": bool(
+            mature_graded["classification"]
+            == "MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED"
+            and mature_graded["method_status"] == mature_graded["classification"]
+            and mature_graded["mature_density_convergence"] == "OPEN"
+            and mature_graded["mature_graded_efficiency"] == "SUPPORTED_NOT_CERTIFIED"
+            and mature_graded["uniform60"][
+                "mean_relative_l1_correction"
+            ] <= 0.001
+            and mature_graded["uniform60"]["all_320_steps_whole_cell_positive"]
+            and mature_graded["uniform60"]["maximum_measured_negative_mass"] == 0.0
+            and mature_graded["graded44x52x46"][
+                "formal_classification"
+            ] == "FAILED_PREDECLARED_MATURE_GRADED_EFFICIENCY_GATES"
+            and mature_graded["graded44x52x46"][
+                "mean_relative_l1_correction"
+            ] > mature_graded["graded44x52x46"]["correction_threshold"]
+            and mature_graded["graded44x52x46"][
+                "density_l1_fraction_of_45_to_60_difference"
+            ] < 0.01
+            and mature_graded["graded44x52x46"]["dof_reduction_fraction"] > 0.5
+            and mature_graded["graded44x52x46"]["runtime_reduction_fraction"] > 0.5
+            and mature_graded["graded44x52x46"]["memory_reduction_fraction"] > 0.5
+            and mature_graded["graded44x52x46"][
+                "matched_grid_maximum_marginal_tv_increase"
+            ] <= 0.005
+            and mature_graded["graded44x52x46"][
+                "all_320_steps_whole_cell_positive"
+            ]
+            and mature_graded["graded44x52x46"]["maximum_measured_negative_mass"] == 0.0
+            and mature_graded["graded44x52x46"]["optimizer_failures"] == 0
+            and mature_graded["graded44x52x46"]["fallbacks"] == 0
+            and classification == mature_graded["classification"]
+            and decision.get("method_status") == mature_graded["method_status"]
+            and decision.get("mature_density_convergence") == "OPEN"
+            and decision.get("mature_graded_efficiency") == "SUPPORTED_NOT_CERTIFIED"
+            and decision.get("production_dataset_authorized") is False
+            and decision.get("next_required_gate") == "MATURE_DENSITY_CONVERGENCE"
         ),
     }
     result = {
@@ -277,6 +339,15 @@ def main() -> int:
             "mature_certificate_maximum_l1_reduction": mature_certificate[
                 "aggregate"
             ]["maximum_l1_correction_reduction_from_depth8"],
+            "mature_uniform60_mean_relative_l1_correction": mature_graded[
+                "uniform60"
+            ]["mean_relative_l1_correction"],
+            "mature_graded_density_l1_vs_uniform60": mature_graded[
+                "graded44x52x46"
+            ]["density_l1_vs_uniform60"],
+            "mature_graded_mean_relative_l1_correction": mature_graded[
+                "graded44x52x46"
+            ]["mean_relative_l1_correction"],
         },
         "interpretation": (
             "The tested invariants and evidence consistency pass. Production certification is "

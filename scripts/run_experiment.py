@@ -19,6 +19,29 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def matched_marginal_tvs(
+    values: np.ndarray,
+    particles: np.ndarray,
+    bounds: list[list[float]],
+    shape: tuple[int,int,int],
+) -> list[float]:
+    """Marginal TVs on one fixed grid for cross-mesh comparisons."""
+    factors=tuple(got//want for got,want in zip(values.shape,shape))
+    if any(want*factor!=got for got,want,factor in zip(values.shape,shape,factors)):
+        raise ValueError(f"Cannot coarsen comparator density {values.shape} to {shape}")
+    coarse=values.reshape(
+        shape[0],factors[0],shape[1],factors[1],shape[2],factors[2]
+    ).mean(axis=(1,3,5))
+    volume=float(np.prod([hi-lo for lo,hi in bounds]))
+    probability=coarse*volume/coarse.size
+    result=[]
+    for axis,((lo,hi),count) in enumerate(zip(bounds,shape)):
+        numerical=probability.sum(axis=tuple(i for i in range(3) if i!=axis))
+        sampled=np.histogram(particles[:,axis],bins=count,range=(lo,hi))[0]/len(particles)
+        result.append(float(.5*np.abs(numerical-sampled).sum()))
+    return result
+
+
 def package_version(name: str) -> str | None:
     try:
         return version(name)
@@ -511,6 +534,13 @@ def main(config_path: Path) -> int:
                     bounds=study.get(
                         "bounds",[[-30.0,30.0],[-40.0,40.0],[-10.0,70.0]]
                     )
+                    metric_shape=tuple(study.get("density_metric_grid",[20,24,24]))
+                    matched_candidate_marginals=matched_marginal_tvs(
+                        candidate_density,particles,bounds,metric_shape
+                    )
+                    matched_comparator_marginals=matched_marginal_tvs(
+                        comparator_density,particles,bounds,metric_shape
+                    )
                     domain_volume=float(np.prod([hi-lo for lo,hi in bounds]))
                     density_l1=float(
                         np.abs(candidate_density-comparator_density).sum()
@@ -539,7 +569,12 @@ def main(config_path: Path) -> int:
                         ) - comparator_covariance,
                         "lobe_error_change": lobe_error - comparator_lobes,
                         "joint_tv_change": joint_tv - comparator_joint,
-                        "maximum_marginal_tv_change": float(marginal_tvs.max()) - comparator_marginals,
+                        "maximum_marginal_tv_change":float(
+                            max(matched_candidate_marginals)-max(matched_comparator_marginals)
+                        ),
+                        "matched_marginal_grid":list(metric_shape),
+                        "matched_candidate_marginal_tvs":matched_candidate_marginals,
+                        "matched_comparator_marginal_tvs":matched_comparator_marginals,
                         "common_grid_density_l1":density_l1,
                         "dg_dof_ratio":candidate_dofs/comparator_dofs,
                         "forecast_runtime_ratio":candidate_runtime/comparator_runtime,
@@ -578,6 +613,84 @@ def main(config_path: Path) -> int:
                     branch_gates["materially_lower_memory"] = (
                         candidate_memory/comparator_memory <= float(
                             comparator_limits.get("maximum_peak_rank_memory_ratio",np.inf)
+                        )
+                    )
+                if "secondary_comparator_report" in branch:
+                    secondary_path=ROOT/str(branch["secondary_comparator_report"])
+                    secondary_report=json.loads(secondary_path.read_text())
+                    secondary_final=secondary_report["comparisons_to_common_mc"]["final"]
+                    secondary_density=np.load(
+                        secondary_path.parent/"final_q2_subcell_averages.npy"
+                    )
+                    candidate_density=np.load(
+                        run_dir/branch_name/"final_q2_subcell_averages.npy"
+                    )
+                    if secondary_density.shape!=candidate_density.shape:
+                        raise ValueError("secondary comparator exports must share one common grid")
+                    bounds=study.get(
+                        "bounds",[[-30.0,30.0],[-40.0,40.0],[-10.0,70.0]]
+                    )
+                    metric_shape=tuple(study.get("density_metric_grid",[20,24,24]))
+                    matched_candidate_marginals=matched_marginal_tvs(
+                        candidate_density,particles,bounds,metric_shape
+                    )
+                    matched_secondary_marginals=matched_marginal_tvs(
+                        secondary_density,particles,bounds,metric_shape
+                    )
+                    volume=float(np.prod([hi-lo for lo,hi in bounds]))
+                    secondary_density_l1=float(
+                        np.abs(candidate_density-secondary_density).sum()
+                        *volume/candidate_density.size
+                    )
+                    secondary_measured={
+                        "common_grid_density_l1":secondary_density_l1,
+                        "normalized_covariance_error_change":float(
+                            covariance["normalized_frobenius_error"]
+                            -secondary_final["covariance_accuracy"]["normalized_frobenius_error"]
+                        ),
+                        "maximum_marginal_tv_change":float(
+                            max(matched_candidate_marginals)-max(matched_secondary_marginals)
+                        ),
+                        "matched_marginal_grid":list(metric_shape),
+                        "joint_tv_change":joint_tv-float(
+                            secondary_final["joint_density"]["smoothed_total_variation"]
+                        ),
+                        "lobe_error_change":lobe_error-float(
+                            secondary_final["maximum_lobe_probability_error"]
+                        ),
+                    }
+                    if comparator_measured is None:
+                        comparator_measured={}
+                    comparator_measured["secondary"]={
+                        "name":str(branch.get("secondary_comparator_name","secondary")),
+                        **secondary_measured,
+                    }
+                    secondary_limits=decision_specification.get(
+                        "secondary_comparator_limits",{}
+                    )
+                    branch_gates["secondary_comparator_density_l1"]=(
+                        secondary_density_l1<=float(
+                            secondary_limits.get("maximum_common_grid_density_l1",np.inf)
+                        )
+                    )
+                    branch_gates["secondary_no_covariance_degradation"]=(
+                        secondary_measured["normalized_covariance_error_change"]<=float(
+                            secondary_limits.get("maximum_covariance_error_increase",np.inf)
+                        )
+                    )
+                    branch_gates["secondary_no_joint_tv_degradation"]=(
+                        secondary_measured["joint_tv_change"]<=float(
+                            secondary_limits.get("maximum_joint_tv_increase",np.inf)
+                        )
+                    )
+                    branch_gates["secondary_no_lobe_degradation"]=(
+                        secondary_measured["lobe_error_change"]<=float(
+                            secondary_limits.get("maximum_lobe_error_increase",np.inf)
+                        )
+                    )
+                    branch_gates["secondary_no_marginal_tv_degradation"]=(
+                        secondary_measured["maximum_marginal_tv_change"]<=float(
+                            secondary_limits.get("maximum_marginal_tv_increase",np.inf)
                         )
                     )
                 if "maximum_low_order_cfl" in decision_specification:

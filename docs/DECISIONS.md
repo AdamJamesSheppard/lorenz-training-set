@@ -4,6 +4,33 @@ Decisions here are dated and revisable. Add a new entry that marks an older
 decision `superseded`, `narrowed`, or `confirmed` rather than rewriting history
 to make the current direction look inevitable.
 
+## 2026-09-15 - Validate static grading for efficiency and open density convergence
+
+**Decision.** Set
+`METHOD_STATUS = MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED`,
+`MATURE_DENSITY_CONVERGENCE = OPEN`,
+`MATURE_GRADED_EFFICIENCY = SUPPORTED_NOT_CERTIFIED`, and
+`NEXT_REQUIRED_GATE = MATURE_DENSITY_CONVERGENCE`. Production dataset
+generation remains unauthorized.
+
+**Evidence.** Uniform `60x72x72` passes the original mature mean-correction
+limit with `0.0008313` and passes positivity, conservation, optimizer,
+covariance, marginal, joint-TV and lobe tests. Static `44x52x46` grading
+reproduces its full density to common-grid `L1=0.001688`, while reducing DG
+unknowns by `66.2%`, runtime by `53.0%`, and peak memory per rank by `61.7%`.
+The graded run's `0.0008384` mean correction remains a formal failure against
+its separately predeclared `0.0008` efficiency threshold. A reported marginal
+degradation failure compared different histogram resolutions; matched-grid
+recomputation gives a maximum increase of `1.75e-4`, below the `0.005` limit.
+
+**Consequence.** Static grading is supported as an efficient reproduction of
+uniform-60. The historical coarse mature hierarchy and graded `0.0008` failure
+remain immutable evidence. The next controlled test increases only the lobe
+resolution on `58x68x56`, compares against uniform-60 and the first graded run,
+and retains all positivity/statistical/cost gates.
+
+**Evidence file.** `mature_graded_efficiency_report.json`.
+
 ## 2026-09-13 - Reject certificate depth as mature-state failure cause
 
 **Decision.** Deprioritize deeper Bernstein subdivision and promote an

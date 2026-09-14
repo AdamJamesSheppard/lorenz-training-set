@@ -1,6 +1,6 @@
 # Project state
 
-Updated: 2026-09-13
+Updated: 2026-09-15
 
 ## Objective
 
@@ -17,13 +17,15 @@ next experiment.
 ## Current decision
 
 ```ini
-METHOD_STATUS = FULL_SPD_DIFFUSION_CERTIFIED
+METHOD_STATUS = MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED
+MATURE_DENSITY_CONVERGENCE = OPEN
+MATURE_GRADED_EFFICIENCY = SUPPORTED_NOT_CERTIFIED
 PRODUCTION_DATASET_AUTHORIZED = false
-NEXT_REQUIRED_GATE = MATURE_STATE
+NEXT_REQUIRED_GATE = MATURE_DENSITY_CONVERGENCE
 ```
 
-- Method-selection classification: `FULL_SPD_DIFFUSION_CERTIFIED`.
-- Next required gate: `MATURE_STATE`.
+- Method-selection classification: `MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED`.
+- Next required gate: `MATURE_DENSITY_CONVERGENCE`.
 - Large neural-operator dataset generation: `NO`.
 - Controlled baseline: Q1 DG, upwind advection, SIPG diffusion, backward
   Euler, quadrature-14 L2 initialization and projected Bayesian analysis,
@@ -31,11 +33,12 @@ NEXT_REQUIRED_GATE = MATURE_STATE
 - Strongest observed numerical trajectory: unlimited same-mesh Q2 with
   Crank--Nicolson. It passes the controlled timestep gates but is not an
   admissible density because it contains genuine negative mass.
-- Leading admissible candidate: same-mesh Q2 Crank--Nicolson with Stage-1
-  average repair and local QP. The tight four-level startup-state diagnostic
-  passes every predeclared temporal, positivity, mass and identity-noise spatial
-  gate. The subsequent non-diagonal full-SPD hierarchy also passes. Production
-  certification still requires mature-state and domain tests.
+- Leading admissible candidate: Q2 Crank--Nicolson with Stage-1 average repair
+  and local QP. It passes the startup-state temporal/positivity, identity-noise
+  spatial, full-SPD spatial, and mature-state positivity/statistical gates.
+  Uniform-60 and its static graded reproduction both satisfy the original
+  mature mean-correction limit of `0.001`. Production certification still
+  requires mature full-density convergence and domain sensitivity.
 - The corrected production-scale run reproduces the earlier Q2 accuracy and
   timestep results while satisfying cell-average and scaling-factor invariants.
   Adaptive Q2 passes its full-step branch gates but fails the half-step mass
@@ -102,14 +105,25 @@ NEXT_REQUIRED_GATE = MATURE_STATE
   corrections decrease `0.003047 -> 0.002789 -> 0.001840`, but every value
   exceeds the fixed `0.001` gate. Common-grid differences decrease only
   `0.42059 -> 0.35373`, with observed rate `0.42695`.
+- The later uniform `60x72x72` mature run passes the original `0.001` mean
+  correction gate at `0.0008313`, together with every positivity, conservation,
+  optimizer, covariance, marginal, joint-TV and lobe test. Its 8.40 million DG
+  unknowns require about 69.4 minutes and 6.05 GiB peak memory per rank.
+- Static `44x52x46` grading reproduces uniform-60 to common-grid `L1=0.001688`
+  while reducing DG unknowns by `66.2%`, runtime by `53.0%`, and peak memory per
+  rank by `61.7%`. It formally misses its separate `0.0008` correction target
+  at `0.0008384`; this failure remains recorded. Matched-grid recomputation
+  shows the automated marginal-degradation failure was a bin-resolution
+  comparison artifact.
 
 ## Active blockers
 
-1. No corrected mature-posterior forecast is validated near production
-   resolution.
-2. The certified startup-state/full-SPD result has not passed on mature,
-   filamented or post-analysis densities; the first bimodal hierarchy fails the
-   frozen mean-correction gate.
+1. Mature positivity and low-dimensional statistics pass at uniform-60 and
+   graded resolution, but full-density spatial convergence remains unresolved:
+   the preceding `45 -> 60` common-grid difference is `0.20997`.
+2. The operational repeated-analysis posterior family remains unvalidated near
+   production resolution; the present mature law is one analytic conditioned
+   bimodal test.
 3. The independent finite-volume hierarchy is not converged enough to define a
    full-density truth error.
 4. The identity-noise spatial hierarchy passed, but its observed rate `3.4026`
@@ -121,8 +135,7 @@ NEXT_REQUIRED_GATE = MATURE_STATE
 6. The reduced fixed-matrix OSQP backend passed a 2,413-problem SLSQP comparison
    and a 10x projection-speed gate. Optimizer cost and startup-state temporal
    positivity are no longer the active blockers.
-7. Mature corrected states and finite-domain sensitivity remain unvalidated for
-   the leading candidate.
+7. Finite-domain sensitivity remains unvalidated for the leading candidate.
 8. A converged independent deterministic full-density reference remains absent.
 
 ## Near-term research portfolio
@@ -130,21 +143,15 @@ NEXT_REQUIRED_GATE = MATURE_STATE
 The living plan is in `docs/RESEARCH_DIRECTIONS.md` and
 `experiments/method-selection-research.yaml`. Current high-value branches are:
 
-1. Diagnose the failed mature bimodal result without relaxing its frozen gates.
-   The initial Q2 projection requires relative corrections of `0.380`, `0.158`
-   and `0.0313`, and forecast QP acts on most probability mass. The frozen
-   `experiments/mature-positivity-certificate-diagnostic.yaml` compares the
-   current depth-4 certificate, depth 8 and scalar limiting on identical raw
-   initialization and forecast polynomials.
-2. The completed diagnostic rejects insufficient certificate depth: at most
-   `0.0788%` of depth-4 non-certified cells are rescued at depth 8, and the
-   largest L1 reduction is `2.89%`. Prioritize a conservative positive low-order
-   or local flux-corrected full-SPD update against the frozen local-QP comparator.
-3. Record temporal/spatial density differences, covariance and marginal TVs,
-   correction L1/L2, negative-average and projected probability mass, projected
-   cell count, optimizer performance and conservation.
-4. Only after a mature-state pass, run aligned-box domain-size sensitivity at
-   approximately fixed physical resolution.
+1. Run `experiments/mature-graded-fine-comparison.yaml`: refine the validated
+   lobe bands to common-grid span two on a `58x68x56` mesh and compare with both
+   uniform-60 and the completed `44x52x46` graded run.
+2. Record both common-grid differences, correction L1/L2, negative-average and
+   projected probability mass, covariance and marginal TVs, lobe/joint metrics,
+   optimizer performance, conservation, runtime and memory.
+3. If targeted refinement establishes decreasing mature-density differences,
+   run aligned-box domain-size sensitivity at approximately fixed physical
+   resolution. Otherwise add one further graded level before domain testing.
 5. Do not spend another hierarchy on deeper Bernstein certification; witnessed
    polynomial negativity, rather than unresolved bounds, dominates every saved
    mature snapshot.
@@ -152,7 +159,7 @@ The living plan is in `docs/RESEARCH_DIRECTIONS.md` and
    high-order reference after the Q2 gate.
 7. Investigate covariance-targeted goal-oriented/nonuniform resolution and a
    genuinely high-order independent deterministic reference.
-8. Regenerate and test mature DA states only after the initialization,
+7. Regenerate and test mature DA states only after the initialization,
    analysis, and positivity path used to produce them is acceptable.
 
 `experiments/mature-state-decision.yaml` is executable and frozen for the first,
