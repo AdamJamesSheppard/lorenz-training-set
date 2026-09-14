@@ -45,9 +45,10 @@ def _model(noise_matrix: list[float] | tuple[float, ...] | None) -> Lorenz63Mode
 
 def _marginal_tv(cell_averages: np.ndarray, particles: np.ndarray,
                  domain: Domain) -> list[float]:
-    probability=cell_averages*domain.volume/np.prod(domain.cells)
+    grid_shape=cell_averages.shape
+    probability=cell_averages*domain.volume/cell_averages.size
     result=[]
-    for axis,((lo,hi),count) in enumerate(zip(domain.bounds,domain.cells)):
+    for axis,((lo,hi),count) in enumerate(zip(domain.bounds,grid_shape)):
         other=tuple(i for i in range(3) if i!=axis)
         numerical=probability.sum(axis=other)
         sampled=np.histogram(particles[:,axis],bins=count,range=(lo,hi))[0]/len(particles)
@@ -347,6 +348,21 @@ def run_forecast(args: argparse.Namespace) -> None:
         output.mkdir(parents=True,exist_ok=False)
     comm.barrier()
     domain=Domain(cells=tuple(args.cells)); model=_model(args.noise_matrix)
+    axis_coordinates=None
+    if args.axis_coordinates is not None:
+        axis_payload=json.loads(args.axis_coordinates.read_text())
+        if all(name in axis_payload for name in ("x","y","z")):
+            axis_coordinates=tuple(
+                np.asarray(axis_payload[name],dtype=float) for name in ("x","y","z")
+            )
+        else:
+            common_shape=tuple(int(value) for value in axis_payload["common_shape"])
+            axis_coordinates=tuple(
+                lo+(hi-lo)*np.asarray(axis_payload["edge_indices"][name],dtype=float)/count
+                for name,(lo,hi),count in zip(
+                    ("x","y","z"),domain.bounds,common_shape
+                )
+            )
     solver_class = (
         AFCProjectionFokkerPlanckSolver if args.afc_projection else
         LocalProjectionFokkerPlanckSolver if args.local_projection else
@@ -366,6 +382,7 @@ def run_forecast(args: argparse.Namespace) -> None:
         certificate_max_depth=args.certificate_max_depth,
         certificate_diagnostics=args.degree>=2,
         apply_positivity=not args.disable_positivity,
+        axis_coordinates=axis_coordinates,
         **solver_options,
     )
     initial_projection=None
@@ -441,8 +458,12 @@ def run_forecast(args: argparse.Namespace) -> None:
             ),
             "local_projection":initial_projection,
         }
-    initial_cells=solver.structured_export(initial,1)
-    initial_subcells=solver.structured_export(initial,args.export_subcells)
+    if args.common_export_grid is not None:
+        initial_cells=solver.common_grid_export(initial,tuple(args.common_export_grid))
+        initial_subcells=initial_cells
+    else:
+        initial_cells=solver.structured_export(initial,1)
+        initial_subcells=solver.structured_export(initial,args.export_subcells)
     initial_particles=(np.load(args.initial_mc_particles)
                        if rank==0 and args.initial_mc_particles is not None else None)
     if rank==0 and initial_particles is not None:
@@ -501,8 +522,13 @@ def run_forecast(args: argparse.Namespace) -> None:
     else:
         stages={name:state.copy(name) for name in ("raw","stage1","final")}
     stage_diagnostics={name:solver.diagnostics(stage) for name,stage in stages.items()}
-    stage_cells={name:solver.structured_export(stage,1) for name,stage in stages.items()}
-    final_subcells=solver.structured_export(stages["final"],args.export_subcells)
+    if args.common_export_grid is not None:
+        stage_cells={name:solver.common_grid_export(stage,tuple(args.common_export_grid))
+                     for name,stage in stages.items()}
+        final_subcells=stage_cells["final"]
+    else:
+        stage_cells={name:solver.structured_export(stage,1) for name,stage in stages.items()}
+        final_subcells=solver.structured_export(stages["final"],args.export_subcells)
     final_subcells_path=output/"final_q2_subcell_averages.npy"
     if rank==0:
         np.save(final_subcells_path,final_subcells)
@@ -584,6 +610,16 @@ def run_forecast(args: argparse.Namespace) -> None:
                 "initial_mean":list(args.mean),"initial_standard_deviation":list(args.std),
                 "initial_quadrature_degree":args.initial_quadrature_degree,
                 "export_subcells_per_cell":args.export_subcells,
+                "axis_coordinates":(str(args.axis_coordinates.resolve())
+                    if args.axis_coordinates else None),
+                "axis_coordinates_sha256":(_sha256(args.axis_coordinates)
+                    if args.axis_coordinates else None),
+                "common_export_grid":(list(args.common_export_grid)
+                    if args.common_export_grid else None),
+                "cell_count":int(np.prod(args.cells)),
+                "dg_dofs":int(np.prod(args.cells)*(args.degree+1)**3),
+                "minimum_cell_volume":float(np.min(solver.cell_volumes)),
+                "maximum_cell_volume":float(np.max(solver.cell_volumes)),
                 "bootstrap_replicates":args.bootstrap,
                 "bootstrap_seed":bootstrap_seed,"seed":args.seed,
                 "density_metric_grid":list(args.density_metric_grid),
@@ -700,6 +736,8 @@ def parser() -> argparse.ArgumentParser:
     run.add_argument("--std",type=float,nargs=3,default=(2.0,2.0,3.0))
     run.add_argument("--initial-quadrature-degree",type=int,default=14)
     run.add_argument("--export-subcells",type=int,default=3)
+    run.add_argument("--axis-coordinates",type=Path)
+    run.add_argument("--common-export-grid",type=int,nargs=3)
     run.add_argument("--mc-particles",type=Path,required=True)
     run.add_argument("--bootstrap",type=int,default=200)
     run.add_argument("--bootstrap-seed",type=int,default=20261910)

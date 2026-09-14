@@ -38,7 +38,7 @@ def main(config_path: Path) -> int:
     kind=config.get("kind")
     if kind not in {
         "forecast", "same_mesh_q2_study", "spatial_q2_study", "full_spd_q2_study",
-        "mature_full_spd_q2_study", "mature_afc_q2_study",
+        "mature_full_spd_q2_study", "mature_afc_q2_study", "mature_graded_q2_study",
         "mature_positivity_diagnostic",
         "mature_dof_convex_diagnostic",
         "local_projection_study",
@@ -86,7 +86,8 @@ def main(config_path: Path) -> int:
             command = ["mpiexec", "-n", str(ranks), *command]
         commands.append(("forecast",command,run_dir))
     elif kind in {"same_mesh_q2_study", "spatial_q2_study", "full_spd_q2_study",
-                  "mature_full_spd_q2_study", "mature_afc_q2_study"}:
+                  "mature_full_spd_q2_study", "mature_afc_q2_study",
+                  "mature_graded_q2_study"}:
         study=config["study"]
         common=["--cells",*map(str,study["cells"]),"--dt",str(study["dt"]),
             "--t-final",str(study["final_time"]),"--seed",str(study["seed"])]
@@ -150,6 +151,19 @@ def main(config_path: Path) -> int:
             ]
             if "noise_matrix" in study:
                 branch_command.extend(["--noise-matrix", *map(str, study["noise_matrix"])])
+            axis_coordinates=branch.get("axis_coordinates",study.get("axis_coordinates"))
+            if axis_coordinates is not None:
+                branch_command.extend([
+                    "--axis-coordinates",str(ROOT/str(axis_coordinates)),
+                ])
+            common_export_grid=branch.get(
+                "common_export_grid",study.get("common_comparison_grid")
+                if axis_coordinates is not None else None
+            )
+            if common_export_grid is not None:
+                branch_command.extend([
+                    "--common-export-grid",*map(str,common_export_grid),
+                ])
             if study.get("initialization","structured") == "structured":
                 branch_command.extend(["--initial-grid",str(initial_grid)])
             elif study.get("initialization") == "mixture_projected":
@@ -294,7 +308,7 @@ def main(config_path: Path) -> int:
             break
     if returncode == 0 and kind in {
         "same_mesh_q2_study", "spatial_q2_study", "full_spd_q2_study",
-        "mature_full_spd_q2_study", "mature_afc_q2_study",
+        "mature_full_spd_q2_study", "mature_afc_q2_study", "mature_graded_q2_study",
     }:
         pairwise=[]
         observed_order = None
@@ -485,6 +499,36 @@ def main(config_path: Path) -> int:
                     comparator_marginals = float(max(
                         comparator_final["marginal_total_variation_distance"]
                     ))
+                    comparator_density=np.load(
+                        (ROOT/str(branch["comparator_report"])).parent/
+                        "final_q2_subcell_averages.npy"
+                    )
+                    candidate_density=np.load(
+                        run_dir/branch_name/"final_q2_subcell_averages.npy"
+                    )
+                    if comparator_density.shape!=candidate_density.shape:
+                        raise ValueError("graded comparator exports must share one common grid")
+                    bounds=study.get(
+                        "bounds",[[-30.0,30.0],[-40.0,40.0],[-10.0,70.0]]
+                    )
+                    domain_volume=float(np.prod([hi-lo for lo,hi in bounds]))
+                    density_l1=float(
+                        np.abs(candidate_density-comparator_density).sum()
+                        *domain_volume/candidate_density.size
+                    )
+                    comparator_dofs=int(
+                        np.prod(comparator_report["configuration"]["cells"])
+                        *(int(comparator_report["configuration"]["degree"])+1)**3
+                    )
+                    candidate_dofs=int(branch_report["configuration"]["dg_dofs"])
+                    comparator_runtime=float(comparator_report["timing"]["forecast_seconds"])
+                    candidate_runtime=float(branch_report["timing"]["forecast_seconds"])
+                    comparator_memory=float(
+                        comparator_report["resources"]["maximum_rank_peak_rss_kib"]
+                    )
+                    candidate_memory=float(
+                        branch_report["resources"]["maximum_rank_peak_rss_kib"]
+                    )
                     comparator_measured = {
                         "normalized_covariance_error": comparator_covariance,
                         "maximum_lobe_probability_error": comparator_lobes,
@@ -496,6 +540,10 @@ def main(config_path: Path) -> int:
                         "lobe_error_change": lobe_error - comparator_lobes,
                         "joint_tv_change": joint_tv - comparator_joint,
                         "maximum_marginal_tv_change": float(marginal_tvs.max()) - comparator_marginals,
+                        "common_grid_density_l1":density_l1,
+                        "dg_dof_ratio":candidate_dofs/comparator_dofs,
+                        "forecast_runtime_ratio":candidate_runtime/comparator_runtime,
+                        "peak_rank_memory_ratio":candidate_memory/comparator_memory,
                     }
                     comparator_limits = decision_specification.get("comparator_limits", {})
                     branch_gates["no_covariance_degradation"] = (
@@ -513,6 +561,24 @@ def main(config_path: Path) -> int:
                     branch_gates["no_marginal_tv_degradation"] = (
                         comparator_measured["maximum_marginal_tv_change"]
                         <= float(comparator_limits.get("maximum_marginal_tv_increase", np.inf))
+                    )
+                    branch_gates["comparator_density_l1"] = density_l1 <= float(
+                        comparator_limits.get("maximum_common_grid_density_l1",np.inf)
+                    )
+                    branch_gates["materially_fewer_dofs"] = (
+                        candidate_dofs/comparator_dofs <= float(
+                            comparator_limits.get("maximum_dg_dof_ratio",np.inf)
+                        )
+                    )
+                    branch_gates["materially_lower_runtime"] = (
+                        candidate_runtime/comparator_runtime <= float(
+                            comparator_limits.get("maximum_forecast_runtime_ratio",np.inf)
+                        )
+                    )
+                    branch_gates["materially_lower_memory"] = (
+                        candidate_memory/comparator_memory <= float(
+                            comparator_limits.get("maximum_peak_rank_memory_ratio",np.inf)
+                        )
                     )
                 if "maximum_low_order_cfl" in decision_specification:
                     branch_gates["positive_low_order_cfl"] = float(
@@ -650,15 +716,19 @@ def main(config_path: Path) -> int:
                         "PASSED_PREDECLARED_FULL_SPD_CONTROL_GATES"
                         if all_passed else "FAILED_PREDECLARED_FULL_SPD_CONTROL_GATES"
                     )
-            elif kind in {"mature_full_spd_q2_study", "mature_afc_q2_study"}:
+            elif kind in {"mature_full_spd_q2_study", "mature_afc_q2_study",
+                          "mature_graded_q2_study"}:
                 finest_difference = (
                     float(pairwise[-1]["subcell_average_l1_lower_bound"])
                     if pairwise else None
                 )
                 temporal_safeguard_required = False
                 classification = (
-                    "PASSED_PREDECLARED_MATURE_BIMODAL_GATES"
-                    if all_passed else "FAILED_PREDECLARED_MATURE_BIMODAL_GATES"
+                    ("PASSED_PREDECLARED_MATURE_GRADED_EFFICIENCY_GATES"
+                     if all_passed else "FAILED_PREDECLARED_MATURE_GRADED_EFFICIENCY_GATES")
+                    if kind=="mature_graded_q2_study" else
+                    ("PASSED_PREDECLARED_MATURE_BIMODAL_GATES"
+                     if all_passed else "FAILED_PREDECLARED_MATURE_BIMODAL_GATES")
                 )
             else:
                 finest_difference = None
@@ -674,7 +744,8 @@ def main(config_path: Path) -> int:
                 "pairwise_density_gates": pairwise_gates,
                 "observed_order_kind": (
                     "spatial" if kind in {"spatial_q2_study", "full_spd_q2_study",
-                                          "mature_full_spd_q2_study", "mature_afc_q2_study"}
+                                          "mature_full_spd_q2_study", "mature_afc_q2_study",
+                                          "mature_graded_q2_study"}
                     else "timestep"
                 ),
                 "observed_order": observed_order,
@@ -694,6 +765,9 @@ def main(config_path: Path) -> int:
                     "Full-SPD diagnostic; the controlled case advances to the full-SPD spatial "
                     "hierarchy, whose pass advances to mature-state certification."
                     if kind == "full_spd_q2_study" else
+                    "Mature graded-grid efficiency diagnostic; passing resolves the open "
+                    "localized-density efficiency branch before domain sensitivity."
+                    if kind=="mature_graded_q2_study" else
                     "Mature bimodal full-SPD diagnostic; passing advances the candidate to "
                     "aligned-box domain-truncation sensitivity."
                     if kind in {"mature_full_spd_q2_study", "mature_afc_q2_study"} else
@@ -704,7 +778,8 @@ def main(config_path: Path) -> int:
             scientific_decision[
                 "observed_spatial_order"
                 if kind in {"spatial_q2_study", "full_spd_q2_study",
-                            "mature_full_spd_q2_study", "mature_afc_q2_study"}
+                            "mature_full_spd_q2_study", "mature_afc_q2_study",
+                            "mature_graded_q2_study"}
                 else "observed_timestep_order"
             ] = observed_order
             (run_dir / "scientific_decision.json").write_text(

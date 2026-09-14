@@ -1,0 +1,85 @@
+id: mature-full-spd-graded-static-comparison
+kind: mature_graded_q2_study
+status: predeclared_executable_efficiency_gate
+purpose: Reproduce the mature full-SPD uniform-60 density on a static graded Cartesian hexahedral mesh with materially lower cost.
+study:
+  cells: [44, 52, 46]
+  axis_coordinates: experiments/mature-graded-static-axes.json
+  dt: 0.00015625
+  final_time: 0.05
+  seed: 20260920
+  monte_carlo_paths: 1000000
+  mc_dt: 0.000125
+  bootstrap_replicates: 1000
+  bootstrap_seed: 20261920
+  certificate_max_depth: 4
+  ksp_rtol: 1.0e-12
+  ksp_atol: 1.0e-15
+  initialization: mixture_projected
+  initial_quadrature_degree: 14
+  common_comparison_grid: [180, 216, 216]
+  density_metric_grid: [20, 24, 24]
+  density_smoothing_sigma: 0.75
+  reference_reuse: runs/local-q2-cn-full-spd-mature-bimodal/20260913T185157Z/reference
+  noise_matrix:
+    - 1.4142135623730951
+    - 0.0
+    - 0.0
+    - 0.5656854249492381
+    - 1.2961481396815722
+    - 0.0
+    - 0.28284271247461906
+    - 0.3394673699166024
+    - 1.3434142714594956
+  branches:
+    - name: mature_bimodal_q2_local_qp_graded44x52x46
+      cells: [44, 52, 46]
+      axis_coordinates: experiments/mature-graded-static-axes.json
+      common_export_grid: [180, 216, 216]
+      export_subcells: 3
+      degree: 2
+      theta: 0.5
+      positivity_method: local_qp
+      optimizer_backend: osqp
+      optimizer_ftol: 1.0e-10
+      maximum_iterations: 10000
+      archive_raw: false
+      comparator_report: runs/mature-full-spd-uniform60-reference/20260914T190730Z/mature_bimodal_q2_local_qp_60x72x72/report.json
+execution:
+  mpi_ranks: 8
+  numerical_threads: 1
+scientific_decision:
+  maximum_step_mass_change: 1.0e-12
+  maximum_absolute_mass_error: 1.0e-10
+  maximum_negative_mass: 1.0e-13
+  maximum_normalized_covariance_error: 0.08
+  maximum_covariance_error_to_mc_p95_ratio: 5.0
+  maximum_mean_relative_l1_correction: 0.0008
+  maximum_relative_l1_correction: 0.005
+  maximum_off_diagonal_correlation_error: 0.08
+  maximum_marginal_tv: 0.05
+  maximum_lobe_probability_error: 0.025
+  maximum_smoothed_joint_tv: 0.15
+  maximum_initial_projection_joint_tv: 0.10
+  comparator_limits:
+    maximum_common_grid_density_l1: 0.104985685
+    maximum_covariance_error_increase: 0.005
+    maximum_lobe_error_increase: 0.005
+    maximum_joint_tv_increase: 0.005
+    maximum_marginal_tv_increase: 0.005
+    maximum_dg_dof_ratio: 0.50
+    maximum_forecast_runtime_ratio: 0.75
+    maximum_peak_rank_memory_ratio: 0.75
+research_gates:
+  - Every graded cell is an affine axis-aligned hexahedron and every edge aligns exactly to the frozen 180x216x216 comparison grid.
+  - The fine bands retain uniform-60 physical spacing over the probability-bearing lobe support; only low-probability exterior slabs merge pairs of uniform cells.
+  - The common-grid density L1 difference from uniform-60 must be below half the prior 45-to-60 difference, 0.20997137.
+  - Mean dynamic local-QP correction must be below the branch-specific 0.0008 efficiency target; this does not retroactively replace the original 0.001 mature-state criterion.
+  - Covariance, marginal TV, joint TV and lobe probabilities may not degrade from uniform-60 by more than 0.005.
+  - The graded branch must use at most half the uniform-60 DG DOFs, 75 percent of its runtime and 75 percent of its peak per-rank memory.
+  - Whole-cell positivity, zero measured negative mass, mass conservation and zero optimizer failures or fallbacks remain mandatory.
+decision_rule: Passing supports localized under-resolution and validates static grading as an efficiency mechanism; dataset generation remains unauthorized pending density convergence resolution and domain sensitivity.
+notes:
+  - Uniform-60 already passes the original mature mean-correction gate of 0.001 and all low-dimensional statistical and positivity gates.
+  - Mature statistical and positivity readiness is therefore separated from the still-open full-density convergence and efficiency question.
+  - The graded branch contains 105248 cells and 2841696 discontinuous Q2 degrees of freedom, 33.84 percent of uniform-60.

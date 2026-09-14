@@ -332,13 +332,24 @@ class PositivityLimiter:
         return self.to_bernstein@coefficients
 
     def subcell_average_matrix(self, subdivisions: int) -> np.ndarray:
-        """Exact reference-subcell average map for Qk coefficients."""
-        s=int(subdivisions); gp,gw=np.polynomial.legendre.leggauss(self.degree+1)
+        """Exact isotropic reference-subcell average map for Qk coefficients."""
+        s=int(subdivisions)
+        return self.subcell_average_matrix_anisotropic((s, s, s))
+
+    def subcell_average_matrix_anisotropic(
+        self, subdivisions: tuple[int, int, int]
+    ) -> np.ndarray:
+        """Exact average map on an anisotropic tensor partition of a cell."""
+        counts=tuple(int(value) for value in subdivisions)
+        if any(value < 1 for value in counts):
+            raise ValueError("subdivision counts must all be positive")
+        gp,gw=np.polynomial.legendre.leggauss(self.degree+1)
         gp=.5*(gp+1.); gw=.5*gw; rows=[]
-        for i in range(s):
-            for j in range(s):
-                for k in range(s):
-                    points=np.array([((i+gp[a])/s,(j+gp[b])/s,(k+gp[c])/s)
+        sx,sy,sz=counts
+        for i in range(sx):
+            for j in range(sy):
+                for k in range(sz):
+                    points=np.array([((i+gp[a])/sx,(j+gp[b])/sy,(k+gp[c])/sz)
                         for a in range(len(gp)) for b in range(len(gp)) for c in range(len(gp))])
                     weights=np.array([gw[a]*gw[b]*gw[c]
                         for a in range(len(gp)) for b in range(len(gp)) for c in range(len(gp))])
@@ -568,6 +579,7 @@ class FokkerPlanckSolver:
         certificate_max_depth: int = 4,
         certificate_diagnostics: bool = False,
         apply_positivity: bool = True,
+        axis_coordinates: tuple[np.ndarray, np.ndarray, np.ndarray] | None = None,
     ):
         self.model, self.domain, self.dt, self.theta = model, domain, float(dt), float(theta)
         self.ksp_rtol, self.ksp_atol = float(ksp_rtol), float(ksp_atol)
@@ -584,6 +596,36 @@ class FokkerPlanckSolver:
             self.comm, [np.asarray(a), np.asarray(b)], list(domain.cells),
             cell_type=mesh.CellType.hexahedron,
         )
+        if axis_coordinates is None:
+            self.axis_coordinates=tuple(
+                np.linspace(lo,hi,count+1,dtype=float)
+                for (lo,hi),count in zip(domain.bounds,domain.cells)
+            )
+        else:
+            coordinates=tuple(np.asarray(values,dtype=float) for values in axis_coordinates)
+            for axis,(values,(lo,hi),count) in enumerate(zip(
+                coordinates,domain.bounds,domain.cells
+            )):
+                if values.shape != (count+1,):
+                    raise ValueError(
+                        f"axis {axis} requires {count+1} coordinates, got {values.shape}"
+                    )
+                if not np.all(np.diff(values)>0.0):
+                    raise ValueError(f"axis {axis} coordinates must be strictly increasing")
+                if not np.allclose(values[[0,-1]],[lo,hi],rtol=0.0,atol=1.0e-12):
+                    raise ValueError(f"axis {axis} coordinates must match domain bounds")
+            self.axis_coordinates=coordinates
+            # create_box provides the required conforming hexahedral topology.
+            # Moving its vertices along each Cartesian axis produces affine,
+            # axis-aligned graded hexes without changing connectivity.
+            geometry=self.mesh.geometry.x
+            for axis,(values,(lo,hi),count) in enumerate(zip(
+                self.axis_coordinates,domain.bounds,domain.cells
+            )):
+                uniform_index=np.rint((geometry[:,axis]-lo)*count/(hi-lo)).astype(int)
+                if np.any((uniform_index<0)|(uniform_index>count)):
+                    raise RuntimeError("structured mesh vertex could not be mapped to graded axis")
+                geometry[:,axis]=values[uniform_index]
         element = basix.ufl.element("DG", self.mesh.basix_cell(), self.degree)
         self.V = fem.functionspace(self.mesh, element)
         q0e = basix.ufl.element("DG", self.mesh.basix_cell(), 0)
@@ -1026,11 +1068,63 @@ class FokkerPlanckSolver:
         arr = np.empty((nx*s,ny*s,nz*s), dtype=float)
         for cell_values, point in zip(values, xyz):
             idx=[]
-            for d, ((lo,hi), count) in enumerate(zip(self.domain.bounds,self.domain.cells)):
-                idx.append(min(count-1,max(0,int(math.floor((point[d]-lo)/(hi-lo)*count)))))
+            for d,(coordinates,count) in enumerate(zip(self.axis_coordinates,self.domain.cells)):
+                idx.append(min(count-1,max(0,int(np.searchsorted(
+                    coordinates,point[d],side="right"
+                )-1))))
             for value,offset in zip(cell_values,offsets):
                 arr[tuple(idx[d]*s+offset[d] for d in range(3))] = value
         return arr
+
+    def common_grid_export(
+        self, state: DensityState, common_shape: tuple[int, int, int]
+    ) -> np.ndarray:
+        """Export exact Qk averages to one aligned uniform comparison grid.
+
+        Every graded cell edge must coincide with an edge of ``common_shape``.
+        This makes the export conservative and avoids interpolation error in a
+        graded-versus-uniform density comparison.
+        """
+        shape=tuple(int(value) for value in common_shape)
+        if any(value<1 for value in shape):
+            raise ValueError("common grid counts must all be positive")
+        edge_indices=[]
+        for axis,(coordinates,(lo,hi),count) in enumerate(zip(
+            self.axis_coordinates,self.domain.bounds,shape
+        )):
+            indices=np.rint((coordinates-lo)*count/(hi-lo)).astype(int)
+            reconstructed=lo+(hi-lo)*indices/count
+            if not np.allclose(coordinates,reconstructed,rtol=0.0,atol=2.0e-12):
+                raise ValueError(f"graded axis {axis} is not aligned to the common grid")
+            if indices[0]!=0 or indices[-1]!=count or np.any(np.diff(indices)<1):
+                raise ValueError(f"graded axis {axis} does not partition the common grid")
+            edge_indices.append(indices)
+
+        _,_,mids=self.cell_averages(state)
+        matrix_cache: dict[tuple[int,int,int],np.ndarray]={}
+        local=[]
+        coefficients=state.function.x.array
+        for cell,point in enumerate(mids):
+            coarse=tuple(min(self.domain.cells[d]-1,max(0,int(np.searchsorted(
+                self.axis_coordinates[d],point[d],side="right"
+            )-1))) for d in range(3))
+            starts=tuple(int(edge_indices[d][coarse[d]]) for d in range(3))
+            spans=tuple(int(edge_indices[d][coarse[d]+1]-starts[d]) for d in range(3))
+            matrix=matrix_cache.get(spans)
+            if matrix is None:
+                matrix=self.limiter.subcell_average_matrix_anisotropic(spans)
+                matrix_cache[spans]=matrix
+            values=(matrix@coefficients[self.V.dofmap.cell_dofs(cell)]).reshape(spans)
+            local.append((starts,spans,values))
+        gathered=self.comm.gather(local,root=0)
+        if self.comm.rank!=0:
+            return np.empty((0,0,0))
+        result=np.empty(shape,dtype=float)
+        for group in gathered:
+            for starts,spans,values in group:
+                slices=tuple(slice(starts[d],starts[d]+spans[d]) for d in range(3))
+                result[slices]=values
+        return result
 
     def diagnostics(self, state: DensityState) -> dict[str, object]:
         p = state.function; x = ufl.SpatialCoordinate(self.mesh)
@@ -1043,10 +1137,10 @@ class FokkerPlanckSolver:
             for j in range(3): cov[i,j]=self._integral((x[i]-mean[i])*(x[j]-mean[j])*p)/mass
         local_owned = p.x.array[: self.V.dofmap.index_map.size_local * self.V.dofmap.index_map_bs]
         av, _, mids = self.cell_averages(state)
-        widths = [(hi-lo)/n for (lo,hi),n in zip(self.domain.bounds,self.domain.cells)]
         boundary = np.zeros(len(av),dtype=bool)
-        for d, ((lo,hi),h) in enumerate(zip(self.domain.bounds,widths)):
-            boundary |= (mids[:,d] < lo+1.01*h/2) | (mids[:,d] > hi-1.01*h/2)
+        for d,coordinates in enumerate(self.axis_coordinates):
+            indices=np.searchsorted(coordinates,mids[:,d],side="right")-1
+            boundary |= (indices==0)|(indices==len(coordinates)-2)
         boundary_mass = _global_sum(self.comm, float(np.dot(av[boundary], self.cell_volumes[boundary])))
         local_boundary_max=float(av[boundary].max()) if boundary.any() else 0.0
         boundary_max=_global_max(self.comm,local_boundary_max)

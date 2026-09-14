@@ -1,0 +1,21 @@
+{
+  "source_run": "runs/mature-full-spd-uniform60-reference/20260914T190730Z/mature_bimodal_q2_local_qp_60x72x72",
+  "common_shape": [180, 216, 216],
+  "edge_indices": {
+    "x": [0, 6, 12, 18, 24, 30, 36, 42, 48, 51, 54, 57, 60, 63, 66, 69, 72, 75, 78, 81, 84, 87, 90, 93, 96, 99, 102, 105, 108, 111, 114, 117, 120, 123, 126, 129, 132, 138, 144, 150, 156, 162, 168, 174, 180],
+    "y": [0, 6, 12, 18, 24, 30, 36, 42, 48, 54, 60, 63, 66, 69, 72, 75, 78, 81, 84, 87, 90, 93, 96, 99, 102, 105, 108, 111, 114, 117, 120, 123, 126, 129, 132, 135, 138, 141, 144, 147, 150, 153, 156, 162, 168, 174, 180, 186, 192, 198, 204, 210, 216],
+    "z": [0, 6, 12, 18, 24, 30, 36, 42, 48, 54, 60, 66, 69, 72, 75, 78, 81, 84, 87, 90, 93, 96, 99, 102, 105, 108, 111, 114, 117, 120, 123, 126, 132, 138, 144, 150, 156, 162, 168, 174, 180, 186, 192, 198, 204, 210, 216]
+  },
+  "native_cells": [44, 52, 46],
+  "selection": {
+    "indicator": "uniform-60 final raw Bernstein negativity and quadrature-negative-mass map, probability weighted and buffered by the corrected-density marginal support",
+    "dorfler_theta": 0.5,
+    "dorfler_marked_cells": 28,
+    "dorfler_marked_probability_mass": 0.18126468092984266,
+    "marked_uniform60_index_box": [[20, 39], [27, 44], [27, 34]],
+    "fine_uniform60_index_bands": [[16, 43], [20, 51], [22, 41]],
+    "fine_common_grid_span": 3,
+    "coarse_common_grid_span": 6,
+    "rationale": "Retain uniform-60 spacing throughout the probability-bearing mature lobes and their indicator buffer; merge pairs of uniform-60 cells only in low-probability exterior slabs."
+  }
+}

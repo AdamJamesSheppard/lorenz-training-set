@@ -31,6 +31,23 @@ class TestSolverSmoke(unittest.TestCase):
         rtol,atol,_,_=solver.ksp.getTolerances()
         self.assertEqual(rtol,1e-12)
         self.assertEqual(atol,1e-15)
+    def test_graded_hex_common_grid_export_is_conservative(self):
+        domain=Domain(cells=(2,2,2))
+        axes=(
+            np.array([-30.0,-15.0,30.0]),
+            np.array([-40.0,-20.0,40.0]),
+            np.array([-10.0,10.0,70.0]),
+        )
+        solver=FokkerPlanckSolver(
+            Lorenz63Model(),domain,.01,degree=2,axis_coordinates=axes,
+        )
+        state=solver.gaussian_projected(
+            (1.0,1.0,20.0),np.diag([9.0,9.0,25.0]),apply_limiter=False,
+        )
+        exported=solver.common_grid_export(state,(4,4,4))
+        self.assertEqual(exported.shape,(4,4,4))
+        self.assertLess(abs(exported.mean()*domain.volume-solver.mass(state)),1e-11)
+        self.assertGreater(float(np.max(solver.cell_volumes)),float(np.min(solver.cell_volumes)))
     def test_refined_structured_roundtrip_preserves_q1_shape(self):
         q=self.s.gaussian((1,1,20),np.diag([9,9,25])); a=self.s.structured_export(q,2)
         r=self.s.from_structured(a); difference=q.function-r.function
