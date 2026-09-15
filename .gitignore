@@ -16,6 +16,7 @@ __pycache__/
 # Generated logs, scratch space, and run outputs
 *.log
 tmp/
+build/
 runs/
 results/
 .cache/
