@@ -47,6 +47,23 @@ element/face matrix agreement, one-step CN agreement, local-QP agreement, then
 the mature uniform-mesh comparison. AMR remains unauthorized until all stages
 pass. Dataset generation remains unauthorized.
 
+## 2026-09-15 - Accept production-scale MFEM one-step equivalence
+
+**Decision.** Accept physical state, operator-action, raw-CN and local-QP
+equivalence on the conforming `30x36x36` mesh. Keep the mature trajectory and
+AMR gates locked in that order.
+
+**Evidence.** Immutable run
+`runs/mfem-physical-equivalence-production/20260915T185006Z` passes all
+predeclared relative-L1 gates with maxima `1.19e-15`, `7.96e-14`, `9.43e-15`
+and `1.21e-11`. The earlier `20260915T184604Z` attempt failed only because the
+MFEM diagnostic projected 1,321 polynomials that DOLFINx had already certified
+positive by depth-four Bernstein subdivision; matching that certificate removes
+the discrepancy.
+
+**Consequence.** Implement and run the frozen full uniform mature equivalence
+forecast. Nonconforming AMR and production data remain unauthorized.
+
 ## 2026-09-15 - Use full-trajectory indicators for the third graded level
 
 **Decision.** Keep `MATURE_DENSITY_CONVERGENCE = OPEN` and freeze every method

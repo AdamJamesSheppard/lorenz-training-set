@@ -366,6 +366,11 @@ public:
       std::array<double, variables> normalized{};
       double minimum = OSQP_INFTY;
       for (int i = 0; i < variables; ++i) { normalized[i] = raw[i] / cell_average; }
+      if (AdaptiveCertificate(raw))
+      {
+         result = raw;
+         return false;
+      }
       for (int row = 0; row < bernstein_rows; ++row)
       {
          double value = 0.0;
@@ -423,6 +428,122 @@ public:
    }
 
 private:
+   using BernsteinBox = std::array<double, 27>;
+
+   static int Index(const int i, const int j, const int k)
+   {
+      return (i * 3 + j) * 3 + k;
+   }
+
+   static std::pair<BernsteinBox, BernsteinBox>
+   SplitAxis(const BernsteinBox &box, const int axis)
+   {
+      BernsteinBox left{}, right{};
+      for (int a = 0; a < 3; ++a)
+      for (int b = 0; b < 3; ++b)
+      {
+         double v[3];
+         for (int q = 0; q < 3; ++q)
+         {
+            const int i = axis == 0 ? q : a;
+            const int j = axis == 1 ? q : (axis == 0 ? a : b);
+            const int k = axis == 2 ? q : b;
+            v[q] = box[Index(i, j, k)];
+         }
+         const double midpoint0 = 0.5 * (v[0] + v[1]);
+         const double midpoint1 = 0.5 * (v[1] + v[2]);
+         const double centre = 0.5 * (midpoint0 + midpoint1);
+         const double lv[3] = {v[0], midpoint0, centre};
+         const double rv[3] = {centre, midpoint1, v[2]};
+         for (int q = 0; q < 3; ++q)
+         {
+            const int i = axis == 0 ? q : a;
+            const int j = axis == 1 ? q : (axis == 0 ? a : b);
+            const int k = axis == 2 ? q : b;
+            left[Index(i, j, k)] = lv[q];
+            right[Index(i, j, k)] = rv[q];
+         }
+      }
+      return {left, right};
+   }
+
+   static bool AdaptiveCertificate(const std::array<double, 27> &nodal)
+   {
+      // Match PositivityLimiter.classify_coefficients: convert the physical
+      // Q2 polynomial to whole-cell tensor Bernstein coefficients, then use
+      // depth-four de Casteljau subdivision. A negative corner or box-centre
+      // value is a physical witness and therefore prevents an adaptive skip.
+      const double transform[3][3] = {
+         {1.0, 0.0, 0.0},
+         {-0.5, 2.0, -0.5},
+         {0.0, 0.0, 1.0}
+      };
+      BernsteinBox root{};
+      for (int a = 0; a < 3; ++a)
+      for (int b = 0; b < 3; ++b)
+      for (int c = 0; c < 3; ++c)
+      for (int i = 0; i < 3; ++i)
+      for (int j = 0; j < 3; ++j)
+      for (int k = 0; k < 3; ++k)
+      {
+         root[Index(a, b, c)] += transform[a][i] * transform[b][j]
+                                    * transform[c][k] * nodal[Index(i, j, k)];
+      }
+      std::vector<std::pair<BernsteinBox, int>> stack{{root, 0}};
+      bool unresolved = false;
+      while (!stack.empty())
+      {
+         auto [box, depth] = std::move(stack.back());
+         stack.pop_back();
+         const auto [minimum_it, maximum_it] =
+            std::minmax_element(box.begin(), box.end());
+         const double scale = std::max(std::abs(*minimum_it), std::abs(*maximum_it));
+         const double witness_tolerance = 128.0 * std::numeric_limits<double>::epsilon()
+                                          * std::max(scale, std::numeric_limits<double>::min());
+         double witness = OSQP_INFTY;
+         for (const int i : {0, 2})
+         for (const int j : {0, 2})
+         for (const int k : {0, 2})
+         {
+            witness = std::min(witness, box[Index(i, j, k)]);
+         }
+         double centre = 0.0;
+         const double weights[3] = {0.25, 0.5, 0.25};
+         for (int i = 0; i < 3; ++i)
+         for (int j = 0; j < 3; ++j)
+         for (int k = 0; k < 3; ++k)
+         {
+            centre += weights[i] * weights[j] * weights[k] * box[Index(i, j, k)];
+         }
+         witness = std::min(witness, centre);
+         if (witness < -witness_tolerance) { return false; }
+         if (*minimum_it >= 0.0) { continue; }
+         if (depth >= 4)
+         {
+            unresolved = true;
+            continue;
+         }
+         std::vector<BernsteinBox> children{box};
+         for (int axis = 0; axis < 3; ++axis)
+         {
+            std::vector<BernsteinBox> next;
+            next.reserve(children.size() * 2);
+            for (const auto &child : children)
+            {
+               auto split = SplitAxis(child, axis);
+               next.push_back(std::move(split.first));
+               next.push_back(std::move(split.second));
+            }
+            children = std::move(next);
+         }
+         for (auto &child : children)
+         {
+            stack.emplace_back(std::move(child), depth + 1);
+         }
+      }
+      return !unresolved;
+   }
+
    static constexpr double positivity_margin = 1.0e-12;
    std::vector<double> hessian, average, constraints;
    std::vector<OSQPFloat> p_values, a_values, q, lower, upper;

@@ -157,9 +157,9 @@ NEXT_REQUIRED_GATE = MATURE_DENSITY_CONVERGENCE
 The living plan is in `docs/RESEARCH_DIRECTIONS.md` and
 `experiments/method-selection-research.yaml`. Current high-value branches are:
 
-1. Repeat the passed MFEM physical Q2/operator/raw-CN/local-QP gate on the
-   `30x36x36` production mesh, then run the frozen uniform mature equivalence
-   forecast only if every one-step tolerance remains satisfied.
+1. The MFEM physical Q2/operator/raw-CN/local-QP gate now passes on the
+   `30x36x36` production mesh. Implement and run the frozen uniform mature
+   equivalence forecast before enabling nonconforming AMR.
 2. Use the completed eleven-snapshot replay only after mass, cell-average,
    density, moment and correction comparisons against DOLFINx pass.
 3. Run a fixed nonconforming octree mesh with `D_AMR,gf < 0.05`, mean correction
