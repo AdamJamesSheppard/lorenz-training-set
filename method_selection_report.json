@@ -32,7 +32,7 @@
       "monte_carlo_200000_cpu_sampling_propagation_histogram_seconds": 3.369948232000722,
       "scope": "One 0.05 forecast interval; MC figure excludes principled bandwidth selection and accuracy certification."
     },
-    "principal_remaining_limitation": "Uniform-60 and its static graded reproduction pass the original mature 0.001 correction, positivity, covariance, marginal, joint-TV and lobe gates, but the preceding 45-to-60 full-density L1 difference is still 0.20997. A finer graded comparison must determine whether the mature density is entering a resolved regime. Finite-domain sensitivity and independently resolved full-density evidence remain absent."
+    "principal_remaining_limitation": "The fine 58x68x56 graded run reduces mean correction to 0.0001128 and affected probability to 0.004179 with all invariant and statistical gates passing, but D_60,gf=0.108680 and D_g,gf=0.107936 remain material. Its runtime is 10.1% above uniform-60 despite 29.0% fewer DG unknowns. A third time-aggregated graded level must establish further full-density contraction before domain sensitivity; independently resolved full-density evidence remains absent."
   },
   "pde": {
     "linear_in_density": true,
@@ -54,7 +54,7 @@
     "Q2/Q3 positivity via Bernstein coefficients on 2x2x2 control subcells",
     "Adaptive tensor-Bernstein three-way classification with fixed conservative fallback",
     "Reduced fixed-matrix OSQP cell projection with SLSQP oracle validation",
-    "Immutable raw pre-correction coefficient archives and same-mesh Q1/Q2 runner",
+    "Immutable raw pre-correction coefficient archives, sparse time-resolved indicator snapshots, and same-mesh Q1/Q2 runner",
     "Exact Qk cell averages and conservative degree+1 subcell export/reconstruction",
     "Independent conservative finite-volume/SSPRK validator",
     "Corrected dataset defaults: L2 initialization and projected Bayesian analysis"

@@ -4,6 +4,7 @@ from pathlib import Path
 import numpy as np
 import yaml
 
+from mature_time_aggregated_pipeline import UNIFORM60_CELLS, design_axes
 from same_mesh_q2_study import (
     _condition_mixture_on_z,
     _model,
@@ -113,6 +114,22 @@ def test_fine_graded_predeclaration_aligns_both_comparators_to_common_grid():
     assert dof_ratio<=config["scientific_decision"]["comparator_limits"][
         "maximum_dg_dof_ratio"
     ]
+
+
+def test_time_aggregated_design_is_aligned_and_respects_uniform_cell_ceiling():
+    aggregate=np.zeros((58,68,56))
+    aggregate[20:32,24:40,18:30]=1.0
+    design,cells=design_axes(aggregate)
+    assert int(np.prod(cells))<=UNIFORM60_CELLS
+    assert design["selection"]["dorfler_theta"]==0.5
+    assert design["selection"]["axis_marked_energy_coverage"] in {
+        0.90,0.85,0.80,0.75
+    }
+    for name,common_size,count in zip(("x","y","z"),(180,216,216),cells):
+        edges=design["edge_indices"][name]
+        assert len(edges)==count+1
+        assert edges[0]==0 and edges[-1]==common_size
+        assert set(np.diff(edges))<={1,6}
 
 
 def test_z_conditioning_and_truncated_mixture_sampling_preserve_lobe_symmetry():

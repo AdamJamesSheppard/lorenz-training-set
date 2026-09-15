@@ -1,6 +1,6 @@
 # Research directions
 
-Updated: 2026-09-13
+Updated: 2026-09-15
 
 This is a living portfolio, not a queue that must be executed in order. Agents
 are welcome to add, remove, split, merge, or re-rank branches as the production
@@ -37,6 +37,14 @@ The follow-up same-polynomial audit rejects depth-4 certificate conservatism as
 the dominant cause: depth 8 rescues at most `0.0788%` of non-certified cells and
 reduces L1 correction by at most `2.89%`. Almost all rejected cells have direct
 negative witnesses.
+Uniform-60 subsequently passes the original correction gate, and static grading
+reproduces that density efficiently. A finer `58x68x56` graded level lowers mean
+correction to `1.13e-4` and affected probability to `0.00418`, while moving by
+`L1=0.108680` from uniform-60. The large density movement together with sharply
+smaller intervention supports localized under-resolution as the leading
+diagnosis. Its 76.4-minute runtime is 10.1% above uniform-60, so cell count alone
+does not establish computational efficiency. The active test is a third graded
+level designed from maximum-over-time indicators over the full trajectory.
 
 ## Active branches
 
@@ -50,7 +58,7 @@ negative witnesses.
 | Positive full-tensor finite volume | Provides an operator-level positivity fallback with substantially different numerical principles. | Prioritize if corrected/AFC Q2 fails; require genuine 3-D convection-diffusion, no-flux and high-Peclet validation. |
 | FCDF or directional complete flux | Directly targets drift-diffusion flux and high-Peclet numerical diffusion. | Keep as an identity/diagonal `B` special-case branch; present FCDF proof is directional and its 2026 evidence is lower-dimensional. |
 | Characteristic/semi-Lagrangian methods | Could reduce upwind transport diffusion substantially. | Require a defensible 3-D diffusion, positivity, conservation, and reflecting-boundary treatment. |
-| Goal-oriented/nonuniform resolution | Mean and raw second moments are linear functionals, so covariance-oriented refinement may beat uniform grids. | Reconsider if current DOLFINx topology or estimator cost prevents a controlled implementation. |
+| Time-aggregated static grading | The fine graded result shows resolution-controlled mature-density change and nearly dormant QP correction; full-trajectory indicators can concentrate the next level where it matters dynamically. | Require `D_gf,gff<0.0543401`, preserved gates and a mesh no larger than uniform-60; keep convergence open if contraction fails. |
 | Dynamically scaled Hermite reference | Supplies a whole-space, high-order method independent of DG/FV and avoids reflecting truncation. | Validate by coefficient decay and moment refinement; use as a reference even if positivity prevents production use. |
 | Monte Carlo plus density reconstruction | Strong independent moment reference and possible production challenger. | Compare full-density reconstruction, tails, bandwidth bias, repeatability, and cost - not moments alone. |
 

@@ -115,6 +115,13 @@ NEXT_REQUIRED_GATE = MATURE_DENSITY_CONVERGENCE
   at `0.0008384`; this failure remains recorded. Matched-grid recomputation
   shows the automated marginal-degradation failure was a bin-resolution
   comparison artifact.
+- The completed `58x68x56` fine graded run reduces mean correction from
+  uniform-60's `8.31e-4` to `1.13e-4` and affected probability from `0.428`
+  to `0.00418`, with zero negativity, optimizer failure or fallback. Its
+  common-grid differences are `D_60,gf=0.108680` and `D_g,gf=0.107936`.
+  Runtime is `76.4` minutes, `10.1%` above uniform-60, despite using `29.0%`
+  fewer DG unknowns; mature-density convergence and solver efficiency remain
+  open.
 
 ## Active blockers
 
@@ -143,15 +150,14 @@ NEXT_REQUIRED_GATE = MATURE_DENSITY_CONVERGENCE
 The living plan is in `docs/RESEARCH_DIRECTIONS.md` and
 `experiments/method-selection-research.yaml`. Current high-value branches are:
 
-1. Run `experiments/mature-graded-fine-comparison.yaml`: refine the validated
-   lobe bands to common-grid span two on a `58x68x56` mesh and compare with both
-   uniform-60 and the completed `44x52x46` graded run.
-2. Record both common-grid differences, correction L1/L2, negative-average and
-   projected probability mass, covariance and marginal TVs, lobe/joint metrics,
-   optimizer performance, conservation, runtime and memory.
-3. If targeted refinement establishes decreasing mature-density differences,
-   run aligned-box domain-size sensitivity at approximately fixed physical
-   resolution. Otherwise add one further graded level before domain testing.
+1. Execute `experiments/mature-time-aggregated-level3-pipeline.yaml`: replay the
+   fine trajectory at eleven fixed snapshots, aggregate correction, witnessed
+   negativity, high-mode and jump indicators, and generate a third graded mesh.
+2. Require `D_gf,gff < 0.0543401`, mean correction below `8e-4`, all existing
+   positivity/statistical gates, and no more cells than uniform-60. Treat any
+   inferred rate as heuristic because the meshes are nonuniform.
+3. If the third level supplies a convincing contraction sequence, proceed to
+   aligned-box domain sensitivity. Otherwise retain density convergence as open.
 5. Do not spend another hierarchy on deeper Bernstein certification; witnessed
    polynomial negativity, rather than unresolved bounds, dominates every saved
    mature snapshot.

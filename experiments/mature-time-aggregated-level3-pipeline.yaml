@@ -1,0 +1,51 @@
+id: mature-time-aggregated-level3-pipeline
+kind: deterministic_replay_then_graded_density_convergence
+status: predeclared_executable_pipeline
+purpose: Construct the third mature graded level from maximum-over-time indicators rather than a single saved state.
+replay:
+  source_configuration: experiments/mature-graded-fine-comparison.yaml
+  cells: [58, 68, 56]
+  steps: 320
+  snapshot_steps: [0, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320]
+  deterministic_parameters_unchanged: true
+indicator:
+  time_aggregation: componentwise maximum over snapshots
+  formula: normalized_correction_l1 + normalized_negative_witness_probability_mass + 0.25*normalized_high_mode_l1 + 0.25*normalized_jump_indicator
+  dorfler_theta: 0.5
+  axis_band_rule: smallest contiguous tensor bands retaining 90 percent of the marked indicator energy on each axis, buffered by two source-mesh cells and rounded outward to existing span-six exterior-cell boundaries
+  axis_energy_coverage_fallbacks: [0.85, 0.80, 0.75]
+  maximum_native_cells: 311040
+  fallback_rule: reduce axis energy coverage in the declared order only when required to stay at or below the uniform-60 cell count
+level3_mesh:
+  common_comparison_grid: [180, 216, 216]
+  refined_band_common_grid_span: 1
+  exterior_common_grid_span: 6
+  element: discontinuous_Q2_hexahedron
+  timestep: 0.00015625
+  final_time: 0.05
+  positivity_method: local_qp
+  full_spd_diffusion_unchanged: true
+scientific_decision:
+  maximum_density_l1_vs_graded58x68x56: 0.05434004396153797
+  maximum_mean_relative_l1_correction: 0.0008
+  maximum_step_mass_change: 1.0e-12
+  maximum_absolute_mass_error: 1.0e-10
+  maximum_negative_mass: 1.0e-13
+  zero_optimizer_failures: true
+  zero_fallbacks: true
+  maximum_statistical_degradation_vs_each_comparator: 0.005
+  maximum_dg_dof_ratio_vs_uniform60: 1.0
+  maximum_runtime_ratio_vs_uniform60: 1.0
+  maximum_peak_rank_memory_ratio_vs_uniform60: 1.0
+  production_dataset_authorized: false
+execution:
+  mpi_ranks: 8
+  numerical_threads: 1
+  automatic_stages:
+    - replay fine trajectory and archive indicator snapshots
+    - aggregate indicators and generate immutable axis/config artifacts
+    - execute full 320-step level3 experiment
+notes:
+  - The existing fine-run artifacts cannot supply time-resolved cell maps because raw trajectory archives and cellwise snapshots were disabled.
+  - The replay is numerically identical to the completed fine run and exists only to recover the requested time-resolved design evidence.
+  - The heuristic contraction rate remains a diagnostic rather than a formal order on nonuniform meshes.

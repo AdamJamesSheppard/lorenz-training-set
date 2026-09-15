@@ -1097,6 +1097,33 @@ both uniform-60 and the first graded result.
 
 Evidence: [`mature_graded_efficiency_report.json`](mature_graded_efficiency_report.json).
 
+## 32. Fine graded mature-density contraction result
+
+The predeclared `58x68x56` fine graded run leaves mature-density convergence
+open. Its mean relative L1 correction falls to `0.0001128` and mean projected
+probability to `0.004179`, from uniform-60 values `0.0008313` and approximately
+`0.428`. All positivity, conservation, optimizer, covariance, marginal,
+joint-TV and lobe-probability gates pass.
+
+The common-grid density changes are `D_60,gf=0.108680` and
+`D_g,gf=0.107936`. These are material changes in the solution while positivity
+intervention collapses, providing numerical evidence for localized spatial
+under-resolution. A rate inferred from nonuniform levels is heuristic only.
+
+The fine mesh uses 29.0% fewer DG unknowns and 26.5% less peak memory per rank
+than uniform-60, but its 76.4-minute forecast is 10.1% slower. It therefore
+fails the frozen density and runtime gates. Fewer unknowns do not guarantee a
+faster local-QP solve when many cells and optimizer calls remain poorly placed.
+
+The next frozen experiment is
+`experiments/mature-time-aggregated-level3-pipeline.yaml`. It replays the full
+fine trajectory at eleven fixed snapshots, constructs a maximum-over-time
+indicator, and runs a third targeted graded level. The primary gate is
+`D_gf,gff < 0.0543401`; production dataset generation remains unauthorized.
+
+Evidence: immutable run
+`runs/mature-full-spd-graded-fine-comparison/20260914T231639Z`.
+
 ## Sources
 
 [^1]: C. Liu, J. Hu, W. T. Taitano and X. Zhang, [“An optimization-based positivity-preserving limiter in semi-implicit discontinuous Galerkin schemes solving Fokker–Planck equations”](https://www.math.purdue.edu/~zhan1966/research/paper/DG_anisotropic_Fokker_Planck.pdf), *Computers & Mathematics with Applications* (2025).

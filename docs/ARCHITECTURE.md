@@ -46,7 +46,11 @@ differences.
 - `generate_dataset.py`: gated sequential DA dataset generation.
 - `validate.py` and focused `*_study.py` files: validation studies.
 - `same_mesh_q2_study.py`: common-law Monte Carlo preparation and auditable
-  Q1/Q2 fixed/adaptive forecast branches, including raw coefficient archives.
+  Q1/Q2 fixed/adaptive forecast branches, including raw coefficient archives
+  and optional sparse cellwise indicator snapshots.
+- `mature_time_aggregated_pipeline.py`: deterministic fine-trajectory replay,
+  maximum-over-time indicator aggregation, bounded graded-axis construction and
+  automatic dispatch of the third mature-density level.
 - `local_projection_study.py`: compares terminal unlimited Q2 states with the
   incumbent correction, a strictly cell-local QP, and Stage-1 average repair
   followed by the local QP.

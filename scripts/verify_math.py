@@ -46,6 +46,9 @@ def main() -> int:
     mature_graded = json.loads(
         (ROOT / "mature_graded_efficiency_report.json").read_text()
     )
+    mature_graded_fine = json.loads(
+        (ROOT / "mature_graded_fine_report.json").read_text()
+    )
     diffusion = Lorenz63Model().diffusion
 
     mass_errors = [abs(float(row["mass_error"])) for row in boundary["rows"]]
@@ -276,6 +279,27 @@ def main() -> int:
             and decision.get("production_dataset_authorized") is False
             and decision.get("next_required_gate") == "MATURE_DENSITY_CONVERGENCE"
         ),
+        "mature_fine_graded_contraction_consistent": bool(
+            mature_graded_fine["classification"]
+            == "FAILED_PREDECLARED_MATURE_GRADED_EFFICIENCY_GATES"
+            and mature_graded_fine["method_status"]
+            == "MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED"
+            and mature_graded_fine["mature_density_convergence"] == "OPEN"
+            and mature_graded_fine["all_320_steps_whole_cell_positive"]
+            and mature_graded_fine["maximum_measured_negative_mass"] == 0.0
+            and mature_graded_fine["absolute_mass_error"] <= 1.0e-10
+            and mature_graded_fine["optimizer_failures"] == 0
+            and mature_graded_fine["fallbacks"] == 0
+            and mature_graded_fine["mean_relative_l1_correction"] <= 8.0e-4
+            and mature_graded_fine["density_l1_vs_uniform60"] > 0.1
+            and mature_graded_fine["density_l1_vs_graded44x52x46"] > 0.1
+            and mature_graded_fine["runtime_ratio_vs_uniform60"] > 1.0
+            and mature_graded_fine["dof_ratio_vs_uniform60"] < 1.0
+            and mature_graded_fine["peak_rank_memory_ratio_vs_uniform60"] < 1.0
+            and mature_graded_fine["production_dataset_authorized"] is False
+            and decision.get("mature_density_convergence") == "OPEN"
+            and decision.get("production_dataset_authorized") is False
+        ),
     }
     result = {
         "passed": all(checks.values()),
@@ -348,6 +372,15 @@ def main() -> int:
             "mature_graded_mean_relative_l1_correction": mature_graded[
                 "graded44x52x46"
             ]["mean_relative_l1_correction"],
+            "mature_fine_graded_density_l1_vs_uniform60": mature_graded_fine[
+                "density_l1_vs_uniform60"
+            ],
+            "mature_fine_graded_density_l1_vs_first_graded": mature_graded_fine[
+                "density_l1_vs_graded44x52x46"
+            ],
+            "mature_fine_graded_mean_relative_l1_correction": mature_graded_fine[
+                "mean_relative_l1_correction"
+            ],
         },
         "interpretation": (
             "The tested invariants and evidence consistency pass. Production certification is "

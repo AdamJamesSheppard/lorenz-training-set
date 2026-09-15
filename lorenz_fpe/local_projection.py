@@ -102,6 +102,7 @@ class LocalPolynomialProjector:
         ]
         self.last_stage1_coefficients: np.ndarray | None = None
         self.last_final_coefficients: np.ndarray | None = None
+        self.last_raw_coefficients: np.ndarray | None = None
 
         # Eliminate the cell-average equality once.  The reduced Hessian and
         # inequality matrix are identical for every cell; only the lower bound
@@ -296,6 +297,7 @@ class LocalPolynomialProjector:
         output = state.copy("local_minimum_change_projection")
         coefficients = output.function.x.array
         raw_coefficients = coefficients.copy()
+        self.last_raw_coefficients = raw_coefficients.copy()
         local_averages = np.array([
             limiter.cell_average(coefficients[dofs]) for dofs in limiter.cell_dofs
         ])

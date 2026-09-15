@@ -224,6 +224,77 @@ def _joint_density_comparison(
             "grid":list(shape),"gaussian_smoothing_sigma_in_voxels":smoothing_sigma}
 
 
+def _write_indicator_snapshot(
+    solver: FokkerPlanckSolver, step: int, state: DensityState, output: Path
+) -> dict[str,object] | None:
+    """Archive one cellwise QP/negativity/jump indicator snapshot."""
+    projector=getattr(solver,"local_projector",None)
+    if projector is None or projector.last_raw_coefficients is None:
+        raise RuntimeError("indicator snapshots require a completed local-QP projection")
+    raw=projector.last_raw_coefficients
+    final=state.function.x.array
+    limiter=solver.limiter
+    _,volumes,mids=solver.cell_averages(state)
+    correction=np.empty(len(mids)); mass=np.empty(len(mids))
+    witnessed=np.empty(len(mids),dtype=np.uint8); high_mode=np.empty(len(mids))
+    averages=np.empty(len(mids))
+    for cell,dofs in enumerate(limiter.cell_dofs):
+        raw_values=raw[dofs]; final_values=final[dofs]
+        correction[cell]=volumes[cell]*float(
+            limiter._quadrature_weights@np.abs(
+                limiter._quadrature_basis@(final_values-raw_values)
+            )
+        )
+        average=limiter.cell_average(final_values); averages[cell]=average
+        mass[cell]=volumes[cell]*max(average,0.0)
+        witnessed[cell]=int(
+            limiter.classify_coefficients(raw_values)["status"]=="WITNESSED_NEGATIVE"
+        )
+        values=limiter._quadrature_basis@final_values
+        high_mode[cell]=volumes[cell]*float(
+            limiter._quadrature_weights@np.abs(values-average)
+        )
+    gathered=solver.comm.gather(
+        (mids,volumes,correction,mass,witnessed,high_mode,averages),root=0
+    )
+    if solver.comm.rank!=0:
+        return None
+    shape=solver.domain.cells
+    arrays={name:np.zeros(shape,dtype=float) for name in (
+        "cell_volume","correction_l1","probability_mass","negative_witness_mass",
+        "high_mode_l1","cell_average"
+    )}
+    for gmids,gvol,gcorrection,gmass,gwitnessed,ghigh,gaverage in gathered:
+        for row,point in enumerate(gmids):
+            index=tuple(min(shape[d]-1,max(0,int(np.searchsorted(
+                solver.axis_coordinates[d],point[d],side="right"
+            )-1))) for d in range(3))
+            arrays["cell_volume"][index]=gvol[row]
+            arrays["correction_l1"][index]=gcorrection[row]
+            arrays["probability_mass"][index]=gmass[row]
+            arrays["negative_witness_mass"][index]=gmass[row]*gwitnessed[row]
+            arrays["high_mode_l1"][index]=ghigh[row]
+            arrays["cell_average"][index]=gaverage[row]
+    jump=np.zeros(shape,dtype=float)
+    average=arrays["cell_average"]
+    for axis in range(3):
+        difference=np.abs(np.diff(average,axis=axis))
+        left=[slice(None)]*3; right=[slice(None)]*3
+        left[axis]=slice(0,-1); right[axis]=slice(1,None)
+        jump[tuple(left)]=np.maximum(jump[tuple(left)],difference)
+        jump[tuple(right)]=np.maximum(jump[tuple(right)],difference)
+    arrays["jump_indicator"]=jump*arrays["cell_volume"]
+    output.mkdir(parents=True,exist_ok=True)
+    path=output/f"indicator_step_{step:04d}.npz"
+    np.savez_compressed(path,step=step,time=state.time,**arrays)
+    return {"step":step,"time":state.time,"path":path.name,
+            "sha256":_sha256(path),"bytes":path.stat().st_size,
+            "correction_l1_sum":float(arrays["correction_l1"].sum()),
+            "negative_witness_probability_mass":float(
+                arrays["negative_witness_mass"].sum()
+            )}
+
+
 def prepare_reference(args: argparse.Namespace) -> None:
     if MPI.COMM_WORLD.size!=1:
         raise SystemExit("reference preparation must run on one rank")
@@ -437,6 +508,13 @@ def run_forecast(args: argparse.Namespace) -> None:
                    "mixture_sha256":_sha256(args.mixture),
                    "local_projection":initial_projection} if rank==0 else None
     initial_diagnostics=solver.diagnostics(initial)
+    indicator_steps=set(args.indicator_snapshot_steps or [])
+    indicator_records=[]
+    if indicator_steps and args.indicator_output is None:
+        raise ValueError("--indicator-output is required with indicator snapshot steps")
+    if 0 in indicator_steps:
+        record=_write_indicator_snapshot(solver,0,initial,args.indicator_output)
+        if rank==0: indicator_records.append(record)
     n_owned_initial=solver.V.dofmap.index_map.size_local*solver.V.dofmap.index_map_bs
     initial_state_sha256_by_rank=comm.gather(
         hashlib.sha256(
@@ -506,6 +584,11 @@ def run_forecast(args: argparse.Namespace) -> None:
             raw_archive[step]=source[:n_owned]
             if (step+1)%10==0:
                 raw_archive.flush()
+        if step+1 in indicator_steps:
+            record=_write_indicator_snapshot(
+                solver,step+1,state,args.indicator_output
+            )
+            if rank==0: indicator_records.append(record)
         if rank==0 and ((step+1)%max(1,steps//10)==0 or step+1==steps):
             elapsed=time.perf_counter()-started
             print(f"{args.branch}: step {step+1}/{steps}, elapsed={elapsed:.1f}s",flush=True)
@@ -633,6 +716,7 @@ def run_forecast(args: argparse.Namespace) -> None:
             "limiter_steps":(solver.local_projection_history
                 if (args.local_projection or args.afc_projection) else
                 [asdict(item) for item in solver.limiter_history]),
+            "indicator_snapshots":indicator_records,
             "timing":{"forecast_seconds":forecast_seconds,
                 "maximum_step_seconds":maximum_step_seconds,"mean_step_seconds":mean_step_seconds,
                 "matrix_assembly_seconds":solver.matrix_assembly_seconds},
@@ -750,6 +834,8 @@ def parser() -> argparse.ArgumentParser:
     run.add_argument("--local-optimizer-ftol",type=float,default=1.0e-10)
     run.add_argument("--local-maximum-iterations",type=int,default=10_000)
     run.add_argument("--no-raw-archive",action="store_true")
+    run.add_argument("--indicator-snapshot-steps",type=int,nargs="*")
+    run.add_argument("--indicator-output",type=Path)
     recover=sub.add_parser("recover",parents=[common])
     recover.add_argument("--degree",type=int,choices=(1,2),default=2)
     recover.add_argument("--certificate-mode",choices=("fixed","adaptive"),default="adaptive")

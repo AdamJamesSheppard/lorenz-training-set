@@ -4,6 +4,31 @@ Decisions here are dated and revisable. Add a new entry that marks an older
 decision `superseded`, `narrowed`, or `confirmed` rather than rewriting history
 to make the current direction look inevitable.
 
+## 2026-09-15 - Use full-trajectory indicators for the third graded level
+
+**Decision.** Keep `MATURE_DENSITY_CONVERGENCE = OPEN` and freeze every method
+parameter except the mesh. Build the third graded mesh from eleven deterministic
+replay snapshots over all 320 steps. Use a componentwise time maximum of
+normalized QP correction, negative-witness probability, high-mode content and
+jump indicators. Dörfler marking uses `theta=0.5`; contiguous tensor bands retain
+the highest predeclared axis energy coverage that stays within the uniform-60
+cell ceiling.
+
+**Evidence.** The completed `58x68x56` run reduces mean QP correction from
+`8.31e-4` to `1.13e-4` and affected probability from `0.428` to `0.00418`, while
+`D_60,gf=0.108680` and `D_g,gf=0.107936`. All positivity, conservation,
+optimizer and statistical gates pass. Runtime is 76.4 minutes, 10.1% above
+uniform-60, so the formal efficiency classification remains failed.
+
+**Consequence.** Predeclare `D_gf,gff < 0.0543401` as the primary contraction
+gate. Mean correction remains limited to `8e-4`; invariant/statistical gates
+remain unchanged. Runtime, memory and cell count are compared with uniform-60.
+The observed nonuniform-mesh rate remains heuristic.
+
+**Evidence.** Immutable run
+`runs/mature-full-spd-graded-fine-comparison/20260914T231639Z` and executable
+pipeline `experiments/mature-time-aggregated-level3-pipeline.yaml`.
+
 ## 2026-09-15 - Validate static grading for efficiency and open density convergence
 
 **Decision.** Set
