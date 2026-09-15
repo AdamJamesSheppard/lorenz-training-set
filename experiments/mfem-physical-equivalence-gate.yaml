@@ -1,0 +1,41 @@
+id: mfem-physical-equivalence-gate
+kind: cross_framework_physical_basis_equivalence
+status: predeclared_implementation_gate
+purpose: Establish DOLFINx/MFEM equivalence in physical Q2 fields before any mature forecast or nonconforming AMR run.
+frozen_mathematics:
+  domain: [[-30.0, 30.0], [-40.0, 40.0], [-10.0, 70.0]]
+  polynomial_space: discontinuous_tensor_Q2_hexahedron
+  drift: conservative_Lorenz63_upwind
+  diffusion: full_SPD_SIPG
+  diffusion_tensor: [[1.0, 0.4, 0.2], [0.4, 1.0, 0.3], [0.2, 0.3, 1.0]]
+  boundary: zero_total_numerical_flux
+  timestepper: Crank_Nicolson
+  dt: 0.00015625
+  dolfinx_penalty: 16.0
+  positivity: global_nonnegative_average_repair_then_local_mass_matrix_QP
+diagnostic_fields:
+  count: 4
+  requirements:
+    - include cellwise discontinuities to exercise interior upwind and SIPG terms
+    - include a positive-average field with genuine within-cell negativity to invoke every local QP
+common_representation:
+  type: conservative_aligned_subcell_averages
+  subcells_per_fe_cell: [3, 3, 3]
+  quadrature: exact_for_Q2_on_each_subcell
+small_mesh: [4, 5, 5]
+production_mesh: [30, 36, 36]
+gates:
+  maximum_state_relative_L1: 1.0e-12
+  maximum_operator_action_relative_L1: 1.0e-7
+  maximum_raw_CN_step_relative_L1: 1.0e-7
+  maximum_QP_corrected_CN_step_relative_L1: 1.0e-7
+stage_order:
+  - physical_state_mapping
+  - operator_action
+  - raw_CN_step
+  - QP_corrected_CN_step
+  - production_mesh_one_step_repetition
+  - frozen_mature_uniform_forecast
+stop_rule: Stop at the first failed stage; do not run the mature forecast or enable AMR.
+amr_authorized: false
+production_dataset_authorized: false

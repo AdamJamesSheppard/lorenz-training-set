@@ -4,6 +4,30 @@ Decisions here are dated and revisable. Add a new entry that marks an older
 decision `superseded`, `narrowed`, or `confirmed` rather than rewriting history
 to make the current direction look inevitable.
 
+## 2026-09-15 - Correct the MFEM port and pass small-mesh physical equivalence
+
+**Decision.** Supersede the earlier MFEM operator probe as structural evidence
+only. Correct the Cartesian-box construction, formulate the MFEM matrix as the
+evolution operator in `M p_t = K p`, match the DOLFINx SIPG penalty on physical
+faces, and require conservative physical-field comparisons before any mature
+forecast. The frozen limits are in
+`experiments/mfem-physical-equivalence-gate.yaml`.
+
+**Evidence.** The earlier constructor call created an x extent of one rather
+than sixty, and the diffusion/CN signs did not represent the frozen DOLFINx
+evolution. The staged diagnostic caught both defects. On the corrected
+`4x5x5` mesh, four independently represented Q2 fields give maximum relative
+L1 discrepancies `2.55e-16` for state mapping, `4.95e-15` for the full operator,
+`2.43e-15` for raw CN, and `7.81e-12` after the local QP. The fourth field makes
+all 100 cell QPs active; both ports report no optimizer fallback.
+
+**Consequence.** The corrected implementation advances to the predeclared
+`30x36x36` one-step repetition. A full mature forecast and NCMesh AMR remain
+locked until that production-mesh diagnostic passes.
+
+**Evidence.** Immutable local run
+`runs/mfem-physical-equivalence/20260915T184304Z`.
+
 ## 2026-09-15 - Replace tensor grading with a gated MFEM AMR branch
 
 **Decision.** Reject another tensor-product graded level. Keep DOLFINx as the

@@ -37,6 +37,53 @@ public:
    }
 };
 
+class DolfinxPenaltyDGDiffusionIntegrator final : public DGDiffusionIntegrator
+{
+public:
+   DolfinxPenaltyDGDiffusionIntegrator(MatrixCoefficient &coefficient,
+                                       const double sigma,
+                                       const double penalty_times_degree_squared)
+      : DGDiffusionIntegrator(coefficient, sigma, 1.0),
+        penalty_factor(penalty_times_degree_squared) { }
+
+   void AssembleFaceMatrix(const FiniteElement &element1,
+                           const FiniteElement &element2,
+                           FaceElementTransformations &transformation,
+                           DenseMatrix &matrix) override
+   {
+      IntegrationPoint center;
+      center.Set2(0.5, 0.5);
+      transformation.SetAllIntPoints(&center);
+      Vector face_normal(3);
+      CalcOrtho(transformation.Jacobian(), face_normal);
+      const double face_scale = face_normal.Norml2();
+      auto geometry = [face_scale](ElementTransformation &element)
+      {
+         const DenseMatrix &jacobian = element.Jacobian();
+         double diameter_squared = 0.0;
+         for (int i = 0; i < jacobian.Height(); ++i)
+         {
+            for (int j = 0; j < jacobian.Width(); ++j)
+            {
+               diameter_squared += jacobian(i, j) * jacobian(i, j);
+            }
+         }
+         return std::pair<double, double>(
+            element.Weight() / face_scale, std::sqrt(diameter_squared));
+      };
+      const auto first = geometry(*transformation.Elem1);
+      const auto second = geometry(*transformation.Elem2);
+      kappa = 4.0 * penalty_factor
+              / ((first.second + second.second)
+                 * (1.0 / first.first + 1.0 / second.first));
+      DGDiffusionIntegrator::AssembleFaceMatrix(
+         element1, element2, transformation, matrix);
+   }
+
+private:
+   double penalty_factor;
+};
+
 int main(int argc, char *argv[])
 {
    Mpi::Init(argc, argv);
@@ -51,7 +98,7 @@ int main(int argc, char *argv[])
    MFEM_VERIFY(nx > 0 && ny > 0 && nz > 0, "positive mesh sizes required");
 
    Mesh serial = Mesh::MakeCartesian3D(
-      nx, ny, nz, Element::HEXAHEDRON, 1, 60.0, 80.0, 80.0);
+      nx, ny, nz, Element::HEXAHEDRON, 60.0, 80.0, 80.0);
    for (int vertex = 0; vertex < serial.GetNV(); ++vertex)
    {
       double *x = serial.GetVertex(vertex);
@@ -69,7 +116,9 @@ int main(int argc, char *argv[])
    tensor(0, 0) = 1.0; tensor(0, 1) = 0.4; tensor(0, 2) = 0.2;
    tensor(1, 0) = 0.4; tensor(1, 1) = 1.0; tensor(1, 2) = 0.3;
    tensor(2, 0) = 0.2; tensor(2, 1) = 0.3; tensor(2, 2) = 1.0;
-   MatrixConstantCoefficient diffusion(tensor);
+   DenseMatrix negative_tensor(tensor);
+   negative_tensor *= -1.0;
+   MatrixConstantCoefficient negative_diffusion(negative_tensor);
    LorenzDrift drift;
 
    ParBilinearForm mass(&space);
@@ -79,15 +128,22 @@ int main(int argc, char *argv[])
    HypreParMatrix *M = mass.ParallelAssemble();
 
    constexpr double sigma = -1.0;
-   constexpr double kappa = 36.0;
+   constexpr double penalty_times_degree_squared = 64.0;
    ParBilinearForm spatial(&space);
-   spatial.AddDomainIntegrator(
-      new ConservativeConvectionIntegrator(drift, -1.0));
+   auto *volume_advection = new ConservativeConvectionIntegrator(drift, -1.0);
+   volume_advection->SetIntRule(&IntRules.Get(Geometry::CUBE, 6));
+   spatial.AddDomainIntegrator(volume_advection);
+   auto *face_advection = new DGTraceIntegrator(drift, -1.0, -0.5);
+   face_advection->SetIntRule(&IntRules.Get(Geometry::SQUARE, 14));
+   spatial.AddInteriorFaceIntegrator(face_advection);
+   // The matrix assembled here is the evolution operator K in M p_t = K p.
+   // MFEM's conservative convection form already represents -div(f p),
+   // whereas its diffusion integrators represent the positive weak stiffness;
+   // use -D to obtain +div(D grad(p)) in the strong evolution equation.
+   spatial.AddDomainIntegrator(new DiffusionIntegrator(negative_diffusion));
    spatial.AddInteriorFaceIntegrator(
-      new DGTraceIntegrator(drift, -1.0, -0.5));
-   spatial.AddDomainIntegrator(new DiffusionIntegrator(diffusion));
-   spatial.AddInteriorFaceIntegrator(
-      new DGDiffusionIntegrator(diffusion, sigma, kappa));
+      new DolfinxPenaltyDGDiffusionIntegrator(
+         negative_diffusion, sigma, penalty_times_degree_squared));
    spatial.Assemble();
    spatial.Finalize();
    HypreParMatrix *A = spatial.ParallelAssemble();
@@ -104,8 +160,8 @@ int main(int argc, char *argv[])
    initial.GetTrueDofs(initial_true);
 
    constexpr double dt = 0.00015625;
-   HypreParMatrix *cn_left = Add(1.0, *M, 0.5 * dt, *A);
-   HypreParMatrix *cn_right = Add(1.0, *M, -0.5 * dt, *A);
+   HypreParMatrix *cn_left = Add(1.0, *M, -0.5 * dt, *A);
+   HypreParMatrix *cn_right = Add(1.0, *M, 0.5 * dt, *A);
    Vector right_hand_side(cn_right->Height());
    cn_right->Mult(initial_true, right_hand_side);
    Vector next(initial_true);

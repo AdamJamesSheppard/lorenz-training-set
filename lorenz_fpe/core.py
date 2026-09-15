@@ -649,8 +649,9 @@ class FokkerPlanckSolver:
         # Conservative upwind advective flux on interior facets.
         beta_n = ufl.dot(ufl.avg(f), n("+"))
         u_up = ufl.conditional(ufl.ge(beta_n, 0.0), u("+"), u("-"))
-        adv = -ufl.dot(f * u, ufl.grad(v)) * ufl.dx
-        adv += beta_n * u_up * (v("+") - v("-")) * ufl.dS
+        adv_volume = -ufl.dot(f * u, ufl.grad(v)) * ufl.dx
+        adv_face = beta_n * u_up * (v("+") - v("-")) * ufl.dS
+        adv = adv_volume + adv_face
 
         # Symmetric interior penalty for the full constant diffusion tensor.
         Du = ufl.dot(D, ufl.grad(u))
@@ -665,6 +666,15 @@ class FokkerPlanckSolver:
 
         mass = u * v * ufl.dx
         spatial=adv+sipg
+        # Retain the method-defining bilinear forms for controlled
+        # cross-framework action comparisons.  The production step still
+        # assembles the combined theta-method matrix below.
+        self.mass_bilinear_form = fem.form(mass)
+        self.advection_volume_bilinear_form = fem.form(adv_volume)
+        self.advection_face_bilinear_form = fem.form(adv_face)
+        self.advection_bilinear_form = fem.form(adv)
+        self.diffusion_bilinear_form = fem.form(sipg)
+        self.spatial_bilinear_form = fem.form(spatial)
         old_spatial=ufl.replace(spatial,{u:self.p_old})
         self.a_form = fem.form(mass + self.theta*self.dt*spatial)
         self.L_form = fem.form(self.p_old*v*ufl.dx-(1.0-self.theta)*self.dt*old_spatial)

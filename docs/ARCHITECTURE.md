@@ -52,9 +52,12 @@ differences.
   maximum-over-time indicator aggregation, bounded graded-axis construction and
   automatic dispatch of the third mature-density level.
 - `mfem/`: isolated MFEM 4.8 cross-framework implementation probes. The first
-  gate assembles conforming hexahedral Q2 mass, conservative Lorenz upwind and
-  full-SPD SIPG operators and verifies the constant-test conservation identity.
-  Nonconforming AMR remains disabled until the full equivalence sequence passes.
+  corrected gate assembles conforming hexahedral Q2 mass, conservative Lorenz
+  upwind and full-SPD SIPG evolution operators, maps independent physical Q2
+  states into both bases, applies explicit CN and the same local mass-matrix QP,
+  and compares exact conservative `3x3x3` subcell averages. The small gate has
+  passed; production-mesh repetition and mature-trajectory agreement remain
+  required before nonconforming AMR is enabled.
 - `local_projection_study.py`: compares terminal unlimited Q2 states with the
   incumbent correction, a strictly cell-local QP, and Stage-1 average repair
   followed by the local QP.

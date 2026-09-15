@@ -122,6 +122,13 @@ NEXT_REQUIRED_GATE = MATURE_DENSITY_CONVERGENCE
   Runtime is `76.4` minutes, `10.1%` above uniform-60, despite using `29.0%`
   fewer DG unknowns; mature-density convergence and solver efficiency remain
   open.
+- The corrected MFEM physical-basis diagnostic passes on `4x5x5` for four
+  deterministic Q2 fields. Maximum conservative-export discrepancies are
+  `2.55e-16` for input representation, `4.95e-15` for the full operator,
+  `2.43e-15` for raw CN and `7.81e-12` for the QP-corrected step. The active-QP
+  field invokes all 100 cell optimizations without fallback. The earlier MFEM
+  production probe is superseded because its Cartesian constructor produced
+  the wrong x extent and its diffusion/CN signs did not match the incumbent.
 
 ## Active blockers
 
@@ -150,8 +157,9 @@ NEXT_REQUIRED_GATE = MATURE_DENSITY_CONVERGENCE
 The living plan is in `docs/RESEARCH_DIRECTIONS.md` and
 `experiments/method-selection-research.yaml`. Current high-value branches are:
 
-1. Establish uniform conforming-mesh equivalence for the MFEM Q2 DG operator,
-   Crank--Nicolson update and frozen local-QP correction before enabling AMR.
+1. Repeat the passed MFEM physical Q2/operator/raw-CN/local-QP gate on the
+   `30x36x36` production mesh, then run the frozen uniform mature equivalence
+   forecast only if every one-step tolerance remains satisfied.
 2. Use the completed eleven-snapshot replay only after mass, cell-average,
    density, moment and correction comparisons against DOLFINx pass.
 3. Run a fixed nonconforming octree mesh with `D_AMR,gf < 0.05`, mean correction

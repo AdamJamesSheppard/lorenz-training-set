@@ -66,8 +66,11 @@ failure or fallback. The candidate therefore advances to spatial refinement.
 The aggregate classification is
 `MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED`; no historical threshold
 was rewritten. This remains narrower than production certification. The next
-experiment freezes the surviving method and increases resolution only in the
-mature lobe bands to resolve full-density convergence before domain sensitivity.
+experiment freezes the surviving method and establishes its corrected MFEM
+physical-basis equivalence at production scale before using local hex AMR to
+resolve mature full-density convergence. The small conforming gate passes for
+state mapping, operator action, raw CN and an active local-QP corrected step;
+production-mesh repetition and a complete uniform mature forecast remain open.
 
 Role assignments are separate:
 
