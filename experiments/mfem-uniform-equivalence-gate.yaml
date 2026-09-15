@@ -21,5 +21,8 @@ amr_authorized: false
 operator_probe_gates:
   maximum_normalized_mass_functional_residual: 1.0e-13
   number_of_deterministic_actions: 5
+  explicit_crank_nicolson_dt: 0.00015625
+  maximum_cn_true_relative_residual: 1.0e-11
+  maximum_cn_absolute_mass_change: 1.0e-9
 amr_unlock_rule: All cross-framework mass, density, moment, operator and limiter-correction tolerances must pass before static NCMesh refinement is enabled.
 production_dataset_authorized: false
