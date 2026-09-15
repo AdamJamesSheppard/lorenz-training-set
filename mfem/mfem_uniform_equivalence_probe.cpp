@@ -109,8 +109,13 @@ int main(int argc, char *argv[])
    Vector right_hand_side(cn_right->Height());
    cn_right->Mult(initial_true, right_hand_side);
    Vector next(initial_true);
-   HypreBoomerAMG preconditioner(*cn_left);
+   HypreILU preconditioner;
+   preconditioner.SetType(0);
+   preconditioner.SetLevelOfFill(1);
+   preconditioner.SetMaxIter(1);
+   preconditioner.SetTol(0.0);
    preconditioner.SetPrintLevel(0);
+   preconditioner.SetOperator(*cn_left);
    HypreGMRES solver(*cn_left);
    solver.SetTol(1.0e-12);
    solver.SetAbsTol(1.0e-15);

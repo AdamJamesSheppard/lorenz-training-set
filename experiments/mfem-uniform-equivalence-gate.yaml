@@ -24,5 +24,7 @@ operator_probe_gates:
   explicit_crank_nicolson_dt: 0.00015625
   maximum_cn_true_relative_residual: 1.0e-11
   maximum_cn_absolute_mass_change: 1.0e-9
+  linear_solver: GMRES
+  preconditioner: distributed_Hypre_ILU1
 amr_unlock_rule: All cross-framework mass, density, moment, operator and limiter-correction tolerances must pass before static NCMesh refinement is enabled.
 production_dataset_authorized: false
