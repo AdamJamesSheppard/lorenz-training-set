@@ -55,7 +55,7 @@ def git_text(*args: str) -> str:
     ).stdout.strip()
 
 
-def main(config_path: Path) -> int:
+def main(config_path: Path, resume_run_dir: Path | None = None) -> int:
     source = config_path.resolve()
     config = yaml.safe_load(source.read_text())
     kind=config.get("kind")
@@ -76,11 +76,19 @@ def main(config_path: Path) -> int:
         raise SystemExit("experiment id must contain only letters, digits, '-' and '_'")
     created_at = datetime.now(timezone.utc)
     run_stamp = created_at.strftime("%Y%m%dT%H%M%SZ")
-    run_dir = ROOT / "runs" / run_id / run_stamp
-    if run_dir.exists():
-        raise SystemExit(f"run instance already exists: {run_dir}")
-    run_dir.mkdir(parents=True)
-    shutil.copy2(source, run_dir / "config.yaml")
+    if resume_run_dir is None:
+        run_dir = ROOT / "runs" / run_id / run_stamp
+        if run_dir.exists():
+            raise SystemExit(f"run instance already exists: {run_dir}")
+        run_dir.mkdir(parents=True)
+        shutil.copy2(source, run_dir / "config.yaml")
+    else:
+        run_dir=resume_run_dir.resolve()
+        if not run_dir.is_dir():
+            raise SystemExit(f"resume run directory does not exist: {run_dir}")
+        frozen_config=run_dir/"config.yaml"
+        if not frozen_config.is_file() or frozen_config.read_bytes()!=source.read_bytes():
+            raise SystemExit("resume configuration does not match the run's frozen config")
 
     ranks = int(config.get("execution", {}).get("mpi_ranks", 1))
     numerical_threads = int(config.get("execution", {}).get("numerical_threads", 0))
@@ -317,18 +325,20 @@ def main(config_path: Path) -> int:
         "commands": [command for _,command,_ in commands],
         "numerical_threads_per_rank": numerical_threads or None,
     }
-    (run_dir / "provenance.json").write_text(json.dumps(provenance, indent=2) + "\n")
+    if resume_run_dir is None:
+        (run_dir / "provenance.json").write_text(json.dumps(provenance, indent=2) + "\n")
 
     returncode=0
-    for label,command,cwd in commands:
-        with (run_dir/f"{label}.log").open("w") as output:
-            completed=subprocess.run(
-                command, cwd=cwd, text=True, stdout=output,
-                stderr=subprocess.STDOUT, env=child_environment,
-            )
-        if completed.returncode:
-            returncode=completed.returncode
-            break
+    if resume_run_dir is None:
+        for label,command,cwd in commands:
+            with (run_dir/f"{label}.log").open("w") as output:
+                completed=subprocess.run(
+                    command, cwd=cwd, text=True, stdout=output,
+                    stderr=subprocess.STDOUT, env=child_environment,
+                )
+            if completed.returncode:
+                returncode=completed.returncode
+                break
     if returncode == 0 and kind in {
         "same_mesh_q2_study", "spatial_q2_study", "full_spd_q2_study",
         "mature_full_spd_q2_study", "mature_afc_q2_study", "mature_graded_q2_study",
@@ -404,6 +414,7 @@ def main(config_path: Path) -> int:
             )
         decision_specification = config.get("scientific_decision")
         if decision_specification is not None:
+            reference_particles=np.load(particles)
             branch_results = []
             for branch in study["branches"]:
                 branch_name = str(branch["name"])
@@ -536,10 +547,10 @@ def main(config_path: Path) -> int:
                     )
                     metric_shape=tuple(study.get("density_metric_grid",[20,24,24]))
                     matched_candidate_marginals=matched_marginal_tvs(
-                        candidate_density,particles,bounds,metric_shape
+                        candidate_density,reference_particles,bounds,metric_shape
                     )
                     matched_comparator_marginals=matched_marginal_tvs(
-                        comparator_density,particles,bounds,metric_shape
+                        comparator_density,reference_particles,bounds,metric_shape
                     )
                     domain_volume=float(np.prod([hi-lo for lo,hi in bounds]))
                     density_l1=float(
@@ -632,10 +643,10 @@ def main(config_path: Path) -> int:
                     )
                     metric_shape=tuple(study.get("density_metric_grid",[20,24,24]))
                     matched_candidate_marginals=matched_marginal_tvs(
-                        candidate_density,particles,bounds,metric_shape
+                        candidate_density,reference_particles,bounds,metric_shape
                     )
                     matched_secondary_marginals=matched_marginal_tvs(
-                        secondary_density,particles,bounds,metric_shape
+                        secondary_density,reference_particles,bounds,metric_shape
                     )
                     volume=float(np.prod([hi-lo for lo,hi in bounds]))
                     secondary_density_l1=float(
@@ -899,7 +910,9 @@ def main(config_path: Path) -> int:
                 json.dumps(scientific_decision, indent=2) + "\n"
             )
     (run_dir / "status.json").write_text(
-        json.dumps({"returncode":returncode,"passed":returncode==0},indent=2)
+        json.dumps({"returncode":returncode,"passed":returncode==0,
+                    "postprocess_resumed":resume_run_dir is not None,
+                    "postprocess_git_commit":git_text("rev-parse","HEAD")},indent=2)
         + "\n"
     )
     print(run_dir)
@@ -907,6 +920,8 @@ def main(config_path: Path) -> int:
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        raise SystemExit("usage: run_experiment.py experiments/<name>.yaml")
-    raise SystemExit(main(Path(sys.argv[1])))
+    cli=__import__("argparse").ArgumentParser()
+    cli.add_argument("config",type=Path)
+    cli.add_argument("--resume-run-dir",type=Path)
+    arguments=cli.parse_args()
+    raise SystemExit(main(arguments.config,arguments.resume_run_dir))
