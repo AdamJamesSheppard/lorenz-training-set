@@ -82,17 +82,36 @@ int main(int argc, char *argv[])
    constant.ProjectCoefficient(one);
    Vector constant_true;
    constant.GetTrueDofs(constant_true);
-   Vector trial(A->Width());
-   for (int i = 0; i < trial.Size(); ++i)
+   double maximum_absolute_conservation = 0.0;
+   double maximum_normalized_conservation = 0.0;
+   constexpr int number_of_trials = 5;
+   for (int trial_index = 0; trial_index < number_of_trials; ++trial_index)
    {
-      trial[i] = std::sin(0.17 * (i + 1 + 31 * rank));
+      Vector trial(A->Width());
+      for (int i = 0; i < trial.Size(); ++i)
+      {
+         const double phase = i + 1 + 31 * rank;
+         trial[i] = std::sin((0.11 + 0.03 * trial_index) * phase)
+                    + 0.25 * std::cos((0.07 + 0.01 * trial_index) * phase);
+      }
+      Vector residual(A->Height());
+      A->Mult(trial, residual);
+      const double local_values[3] = {
+         constant_true * residual,
+         constant_true * constant_true,
+         residual * residual
+      };
+      double global_values[3] = {0.0, 0.0, 0.0};
+      MPI_Allreduce(local_values, global_values, 3, MPI_DOUBLE, MPI_SUM,
+                    MPI_COMM_WORLD);
+      const double absolute = std::abs(global_values[0]);
+      const double scale = std::sqrt(global_values[1] * global_values[2]);
+      const double normalized = scale > 0.0 ? absolute / scale : absolute;
+      maximum_absolute_conservation =
+         std::max(maximum_absolute_conservation, absolute);
+      maximum_normalized_conservation =
+         std::max(maximum_normalized_conservation, normalized);
    }
-   Vector residual(A->Height());
-   A->Mult(trial, residual);
-   const double local_conservation = constant_true * residual;
-   double conservation = 0.0;
-   MPI_Allreduce(&local_conservation, &conservation, 1, MPI_DOUBLE, MPI_SUM,
-                 MPI_COMM_WORLD);
 
    if (rank == 0)
    {
@@ -102,7 +121,11 @@ int main(int argc, char *argv[])
                 << "global_q2_dofs=" << space.GlobalTrueVSize() << "\n"
                 << "mass_rows=" << M->GetGlobalNumRows() << "\n"
                 << "spatial_rows=" << A->GetGlobalNumRows() << "\n"
-                << "constant_test_conservation_residual=" << conservation << "\n"
+                << "number_of_operator_action_trials=" << number_of_trials << "\n"
+                << "maximum_absolute_mass_functional_residual="
+                << maximum_absolute_conservation << "\n"
+                << "maximum_normalized_mass_functional_residual="
+                << maximum_normalized_conservation << "\n"
                 << "full_spd_tensor=true\n"
                 << "interior_upwind_faces=true\n"
                 << "interior_sipg_faces=true\n"
@@ -111,5 +134,5 @@ int main(int argc, char *argv[])
 
    delete A;
    delete M;
-   return std::abs(conservation) <= 1.0e-9 ? 0 : 2;
+   return maximum_normalized_conservation <= 1.0e-13 ? 0 : 2;
 }

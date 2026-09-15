@@ -12,11 +12,14 @@ frozen_mathematics:
   future_dt: 0.00015625
 stages:
   - assemble MFEM mass and spatial operators on a conforming uniform hex mesh
-  - verify the constant-test conservation residual
+  - verify absolute and normalized mass-functional residuals on five deterministic Q2 states
   - compare element and face matrices against DOLFINx on identical small meshes
   - compare one-step unlimited Crank-Nicolson states
   - port and compare the frozen Stage-1 plus local-QP correction
   - run the mature uniform-mesh equivalence experiment
 amr_authorized: false
+operator_probe_gates:
+  maximum_normalized_mass_functional_residual: 1.0e-13
+  number_of_deterministic_actions: 5
 amr_unlock_rule: All cross-framework mass, density, moment, operator and limiter-correction tolerances must pass before static NCMesh refinement is enabled.
 production_dataset_authorized: false
