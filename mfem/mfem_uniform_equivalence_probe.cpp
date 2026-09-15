@@ -117,8 +117,11 @@ int main(int argc, char *argv[])
    preconditioner.SetPrintLevel(0);
    preconditioner.SetOperator(*cn_left);
    HypreGMRES solver(*cn_left);
-   solver.SetTol(1.0e-12);
-   solver.SetAbsTol(1.0e-15);
+   // Hypre's reported convergence norm is not the independently recomputed
+   // Euclidean residual used by the cross-framework gate.  Tighten the
+   // internal request while retaining the frozen 1e-11 physical gate.
+   solver.SetTol(1.0e-14);
+   solver.SetAbsTol(1.0e-17);
    solver.SetMaxIter(1000);
    solver.SetKDim(100);
    solver.SetPrintLevel(0);

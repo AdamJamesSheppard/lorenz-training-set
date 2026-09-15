@@ -26,5 +26,8 @@ operator_probe_gates:
   maximum_cn_absolute_mass_change: 1.0e-9
   linear_solver: GMRES
   preconditioner: distributed_Hypre_ILU1
+  mfem_internal_relative_tolerance: 1.0e-14
+  mfem_internal_absolute_tolerance: 1.0e-17
+  tolerance_interpretation: Internal Hypre tolerances are tightened to enforce the unchanged independently recomputed 1e-11 physical residual gate.
 amr_unlock_rule: All cross-framework mass, density, moment, operator and limiter-correction tolerances must pass before static NCMesh refinement is enabled.
 production_dataset_authorized: false
