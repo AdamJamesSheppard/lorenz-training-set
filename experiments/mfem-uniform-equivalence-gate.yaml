@@ -1,0 +1,22 @@
+id: mfem-uniform-equivalence-gate
+kind: cross_framework_operator_equivalence
+status: implementation_gate
+purpose: Establish the MFEM Q2 DG operator and conservation conventions before porting local-QP propagation or enabling nonconforming AMR.
+frozen_mathematics:
+  polynomial_space: discontinuous_Q2_hexahedron
+  drift: conservative_Lorenz63_upwind
+  diffusion: full_SPD_SIPG
+  diffusion_tensor: [[1.0, 0.4, 0.2], [0.4, 1.0, 0.3], [0.2, 0.3, 1.0]]
+  boundary: zero_total_numerical_flux
+  future_timestepper: Crank_Nicolson
+  future_dt: 0.00015625
+stages:
+  - assemble MFEM mass and spatial operators on a conforming uniform hex mesh
+  - verify the constant-test conservation residual
+  - compare element and face matrices against DOLFINx on identical small meshes
+  - compare one-step unlimited Crank-Nicolson states
+  - port and compare the frozen Stage-1 plus local-QP correction
+  - run the mature uniform-mesh equivalence experiment
+amr_authorized: false
+amr_unlock_rule: All cross-framework mass, density, moment, operator and limiter-correction tolerances must pass before static NCMesh refinement is enabled.
+production_dataset_authorized: false

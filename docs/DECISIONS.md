@@ -4,6 +4,25 @@ Decisions here are dated and revisable. Add a new entry that marks an older
 decision `superseded`, `narrowed`, or `confirmed` rather than rewriting history
 to make the current direction look inevitable.
 
+## 2026-09-15 - Replace tensor grading with a gated MFEM AMR branch
+
+**Decision.** Reject another tensor-product graded level. Keep DOLFINx as the
+frozen reference and port the identical Q2 DG, Crank--Nicolson, full-SPD and
+local-QP mathematics to MFEM. Require uniform conforming-mesh equivalence before
+using `NCMesh`; initially use a fixed isotropically refined mesh driven by the
+completed time-aggregated replay.
+
+**Evidence.** The replay is deterministic to common-grid `L1=3.61e-11` against
+the completed fine run. Dörfler `theta=0.5` selects only 71 cells, but their
+coordinate-product bands require 699,600 cells even at 75% axis-energy coverage,
+above the frozen 311,040-cell ceiling. This is a topology/representation failure,
+not a failure of the indicator or Q2 trajectory.
+
+**Consequence.** The MFEM gate proceeds in stages: operator conservation,
+element/face matrix agreement, one-step CN agreement, local-QP agreement, then
+the mature uniform-mesh comparison. AMR remains unauthorized until all stages
+pass. Dataset generation remains unauthorized.
+
 ## 2026-09-15 - Use full-trajectory indicators for the third graded level
 
 **Decision.** Keep `MATURE_DENSITY_CONVERGENCE = OPEN` and freeze every method

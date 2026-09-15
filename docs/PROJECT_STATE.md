@@ -150,14 +150,13 @@ NEXT_REQUIRED_GATE = MATURE_DENSITY_CONVERGENCE
 The living plan is in `docs/RESEARCH_DIRECTIONS.md` and
 `experiments/method-selection-research.yaml`. Current high-value branches are:
 
-1. Execute `experiments/mature-time-aggregated-level3-pipeline.yaml`: replay the
-   fine trajectory at eleven fixed snapshots, aggregate correction, witnessed
-   negativity, high-mode and jump indicators, and generate a third graded mesh.
-2. Require `D_gf,gff < 0.0543401`, mean correction below `8e-4`, all existing
-   positivity/statistical gates, and no more cells than uniform-60. Treat any
-   inferred rate as heuristic because the meshes are nonuniform.
-3. If the third level supplies a convincing contraction sequence, proceed to
-   aligned-box domain sensitivity. Otherwise retain density convergence as open.
+1. Establish uniform conforming-mesh equivalence for the MFEM Q2 DG operator,
+   Crank--Nicolson update and frozen local-QP correction before enabling AMR.
+2. Use the completed eleven-snapshot replay only after mass, cell-average,
+   density, moment and correction comparisons against DOLFINx pass.
+3. Run a fixed nonconforming octree mesh with `D_AMR,gf < 0.05`, mean correction
+   below `8e-4`, all existing statistical/invariant gates and a material resource
+   advantage over equivalent uniform resolution.
 5. Do not spend another hierarchy on deeper Bernstein certification; witnessed
    polynomial negativity, rather than unresolved bounds, dominates every saved
    mature snapshot.

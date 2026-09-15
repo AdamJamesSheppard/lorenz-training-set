@@ -51,6 +51,10 @@ differences.
 - `mature_time_aggregated_pipeline.py`: deterministic fine-trajectory replay,
   maximum-over-time indicator aggregation, bounded graded-axis construction and
   automatic dispatch of the third mature-density level.
+- `mfem/`: isolated MFEM 4.8 cross-framework implementation probes. The first
+  gate assembles conforming hexahedral Q2 mass, conservative Lorenz upwind and
+  full-SPD SIPG operators and verifies the constant-test conservation identity.
+  Nonconforming AMR remains disabled until the full equivalence sequence passes.
 - `local_projection_study.py`: compares terminal unlimited Q2 states with the
   incumbent correction, a strictly cell-local QP, and Stage-1 average repair
   followed by the local QP.
