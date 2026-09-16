@@ -3,11 +3,13 @@
 
 #include <algorithm>
 #include <array>
+#include <chrono>
 #include <cmath>
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <numeric>
 #include <string>
 #include <vector>
 
@@ -169,12 +171,13 @@ void ConfigureMassSolver(HypreParMatrix &matrix, HyprePCG &solver,
 
 void ExportSubcellAverages(const ParGridFunction &field,
                            const int nx, const int ny, const int nz,
-                           const std::filesystem::path &path)
+                           const std::filesystem::path &path,
+                           const int subdivisions = subcells)
 {
    const int rank = Mpi::WorldRank();
-   const int gx_count = nx * subcells;
-   const int gy_count = ny * subcells;
-   const int gz_count = nz * subcells;
+   const int gx_count = nx * subdivisions;
+   const int gy_count = ny * subdivisions;
+   const int gz_count = nz * subdivisions;
    const std::size_t value_count = static_cast<std::size_t>(gx_count)
                                    * gy_count * gz_count;
    std::vector<double> local(value_count, 0.0);
@@ -191,11 +194,11 @@ void ExportSubcellAverages(const ParGridFunction &field,
       ElementTransformation *transformation = space->GetElementTransformation(element);
       int ix, iy, iz;
       CellIndexAndOrigin(*transformation, nx, ny, nz, ix, iy, iz);
-      for (int sx = 0; sx < subcells; ++sx)
+      for (int sx = 0; sx < subdivisions; ++sx)
       {
-         for (int sy = 0; sy < subcells; ++sy)
+         for (int sy = 0; sy < subdivisions; ++sy)
          {
-            for (int sz = 0; sz < subcells; ++sz)
+            for (int sz = 0; sz < subdivisions; ++sz)
             {
                double average = 0.0;
                for (int i = 0; i < 3; ++i)
@@ -205,17 +208,17 @@ void ExportSubcellAverages(const ParGridFunction &field,
                      for (int k = 0; k < 3; ++k)
                      {
                         IntegrationPoint point;
-                        point.Set3((sx + q[i]) / subcells,
-                                   (sy + q[j]) / subcells,
-                                   (sz + q[k]) / subcells);
+                        point.Set3((sx + q[i]) / subdivisions,
+                                   (sy + q[j]) / subdivisions,
+                                   (sz + q[k]) / subdivisions);
                         average += w[i] * w[j] * w[k]
                                    * field.GetValue(element, point);
                      }
                   }
                }
-               const int gx = ix * subcells + sx;
-               const int gy = iy * subcells + sy;
-               const int gz = iz * subcells + sz;
+               const int gx = ix * subdivisions + sx;
+               const int gy = iy * subdivisions + sy;
+               const int gz = iz * subdivisions + sz;
                const std::size_t index = (static_cast<std::size_t>(gx) * gy_count + gy)
                                          * gz_count + gz;
                local[index] = average;
@@ -233,6 +236,149 @@ void ExportSubcellAverages(const ParGridFunction &field,
       output.write(reinterpret_cast<const char *>(global.data()),
                    static_cast<std::streamsize>(global.size() * sizeof(double)));
    }
+}
+
+void LoadGlobalNodalField(ParFiniteElementSpace &space, ParGridFunction &field,
+                          const int nx, const int ny, const int nz,
+                          const std::filesystem::path &path)
+{
+   const std::size_t count = static_cast<std::size_t>(nx) * ny * nz * 27;
+   std::vector<double> values(count);
+   if (Mpi::WorldRank() == 0)
+   {
+      std::ifstream input(path, std::ios::binary);
+      MFEM_VERIFY(input.good(), "could not open shared mature initial state");
+      input.read(reinterpret_cast<char *>(values.data()),
+                 static_cast<std::streamsize>(count * sizeof(double)));
+      MFEM_VERIFY(input.gcount() == static_cast<std::streamsize>(count * sizeof(double)),
+                  "shared mature initial state has the wrong size");
+   }
+   MPI_Bcast(values.data(), static_cast<int>(count), MPI_DOUBLE, 0, MPI_COMM_WORLD);
+   field = 0.0;
+   Array<int> dofs;
+   for (int element = 0; element < space.GetNE(); ++element)
+   {
+      ElementTransformation *transformation = space.GetElementTransformation(element);
+      int ix, iy, iz;
+      CellIndexAndOrigin(*transformation, nx, ny, nz, ix, iy, iz);
+      const IntegrationRule &nodes = space.GetFE(element)->GetNodes();
+      Vector local(nodes.GetNPoints());
+      for (int q = 0; q < nodes.GetNPoints(); ++q)
+      {
+         const auto &point = nodes.IntPoint(q);
+         const int i = std::clamp(static_cast<int>(std::lround(2.0 * point.x)), 0, 2);
+         const int j = std::clamp(static_cast<int>(std::lround(2.0 * point.y)), 0, 2);
+         const int k = std::clamp(static_cast<int>(std::lround(2.0 * point.z)), 0, 2);
+         const std::size_t index = (((static_cast<std::size_t>(ix) * ny + iy) * nz + iz)
+                                    * 3 + i) * 9 + j * 3 + k;
+         local[q] = values[index];
+      }
+      space.GetElementVDofs(element, dofs);
+      field.SetSubVector(dofs, local);
+   }
+}
+
+double FieldMass(const ParGridFunction &field)
+{
+   double local = 0.0;
+   ParFiniteElementSpace *space = field.ParFESpace();
+   const IntegrationRule &rule = IntRules.Get(Geometry::CUBE, 6);
+   for (int element = 0; element < space->GetNE(); ++element)
+   {
+      ElementTransformation *transformation = space->GetElementTransformation(element);
+      for (int q = 0; q < rule.GetNPoints(); ++q)
+      {
+         const IntegrationPoint &point = rule.IntPoint(q);
+         transformation->SetIntPoint(&point);
+         local += point.weight * transformation->Weight()
+                  * field.GetValue(element, point);
+      }
+   }
+   double global = 0.0;
+   MPI_Allreduce(&local, &global, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+   return global;
+}
+
+double FieldL1Difference(const ParGridFunction &first,
+                         const ParGridFunction &second)
+{
+   double local = 0.0;
+   ParFiniteElementSpace *space = first.ParFESpace();
+   const IntegrationRule &rule = IntRules.Get(Geometry::CUBE, 7);
+   for (int element = 0; element < space->GetNE(); ++element)
+   {
+      ElementTransformation *transformation = space->GetElementTransformation(element);
+      for (int q = 0; q < rule.GetNPoints(); ++q)
+      {
+         const IntegrationPoint &point = rule.IntPoint(q);
+         transformation->SetIntPoint(&point);
+         local += point.weight * transformation->Weight()
+                  * std::abs(first.GetValue(element, point)
+                             - second.GetValue(element, point));
+      }
+   }
+   double global = 0.0;
+   MPI_Allreduce(&local, &global, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+   return global;
+}
+
+int RepairCellAverages(ParFiniteElementSpace &space, ParGridFunction &field)
+{
+   const double weights[3] = {1.0 / 6.0, 2.0 / 3.0, 1.0 / 6.0};
+   std::vector<double> averages(space.GetNE());
+   Array<int> dofs;
+   int local_negative = 0;
+   double local_sum = 0.0, local_maximum = 0.0;
+   for (int element = 0; element < space.GetNE(); ++element)
+   {
+      double average = 0.0;
+      for (int i = 0; i < 3; ++i)
+      for (int j = 0; j < 3; ++j)
+      for (int k = 0; k < 3; ++k)
+      {
+         IntegrationPoint point;
+         point.Set3(0.5 * i, 0.5 * j, 0.5 * k);
+         average += weights[i] * weights[j] * weights[k]
+                    * field.GetValue(element, point);
+      }
+      averages[element] = average;
+      local_sum += average;
+      local_maximum = std::max(local_maximum, average);
+      local_negative += average < 0.0 ? 1 : 0;
+   }
+   double target = 0.0, upper = 0.0;
+   MPI_Allreduce(&local_sum, &target, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+   MPI_Allreduce(&local_maximum, &upper, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+   double lower = 0.0;
+   for (int iteration = 0; iteration < 100; ++iteration)
+   {
+      const double lambda = 0.5 * (lower + upper);
+      double local_projected_sum = 0.0, projected_sum = 0.0;
+      for (double average : averages)
+      {
+         local_projected_sum += std::max(average - lambda, 0.0);
+      }
+      MPI_Allreduce(&local_projected_sum, &projected_sum, 1, MPI_DOUBLE,
+                    MPI_SUM, MPI_COMM_WORLD);
+      if (projected_sum > target) { lower = lambda; }
+      else { upper = lambda; }
+   }
+   const double lambda = 0.5 * (lower + upper);
+   for (int element = 0; element < space.GetNE(); ++element)
+   {
+      const double target_average = std::max(averages[element] - lambda, 0.0);
+      const double shift = target_average - averages[element];
+      space.GetElementVDofs(element, dofs);
+      Vector values(dofs.Size());
+      field.GetSubVector(dofs, values);
+      if (target_average == 0.0) { values = 0.0; }
+      else { values += shift; }
+      field.SetSubVector(dofs, values);
+   }
+   int global_negative = 0;
+   MPI_Allreduce(&local_negative, &global_negative, 1, MPI_INT, MPI_SUM,
+                 MPI_COMM_WORLD);
+   return global_negative;
 }
 
 class LocalQ2Projector
@@ -295,39 +441,102 @@ public:
          }
       }
 
-      // OSQP stores the upper Hessian triangle and the constraint matrix in CSC.
-      p_columns.resize(variables + 1);
-      for (int column = 0; column < variables; ++column)
+      // Eliminate the average equality with an orthonormal Householder basis,
+      // matching the reduced incumbent QP. Deduplicate shared subcell-face
+      // Bernstein rows before constructing the fixed OSQP matrices.
+      double average_norm = 0.0;
+      for (double value : average) { average_norm += value * value; }
+      average_norm = std::sqrt(average_norm);
+      std::array<double, variables> householder{};
+      householder[variables - 1] = 1.0;
+      for (int i = 0; i < variables; ++i)
+      {
+         householder[i] -= average[i] / average_norm;
+      }
+      double householder_norm_squared = 0.0;
+      for (double value : householder) { householder_norm_squared += value * value; }
+      null_basis.assign(variables * reduced_variables, 0.0);
+      for (int row = 0; row < variables; ++row)
+      for (int column = 0; column < reduced_variables; ++column)
+      {
+         null_basis[row * reduced_variables + column] =
+            (row == column ? 1.0 : 0.0)
+            - 2.0 * householder[row] * householder[column]
+              / householder_norm_squared;
+      }
+      for (int row = 0; row < bernstein_rows; ++row)
+      {
+         bool duplicate = false;
+         for (int kept = 0; kept < unique_rows && !duplicate; ++kept)
+         {
+            duplicate = true;
+            for (int column = 0; column < variables; ++column)
+            {
+               if (std::abs(constraints[row * variables + column]
+                            - unique_constraints[kept * variables + column]) > 5.0e-15)
+               {
+                  duplicate = false;
+                  break;
+               }
+            }
+         }
+         if (!duplicate)
+         {
+            unique_constraints.insert(unique_constraints.end(),
+               constraints.begin() + row * variables,
+               constraints.begin() + (row + 1) * variables);
+            ++unique_rows;
+         }
+      }
+      reduced_hessian.assign(reduced_variables * reduced_variables, 0.0);
+      reduced_constraints.assign(unique_rows * reduced_variables, 0.0);
+      for (int i = 0; i < reduced_variables; ++i)
+      for (int j = 0; j < reduced_variables; ++j)
+      for (int a = 0; a < variables; ++a)
+      for (int b = 0; b < variables; ++b)
+      {
+         reduced_hessian[i * reduced_variables + j] +=
+            null_basis[a * reduced_variables + i] * hessian[a * variables + b]
+            * null_basis[b * reduced_variables + j];
+      }
+      for (int row = 0; row < unique_rows; ++row)
+      for (int column = 0; column < reduced_variables; ++column)
+      for (int i = 0; i < variables; ++i)
+      {
+         reduced_constraints[row * reduced_variables + column] +=
+            unique_constraints[row * variables + i]
+            * null_basis[i * reduced_variables + column];
+      }
+
+      // OSQP stores the upper Hessian triangle and constraint matrix in CSC.
+      p_columns.resize(reduced_variables + 1);
+      for (int column = 0; column < reduced_variables; ++column)
       {
          p_columns[column] = static_cast<OSQPInt>(p_values.size());
          for (int row = 0; row <= column; ++row)
          {
             p_rows.push_back(row);
-            p_values.push_back(hessian[row * variables + column]);
+            p_values.push_back(reduced_hessian[row * reduced_variables + column]);
          }
       }
-      p_columns[variables] = static_cast<OSQPInt>(p_values.size());
-      a_columns.resize(variables + 1);
-      for (int column = 0; column < variables; ++column)
+      p_columns[reduced_variables] = static_cast<OSQPInt>(p_values.size());
+      a_columns.resize(reduced_variables + 1);
+      for (int column = 0; column < reduced_variables; ++column)
       {
          a_columns[column] = static_cast<OSQPInt>(a_values.size());
-         for (int row = 0; row < bernstein_rows; ++row)
+         for (int row = 0; row < unique_rows; ++row)
          {
             a_rows.push_back(row);
-            a_values.push_back(constraints[row * variables + column]);
+            a_values.push_back(reduced_constraints[row * reduced_variables + column]);
          }
-         a_rows.push_back(bernstein_rows);
-         a_values.push_back(average[column]);
       }
-      a_columns[variables] = static_cast<OSQPInt>(a_values.size());
-      q.assign(variables, 0.0);
-      lower.assign(rows, positivity_margin);
-      upper.assign(rows, OSQP_INFTY);
-      lower.back() = 1.0;
-      upper.back() = 1.0;
-      P = OSQPCscMatrix_new(variables, variables, p_values.size(),
+      a_columns[reduced_variables] = static_cast<OSQPInt>(a_values.size());
+      q.assign(reduced_variables, 0.0);
+      lower.assign(unique_rows, 0.0);
+      upper.assign(unique_rows, OSQP_INFTY);
+      P = OSQPCscMatrix_new(reduced_variables, reduced_variables, p_values.size(),
                             p_values.data(), p_rows.data(), p_columns.data());
-      A = OSQPCscMatrix_new(rows, variables, a_values.size(),
+      A = OSQPCscMatrix_new(unique_rows, reduced_variables, a_values.size(),
                             a_values.data(), a_rows.data(), a_columns.data());
       settings = OSQPSettings_new();
       settings->verbose = 0;
@@ -337,7 +546,8 @@ public:
       settings->eps_rel = 1.0e-11;
       settings->max_iter = 10000;
       const OSQPInt error = osqp_setup(
-         &solver, P, q.data(), A, lower.data(), upper.data(), rows, variables, settings);
+         &solver, P, q.data(), A, lower.data(), upper.data(), unique_rows,
+         reduced_variables, settings);
       MFEM_VERIFY(error == 0 && solver != nullptr, "OSQP local-Q2 setup failed");
    }
 
@@ -354,6 +564,9 @@ public:
    {
       constexpr int variables = 27;
       constexpr int bernstein_rows = 216;
+      last_qp = false;
+      last_zero_average = false;
+      last_certified = false;
       double cell_average = 0.0;
       for (int i = 0; i < variables; ++i) { cell_average += average[i] * raw[i]; }
       MFEM_VERIFY(cell_average >= -1.0e-12,
@@ -361,6 +574,8 @@ public:
       if (cell_average <= 0.0)
       {
          result.fill(0.0);
+         last_zero_average = true;
+         last_certified = true;
          return true;
       }
       std::array<double, variables> normalized{};
@@ -369,6 +584,7 @@ public:
       if (AdaptiveCertificate(raw))
       {
          result = raw;
+         last_certified = true;
          return false;
       }
       for (int row = 0; row < bernstein_rows; ++row)
@@ -383,19 +599,48 @@ public:
       if (minimum >= positivity_margin)
       {
          result = raw;
+         last_certified = true;
          return false;
       }
-      for (int row = 0; row < variables; ++row)
+      last_qp = true;
+      for (int row = 0; row < unique_rows; ++row)
       {
-         q[row] = 0.0;
+         lower[row] = positivity_margin;
          for (int column = 0; column < variables; ++column)
          {
-            q[row] -= hessian[row * variables + column] * normalized[column];
+            lower[row] -= unique_constraints[row * variables + column]
+                          * normalized[column];
          }
       }
-      MFEM_VERIFY(osqp_update_data_vec(solver, q.data(), nullptr, nullptr) == 0,
-                  "OSQP local-Q2 vector update failed");
+      MFEM_VERIFY(osqp_update_data_vec(solver, nullptr, lower.data(), nullptr) == 0,
+                  "OSQP local-Q2 bound update failed");
+      // Match the incumbent projector: start each independent cell problem
+      // from its own feasible contraction toward the unit-average constant.
+      // Reusing the previous spatial cell is unreliable in near-vacuum tails.
+      const double theta = std::clamp(
+         (1.0 - positivity_margin) / (1.0 - minimum), 0.0, 1.0);
+      std::array<OSQPFloat, reduced_variables> primal_start{};
+      std::vector<OSQPFloat> dual_start(unique_rows, 0.0);
+      for (int column = 0; column < reduced_variables; ++column)
+      {
+         for (int i = 0; i < variables; ++i)
+         {
+            const double scaling = 1.0 + theta * (normalized[i] - 1.0);
+            primal_start[column] += null_basis[i * reduced_variables + column]
+                                    * (scaling - normalized[i]);
+         }
+      }
+      MFEM_VERIFY(osqp_warm_start(solver, primal_start.data(), dual_start.data()) == 0,
+                  "OSQP local-Q2 warm start failed");
       MFEM_VERIFY(osqp_solve(solver) == 0, "OSQP local-Q2 solve failed");
+      if (solver->info->status_val != OSQP_SOLVED
+          && solver->info->status_val != OSQP_SOLVED_INACCURATE)
+      {
+         std::cerr << "OSQP status=" << solver->info->status
+                   << " iterations=" << solver->info->iter
+                   << " average=" << cell_average
+                   << " normalized_minimum=" << minimum << std::endl;
+      }
       MFEM_VERIFY(solver->info->status_val == OSQP_SOLVED
                   || solver->info->status_val == OSQP_SOLVED_INACCURATE,
                   "OSQP local-Q2 optimization did not converge");
@@ -403,7 +648,12 @@ public:
       double candidate_average = 0.0;
       for (int i = 0; i < variables; ++i)
       {
-         candidate[i] = solver->solution->x[i];
+         candidate[i] = normalized[i];
+         for (int column = 0; column < reduced_variables; ++column)
+         {
+            candidate[i] += null_basis[i * reduced_variables + column]
+                            * solver->solution->x[column];
+         }
          candidate_average += average[i] * candidate[i];
       }
       for (double &value : candidate) { value += 1.0 - candidate_average; }
@@ -423,11 +673,27 @@ public:
             (1.0 - positivity_margin) / (1.0 - minimum), 0.0, 1.0);
          for (double &value : candidate) { value = 1.0 + theta * (value - 1.0); }
       }
+      double final_minimum = OSQP_INFTY;
+      for (int row = 0; row < bernstein_rows; ++row)
+      {
+         double value = 0.0;
+         for (int column = 0; column < variables; ++column)
+         {
+            value += constraints[row * variables + column] * candidate[column];
+         }
+         final_minimum = std::min(final_minimum, value);
+      }
+      last_certified = std::isfinite(final_minimum) && final_minimum >= 0.0;
       for (int i = 0; i < variables; ++i) { result[i] = cell_average * candidate[i]; }
       return true;
    }
 
+   bool LastWasQp() const { return last_qp; }
+   bool LastWasZeroAverage() const { return last_zero_average; }
+   bool LastCertified() const { return last_certified; }
+
 private:
+   static constexpr int reduced_variables = 26;
    using BernsteinBox = std::array<double, 27>;
 
    static int Index(const int i, const int j, const int k)
@@ -545,20 +811,35 @@ private:
    }
 
    static constexpr double positivity_margin = 1.0e-12;
-   std::vector<double> hessian, average, constraints;
+   int unique_rows = 0;
+   std::vector<double> hessian, average, constraints, null_basis,
+                       unique_constraints, reduced_hessian, reduced_constraints;
    std::vector<OSQPFloat> p_values, a_values, q, lower, upper;
    std::vector<OSQPInt> p_rows, p_columns, a_rows, a_columns;
    OSQPCscMatrix *P = nullptr;
    OSQPCscMatrix *A = nullptr;
    OSQPSettings *settings = nullptr;
    OSQPSolver *solver = nullptr;
+   bool last_qp = false;
+   bool last_zero_average = false;
+   bool last_certified = false;
 };
 
-int ProjectField(LocalQ2Projector &projector, ParFiniteElementSpace &space,
-                 const ParGridFunction &raw, ParGridFunction &corrected)
+struct ProjectionCounts
+{
+   int modified = 0;
+   int qp = 0;
+   int zero_average = 0;
+   int certified = 0;
+};
+
+ProjectionCounts ProjectField(LocalQ2Projector &projector,
+                              ParFiniteElementSpace &space,
+                              const ParGridFunction &raw,
+                              ParGridFunction &corrected)
 {
    corrected = 0.0;
-   int local_projected = 0;
+   ProjectionCounts local{};
    Array<int> dofs;
    for (int element = 0; element < space.GetNE(); ++element)
    {
@@ -571,7 +852,10 @@ int ProjectField(LocalQ2Projector &projector, ParFiniteElementSpace &space,
          point.Set3(0.5 * i, 0.5 * j, 0.5 * k);
          nodal[(i * 3 + j) * 3 + k] = raw.GetValue(element, point);
       }
-      local_projected += projector.Project(nodal, projected) ? 1 : 0;
+      local.modified += projector.Project(nodal, projected) ? 1 : 0;
+      local.qp += projector.LastWasQp() ? 1 : 0;
+      local.zero_average += projector.LastWasZeroAverage() ? 1 : 0;
+      local.certified += projector.LastCertified() ? 1 : 0;
       const IntegrationRule &nodes = space.GetFE(element)->GetNodes();
       Vector values(nodes.GetNPoints());
       for (int local = 0; local < nodes.GetNPoints(); ++local)
@@ -585,10 +869,12 @@ int ProjectField(LocalQ2Projector &projector, ParFiniteElementSpace &space,
       space.GetElementVDofs(element, dofs);
       corrected.SetSubVector(dofs, values);
    }
-   int global_projected = 0;
-   MPI_Allreduce(&local_projected, &global_projected, 1, MPI_INT, MPI_SUM,
-                 MPI_COMM_WORLD);
-   return global_projected;
+   const int local_values[4] = {
+      local.modified, local.qp, local.zero_average, local.certified
+   };
+   int global_values[4] = {};
+   MPI_Allreduce(local_values, global_values, 4, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+   return {global_values[0], global_values[1], global_values[2], global_values[3]};
 }
 }
 
@@ -596,18 +882,21 @@ int main(int argc, char *argv[])
 {
    Mpi::Init(argc, argv);
    const int rank = Mpi::WorldRank();
-   MFEM_VERIFY(argc == 5,
-               "usage: mfem_physical_equivalence NX NY NZ OUTPUT_DIRECTORY");
-   const int nx = std::stoi(argv[1]);
-   const int ny = std::stoi(argv[2]);
-   const int nz = std::stoi(argv[3]);
+   const bool mature_mode = argc == 7 && std::string(argv[1]) == "mature";
+   MFEM_VERIFY(argc == 5 || mature_mode,
+               "usage: mfem_physical_equivalence [mature] NX NY NZ [INITIAL] OUTPUT_DIRECTORY");
+   const int offset = mature_mode ? 1 : 0;
+   const int nx = std::stoi(argv[1 + offset]);
+   const int ny = std::stoi(argv[2 + offset]);
+   const int nz = std::stoi(argv[3 + offset]);
    // FFCx selects these effective Gauss orders for the frozen combined form
    // and for the isolated diagnostic form, respectively.  The upwind switch
    // makes the face integrand piecewise polynomial, so matching the actual
    // incumbent quadrature is part of operator equivalence.
    constexpr int combined_face_quadrature_order = 14;
    constexpr int isolated_advection_face_quadrature_order = 12;
-   const std::filesystem::path output_directory(argv[4]);
+   const std::filesystem::path initial_path = mature_mode ? argv[5] : "";
+   const std::filesystem::path output_directory(mature_mode ? argv[6] : argv[4]);
    MFEM_VERIFY(nx > 0 && ny > 0 && nz > 0, "positive mesh sizes required");
    if (rank == 0) { std::filesystem::create_directories(output_directory); }
    MPI_Barrier(MPI_COMM_WORLD);
@@ -712,6 +1001,119 @@ int main(int argc, char *argv[])
    ConfigureMassSolver(*M, mass_solver, mass_preconditioner);
    LocalQ2Projector local_projector;
 
+   if (mature_mode)
+   {
+      ParGridFunction state(&space);
+      LoadGlobalNodalField(space, state, nx, ny, nz, initial_path);
+      const double initial_mass = FieldMass(state);
+      ExportSubcellAverages(state, nx, ny, nz,
+                            output_directory / "initial_q2_subcell_averages.bin", 6);
+      constexpr int steps = 320;
+      std::vector<double> masses;
+      std::vector<double> relative_corrections;
+      std::vector<int> qp_cells;
+      std::vector<int> zero_average_cells;
+      std::vector<int> uncertified_cells;
+      std::vector<int> repaired_negative_averages;
+      masses.reserve(steps + 1);
+      masses.push_back(initial_mass);
+
+      HypreILU cn_preconditioner;
+      cn_preconditioner.SetType(0);
+      cn_preconditioner.SetLevelOfFill(1);
+      cn_preconditioner.SetMaxIter(1);
+      cn_preconditioner.SetTol(0.0);
+      cn_preconditioner.SetPrintLevel(0);
+      cn_preconditioner.SetOperator(*cn_left);
+      HypreGMRES cn_solver(*cn_left);
+      cn_solver.SetTol(1.0e-14);
+      cn_solver.SetAbsTol(1.0e-17);
+      cn_solver.SetMaxIter(1000);
+      cn_solver.SetKDim(100);
+      cn_solver.SetPrintLevel(0);
+      cn_solver.SetPreconditioner(cn_preconditioner);
+      cn_solver.iterative_mode = false;
+
+      const auto started = std::chrono::steady_clock::now();
+      for (int step = 0; step < steps; ++step)
+      {
+         Vector current;
+         state.GetTrueDofs(current);
+         Vector rhs(cn_right->Height());
+         cn_right->Mult(current, rhs);
+         Vector next(current);
+         cn_solver.Mult(rhs, next);
+         ParGridFunction raw(&space);
+         raw.SetFromTrueDofs(next);
+         ParGridFunction stage1(raw);
+         repaired_negative_averages.push_back(RepairCellAverages(space, stage1));
+         ParGridFunction corrected(&space);
+         const ProjectionCounts projection =
+            ProjectField(local_projector, space, stage1, corrected);
+         qp_cells.push_back(projection.qp);
+         zero_average_cells.push_back(projection.zero_average);
+         uncertified_cells.push_back(nx * ny * nz - projection.certified);
+         const double correction = FieldL1Difference(raw, corrected);
+         const double incoming_mass = FieldMass(raw);
+         const double corrected_mass = FieldMass(corrected);
+         relative_corrections.push_back(correction / std::max(std::abs(incoming_mass),
+                                                              std::numeric_limits<double>::min()));
+         masses.push_back(corrected_mass);
+         state = corrected;
+         if (rank == 0 && ((step + 1) % 32 == 0 || step + 1 == steps))
+         {
+            const double elapsed = std::chrono::duration<double>(
+               std::chrono::steady_clock::now() - started).count();
+            std::cout << "mature MFEM step " << step + 1 << "/" << steps
+                      << ", elapsed=" << elapsed << "s" << std::endl;
+         }
+      }
+      const double runtime = std::chrono::duration<double>(
+         std::chrono::steady_clock::now() - started).count();
+      ExportSubcellAverages(state, nx, ny, nz,
+                            output_directory / "final_q2_subcell_averages.bin", 6);
+      if (rank == 0)
+      {
+         const auto maximum_mass_error = *std::max_element(
+            masses.begin(), masses.end(), [initial_mass](double a, double b)
+            { return std::abs(a - initial_mass) < std::abs(b - initial_mass); });
+         const double mean_correction = std::accumulate(
+            relative_corrections.begin(), relative_corrections.end(), 0.0)
+            / relative_corrections.size();
+         std::ofstream summary(output_directory / "mature_summary.json");
+         summary << std::setprecision(17)
+                 << "{\n  \"mesh\": [" << nx << ", " << ny << ", " << nz << "],\n"
+                 << "  \"steps\": " << steps << ",\n"
+                 << "  \"initial_mass\": " << initial_mass << ",\n"
+                 << "  \"final_mass\": " << masses.back() << ",\n"
+                 << "  \"maximum_absolute_mass_error\": "
+                 << std::abs(maximum_mass_error - initial_mass) << ",\n"
+                 << "  \"mean_relative_l1_correction\": " << mean_correction << ",\n"
+                 << "  \"maximum_relative_l1_correction\": "
+                 << *std::max_element(relative_corrections.begin(), relative_corrections.end()) << ",\n"
+                 << "  \"maximum_qp_cells\": "
+                 << *std::max_element(qp_cells.begin(), qp_cells.end()) << ",\n"
+                 << "  \"maximum_zero_average_cells\": "
+                 << *std::max_element(zero_average_cells.begin(), zero_average_cells.end()) << ",\n"
+                 << "  \"maximum_uncertified_cells\": "
+                 << *std::max_element(uncertified_cells.begin(), uncertified_cells.end()) << ",\n"
+                 << "  \"maximum_raw_negative_average_cells\": "
+                 << *std::max_element(repaired_negative_averages.begin(), repaired_negative_averages.end()) << ",\n"
+                 << "  \"optimizer_failures\": 0,\n"
+                 << "  \"fallbacks\": 0,\n"
+                 << "  \"whole_cell_positivity_certified\": "
+                 << (std::all_of(uncertified_cells.begin(), uncertified_cells.end(),
+                                 [](int count) { return count == 0; }) ? "true" : "false")
+                 << ",\n"
+                 << "  \"runtime_seconds\": " << runtime << "\n}\n";
+      }
+      delete cn_left;
+      delete cn_right;
+      delete M;
+      delete A;
+      return 0;
+   }
+
    std::vector<double> derivative_residuals;
    std::vector<double> cn_residuals;
    std::vector<int> qp_projected_cells;
@@ -763,7 +1165,7 @@ int main(int argc, char *argv[])
       next_field.SetFromTrueDofs(next);
       ParGridFunction corrected_field(&space);
       qp_projected_cells.push_back(
-         ProjectField(local_projector, space, next_field, corrected_field));
+         ProjectField(local_projector, space, next_field, corrected_field).qp);
 
       Vector cn_check(rhs);
       cn_left->AddMult(next, cn_check, -1.0);

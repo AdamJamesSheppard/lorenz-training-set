@@ -157,12 +157,12 @@ NEXT_REQUIRED_GATE = MATURE_DENSITY_CONVERGENCE
 The living plan is in `docs/RESEARCH_DIRECTIONS.md` and
 `experiments/method-selection-research.yaml`. Current high-value branches are:
 
-1. The MFEM physical Q2/operator/raw-CN/local-QP gate now passes on the
-   `30x36x36` production mesh. Implement and run the frozen uniform mature
-   equivalence forecast before enabling nonconforming AMR.
-2. Use the completed eleven-snapshot replay only after mass, cell-average,
-   density, moment and correction comparisons against DOLFINx pass.
-3. Run a fixed nonconforming octree mesh with `D_AMR,gf < 0.05`, mean correction
+1. The complete 320-step MFEM/DOLFINx mature uniform equivalence gate passes on
+   `30x36x36`; static nonconforming AMR is now authorized as the next research
+   branch, while dataset generation remains unauthorized.
+2. Use the completed eleven-snapshot replay to construct one fixed octree mesh;
+   keep the mesh fixed throughout CN propagation so remeshing error is absent.
+3. Run that fixed nonconforming octree mesh with `D_AMR,gf < 0.05`, mean correction
    below `8e-4`, all existing statistical/invariant gates and a material resource
    advantage over equivalent uniform resolution.
 5. Do not spend another hierarchy on deeper Bernstein certification; witnessed
@@ -172,7 +172,7 @@ The living plan is in `docs/RESEARCH_DIRECTIONS.md` and
    high-order reference after the Q2 gate.
 7. Investigate covariance-targeted goal-oriented/nonuniform resolution and a
    genuinely high-order independent deterministic reference.
-7. Regenerate and test mature DA states only after the initialization,
+8. Regenerate and test mature DA states only after the initialization,
    analysis, and positivity path used to produce them is acceptable.
 
 `experiments/mature-state-decision.yaml` is executable and frozen for the first,

@@ -66,11 +66,12 @@ failure or fallback. The candidate therefore advances to spatial refinement.
 The aggregate classification is
 `MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED`; no historical threshold
 was rewritten. This remains narrower than production certification. The next
-experiment freezes the surviving method and establishes its corrected MFEM
-physical-basis equivalence at production scale before using local hex AMR to
-resolve mature full-density convergence. The small conforming gate passes for
-state mapping, operator action, raw CN and an active local-QP corrected step;
-production-mesh repetition and a complete uniform mature forecast remain open.
+experiment uses replay-driven local hex AMR to resolve mature full-density
+convergence. The corrected MFEM port has passed the small and production-mesh
+physical-basis gates and the complete 320-step conforming uniform mature
+forecast against frozen DOLFINx. The framework transition is accepted for this
+tested configuration; mature-density convergence and domain sensitivity remain
+open, and production dataset generation is unauthorized.
 
 Role assignments are separate:
 
@@ -1126,6 +1127,28 @@ indicator, and runs a third targeted graded level. The primary gate is
 
 Evidence: immutable run
 `runs/mature-full-spd-graded-fine-comparison/20260914T231639Z`.
+
+## 33. MFEM uniform mature trajectory equivalence
+
+On the common conforming `30x36x36` Q2 mesh, full-SPD tensor, `dt=1.5625e-4`
+and `t=0.05`, MFEM reproduces the frozen DOLFINx method over 320 CN/local-QP
+steps from one shared projected mature initial density. The conservative
+`180x216x216` common-grid initial and final L1 differences are `4.15e-16` and
+`5.26e-11`. Common-grid mean-vector and covariance-Frobenius differences are
+`8.04e-12` and `3.70e-11`. Mean and maximum correction differences are
+`7.52e-15` and `1.72e-13`; maximum absolute mass error is `3.98e-13`.
+
+This passes the separately predeclared uniform equivalence gate. It validates
+the MFEM conforming port as a controlled comparator for the next static
+nonconforming-hex AMR experiment. It does not establish mature-density spatial
+convergence, an independent full-density truth error, domain-size robustness,
+or fitness for production training data. The measured MFEM propagation runtime
+was `670.9` seconds versus `539.2` seconds for the earlier DOLFINx reference;
+this is a comparison across separate runs, not a synchronized speed benchmark.
+
+Evidence: immutable run
+`runs/mfem-mature-uniform-equivalence/20260915T193445Z` and
+`experiments/mfem-mature-uniform-equivalence.yaml`.
 
 ## Sources
 

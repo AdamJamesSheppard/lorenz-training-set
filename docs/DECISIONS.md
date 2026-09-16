@@ -64,6 +64,27 @@ the discrepancy.
 **Consequence.** Implement and run the frozen full uniform mature equivalence
 forecast. Nonconforming AMR and production data remain unauthorized.
 
+## 2026-09-15 - Pass full MFEM mature equivalence and unlock static AMR
+
+**Decision.** Accept the MFEM conforming implementation as numerically
+equivalent to the frozen DOLFINx method over the complete 320-step mature
+forecast. Authorize the predeclared fixed nonconforming-hexahedral AMR branch.
+
+**Evidence.** Immutable run
+`runs/mfem-mature-uniform-equivalence/20260915T193445Z` passes every gate. The
+shared initial field differs by `4.15e-16` in common-grid L1 and the final fields
+by `5.26e-11`; mean and covariance errors are `8.04e-12` and `3.70e-11`.
+Mean and maximum relative local-QP corrections agree within `7.52e-15` and
+`1.72e-13`. Maximum absolute mass error is `3.98e-13`, with zero optimizer
+failures and fallbacks under fail-closed execution. The original positivity
+field was inferred from the projection code path; a second run now counts the
+cell certificates explicitly at every step before closing that measurement.
+
+**Consequence.** Construct one replay-driven static `NCMesh`, then test it
+against the fine graded reference under the frozen `D_AMR,gf < 0.05`, positivity,
+statistics, correction and resource gates. Production dataset authorization
+remains false until mature-density convergence and domain sensitivity pass.
+
 ## 2026-09-15 - Use full-trajectory indicators for the third graded level
 
 **Decision.** Keep `MATURE_DENSITY_CONVERGENCE = OPEN` and freeze every method

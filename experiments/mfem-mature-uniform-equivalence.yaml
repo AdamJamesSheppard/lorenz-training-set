@@ -1,0 +1,25 @@
+id: mfem-mature-uniform-equivalence
+kind: cross_framework_mature_trajectory_equivalence
+status: predeclared_implementation_gate
+mesh: [30, 36, 36]
+steps: 320
+dt: 1.5625e-4
+final_time: 0.05
+mpi_ranks: 8
+shared_initial_state: one DOLFINx L2 projection plus local-QP projection transferred physically to MFEM
+reference_run: runs/local-q2-cn-full-spd-mature-bimodal/20260913T185157Z/mature_bimodal_q2_local_qp_30x36x36
+common_grid: [180, 216, 216]
+gates:
+  maximum_initial_density_L1: 1.0e-10
+  maximum_final_density_L1: 1.0e-3
+  maximum_mass_error: 1.0e-10
+  maximum_mean_vector_error: 1.0e-3
+  maximum_covariance_frobenius_error: 2.0e-2
+  maximum_mean_correction_difference: 1.0e-4
+  maximum_correction_difference: 1.0e-4
+  require_zero_optimizer_failures: true
+  require_zero_fallbacks: true
+  require_whole_cell_positivity: true
+stop_rule: Keep nonconforming AMR locked unless every mature trajectory gate passes.
+amr_authorized: false
+production_dataset_authorized: false

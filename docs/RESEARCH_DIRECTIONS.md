@@ -28,8 +28,7 @@ constant-ratio spatial study. That identity-noise hierarchy also passed, with
 common-grid density differences `0.141394` and `0.0355845` and observed rate
 `3.4026`. The subsequent non-diagonal full-SPD hierarchy also passes, with L1
 differences `0.139500` and `0.0348401` and observed rate `3.4215`. These rates
-remain numerical evidence rather than formal-order proofs. The immediate gate
-is still a mature later-time or post-analysis Lorenz density. The first bimodal
+remain numerical evidence rather than formal-order proofs. The first bimodal
 hierarchy failed only its fixed mean-correction gate: corrections decrease
 `0.003047 -> 0.002789 -> 0.001840` but remain above `0.001`; its observed
 common-grid rate is only `0.42695`.
@@ -43,8 +42,12 @@ correction to `1.13e-4` and affected probability to `0.00418`, while moving by
 `L1=0.108680` from uniform-60. The large density movement together with sharply
 smaller intervention supports localized under-resolution as the leading
 diagnosis. Its 76.4-minute runtime is 10.1% above uniform-60, so cell count alone
-does not establish computational efficiency. The active test is a third graded
-level designed from maximum-over-time indicators over the full trajectory.
+does not establish computational efficiency. An eleven-snapshot replay showed
+that tensor-product bands cannot represent the sparse marked regions within
+the frozen cell ceiling. A conforming `30x36x36` MFEM port now matches DOLFINx
+over the full 320-step mature forecast to common-grid `L1=5.26e-11`. The active
+branch is a fixed, replay-driven nonconforming-hex AMR test. This cross-framework
+result does not close mature full-density convergence or domain sensitivity.
 
 ## Active branches
 
@@ -58,7 +61,7 @@ level designed from maximum-over-time indicators over the full trajectory.
 | Positive full-tensor finite volume | Provides an operator-level positivity fallback with substantially different numerical principles. | Prioritize if corrected/AFC Q2 fails; require genuine 3-D convection-diffusion, no-flux and high-Peclet validation. |
 | FCDF or directional complete flux | Directly targets drift-diffusion flux and high-Peclet numerical diffusion. | Keep as an identity/diagonal `B` special-case branch; present FCDF proof is directional and its 2026 evidence is lower-dimensional. |
 | Characteristic/semi-Lagrangian methods | Could reduce upwind transport diffusion substantially. | Require a defensible 3-D diffusion, positivity, conservation, and reflecting-boundary treatment. |
-| Time-aggregated static grading | The fine graded result shows resolution-controlled mature-density change and nearly dormant QP correction; full-trajectory indicators can concentrate the next level where it matters dynamically. | Require `D_gf,gff<0.0543401`, preserved gates and a mesh no larger than uniform-60; keep convergence open if contraction fails. |
+| Time-aggregated static nonconforming-hex AMR | The fine graded result shows resolution-controlled mature-density change and nearly dormant QP correction; tensor-product grading could not represent the sparse replay indicator efficiently. MFEM has passed the conforming uniform equivalence gate. | Require `D_AMR,gf<0.05`, positivity/statistical gates and a material resource advantage; keep convergence open if contraction fails. |
 | Dynamically scaled Hermite reference | Supplies a whole-space, high-order method independent of DG/FV and avoids reflecting truncation. | Validate by coefficient decay and moment refinement; use as a reference even if positivity prevents production use. |
 | Monte Carlo plus density reconstruction | Strong independent moment reference and possible production challenger. | Compare full-density reconstruction, tails, bandwidth bias, repeatability, and cost - not moments alone. |
 
