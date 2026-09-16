@@ -58,7 +58,12 @@ differences.
   and compares exact conservative `3x3x3` subcell averages. The small and
   production one-step gates passed. The complete uniform mature trajectory
   also passed against DOLFINx on the common `180x216x216` conservative grid;
-  static nonconforming AMR is the next, separate validation branch.
+  a two-rank nonconforming-face probe passed. The separate static AMR branch
+  generates replay-driven local octree marks, initializes the same continuous
+  mature Gaussian mixture by Q2 L2 projection, repairs averages using actual
+  cell volumes, propagates on one fixed NC mesh, and exports conservative
+  averages to the common `180x216x216` grid for comparison with the fine graded
+  DOLFINx reference.
 - `local_projection_study.py`: compares terminal unlimited Q2 states with the
   incumbent correction, a strictly cell-local QP, and Stage-1 average repair
   followed by the local QP.

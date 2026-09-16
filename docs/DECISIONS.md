@@ -4,6 +4,28 @@ Decisions here are dated and revisable. Add a new entry that marks an older
 decision `superseded`, `narrowed`, or `confirmed` rather than rewriting history
 to make the current direction look inevitable.
 
+## 2026-09-16 - Certify uniform MFEM equivalence and authorize static NC-hex AMR
+
+**Decision.** Certify the tested conforming MFEM port as numerically equivalent
+to the frozen DOLFINx mature Q2-CN/local-QP trajectory. Authorize a fixed-mesh,
+replay-marked NC-hex reproduction experiment against the fine graded `g_f`
+solution. Keep mature full-density convergence and production dataset
+authorization open.
+
+**Evidence.** The primary clean 320-step equivalence run has final conservative
+common-grid `L1=5.26e-11`. A later counted-certificate rerun produced identical
+final bytes with zero uncertified cells, but its wrapper failed after the solve;
+the comparison was completed separately and provenance records the distinction.
+The `2:1` NC-face probe agrees with a conforming comparator within `5.87e-14`
+relative action error on two ranks. A one-step 140,418-cell AMR smoke test has
+zero uncertified cells and `1.43e-14` mass drift. These small tests do not yet
+establish full AMR trajectory accuracy.
+
+**Consequence.** The first AMR run must reproduce `g_f` to `L1<0.02` while
+meeting positivity, mass, correction, statistical and DOF gates. Only a second
+AMR level can provide a density-convergence sequence. Domain sensitivity and
+production dataset gates follow later.
+
 ## 2026-09-15 - Correct the MFEM port and pass small-mesh physical equivalence
 
 **Decision.** Supersede the earlier MFEM operator probe as structural evidence

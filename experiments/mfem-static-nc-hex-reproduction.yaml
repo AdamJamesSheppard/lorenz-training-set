@@ -1,0 +1,38 @@
+id: mfem-static-nc-hex-reproduction
+kind: replay_marked_mature_full_spd_q2_cn_local_qp
+status: predeclared
+source_indicator: runs/mature-time-aggregated-grid-pipeline/20260915T134916Z/time_aggregated_indicator.npy
+source_axes: experiments/mature-graded-fine-axes.json
+source_mixture: runs/local-q2-cn-full-spd-mature-bimodal/20260913T185157Z/reference/mature_mixture.json
+fine_graded_reference: runs/mature-full-spd-graded-fine-comparison/20260914T231639Z/mature_bimodal_q2_local_qp_graded58x68x56
+particle_reference: runs/local-q2-cn-full-spd-mature-bimodal/20260913T185157Z/reference/mc_final_particles.npy
+base_mesh: [45, 54, 54]
+static_refinement:
+  rule: base-cell summed squared replay indicator
+  dorfler_energy_coverage: 0.99
+  buffer_base_cells: 1
+  refinement: one isotropic 1-to-8 level
+  maximum_nc_level: 1
+  mesh_fixed_through_forecast: true
+method:
+  element: discontinuous_Q2_hexahedron
+  diffusion: [[1.0, 0.4, 0.2], [0.4, 1.0, 0.3], [0.2, 0.3, 1.0]]
+  drift: Lorenz_63
+  timestep: 0.00015625
+  steps: 320
+  time_method: Crank_Nicolson
+  positivity: conservative_average_repair_then_frozen_local_QP
+  common_grid: [180, 216, 216]
+gates:
+  nc_face_probe_relative_action_error: 1.0e-9
+  maximum_final_density_l1_to_fine_graded: 0.02
+  maximum_mean_relative_l1_correction: 0.0008
+  maximum_absolute_mass_error: 1.0e-10
+  maximum_common_grid_negative_mass: 1.0e-13
+  zero_uncertified_cells: true
+  zero_optimizer_failures: true
+  zero_fallbacks: true
+  maximum_statistical_degradation_to_mc_vs_fine_graded: 0.005
+  fewer_dofs_than_fine_graded: true
+  production_dataset_authorized: false
+interpretation: Passing reproduces g_f efficiently; a second AMR level is still required to assess mature-density convergence.

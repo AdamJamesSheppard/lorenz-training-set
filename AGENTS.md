@@ -39,9 +39,10 @@ Read deeper documentation only when it is relevant to the task.
 - Use the evidence labels in `docs/CLAIMS.md`.
 - Cite assumption IDs from `docs/assumptions.yaml` when they matter.
 - Do not claim novelty without a literature search.
-- The current method status is `FULL_SPD_DIFFUSION_CERTIFIED`; do not generate
-  a large training dataset until the predeclared mature-state and domain gates
-  pass and the project state is explicitly updated.
+- The current method status is
+  `MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED`; do not generate a
+  large training dataset until locally refined mature-density convergence and
+  domain gates pass and the project state is explicitly updated.
 
 ## Living research policy
 

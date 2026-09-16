@@ -1,6 +1,6 @@
 # Project state
 
-Updated: 2026-09-15
+Updated: 2026-09-16
 
 ## Objective
 
@@ -20,12 +20,14 @@ next experiment.
 METHOD_STATUS = MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED
 MATURE_DENSITY_CONVERGENCE = OPEN
 MATURE_GRADED_EFFICIENCY = SUPPORTED_NOT_CERTIFIED
+MFEM_UNIFORM_EQUIVALENCE = CERTIFIED
+MFEM_STATIC_NC_HEX_AMR = AUTHORIZED
 PRODUCTION_DATASET_AUTHORIZED = false
-NEXT_REQUIRED_GATE = MATURE_DENSITY_CONVERGENCE
+NEXT_REQUIRED_GATE = LOCALLY_REFINED_MATURE_DENSITY_CONVERGENCE
 ```
 
 - Method-selection classification: `MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED`.
-- Next required gate: `MATURE_DENSITY_CONVERGENCE`.
+- Next required gate: `LOCALLY_REFINED_MATURE_DENSITY_CONVERGENCE`.
 - Large neural-operator dataset generation: `NO`.
 - Controlled baseline: Q1 DG, upwind advection, SIPG diffusion, backward
   Euler, quadrature-14 L2 initialization and projected Bayesian analysis,
@@ -158,13 +160,17 @@ The living plan is in `docs/RESEARCH_DIRECTIONS.md` and
 `experiments/method-selection-research.yaml`. Current high-value branches are:
 
 1. The complete 320-step MFEM/DOLFINx mature uniform equivalence gate passes on
-   `30x36x36`; static nonconforming AMR is now authorized as the next research
-   branch, while dataset generation remains unauthorized.
-2. Use the completed eleven-snapshot replay to construct one fixed octree mesh;
-   keep the mesh fixed throughout CN propagation so remeshing error is absent.
-3. Run that fixed nonconforming octree mesh with `D_AMR,gf < 0.05`, mean correction
-   below `8e-4`, all existing statistical/invariant gates and a material resource
-   advantage over equivalent uniform resolution.
+   `30x36x36`; the strengthened rerun counts zero uncertified cells at every
+   step. Its wrapper failed only after propagation, so the earlier clean run
+   remains primary. Static nonconforming AMR is authorized as research.
+2. The two-rank `2:1` hanging-face probe agrees with a conforming uniformly
+   refined comparator at `5.9e-14` or better relative action error and preserves
+   discrete mass. The first static octree mesh is fixed for all 320 CN steps.
+3. Test reproduction of the fine graded `g_f` solution with
+   `D_AMR,gf < 0.02`, mean correction below `8e-4`, all existing
+   statistical/invariant gates, and fewer DOFs than `g_f`.
+4. If reproduction passes, build a second AMR level with the same marking
+   functional and test `D_AMR1,AMR2 <= 0.05` as contraction evidence.
 5. Do not spend another hierarchy on deeper Bernstein certification; witnessed
    polynomial negativity, rather than unresolved bounds, dominates every saved
    mature snapshot.

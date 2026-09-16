@@ -68,7 +68,8 @@ The implementation passed its QP-equivalence tests, the superseding tight
 four-level temporal/positivity gate, the identity-noise spatial hierarchy, and
 the non-diagonal full-SPD spatial hierarchy. Its observed common-grid spatial
 rates `3.4026` and `3.4215` are numerical evidence rather than proved formal
-orders. Mature-state and domain certification remain pending.
+orders. Mature-state positivity/statistical gates pass at uniform-60; mature
+full-density spatial convergence and domain certification remain pending.
 
 ## Executable invariants
 

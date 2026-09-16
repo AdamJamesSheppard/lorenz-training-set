@@ -144,7 +144,8 @@ def main() -> int:
             }
             and decision.get("production_dataset_authorized") is False
             and decision.get("next_required_gate") in {
-                "FULL_SPD_DIFFUSION", "MATURE_STATE", "MATURE_DENSITY_CONVERGENCE"
+                "FULL_SPD_DIFFUSION", "MATURE_STATE", "MATURE_DENSITY_CONVERGENCE",
+                "LOCALLY_REFINED_MATURE_DENSITY_CONVERGENCE"
             }
         ),
         "full_spd_control_consistent": bool(
@@ -192,7 +193,8 @@ def main() -> int:
             }
             and decision.get("method_status") == classification
             and decision.get("next_required_gate") in {
-                "MATURE_STATE", "MATURE_DENSITY_CONVERGENCE"
+                "MATURE_STATE", "MATURE_DENSITY_CONVERGENCE",
+                "LOCALLY_REFINED_MATURE_DENSITY_CONVERGENCE"
             }
         ),
         "mature_bimodal_failure_consistent": bool(
@@ -217,7 +219,8 @@ def main() -> int:
             and decision.get("method_status") == classification
             and decision.get("production_dataset_authorized") is False
             and decision.get("next_required_gate") in {
-                "MATURE_STATE", "MATURE_DENSITY_CONVERGENCE"
+                "MATURE_STATE", "MATURE_DENSITY_CONVERGENCE",
+                "LOCALLY_REFINED_MATURE_DENSITY_CONVERGENCE"
             }
         ),
         "mature_certificate_diagnostic_consistent": bool(
@@ -237,7 +240,8 @@ def main() -> int:
             }
             and decision.get("production_dataset_authorized") is False
             and decision.get("next_required_gate") in {
-                "MATURE_STATE", "MATURE_DENSITY_CONVERGENCE"
+                "MATURE_STATE", "MATURE_DENSITY_CONVERGENCE",
+                "LOCALLY_REFINED_MATURE_DENSITY_CONVERGENCE"
             }
         ),
         "mature_uniform60_and_graded_efficiency_consistent": bool(
@@ -277,7 +281,27 @@ def main() -> int:
             and decision.get("mature_density_convergence") == "OPEN"
             and decision.get("mature_graded_efficiency") == "SUPPORTED_NOT_CERTIFIED"
             and decision.get("production_dataset_authorized") is False
-            and decision.get("next_required_gate") == "MATURE_DENSITY_CONVERGENCE"
+            and decision.get("next_required_gate") in {
+                "MATURE_DENSITY_CONVERGENCE",
+                "LOCALLY_REFINED_MATURE_DENSITY_CONVERGENCE"
+            }
+        ),
+        "mfem_uniform_equivalence_and_nc_face_consistent": bool(
+            decision.get("mfem_uniform_equivalence") == "CERTIFIED"
+            and decision.get("mfem_static_nc_hex_amr") == "AUTHORIZED"
+            and decision["mfem_uniform_mature_equivalence"]["classification"]
+            == "PASSED_PREDECLARED_MATURE_EQUIVALENCE_GATES"
+            and decision["mfem_uniform_mature_equivalence"]["final_density_l1"] < 1.0e-3
+            and decision["mfem_uniform_mature_equivalence"]["counted_certificate_rerun"]
+            ["maximum_uncertified_cells"] == 0
+            and decision["mfem_uniform_mature_equivalence"]["counted_certificate_rerun"]
+            ["comparison_passed_after_wrapper_failure"]
+            and decision["mfem_nc_face_probe"]["classification"]
+            == "PASSED_NC_FACE_CONSERVATION_AND_EQUIVALENCE_PROBE"
+            and decision["mfem_nc_face_probe"]["maximum_relative_action_error"] < 1.0e-9
+            and decision.get("production_dataset_authorized") is False
+            and decision.get("next_required_gate")
+            == "LOCALLY_REFINED_MATURE_DENSITY_CONVERGENCE"
         ),
         "mature_fine_graded_contraction_consistent": bool(
             mature_graded_fine["classification"]

@@ -5,6 +5,7 @@
 #include <array>
 #include <chrono>
 #include <cmath>
+#include <cstdint>
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
@@ -41,6 +42,49 @@ public:
    }
 };
 
+class MatureGaussianMixture final : public Coefficient
+{
+public:
+   explicit MatureGaussianMixture(const std::filesystem::path &path)
+   {
+      std::ifstream input(path, std::ios::binary | std::ios::ate);
+      MFEM_VERIFY(input.good(), "could not open frozen mature mixture parameters");
+      const auto bytes = input.tellg();
+      MFEM_VERIFY(bytes > 0 && bytes % static_cast<std::streamoff>(13 * sizeof(double)) == 0,
+                  "mature mixture parameter size is invalid");
+      parameters.resize(static_cast<std::size_t>(bytes) / sizeof(double));
+      input.seekg(0);
+      input.read(reinterpret_cast<char *>(parameters.data()), bytes);
+      MFEM_VERIFY(input.good(), "could not read mature mixture parameters");
+   }
+
+   double Eval(ElementTransformation &transformation,
+               const IntegrationPoint &point) override
+   {
+      Vector x(3);
+      transformation.Transform(point, x);
+      double density = 0.0;
+      for (std::size_t component = 0; component < parameters.size(); component += 13)
+      {
+         const double dx[3] = {x[0] - parameters[component + 1],
+                               x[1] - parameters[component + 2],
+                               x[2] - parameters[component + 3]};
+         double exponent = 0.0;
+         for (int row = 0; row < 3; ++row)
+         for (int column = 0; column < 3; ++column)
+         {
+            exponent += dx[row] * parameters[component + 4 + 3 * row + column]
+                        * dx[column];
+         }
+         density += parameters[component] * std::exp(-0.5 * exponent);
+      }
+      return density;
+   }
+
+private:
+   std::vector<double> parameters;
+};
+
 class DolfinxPenaltyDGDiffusionIntegrator final : public DGDiffusionIntegrator
 {
 public:
@@ -61,10 +105,22 @@ public:
       Vector face_normal(3);
       CalcOrtho(transformation.Jacobian(), face_normal);
       const double face_scale = face_normal.Norml2();
-      auto geometry = [face_scale](ElementTransformation &element)
+      MFEM_VERIFY(face_scale > 0.0, "degenerate DG face");
+      auto geometry = [&face_normal, face_scale](ElementTransformation &element)
       {
          const DenseMatrix &jacobian = element.Jacobian();
          double diameter_squared = 0.0;
+         double normal_width = 0.0;
+         for (int column = 0; column < jacobian.Width(); ++column)
+         {
+            double normal_projection = 0.0;
+            for (int row = 0; row < jacobian.Height(); ++row)
+            {
+               normal_projection += jacobian(row, column)
+                                    * face_normal[row] / face_scale;
+            }
+            normal_width = std::max(normal_width, std::abs(normal_projection));
+         }
          for (int i = 0; i < jacobian.Height(); ++i)
          {
             for (int j = 0; j < jacobian.Width(); ++j)
@@ -72,8 +128,9 @@ public:
                diameter_squared += jacobian(i, j) * jacobian(i, j);
             }
          }
+         MFEM_VERIFY(normal_width > 0.0, "invalid DG normal cell width");
          return std::pair<double, double>(
-            element.Weight() / face_scale, std::sqrt(diameter_squared));
+            normal_width, std::sqrt(diameter_squared));
       };
       const auto first = geometry(*transformation.Elem1);
       const auto second = geometry(*transformation.Elem2);
@@ -238,6 +295,82 @@ void ExportSubcellAverages(const ParGridFunction &field,
    }
 }
 
+void ExportAlignedCommonAverages(const ParGridFunction &field,
+                                 const std::filesystem::path &path)
+{
+   constexpr int counts[3] = {180, 216, 216};
+   constexpr double origins[3] = {x_min, y_min, z_min};
+   constexpr double lengths[3] = {x_max - x_min, y_max - y_min, z_max - z_min};
+   const std::size_t total = static_cast<std::size_t>(counts[0]) * counts[1] * counts[2];
+   std::vector<double> local(total, 0.0);
+   std::vector<std::uint8_t> local_coverage(total, 0);
+   const double q[3] = {0.5 * (1.0 - std::sqrt(3.0 / 5.0)), 0.5,
+                        0.5 * (1.0 + std::sqrt(3.0 / 5.0))};
+   const double w[3] = {5.0 / 18.0, 8.0 / 18.0, 5.0 / 18.0};
+   ParFiniteElementSpace *space = field.ParFESpace();
+   for (int element = 0; element < space->GetNE(); ++element)
+   {
+      ElementTransformation *transformation = space->GetElementTransformation(element);
+      IntegrationPoint start, end;
+      start.Set3(0.0, 0.0, 0.0); end.Set3(1.0, 1.0, 1.0);
+      Vector low(3), high(3);
+      transformation->Transform(start, low);
+      transformation->Transform(end, high);
+      int first[3], span[3];
+      for (int axis = 0; axis < 3; ++axis)
+      {
+         const double mapped_low = (low[axis] - origins[axis])
+                                   * counts[axis] / lengths[axis];
+         const double mapped_high = (high[axis] - origins[axis])
+                                    * counts[axis] / lengths[axis];
+         first[axis] = static_cast<int>(std::lround(mapped_low));
+         span[axis] = static_cast<int>(std::lround(mapped_high)) - first[axis];
+         MFEM_VERIFY(std::abs(mapped_low - first[axis]) < 1.0e-8
+                     && std::abs(mapped_high - first[axis] - span[axis]) < 1.0e-8
+                     && span[axis] > 0 && first[axis] >= 0
+                     && first[axis] + span[axis] <= counts[axis],
+                     "AMR element is not aligned with the conservative common grid");
+      }
+      for (int i = 0; i < span[0]; ++i)
+      for (int j = 0; j < span[1]; ++j)
+      for (int k = 0; k < span[2]; ++k)
+      {
+         double average = 0.0;
+         for (int a = 0; a < 3; ++a)
+         for (int b = 0; b < 3; ++b)
+         for (int c = 0; c < 3; ++c)
+         {
+            IntegrationPoint point;
+            point.Set3((i + q[a]) / span[0], (j + q[b]) / span[1],
+                       (k + q[c]) / span[2]);
+            average += w[a] * w[b] * w[c] * field.GetValue(element, point);
+         }
+         const std::size_t index =
+            (static_cast<std::size_t>(first[0] + i) * counts[1] + first[1] + j)
+            * counts[2] + first[2] + k;
+         local[index] = average;
+         ++local_coverage[index];
+      }
+   }
+   std::vector<double> global(Mpi::WorldRank() == 0 ? total : 0);
+   std::vector<std::uint8_t> global_coverage(Mpi::WorldRank() == 0 ? total : 0);
+   MPI_Reduce(local.data(), Mpi::WorldRank() == 0 ? global.data() : nullptr,
+              static_cast<int>(total), MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+   MPI_Reduce(local_coverage.data(),
+              Mpi::WorldRank() == 0 ? global_coverage.data() : nullptr,
+              static_cast<int>(total), MPI_UNSIGNED_CHAR, MPI_SUM, 0, MPI_COMM_WORLD);
+   if (Mpi::WorldRank() == 0)
+   {
+      MFEM_VERIFY(std::all_of(global_coverage.begin(), global_coverage.end(),
+                             [](std::uint8_t count) { return count == 1; }),
+                  "AMR common-grid export has an uncovered or multiply covered voxel");
+      std::ofstream output(path, std::ios::binary);
+      MFEM_VERIFY(output.good(), "could not open AMR common-grid export");
+      output.write(reinterpret_cast<const char *>(global.data()),
+                   static_cast<std::streamsize>(total * sizeof(double)));
+   }
+}
+
 void LoadGlobalNodalField(ParFiniteElementSpace &space, ParGridFunction &field,
                           const int nx, const int ny, const int nz,
                           const std::filesystem::path &path)
@@ -276,6 +409,41 @@ void LoadGlobalNodalField(ParFiniteElementSpace &space, ParGridFunction &field,
       space.GetElementVDofs(element, dofs);
       field.SetSubVector(dofs, local);
    }
+}
+
+int RefineMarkedBackground(Mesh &mesh, const int nx, const int ny, const int nz,
+                           const std::filesystem::path &path)
+{
+   const std::size_t count = static_cast<std::size_t>(nx) * ny * nz;
+   std::vector<std::uint8_t> flags(count);
+   std::ifstream input(path, std::ios::binary);
+   MFEM_VERIFY(input.good(), "could not open replay-derived AMR marks");
+   input.read(reinterpret_cast<char *>(flags.data()),
+              static_cast<std::streamsize>(count));
+   MFEM_VERIFY(input.gcount() == static_cast<std::streamsize>(count),
+               "AMR mark file size does not match base mesh");
+   MFEM_VERIFY(input.peek() == EOF, "AMR mark file has extra bytes");
+   Array<int> marked;
+   IntegrationPoint midpoint;
+   midpoint.Set3(0.5, 0.5, 0.5);
+   for (int element = 0; element < mesh.GetNE(); ++element)
+   {
+      Vector x(3);
+      mesh.GetElementTransformation(element)->Transform(midpoint, x);
+      const int ix = std::clamp(static_cast<int>(std::floor((x[0] - x_min)
+                           * nx / (x_max - x_min))), 0, nx - 1);
+      const int iy = std::clamp(static_cast<int>(std::floor((x[1] - y_min)
+                           * ny / (y_max - y_min))), 0, ny - 1);
+      const int iz = std::clamp(static_cast<int>(std::floor((x[2] - z_min)
+                           * nz / (z_max - z_min))), 0, nz - 1);
+      if (flags[(static_cast<std::size_t>(ix) * ny + iy) * nz + iz])
+      {
+         marked.Append(element);
+      }
+   }
+   mesh.EnsureNCMesh(true);
+   mesh.GeneralRefinement(marked, 1);
+   return marked.Size();
 }
 
 double FieldMass(const ParGridFunction &field)
@@ -326,6 +494,7 @@ int RepairCellAverages(ParFiniteElementSpace &space, ParGridFunction &field)
 {
    const double weights[3] = {1.0 / 6.0, 2.0 / 3.0, 1.0 / 6.0};
    std::vector<double> averages(space.GetNE());
+   std::vector<double> cell_volumes(space.GetNE());
    Array<int> dofs;
    int local_negative = 0;
    double local_sum = 0.0, local_maximum = 0.0;
@@ -342,7 +511,12 @@ int RepairCellAverages(ParFiniteElementSpace &space, ParGridFunction &field)
                     * field.GetValue(element, point);
       }
       averages[element] = average;
-      local_sum += average;
+      IntegrationPoint center;
+      center.Set3(0.5, 0.5, 0.5);
+      ElementTransformation *transformation = space.GetElementTransformation(element);
+      transformation->SetIntPoint(&center);
+      cell_volumes[element] = transformation->Weight();
+      local_sum += cell_volumes[element] * average;
       local_maximum = std::max(local_maximum, average);
       local_negative += average < 0.0 ? 1 : 0;
    }
@@ -354,9 +528,10 @@ int RepairCellAverages(ParFiniteElementSpace &space, ParGridFunction &field)
    {
       const double lambda = 0.5 * (lower + upper);
       double local_projected_sum = 0.0, projected_sum = 0.0;
-      for (double average : averages)
+      for (int element = 0; element < space.GetNE(); ++element)
       {
-         local_projected_sum += std::max(average - lambda, 0.0);
+         local_projected_sum += cell_volumes[element]
+                                * std::max(averages[element] - lambda, 0.0);
       }
       MPI_Allreduce(&local_projected_sum, &projected_sum, 1, MPI_DOUBLE,
                     MPI_SUM, MPI_COMM_WORLD);
@@ -878,14 +1053,213 @@ ProjectionCounts ProjectField(LocalQ2Projector &projector,
 }
 }
 
+namespace
+{
+struct FaceProbeResult
+{
+   std::array<double, 3> actions{};
+   std::array<double, 3> constant_test_actions{};
+   double diffusion_constant_maximum = 0.0;
+   int cells = 0;
+};
+
+FaceProbeResult NonconformingFaceActions(const bool refine_right,
+                                         const bool uniformly_refined,
+                                         const int test)
+{
+   Mesh serial = Mesh::MakeCartesian3D(
+      uniformly_refined ? 4 : 2, uniformly_refined ? 2 : 1,
+      uniformly_refined ? 2 : 1, Element::HEXAHEDRON,
+      x_max - x_min, y_max - y_min, z_max - z_min);
+   for (int vertex = 0; vertex < serial.GetNV(); ++vertex)
+   {
+      double *x = serial.GetVertex(vertex);
+      x[0] += x_min; x[1] += y_min; x[2] += z_min;
+   }
+   if (refine_right)
+   {
+      serial.EnsureNCMesh(true);
+      Array<int> marked(1);
+      marked[0] = 1;
+      serial.GeneralRefinement(marked, 1);
+   }
+   ParMesh mesh(MPI_COMM_WORLD, serial);
+   int local_cells = mesh.GetNE();
+   FaceProbeResult probe;
+   MPI_Allreduce(&local_cells, &probe.cells, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+   L2_FECollection collection(2, 3, BasisType::GaussLobatto);
+   ParFiniteElementSpace space(&mesh, &collection);
+   LorenzDrift drift;
+   DenseMatrix tensor(3);
+   tensor = 0.0;
+   tensor(0, 0) = 1.0; tensor(0, 1) = 0.4; tensor(0, 2) = 0.2;
+   tensor(1, 0) = 0.4; tensor(1, 1) = 1.0; tensor(1, 2) = 0.3;
+   tensor(2, 0) = 0.2; tensor(2, 1) = 0.3; tensor(2, 2) = 1.0;
+   tensor *= -1.0;
+   MatrixConstantCoefficient diffusion(tensor);
+
+   ParBilinearForm complete(&space);
+   auto *volume = new ConservativeConvectionIntegrator(drift, -1.0);
+   volume->SetIntRule(&IntRules.Get(Geometry::CUBE, 6));
+   complete.AddDomainIntegrator(volume);
+   auto *face = new DGTraceIntegrator(drift, -1.0, -0.5);
+   face->SetIntRule(&IntRules.Get(Geometry::SQUARE, 14));
+   complete.AddInteriorFaceIntegrator(face);
+   complete.AddDomainIntegrator(new DiffusionIntegrator(diffusion));
+   complete.AddInteriorFaceIntegrator(new DolfinxPenaltyDGDiffusionIntegrator(
+      diffusion, -1.0, 64.0));
+   complete.Assemble(); complete.Finalize();
+
+   ParBilinearForm advection_face(&space);
+   auto *advective_flux = new DGTraceIntegrator(drift, -1.0, -0.5);
+   advective_flux->SetIntRule(&IntRules.Get(Geometry::SQUARE, 14));
+   advection_face.AddInteriorFaceIntegrator(advective_flux);
+   advection_face.Assemble(); advection_face.Finalize();
+
+   ParBilinearForm diffusion_face(&space);
+   diffusion_face.AddInteriorFaceIntegrator(new DolfinxPenaltyDGDiffusionIntegrator(
+      diffusion, -1.0, 64.0));
+   diffusion_face.Assemble(); diffusion_face.Finalize();
+
+   FunctionCoefficient smooth([test](const Vector &x) {
+      if (test == 1)
+      {
+         return 1.0 + 0.003 * x[0] - 0.002 * x[1] + 0.001 * x[2]
+                + 0.00004 * x[0] * x[1] + 0.00003 * x[2] * x[2];
+      }
+      return 1.0 + 0.003 * x[0] - 0.002 * x[1] + 0.001 * x[2];
+   });
+   ParGridFunction trial(&space), jump(&space), constant(&space);
+   trial.ProjectCoefficient(smooth);
+   if (test == 2)
+   {
+      Array<int> local_dofs;
+      for (int element = 0; element < space.GetNE(); ++element)
+      {
+         ElementTransformation *transformation = space.GetElementTransformation(element);
+         IntegrationPoint midpoint;
+         midpoint.Set3(0.5, 0.5, 0.5);
+         Vector x(3);
+         transformation->Transform(midpoint, x);
+         space.GetElementVDofs(element, local_dofs);
+         Vector values(local_dofs.Size());
+         values = x[0] < 0.0 ? 1.0 : 2.0;
+         trial.SetSubVector(local_dofs, values);
+      }
+   }
+   constant = 1.0;
+   jump = 0.0;
+   Array<int> dofs;
+   for (int element = 0; element < space.GetNE(); ++element)
+   {
+      ElementTransformation *transformation = space.GetElementTransformation(element);
+      IntegrationPoint midpoint;
+      midpoint.Set3(0.5, 0.5, 0.5);
+      Vector x(3);
+      transformation->Transform(midpoint, x);
+      space.GetElementVDofs(element, dofs);
+      Vector values(dofs.Size());
+      values = x[0] < 0.0 ? 2.0 : -1.0;
+      jump.SetSubVector(dofs, values);
+   }
+   Vector u, v, one;
+   trial.GetTrueDofs(u); jump.GetTrueDofs(v); constant.GetTrueDofs(one);
+   ParBilinearForm *forms[] = {&complete, &advection_face, &diffusion_face};
+   for (int i = 0; i < 3; ++i)
+   {
+      HypreParMatrix *matrix = forms[i]->ParallelAssemble();
+      Vector result(matrix->Height());
+      matrix->Mult(u, result);
+      const double local = v * result;
+      MPI_Allreduce(&local, &probe.actions[i], 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+      const double local_constant_action = one * result;
+      MPI_Allreduce(&local_constant_action, &probe.constant_test_actions[i],
+                    1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+      if (i == 2)
+      {
+         Vector diffusion_constant(matrix->Height());
+         matrix->Mult(one, diffusion_constant);
+         const double local_maximum = diffusion_constant.Normlinf();
+         MPI_Allreduce(&local_maximum, &probe.diffusion_constant_maximum,
+                       1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+      }
+      delete matrix;
+   }
+   return probe;
+}
+
+int RunNonconformingFaceProbe(const std::filesystem::path &output)
+{
+   std::array<FaceProbeResult, 3> nc;
+   std::array<FaceProbeResult, 2> uniform;
+   std::array<std::array<double, 3>, 2> relative{};
+   for (int test = 0; test < 3; ++test)
+   {
+      nc[test] = NonconformingFaceActions(true, false, test);
+      if (test < 2)
+      {
+         uniform[test] = NonconformingFaceActions(false, true, test);
+         for (int i = 0; i < 3; ++i)
+         {
+            relative[test][i] = std::abs(nc[test].actions[i]
+                                          - uniform[test].actions[i])
+               / std::max(1.0, std::abs(uniform[test].actions[i]));
+         }
+      }
+   }
+   double maximum_relative = 0.0, maximum_conservation = 0.0;
+   double maximum_constant_diffusion = 0.0;
+   for (const auto &test : relative)
+   for (double value : test) { maximum_relative = std::max(maximum_relative, value); }
+   for (const auto &test : nc)
+   {
+      maximum_constant_diffusion = std::max(maximum_constant_diffusion,
+                                            test.diffusion_constant_maximum);
+      for (double value : test.constant_test_actions)
+      {
+         maximum_conservation = std::max(maximum_conservation, std::abs(value));
+      }
+   }
+   const bool pass = nc[0].cells == 9 && uniform[0].cells == 16
+                     && maximum_relative < 1.0e-9
+                     && maximum_conservation < 1.0e-8
+                     && maximum_constant_diffusion < 1.0e-10;
+   if (Mpi::WorldRank() == 0)
+   {
+      std::ofstream report(output);
+      report << std::setprecision(17)
+             << "{\n  \"status\": \"" << (pass ? "PASS" : "FAIL") << "\",\n"
+             << "  \"nc_cells\": " << nc[0].cells << ",\n"
+             << "  \"uniform_cells\": " << uniform[0].cells << ",\n"
+             << "  \"tested_states\": [\"affine\", \"quadratic\", \"discontinuous\"],\n"
+             << "  \"relative_action_errors\": [["
+             << relative[0][0] << ", " << relative[0][1] << ", " << relative[0][2]
+             << "], [" << relative[1][0] << ", " << relative[1][1] << ", "
+             << relative[1][2] << "]],\n"
+             << "  \"maximum_relative_action_error\": " << maximum_relative << ",\n"
+             << "  \"maximum_constant_test_action\": " << maximum_conservation << ",\n"
+             << "  \"discontinuous_nc_actions\": [" << nc[2].actions[0] << ", "
+             << nc[2].actions[1] << ", " << nc[2].actions[2] << "],\n"
+             << "  \"maximum_diffusion_action_on_constant\": "
+             << maximum_constant_diffusion << "\n}\n";
+   }
+   return pass ? 0 : 2;
+}
+}
+
 int main(int argc, char *argv[])
 {
    Mpi::Init(argc, argv);
    const int rank = Mpi::WorldRank();
+   if (argc == 3 && std::string(argv[1]) == "nc-face-probe")
+   {
+      return RunNonconformingFaceProbe(argv[2]);
+   }
    const bool mature_mode = argc == 7 && std::string(argv[1]) == "mature";
-   MFEM_VERIFY(argc == 5 || mature_mode,
-               "usage: mfem_physical_equivalence [mature] NX NY NZ [INITIAL] OUTPUT_DIRECTORY");
-   const int offset = mature_mode ? 1 : 0;
+   const bool amr_mode = (argc == 8 || argc == 9) && std::string(argv[1]) == "amr";
+   MFEM_VERIFY(argc == 5 || mature_mode || amr_mode,
+               "usage: mfem_physical_equivalence [mature|amr] NX NY NZ [INPUTS] OUTPUT_DIRECTORY");
+   const int offset = (mature_mode || amr_mode) ? 1 : 0;
    const int nx = std::stoi(argv[1 + offset]);
    const int ny = std::stoi(argv[2 + offset]);
    const int nz = std::stoi(argv[3 + offset]);
@@ -896,7 +1270,10 @@ int main(int argc, char *argv[])
    constexpr int combined_face_quadrature_order = 14;
    constexpr int isolated_advection_face_quadrature_order = 12;
    const std::filesystem::path initial_path = mature_mode ? argv[5] : "";
-   const std::filesystem::path output_directory(mature_mode ? argv[6] : argv[4]);
+   const std::filesystem::path mark_path = amr_mode ? argv[5] : "";
+   const std::filesystem::path mixture_path = amr_mode ? argv[6] : "";
+   const std::filesystem::path output_directory(
+      amr_mode ? argv[7] : (mature_mode ? argv[6] : argv[4]));
    MFEM_VERIFY(nx > 0 && ny > 0 && nz > 0, "positive mesh sizes required");
    if (rank == 0) { std::filesystem::create_directories(output_directory); }
    MPI_Barrier(MPI_COMM_WORLD);
@@ -911,7 +1288,16 @@ int main(int argc, char *argv[])
       x[1] += y_min;
       x[2] += z_min;
    }
+   const int requested_refinements = amr_mode
+      ? RefineMarkedBackground(serial, nx, ny, nz, mark_path) : 0;
    ParMesh mesh(MPI_COMM_WORLD, serial);
+   int local_cells = mesh.GetNE(), global_cells = 0;
+   MPI_Allreduce(&local_cells, &global_cells, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+   if (amr_mode && rank == 0)
+   {
+      std::cout << "static AMR mesh: " << global_cells << " cells from "
+                << requested_refinements << " requested refinements" << std::endl;
+   }
    L2_FECollection collection(2, 3, BasisType::GaussLobatto);
    ParFiniteElementSpace space(&mesh, &collection);
 
@@ -1001,14 +1387,55 @@ int main(int argc, char *argv[])
    ConfigureMassSolver(*M, mass_solver, mass_preconditioner);
    LocalQ2Projector local_projector;
 
-   if (mature_mode)
+   if (mature_mode || amr_mode)
    {
       ParGridFunction state(&space);
-      LoadGlobalNodalField(space, state, nx, ny, nz, initial_path);
+      int initial_qp_cells = 0;
+      int initial_uncertified_cells = 0;
+      double initial_projection_correction = 0.0;
+      if (amr_mode)
+      {
+         MatureGaussianMixture mixture(mixture_path);
+         ParLinearForm load(&space);
+         auto *integrator = new DomainLFIntegrator(mixture);
+         integrator->SetIntRule(&IntRules.Get(Geometry::CUBE, 14));
+         load.AddDomainIntegrator(integrator);
+         load.Assemble();
+         HypreParVector *rhs = load.ParallelAssemble();
+         Vector projected(space.GetTrueVSize());
+         mass_solver.Mult(*rhs, projected);
+         state.SetFromTrueDofs(projected);
+         delete rhs;
+         const double raw_mass = FieldMass(state);
+         MFEM_VERIFY(raw_mass > 0.0, "AMR initial mixture has nonpositive mass");
+         state *= 1.0 / raw_mass;
+         ParGridFunction raw(state);
+         RepairCellAverages(space, state);
+         ParGridFunction admissible(&space);
+         const ProjectionCounts initial_projection =
+            ProjectField(local_projector, space, state, admissible);
+         initial_qp_cells = initial_projection.qp;
+         initial_uncertified_cells = global_cells - initial_projection.certified;
+         initial_projection_correction = FieldL1Difference(raw, admissible);
+         state = admissible;
+      }
+      else
+      {
+         LoadGlobalNodalField(space, state, nx, ny, nz, initial_path);
+      }
       const double initial_mass = FieldMass(state);
-      ExportSubcellAverages(state, nx, ny, nz,
-                            output_directory / "initial_q2_subcell_averages.bin", 6);
-      constexpr int steps = 320;
+      if (amr_mode)
+      {
+         ExportAlignedCommonAverages(state,
+            output_directory / "initial_q2_subcell_averages.bin");
+      }
+      else
+      {
+         ExportSubcellAverages(state, nx, ny, nz,
+            output_directory / "initial_q2_subcell_averages.bin", 6);
+      }
+      const int steps = amr_mode && argc == 9 ? std::stoi(argv[8]) : 320;
+      MFEM_VERIFY(steps > 0 && steps <= 320, "AMR diagnostic step count is invalid");
       std::vector<double> masses;
       std::vector<double> relative_corrections;
       std::vector<int> qp_cells;
@@ -1052,7 +1479,7 @@ int main(int argc, char *argv[])
             ProjectField(local_projector, space, stage1, corrected);
          qp_cells.push_back(projection.qp);
          zero_average_cells.push_back(projection.zero_average);
-         uncertified_cells.push_back(nx * ny * nz - projection.certified);
+         uncertified_cells.push_back(global_cells - projection.certified);
          const double correction = FieldL1Difference(raw, corrected);
          const double incoming_mass = FieldMass(raw);
          const double corrected_mass = FieldMass(corrected);
@@ -1070,8 +1497,16 @@ int main(int argc, char *argv[])
       }
       const double runtime = std::chrono::duration<double>(
          std::chrono::steady_clock::now() - started).count();
-      ExportSubcellAverages(state, nx, ny, nz,
-                            output_directory / "final_q2_subcell_averages.bin", 6);
+      if (amr_mode)
+      {
+         ExportAlignedCommonAverages(state,
+            output_directory / "final_q2_subcell_averages.bin");
+      }
+      else
+      {
+         ExportSubcellAverages(state, nx, ny, nz,
+            output_directory / "final_q2_subcell_averages.bin", 6);
+      }
       if (rank == 0)
       {
          const auto maximum_mass_error = *std::max_element(
@@ -1083,6 +1518,12 @@ int main(int argc, char *argv[])
          std::ofstream summary(output_directory / "mature_summary.json");
          summary << std::setprecision(17)
                  << "{\n  \"mesh\": [" << nx << ", " << ny << ", " << nz << "],\n"
+                 << "  \"amr\": " << (amr_mode ? "true" : "false") << ",\n"
+                 << "  \"cells\": " << global_cells << ",\n"
+                 << "  \"initial_qp_cells\": " << initial_qp_cells << ",\n"
+                 << "  \"initial_uncertified_cells\": " << initial_uncertified_cells << ",\n"
+                 << "  \"initial_projection_l1_correction\": "
+                 << initial_projection_correction << ",\n"
                  << "  \"steps\": " << steps << ",\n"
                  << "  \"initial_mass\": " << initial_mass << ",\n"
                  << "  \"final_mass\": " << masses.back() << ",\n"

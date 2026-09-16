@@ -1150,6 +1150,34 @@ Evidence: immutable run
 `runs/mfem-mature-uniform-equivalence/20260915T193445Z` and
 `experiments/mfem-mature-uniform-equivalence.yaml`.
 
+## 34. Static NC-hex AMR gate and provenance
+
+The clean conforming MFEM mature run remains the primary numerical-equivalence
+artifact. The strengthened `20260916T213458Z` rerun produced the identical
+final common-grid bytes and counted zero uncertified cells at every step, but
+its wrapper exited after propagation because of a shell quoting error. Its
+comparison was completed separately and the status record now distinguishes
+that wrapper failure from the numerical pass.
+
+A one- and two-rank `2:1` nonconforming-hex face probe compares the full DG,
+upwind face and full-SPD SIPG face weak actions with a uniformly refined
+conforming mesh on affine and quadratic physical states. A discontinuous state
+also tests conservative face balance. The maximum two-rank relative action
+difference is `5.87e-14`; the maximum absolute constant-test action is
+`1.16e-9` on the large physical box. This is a local structural test, not yet
+an AMR trajectory result.
+
+The first static AMR reproduction test is predeclared in
+`experiments/mfem-static-nc-hex-reproduction.yaml`. The eleven-snapshot replay
+indicator marks 539 of the `45x54x54` background cells to capture 99 percent
+of squared indicator energy; a one-cell buffer yields 1,314 local octree
+refinements and 140,418 final cells (3,791,286 DG DOFs). The mesh stays fixed
+for all 320 CN steps. The primary reproduction gate is conservative common-grid
+`D_AMR,gf < 0.02`, alongside mean correction below `8e-4`, whole-cell
+positivity, conservation, zero optimizer failures/fallbacks, statistical
+non-degradation and fewer DOFs than `g_f`. A second AMR level remains mandatory
+for density-convergence evidence even if this reproduction test passes.
+
 ## Sources
 
 [^1]: C. Liu, J. Hu, W. T. Taitano and X. Zhang, [“An optimization-based positivity-preserving limiter in semi-implicit discontinuous Galerkin schemes solving Fokker–Planck equations”](https://www.math.purdue.edu/~zhan1966/research/paper/DG_anisotropic_Fokker_Planck.pdf), *Computers & Mathematics with Applications* (2025).

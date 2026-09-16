@@ -1,9 +1,18 @@
 {
-  "report_date": "2026-09-15",
+  "report_date": "2026-09-16",
   "classification": "MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED",
   "method_status": "MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED",
   "production_dataset_authorized": false,
-  "next_required_gate": "MATURE_DENSITY_CONVERGENCE",
+  "next_required_gate": "LOCALLY_REFINED_MATURE_DENSITY_CONVERGENCE",
+  "mfem_uniform_equivalence": "CERTIFIED",
+  "mfem_static_nc_hex_amr": "AUTHORIZED",
+  "mfem_nc_face_probe": {
+    "classification": "PASSED_NC_FACE_CONSERVATION_AND_EQUIVALENCE_PROBE",
+    "maximum_relative_action_error": 5.874930171975145e-14,
+    "ranks": 2,
+    "evidence_run": "runs/mfem-nc-face-probe/20260916T-probe/report-2rank-penalty-fixed.json",
+    "scope": "One 2:1 hanging-face mesh; affine and quadratic physical fields plus a discontinuous conservation state; full static-AMR trajectory remains untested"
+  },
   "mfem_uniform_mature_equivalence": {
     "classification": "PASSED_PREDECLARED_MATURE_EQUIVALENCE_GATES",
     "mesh": [30, 36, 36],
@@ -14,6 +23,13 @@
     "mean_vector_error": 8.037630982190963e-12,
     "covariance_frobenius_error": 3.702656456488332e-11,
     "maximum_absolute_mass_error": 3.984590435379687e-13,
+    "counted_certificate_rerun": {
+      "evidence_run": "runs/mfem-mature-uniform-equivalence/20260916T213458Z",
+      "maximum_uncertified_cells": 0,
+      "final_density_bytes_match_primary": true,
+      "comparison_passed_after_wrapper_failure": true,
+      "wrapper_exit_code": 2
+    },
     "mean_correction_difference": 7.516123140538511e-15,
     "maximum_correction_difference": 1.723135523157282e-13,
     "static_nonconforming_amr_experiment_authorized": true,
@@ -49,7 +65,7 @@
       "monte_carlo_200000_cpu_sampling_propagation_histogram_seconds": 3.369948232000722,
       "scope": "One 0.05 forecast interval; MC figure excludes principled bandwidth selection and accuracy certification."
     },
-    "principal_remaining_limitation": "The fine 58x68x56 graded run reduces mean correction to 0.0001128 and affected probability to 0.004179 with all invariant and statistical gates passing, but D_60,gf=0.108680 and D_g,gf=0.107936 remain material. Its runtime is 10.1% above uniform-60 despite 29.0% fewer DG unknowns. A third time-aggregated graded level must establish further full-density contraction before domain sensitivity; independently resolved full-density evidence remains absent."
+    "principal_remaining_limitation": "The fine 58x68x56 graded run reduces mean correction to 0.0001128 and affected probability to 0.004179 with all invariant and statistical gates passing, but D_60,gf=0.108680 and D_g,gf=0.107936 remain material. Its runtime is 10.1% above uniform-60 despite 29.0% fewer DG unknowns. The authorized static NC-hex reproduction and a second AMR level must establish further full-density contraction before domain sensitivity; independently resolved full-density evidence remains absent."
   },
   "pde": {
     "linear_in_density": true,
