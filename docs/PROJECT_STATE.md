@@ -1,6 +1,6 @@
 # Project state
 
-Updated: 2026-09-16
+Updated: 2026-09-23
 
 ## Objective
 
@@ -22,6 +22,8 @@ MATURE_DENSITY_CONVERGENCE = OPEN
 MATURE_GRADED_EFFICIENCY = SUPPORTED_NOT_CERTIFIED
 MFEM_UNIFORM_EQUIVALENCE = CERTIFIED
 MFEM_STATIC_NC_HEX_AMR = AUTHORIZED
+MFEM_STATIC_AMR_REPRODUCTION = PASSED_NUMERICALLY
+MFEM_STATIC_AMR_RESOURCE_EFFICIENCY = OPEN
 PRODUCTION_DATASET_AUTHORIZED = false
 NEXT_REQUIRED_GATE = LOCALLY_REFINED_MATURE_DENSITY_CONVERGENCE
 ```
@@ -29,6 +31,17 @@ NEXT_REQUIRED_GATE = LOCALLY_REFINED_MATURE_DENSITY_CONVERGENCE
 - Method-selection classification: `MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED`.
 - Next required gate: `LOCALLY_REFINED_MATURE_DENSITY_CONVERGENCE`.
 - Large neural-operator dataset generation: `NO`.
+- The first full 320-step static MFEM NC-hex AMR trajectory passes its
+  predeclared numerical reproduction gates:
+  `D_AMR1,gf = 0.01871569 < 0.02`, mean relative local-QP correction
+  `2.07549e-4 < 8e-4`, maximum mass error `7.53e-13`, zero
+  uncertified cells, optimizer failures, and fallbacks. It uses 3,791,286
+  DG DOFs, 36.4% fewer than `g_f`. Its 9,780-second propagation takes
+  2.13 times the `g_f` runtime; peak AMR memory was not recorded.
+  Numerical reproduction is established, while resource efficiency is not.
+  Evidence: `runs/mfem-static-amr-reproduction/20260916T221235Z`.
+  A second, predeclared local refinement level tests density contraction;
+  dataset authorization remains withheld.
 - Controlled baseline: Q1 DG, upwind advection, SIPG diffusion, backward
   Euler, quadrature-14 L2 initialization and projected Bayesian analysis,
   followed by the conservative two-stage positivity limiter.
@@ -166,11 +179,12 @@ The living plan is in `docs/RESEARCH_DIRECTIONS.md` and
 2. The two-rank `2:1` hanging-face probe agrees with a conforming uniformly
    refined comparator at `5.9e-14` or better relative action error and preserves
    discrete mass. The first static octree mesh is fixed for all 320 CN steps.
-3. Test reproduction of the fine graded `g_f` solution with
-   `D_AMR,gf < 0.02`, mean correction below `8e-4`, all existing
-   statistical/invariant gates, and fewer DOFs than `g_f`.
-4. If reproduction passes, build a second AMR level with the same marking
-   functional and test `D_AMR1,AMR2 <= 0.05` as contraction evidence.
+3. First AMR reproduction passed its numerical gates; the slower runtime
+   prevents an efficiency claim despite lower DOF count.
+4. Run the predeclared second AMR level using the same time-aggregated
+   marking functional and test `D_AMR1,AMR2 <= 0.05` as contraction
+   evidence. Its 95% second-level energy target is a prospective cost/coverage
+   choice; the first-level 99% criterion remains unchanged.
 5. Do not spend another hierarchy on deeper Bernstein certification; witnessed
    polynomial negativity, rather than unresolved bounds, dominates every saved
    mature snapshot.

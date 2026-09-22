@@ -1,0 +1,36 @@
+id: mfem-static-nc-hex-level2
+kind: replay_marked_second_level_mature_full_spd_q2_cn_local_qp
+status: predeclared
+source_indicator: runs/mature-time-aggregated-grid-pipeline/20260915T134916Z/time_aggregated_indicator.npy
+first_level_reference: runs/mfem-static-amr-reproduction/20260916T221235Z
+fine_graded_reference: runs/mature-full-spd-graded-fine-comparison/20260914T231639Z/mature_bimodal_q2_local_qp_graded58x68x56
+base_mesh: [45, 54, 54]
+second_level_refinement:
+  rule: child-cell summed squared time-aggregated replay indicator
+  dorfler_energy_coverage_of_total: 0.95
+  buffer_child_cells: 1
+  permitted_only_within_first_level_refined_cells: true
+  refinement: one_additional_isotropic_1_to_8_level
+  maximum_nc_level: 1
+  mesh_fixed_through_forecast: true
+method:
+  element: discontinuous_Q2_hexahedron
+  diffusion: [[1.0, 0.4, 0.2], [0.4, 1.0, 0.3], [0.2, 0.3, 1.0]]
+  drift: Lorenz_63
+  timestep: 0.00015625
+  steps: 320
+  time_method: Crank_Nicolson
+  positivity: conservative_average_repair_then_frozen_local_QP
+  common_grid: [180, 216, 216]
+gates:
+  maximum_final_density_l1_to_first_amr: 0.05
+  maximum_mean_relative_l1_correction: 0.0008
+  maximum_absolute_mass_error: 1.0e-10
+  maximum_common_grid_negative_mass: 1.0e-13
+  zero_uncertified_cells: true
+  zero_optimizer_failures: true
+  zero_fallbacks: true
+  maximum_statistical_degradation_to_mc_vs_fine_graded: 0.005
+  fewer_dofs_than_fine_graded: true
+  production_dataset_authorized: false
+interpretation: Passing gives second-level contraction evidence; further independent resolution evidence remains necessary for mature-density certification.

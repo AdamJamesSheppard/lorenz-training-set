@@ -6,12 +6,28 @@
   "next_required_gate": "LOCALLY_REFINED_MATURE_DENSITY_CONVERGENCE",
   "mfem_uniform_equivalence": "CERTIFIED",
   "mfem_static_nc_hex_amr": "AUTHORIZED",
+  "mfem_static_amr_reproduction": {
+    "classification": "PASSED_STATIC_AMR_REPRODUCTION_GATES",
+    "evidence_run": "runs/mfem-static-amr-reproduction/20260916T221235Z",
+    "final_density_l1_to_fine_graded": 0.01871569170756896,
+    "mean_relative_l1_correction": 0.00020754857625094754,
+    "maximum_absolute_mass_error": 7.531752999057062e-13,
+    "cells": 140418,
+    "dg_dofs": 3791286,
+    "runtime_seconds": 9780.224667,
+    "runtime_ratio_to_fine_graded": 2.134,
+    "peak_memory_measured": false,
+    "numerical_reproduction_supported": true,
+    "resource_efficiency_certified": false,
+    "mature_density_convergence_certified": false,
+    "next_required_experiment": "second_static_nc_hex_amr_level"
+  },
   "mfem_nc_face_probe": {
     "classification": "PASSED_NC_FACE_CONSERVATION_AND_EQUIVALENCE_PROBE",
     "maximum_relative_action_error": 5.874930171975145e-14,
     "ranks": 2,
     "evidence_run": "runs/mfem-nc-face-probe/20260916T-probe/report-2rank-penalty-fixed.json",
-    "scope": "One 2:1 hanging-face mesh; affine and quadratic physical fields plus a discontinuous conservation state; full static-AMR trajectory remains untested"
+    "scope": "One 2:1 hanging-face mesh; affine and quadratic physical fields plus a discontinuous conservation state; the later full static-AMR trajectory separately passed numerical reproduction gates"
   },
   "mfem_uniform_mature_equivalence": {
     "classification": "PASSED_PREDECLARED_MATURE_EQUIVALENCE_GATES",

@@ -12,6 +12,7 @@
 #include <iostream>
 #include <numeric>
 #include <string>
+#include <sys/resource.h>
 #include <vector>
 
 using namespace mfem;
@@ -443,6 +444,49 @@ int RefineMarkedBackground(Mesh &mesh, const int nx, const int ny, const int nz,
    }
    mesh.EnsureNCMesh(true);
    mesh.GeneralRefinement(marked, 1);
+   return marked.Size();
+}
+
+int RefineMarkedChildren(Mesh &mesh, const int nx, const int ny, const int nz,
+                         const std::filesystem::path &path)
+{
+   const int counts[3] = {2 * nx, 2 * ny, 2 * nz};
+   const double origins[3] = {x_min, y_min, z_min};
+   const double lengths[3] = {x_max - x_min, y_max - y_min, z_max - z_min};
+   const std::size_t count = static_cast<std::size_t>(counts[0]) * counts[1] * counts[2];
+   std::vector<std::uint8_t> flags(count);
+   std::ifstream input(path, std::ios::binary);
+   MFEM_VERIFY(input.good(), "could not open second-level AMR marks");
+   input.read(reinterpret_cast<char *>(flags.data()), static_cast<std::streamsize>(count));
+   MFEM_VERIFY(input.gcount() == static_cast<std::streamsize>(count) && input.peek() == EOF,
+               "second-level AMR mark file size is invalid");
+   Array<int> marked;
+   IntegrationPoint start, end, midpoint;
+   start.Set3(0.0, 0.0, 0.0);
+   end.Set3(1.0, 1.0, 1.0);
+   midpoint.Set3(0.5, 0.5, 0.5);
+   for (int element = 0; element < mesh.GetNE(); ++element)
+   {
+      auto *transformation = mesh.GetElementTransformation(element);
+      Vector low(3), high(3), center(3);
+      transformation->Transform(start, low);
+      transformation->Transform(end, high);
+      transformation->Transform(midpoint, center);
+      int index[3];
+      bool first_level_child = true;
+      for (int axis = 0; axis < 3; ++axis)
+      {
+         const double width = lengths[axis] / counts[axis];
+         first_level_child &= std::abs((high[axis] - low[axis]) / width - 1.0) < 1.0e-8;
+         index[axis] = std::clamp(
+            static_cast<int>(std::floor((center[axis] - origins[axis]) / width)),
+            0, counts[axis] - 1);
+      }
+      const std::size_t flat = (static_cast<std::size_t>(index[0]) * counts[1]
+                                + index[1]) * counts[2] + index[2];
+      if (first_level_child && flags[flat]) { marked.Append(element); }
+   }
+   mesh.GeneralRefinement(marked, 1, 1);
    return marked.Size();
 }
 
@@ -1257,9 +1301,11 @@ int main(int argc, char *argv[])
    }
    const bool mature_mode = argc == 7 && std::string(argv[1]) == "mature";
    const bool amr_mode = (argc == 8 || argc == 9) && std::string(argv[1]) == "amr";
-   MFEM_VERIFY(argc == 5 || mature_mode || amr_mode,
-               "usage: mfem_physical_equivalence [mature|amr] NX NY NZ [INPUTS] OUTPUT_DIRECTORY");
-   const int offset = (mature_mode || amr_mode) ? 1 : 0;
+   const bool amr2_mode = (argc == 9 || argc == 10) && std::string(argv[1]) == "amr2";
+   const bool adaptive_mode = amr_mode || amr2_mode;
+   MFEM_VERIFY(argc == 5 || mature_mode || adaptive_mode,
+               "usage: mfem_physical_equivalence [mature|amr|amr2] NX NY NZ [INPUTS] OUTPUT_DIRECTORY");
+   const int offset = (mature_mode || adaptive_mode) ? 1 : 0;
    const int nx = std::stoi(argv[1 + offset]);
    const int ny = std::stoi(argv[2 + offset]);
    const int nz = std::stoi(argv[3 + offset]);
@@ -1270,10 +1316,12 @@ int main(int argc, char *argv[])
    constexpr int combined_face_quadrature_order = 14;
    constexpr int isolated_advection_face_quadrature_order = 12;
    const std::filesystem::path initial_path = mature_mode ? argv[5] : "";
-   const std::filesystem::path mark_path = amr_mode ? argv[5] : "";
-   const std::filesystem::path mixture_path = amr_mode ? argv[6] : "";
+   const std::filesystem::path mark_path = adaptive_mode ? argv[5] : "";
+   const std::filesystem::path second_mark_path = amr2_mode ? argv[6] : "";
+   const std::filesystem::path mixture_path =
+      amr2_mode ? argv[7] : (amr_mode ? argv[6] : "");
    const std::filesystem::path output_directory(
-      amr_mode ? argv[7] : (mature_mode ? argv[6] : argv[4]));
+      amr2_mode ? argv[8] : (amr_mode ? argv[7] : (mature_mode ? argv[6] : argv[4])));
    MFEM_VERIFY(nx > 0 && ny > 0 && nz > 0, "positive mesh sizes required");
    if (rank == 0) { std::filesystem::create_directories(output_directory); }
    MPI_Barrier(MPI_COMM_WORLD);
@@ -1288,15 +1336,19 @@ int main(int argc, char *argv[])
       x[1] += y_min;
       x[2] += z_min;
    }
-   const int requested_refinements = amr_mode
+   const int requested_refinements = adaptive_mode
       ? RefineMarkedBackground(serial, nx, ny, nz, mark_path) : 0;
+   const int requested_child_refinements = amr2_mode
+      ? RefineMarkedChildren(serial, nx, ny, nz, second_mark_path) : 0;
    ParMesh mesh(MPI_COMM_WORLD, serial);
    int local_cells = mesh.GetNE(), global_cells = 0;
    MPI_Allreduce(&local_cells, &global_cells, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-   if (amr_mode && rank == 0)
+   if (adaptive_mode && rank == 0)
    {
       std::cout << "static AMR mesh: " << global_cells << " cells from "
-                << requested_refinements << " requested refinements" << std::endl;
+                << requested_refinements << " first-level and "
+                << requested_child_refinements << " second-level requested refinements"
+                << std::endl;
    }
    L2_FECollection collection(2, 3, BasisType::GaussLobatto);
    ParFiniteElementSpace space(&mesh, &collection);
@@ -1387,13 +1439,13 @@ int main(int argc, char *argv[])
    ConfigureMassSolver(*M, mass_solver, mass_preconditioner);
    LocalQ2Projector local_projector;
 
-   if (mature_mode || amr_mode)
+   if (mature_mode || adaptive_mode)
    {
       ParGridFunction state(&space);
       int initial_qp_cells = 0;
       int initial_uncertified_cells = 0;
       double initial_projection_correction = 0.0;
-      if (amr_mode)
+      if (adaptive_mode)
       {
          MatureGaussianMixture mixture(mixture_path);
          ParLinearForm load(&space);
@@ -1424,7 +1476,7 @@ int main(int argc, char *argv[])
          LoadGlobalNodalField(space, state, nx, ny, nz, initial_path);
       }
       const double initial_mass = FieldMass(state);
-      if (amr_mode)
+      if (adaptive_mode)
       {
          ExportAlignedCommonAverages(state,
             output_directory / "initial_q2_subcell_averages.bin");
@@ -1434,7 +1486,8 @@ int main(int argc, char *argv[])
          ExportSubcellAverages(state, nx, ny, nz,
             output_directory / "initial_q2_subcell_averages.bin", 6);
       }
-      const int steps = amr_mode && argc == 9 ? std::stoi(argv[8]) : 320;
+      const int steps = amr2_mode && argc == 10 ? std::stoi(argv[9])
+                        : (amr_mode && argc == 9 ? std::stoi(argv[8]) : 320);
       MFEM_VERIFY(steps > 0 && steps <= 320, "AMR diagnostic step count is invalid");
       std::vector<double> masses;
       std::vector<double> relative_corrections;
@@ -1497,7 +1550,7 @@ int main(int argc, char *argv[])
       }
       const double runtime = std::chrono::duration<double>(
          std::chrono::steady_clock::now() - started).count();
-      if (amr_mode)
+      if (adaptive_mode)
       {
          ExportAlignedCommonAverages(state,
             output_directory / "final_q2_subcell_averages.bin");
@@ -1507,6 +1560,11 @@ int main(int argc, char *argv[])
          ExportSubcellAverages(state, nx, ny, nz,
             output_directory / "final_q2_subcell_averages.bin", 6);
       }
+      struct rusage usage {};
+      getrusage(RUSAGE_SELF, &usage);
+      long local_peak_rss = usage.ru_maxrss, maximum_peak_rss = 0;
+      MPI_Allreduce(&local_peak_rss, &maximum_peak_rss, 1, MPI_LONG, MPI_MAX,
+                    MPI_COMM_WORLD);
       if (rank == 0)
       {
          const auto maximum_mass_error = *std::max_element(
@@ -1518,7 +1576,8 @@ int main(int argc, char *argv[])
          std::ofstream summary(output_directory / "mature_summary.json");
          summary << std::setprecision(17)
                  << "{\n  \"mesh\": [" << nx << ", " << ny << ", " << nz << "],\n"
-                 << "  \"amr\": " << (amr_mode ? "true" : "false") << ",\n"
+                 << "  \"amr\": " << (adaptive_mode ? "true" : "false") << ",\n"
+                 << "  \"amr_levels\": " << (amr2_mode ? 2 : (amr_mode ? 1 : 0)) << ",\n"
                  << "  \"cells\": " << global_cells << ",\n"
                  << "  \"initial_qp_cells\": " << initial_qp_cells << ",\n"
                  << "  \"initial_uncertified_cells\": " << initial_uncertified_cells << ",\n"
@@ -1546,7 +1605,8 @@ int main(int argc, char *argv[])
                  << (std::all_of(uncertified_cells.begin(), uncertified_cells.end(),
                                  [](int count) { return count == 0; }) ? "true" : "false")
                  << ",\n"
-                 << "  \"runtime_seconds\": " << runtime << "\n}\n";
+                 << "  \"runtime_seconds\": " << runtime << ",\n"
+                 << "  \"maximum_rank_peak_rss_kib\": " << maximum_peak_rss << "\n}\n";
       }
       delete cn_left;
       delete cn_right;
