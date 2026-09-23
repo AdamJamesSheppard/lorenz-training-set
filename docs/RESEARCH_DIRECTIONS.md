@@ -1,6 +1,6 @@
 # Research directions
 
-Updated: 2026-09-16
+Updated: 2026-09-23
 
 This is a living portfolio, not a queue that must be executed in order. Agents
 are welcome to add, remove, split, merge, or re-rank branches as the production
@@ -49,10 +49,13 @@ over the full 320-step mature forecast to common-grid `L1=5.26e-11`. The active
 branch is a fixed, replay-driven nonconforming-hex AMR test. This cross-framework
 result does not close mature full-density convergence or domain sensitivity.
 The two-rank hanging-face structural probe passes at `5.87e-14` relative
-action error. The first fixed NC mesh contains 140,418 cells after 1,314 local
-refinements from a `45x54x54` background. Its 320-step reproduction of `g_f`
-is the active experiment; another AMR level will still be needed for spatial
-contraction evidence.
+action error. The first fixed NC mesh reproduces `g_f` within `L1=0.01872`.
+The second mesh passes its declared `D_AMR1,AMR2<0.05` gate at `0.01571`
+and roughly halves the correction, but its distance to `g_f` increases
+slightly to `0.01913`. Both AMR trajectories take about twice the fine
+graded runtime. A third geometric refinement depth is the active contraction
+test on the frozen conservative voxel grid; a passed gate will not establish
+subvoxel Q2 convergence or resource efficiency.
 
 ## Active branches
 
@@ -66,7 +69,7 @@ contraction evidence.
 | Positive full-tensor finite volume | Provides an operator-level positivity fallback with substantially different numerical principles. | Prioritize if corrected/AFC Q2 fails; require genuine 3-D convection-diffusion, no-flux and high-Peclet validation. |
 | FCDF or directional complete flux | Directly targets drift-diffusion flux and high-Peclet numerical diffusion. | Keep as an identity/diagonal `B` special-case branch; present FCDF proof is directional and its 2026 evidence is lower-dimensional. |
 | Characteristic/semi-Lagrangian methods | Could reduce upwind transport diffusion substantially. | Require a defensible 3-D diffusion, positivity, conservation, and reflecting-boundary treatment. |
-| Time-aggregated static nonconforming-hex AMR | The fine graded result shows resolution-controlled mature-density change and nearly dormant QP correction; tensor-product grading could not represent the sparse replay indicator efficiently. MFEM has passed conforming uniform equivalence and the small NC-face probe. | First require `D_AMR,gf<0.02`, positivity/statistical gates and fewer DOFs than `g_f`; then require a second AMR level with clear density-difference contraction. |
+| Time-aggregated static nonconforming-hex AMR | Uniform equivalence and first/second NC-hex trajectory gates pass; two levels remain too close to infer full-density convergence, and memory/runtime efficiency is unproved. | Require third-depth voxel-average difference `D_AMR2,AMR3<=0.00785326`, invariant/statistical gates, and a separate assessment of subvoxel convergence before certification. |
 | Dynamically scaled Hermite reference | Supplies a whole-space, high-order method independent of DG/FV and avoids reflecting truncation. | Validate by coefficient decay and moment refinement; use as a reference even if positivity prevents production use. |
 | Monte Carlo plus density reconstruction | Strong independent moment reference and possible production challenger. | Compare full-density reconstruction, tails, bandwidth bias, repeatability, and cost - not moments alone. |
 

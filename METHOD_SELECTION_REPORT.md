@@ -70,8 +70,13 @@ experiment uses replay-driven local hex AMR to resolve mature full-density
 convergence. The corrected MFEM port has passed the small and production-mesh
 physical-basis gates and the complete 320-step conforming uniform mature
 forecast against frozen DOLFINx. The framework transition is accepted for this
-tested configuration; mature-density convergence and domain sensitivity remain
-open, and production dataset generation is unauthorized.
+tested configuration. The first static AMR trajectory reproduces the fine graded
+solution within `L1=0.01872`. A second mesh passes its predeclared gates with
+`D_AMR1,AMR2=0.01571`, but its distance to the fine graded solution rises
+slightly from `0.01872` to `0.01913`. A third geometric depth now tests
+whether conservative common-grid differences at least halve; subvoxel Q2
+convergence and domain sensitivity remain open, and production dataset
+generation is unauthorized.
 
 Role assignments are separate:
 

@@ -303,6 +303,28 @@ def main() -> int:
             and decision.get("next_required_gate")
             == "LOCALLY_REFINED_MATURE_DENSITY_CONVERGENCE"
         ),
+        "mfem_static_amr_decision_consistent": bool(
+            decision["mfem_static_amr_reproduction"]["classification"]
+            == "PASSED_STATIC_AMR_REPRODUCTION_GATES"
+            and decision["mfem_static_amr_reproduction"]
+            ["final_density_l1_to_fine_graded"] < 0.02
+            and decision["mfem_static_amr_reproduction"]
+            ["resource_efficiency_certified"] is False
+            and decision["mfem_second_amr_level"]["classification"]
+            == "PASSED_SECOND_AMR_LEVEL_GATES"
+            and decision["mfem_second_amr_level"]
+            ["final_density_l1_to_first_amr"] < 0.05
+            and decision["mfem_second_amr_level"]
+            ["final_density_l1_to_fine_graded"]
+            >= decision["mfem_static_amr_reproduction"]
+            ["final_density_l1_to_fine_graded"]
+            and decision["mfem_second_amr_level"]
+            ["mature_density_convergence_certified"] is False
+            and decision["mfem_second_amr_level"]
+            ["production_dataset_authorized"] is False
+            and decision.get("next_required_gate")
+            == "LOCALLY_REFINED_MATURE_DENSITY_CONVERGENCE"
+        ),
         "mature_fine_graded_contraction_consistent": bool(
             mature_graded_fine["classification"]
             == "FAILED_PREDECLARED_MATURE_GRADED_EFFICIENCY_GATES"
@@ -405,6 +427,15 @@ def main() -> int:
             "mature_fine_graded_mean_relative_l1_correction": mature_graded_fine[
                 "mean_relative_l1_correction"
             ],
+            "mfem_first_amr_density_l1_to_fine_graded": decision[
+                "mfem_static_amr_reproduction"
+            ]["final_density_l1_to_fine_graded"],
+            "mfem_second_amr_density_l1_to_first": decision[
+                "mfem_second_amr_level"
+            ]["final_density_l1_to_first_amr"],
+            "mfem_second_amr_density_l1_to_fine_graded": decision[
+                "mfem_second_amr_level"
+            ]["final_density_l1_to_fine_graded"],
         },
         "interpretation": (
             "The tested invariants and evidence consistency pass. Production certification is "

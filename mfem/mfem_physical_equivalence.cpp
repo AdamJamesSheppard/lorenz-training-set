@@ -318,16 +318,54 @@ void ExportAlignedCommonAverages(const ParGridFunction &field,
       transformation->Transform(start, low);
       transformation->Transform(end, high);
       int first[3], span[3];
+      double mapped_low[3], mapped_high[3];
       for (int axis = 0; axis < 3; ++axis)
       {
-         const double mapped_low = (low[axis] - origins[axis])
-                                   * counts[axis] / lengths[axis];
-         const double mapped_high = (high[axis] - origins[axis])
-                                    * counts[axis] / lengths[axis];
-         first[axis] = static_cast<int>(std::lround(mapped_low));
-         span[axis] = static_cast<int>(std::lround(mapped_high)) - first[axis];
-         MFEM_VERIFY(std::abs(mapped_low - first[axis]) < 1.0e-8
-                     && std::abs(mapped_high - first[axis] - span[axis]) < 1.0e-8
+         mapped_low[axis] = (low[axis] - origins[axis])
+                            * counts[axis] / lengths[axis];
+         mapped_high[axis] = (high[axis] - origins[axis])
+                             * counts[axis] / lengths[axis];
+      }
+      bool fine_cell = true;
+      for (int axis = 0; axis < 3; ++axis)
+      {
+         fine_cell &= std::abs(mapped_high[axis] - mapped_low[axis] - 0.5) < 1.0e-8;
+      }
+      if (fine_cell)
+      {
+         int voxel[3];
+         for (int axis = 0; axis < 3; ++axis)
+         {
+            const double twice_low = 2.0 * mapped_low[axis];
+            MFEM_VERIFY(std::abs(twice_low - std::round(twice_low)) < 1.0e-8,
+                        "fine AMR cell is not aligned with the conservative common grid");
+            voxel[axis] = static_cast<int>(std::floor(mapped_low[axis] + 1.0e-8));
+            MFEM_VERIFY(voxel[axis] >= 0 && voxel[axis] < counts[axis]
+                        && mapped_high[axis] <= voxel[axis] + 1.0 + 1.0e-8,
+                        "fine AMR cell crosses a common-grid voxel boundary");
+         }
+         double average = 0.0;
+         for (int a = 0; a < 3; ++a)
+         for (int b = 0; b < 3; ++b)
+         for (int c = 0; c < 3; ++c)
+         {
+            IntegrationPoint point;
+            point.Set3(q[a], q[b], q[c]);
+            average += w[a] * w[b] * w[c] * field.GetValue(element, point);
+         }
+         const std::size_t index =
+            (static_cast<std::size_t>(voxel[0]) * counts[1] + voxel[1])
+            * counts[2] + voxel[2];
+         local[index] += average / 8.0;
+         ++local_coverage[index];
+         continue;
+      }
+      for (int axis = 0; axis < 3; ++axis)
+      {
+         first[axis] = static_cast<int>(std::lround(mapped_low[axis]));
+         span[axis] = static_cast<int>(std::lround(mapped_high[axis])) - first[axis];
+         MFEM_VERIFY(std::abs(mapped_low[axis] - first[axis]) < 1.0e-8
+                     && std::abs(mapped_high[axis] - first[axis] - span[axis]) < 1.0e-8
                      && span[axis] > 0 && first[axis] >= 0
                      && first[axis] + span[axis] <= counts[axis],
                      "AMR element is not aligned with the conservative common grid");
@@ -349,8 +387,8 @@ void ExportAlignedCommonAverages(const ParGridFunction &field,
          const std::size_t index =
             (static_cast<std::size_t>(first[0] + i) * counts[1] + first[1] + j)
             * counts[2] + first[2] + k;
-         local[index] = average;
-         ++local_coverage[index];
+         local[index] += average;
+         local_coverage[index] += 8;
       }
    }
    std::vector<double> global(Mpi::WorldRank() == 0 ? total : 0);
@@ -363,7 +401,7 @@ void ExportAlignedCommonAverages(const ParGridFunction &field,
    if (Mpi::WorldRank() == 0)
    {
       MFEM_VERIFY(std::all_of(global_coverage.begin(), global_coverage.end(),
-                             [](std::uint8_t count) { return count == 1; }),
+                             [](std::uint8_t count) { return count == 8; }),
                   "AMR common-grid export has an uncovered or multiply covered voxel");
       std::ofstream output(path, std::ios::binary);
       MFEM_VERIFY(output.good(), "could not open AMR common-grid export");
@@ -448,18 +486,19 @@ int RefineMarkedBackground(Mesh &mesh, const int nx, const int ny, const int nz,
 }
 
 int RefineMarkedChildren(Mesh &mesh, const int nx, const int ny, const int nz,
-                         const std::filesystem::path &path)
+                         const int level, const std::filesystem::path &path)
 {
-   const int counts[3] = {2 * nx, 2 * ny, 2 * nz};
+   const int factor = 1 << level;
+   const int counts[3] = {factor * nx, factor * ny, factor * nz};
    const double origins[3] = {x_min, y_min, z_min};
    const double lengths[3] = {x_max - x_min, y_max - y_min, z_max - z_min};
    const std::size_t count = static_cast<std::size_t>(counts[0]) * counts[1] * counts[2];
    std::vector<std::uint8_t> flags(count);
    std::ifstream input(path, std::ios::binary);
-   MFEM_VERIFY(input.good(), "could not open second-level AMR marks");
+   MFEM_VERIFY(input.good(), "could not open nested AMR marks");
    input.read(reinterpret_cast<char *>(flags.data()), static_cast<std::streamsize>(count));
    MFEM_VERIFY(input.gcount() == static_cast<std::streamsize>(count) && input.peek() == EOF,
-               "second-level AMR mark file size is invalid");
+               "nested AMR mark file size is invalid");
    Array<int> marked;
    IntegrationPoint start, end, midpoint;
    start.Set3(0.0, 0.0, 0.0);
@@ -473,18 +512,18 @@ int RefineMarkedChildren(Mesh &mesh, const int nx, const int ny, const int nz,
       transformation->Transform(end, high);
       transformation->Transform(midpoint, center);
       int index[3];
-      bool first_level_child = true;
+      bool target_level_child = true;
       for (int axis = 0; axis < 3; ++axis)
       {
          const double width = lengths[axis] / counts[axis];
-         first_level_child &= std::abs((high[axis] - low[axis]) / width - 1.0) < 1.0e-8;
+         target_level_child &= std::abs((high[axis] - low[axis]) / width - 1.0) < 1.0e-8;
          index[axis] = std::clamp(
             static_cast<int>(std::floor((center[axis] - origins[axis]) / width)),
             0, counts[axis] - 1);
       }
       const std::size_t flat = (static_cast<std::size_t>(index[0]) * counts[1]
                                 + index[1]) * counts[2] + index[2];
-      if (first_level_child && flags[flat]) { marked.Append(element); }
+      if (target_level_child && flags[flat]) { marked.Append(element); }
    }
    mesh.GeneralRefinement(marked, 1, 1);
    return marked.Size();
@@ -1302,9 +1341,10 @@ int main(int argc, char *argv[])
    const bool mature_mode = argc == 7 && std::string(argv[1]) == "mature";
    const bool amr_mode = (argc == 8 || argc == 9) && std::string(argv[1]) == "amr";
    const bool amr2_mode = (argc == 9 || argc == 10) && std::string(argv[1]) == "amr2";
-   const bool adaptive_mode = amr_mode || amr2_mode;
+   const bool amr3_mode = (argc == 10 || argc == 11) && std::string(argv[1]) == "amr3";
+   const bool adaptive_mode = amr_mode || amr2_mode || amr3_mode;
    MFEM_VERIFY(argc == 5 || mature_mode || adaptive_mode,
-               "usage: mfem_physical_equivalence [mature|amr|amr2] NX NY NZ [INPUTS] OUTPUT_DIRECTORY");
+               "usage: mfem_physical_equivalence [mature|amr|amr2|amr3] NX NY NZ [INPUTS] OUTPUT_DIRECTORY");
    const int offset = (mature_mode || adaptive_mode) ? 1 : 0;
    const int nx = std::stoi(argv[1 + offset]);
    const int ny = std::stoi(argv[2 + offset]);
@@ -1317,11 +1357,13 @@ int main(int argc, char *argv[])
    constexpr int isolated_advection_face_quadrature_order = 12;
    const std::filesystem::path initial_path = mature_mode ? argv[5] : "";
    const std::filesystem::path mark_path = adaptive_mode ? argv[5] : "";
-   const std::filesystem::path second_mark_path = amr2_mode ? argv[6] : "";
+   const std::filesystem::path second_mark_path = (amr2_mode || amr3_mode) ? argv[6] : "";
+   const std::filesystem::path third_mark_path = amr3_mode ? argv[7] : "";
    const std::filesystem::path mixture_path =
-      amr2_mode ? argv[7] : (amr_mode ? argv[6] : "");
+      amr3_mode ? argv[8] : (amr2_mode ? argv[7] : (amr_mode ? argv[6] : ""));
    const std::filesystem::path output_directory(
-      amr2_mode ? argv[8] : (amr_mode ? argv[7] : (mature_mode ? argv[6] : argv[4])));
+      amr3_mode ? argv[9] : (amr2_mode ? argv[8] : (amr_mode ? argv[7] :
+                    (mature_mode ? argv[6] : argv[4]))));
    MFEM_VERIFY(nx > 0 && ny > 0 && nz > 0, "positive mesh sizes required");
    if (rank == 0) { std::filesystem::create_directories(output_directory); }
    MPI_Barrier(MPI_COMM_WORLD);
@@ -1338,8 +1380,10 @@ int main(int argc, char *argv[])
    }
    const int requested_refinements = adaptive_mode
       ? RefineMarkedBackground(serial, nx, ny, nz, mark_path) : 0;
-   const int requested_child_refinements = amr2_mode
-      ? RefineMarkedChildren(serial, nx, ny, nz, second_mark_path) : 0;
+   const int requested_child_refinements = (amr2_mode || amr3_mode)
+      ? RefineMarkedChildren(serial, nx, ny, nz, 1, second_mark_path) : 0;
+   const int requested_grandchild_refinements = amr3_mode
+      ? RefineMarkedChildren(serial, nx, ny, nz, 2, third_mark_path) : 0;
    ParMesh mesh(MPI_COMM_WORLD, serial);
    int local_cells = mesh.GetNE(), global_cells = 0;
    MPI_Allreduce(&local_cells, &global_cells, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
@@ -1347,7 +1391,8 @@ int main(int argc, char *argv[])
    {
       std::cout << "static AMR mesh: " << global_cells << " cells from "
                 << requested_refinements << " first-level and "
-                << requested_child_refinements << " second-level requested refinements"
+                << requested_child_refinements << " second-level and "
+                << requested_grandchild_refinements << " third-level requested refinements"
                 << std::endl;
    }
    L2_FECollection collection(2, 3, BasisType::GaussLobatto);
@@ -1486,8 +1531,9 @@ int main(int argc, char *argv[])
          ExportSubcellAverages(state, nx, ny, nz,
             output_directory / "initial_q2_subcell_averages.bin", 6);
       }
-      const int steps = amr2_mode && argc == 10 ? std::stoi(argv[9])
-                        : (amr_mode && argc == 9 ? std::stoi(argv[8]) : 320);
+      const int steps = amr3_mode && argc == 11 ? std::stoi(argv[10])
+                        : (amr2_mode && argc == 10 ? std::stoi(argv[9])
+                        : (amr_mode && argc == 9 ? std::stoi(argv[8]) : 320));
       MFEM_VERIFY(steps > 0 && steps <= 320, "AMR diagnostic step count is invalid");
       std::vector<double> masses;
       std::vector<double> relative_corrections;
@@ -1577,7 +1623,7 @@ int main(int argc, char *argv[])
          summary << std::setprecision(17)
                  << "{\n  \"mesh\": [" << nx << ", " << ny << ", " << nz << "],\n"
                  << "  \"amr\": " << (adaptive_mode ? "true" : "false") << ",\n"
-                 << "  \"amr_levels\": " << (amr2_mode ? 2 : (amr_mode ? 1 : 0)) << ",\n"
+                 << "  \"amr_levels\": " << (amr3_mode ? 3 : (amr2_mode ? 2 : (amr_mode ? 1 : 0))) << ",\n"
                  << "  \"cells\": " << global_cells << ",\n"
                  << "  \"initial_qp_cells\": " << initial_qp_cells << ",\n"
                  << "  \"initial_uncertified_cells\": " << initial_uncertified_cells << ",\n"

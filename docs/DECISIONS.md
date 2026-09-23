@@ -4,6 +4,32 @@ Decisions here are dated and revisable. Add a new entry that marks an older
 decision `superseded`, `narrowed`, or `confirmed` rather than rewriting history
 to make the current direction look inevitable.
 
+## 2026-09-23 - Test a third geometric AMR depth on conservative voxel averages
+
+**Decision.** Confirm the numerical validity of the first and second static
+NC-hex trajectories while keeping mature-density convergence and production
+authorization open. Predeclare a third geometric refinement depth within the
+second-level marked region, using the unchanged time-aggregated indicator and
+95% total indicator-energy target. Require
+`D_AMR2,AMR3 <= 0.007853258960160175`, half the observed first-to-second
+common-grid difference, plus the existing positivity, mass, correction,
+statistical and DOF gates.
+
+**Evidence.** The first 320-step run passes `D_AMR1,gf=0.0187157<0.02`;
+the second passes every declared gate with `D_AMR1,AMR2=0.0157065<0.05`
+and mean correction `1.04980e-4`. Its distance to `g_f` rises slightly
+to `0.0191270`, so the prior loose gate does not establish asymptotic
+convergence. The second run takes 155 minutes, with 6.33 GiB peak RSS per
+rank. A one-step third-depth test contains 208,983 cells and passes positivity,
+mass and exact conservative voxel-export checks; its observed 7.15 GiB
+peak RSS per rank motivates a memory check during the full run.
+
+**Scope.** The `180x216x216` common grid is the frozen comparison
+representation. Third-depth cells are integrated conservatively into its
+voxels, so any pass demonstrates contraction of voxel averages, not
+subvoxel Q2 convergence. Domain sensitivity and independent full-density
+reference remain required.
+
 ## 2026-09-16 - Certify uniform MFEM equivalence and authorize static NC-hex AMR
 
 **Decision.** Certify the tested conforming MFEM port as numerically equivalent

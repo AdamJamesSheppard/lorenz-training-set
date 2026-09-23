@@ -1,5 +1,5 @@
 {
-  "report_date": "2026-09-16",
+  "report_date": "2026-09-23",
   "classification": "MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED",
   "method_status": "MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED",
   "production_dataset_authorized": false,
@@ -20,7 +20,24 @@
     "numerical_reproduction_supported": true,
     "resource_efficiency_certified": false,
     "mature_density_convergence_certified": false,
-    "next_required_experiment": "second_static_nc_hex_amr_level"
+    "next_required_experiment": "third_depth_static_nc_hex_amr_level"
+  },
+  "mfem_second_amr_level": {
+    "classification": "PASSED_SECOND_AMR_LEVEL_GATES",
+    "evidence_run": "runs/mfem-static-amr-level2/20260922T231219Z",
+    "final_density_l1_to_first_amr": 0.01570651792032035,
+    "final_density_l1_to_fine_graded": 0.01912701415926499,
+    "first_amr_density_l1_to_fine_graded": 0.01871569170756896,
+    "initial_density_l1_to_first_amr": 0.0018386057196939135,
+    "mean_relative_l1_correction": 0.00010498002763262651,
+    "maximum_absolute_mass_error": 8.40327807338781e-13,
+    "cells": 163728,
+    "dg_dofs": 4420656,
+    "runtime_seconds": 9316.402196954,
+    "maximum_rank_peak_rss_kib": 6637064,
+    "mature_density_convergence_certified": false,
+    "production_dataset_authorized": false,
+    "next_required_experiment": "third_depth_static_nc_hex_amr_level"
   },
   "mfem_nc_face_probe": {
     "classification": "PASSED_NC_FACE_CONSERVATION_AND_EQUIVALENCE_PROBE",
