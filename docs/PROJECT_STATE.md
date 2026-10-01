@@ -33,6 +33,14 @@ NEXT_REQUIRED_GATE = LOCALLY_REFINED_MATURE_DENSITY_CONVERGENCE
 - Method-selection classification: `MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED`.
 - Next required gate: `LOCALLY_REFINED_MATURE_DENSITY_CONVERGENCE`.
 - Large neural-operator dataset generation: `NO`.
+- Expanded-support run `runs/mfem-support-sensitivity/20261001T144235Z`
+  completed 320 steps. It failed reproduction of AMR3 at `0.0150712`
+  against `0.00785326`; every invariant and statistical gate passed.
+  Mean QP correction fell to `2.02955e-5`, runtime was 2.70 hours and
+  peak RSS 5.63 GiB/rank. The next test retains its base and second-depth
+  marks, adding a bounded third depth in 1,889 buffered cells ranked by the
+  saved AMR2/AMR3 density difference (39.1% coverage). This partial test
+  cannot certify full-density convergence even if its difference gate passes.
 - The third-depth trajectory completed all 320 steps but failed its halving
   gate: `D_AMR2,AMR3=0.0106884 > 0.00785326`, ratio `0.6805`.
   All positivity, mass, optimizer, export and statistical gates passed.

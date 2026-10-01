@@ -1,0 +1,17 @@
+id: mfem-support-depth
+status: predeclared
+fixed_support: runs/mfem-support-sensitivity/20261001T144235Z/design
+third_depth:
+  raw_cells: 512
+  score: absolute_saved_AMR2_AMR3_voxel_difference
+  buffer: one_voxel
+  maximum_buffered_marks: 2048
+  maximum_nc_level: 1
+method: frozen_Q2_CN_full_SPD_local_QP
+steps: 320
+timestep: 0.00015625
+common_grid: [180, 216, 216]
+maximum_final_density_l1_to_fixed_support: 0.007853258960160175
+other_gates: inherited_support_test_invariant_statistical_and_DOF_gates
+scope: targeted_depth_sensitivity_only_partial_indicator_coverage
+production_dataset_authorized: false

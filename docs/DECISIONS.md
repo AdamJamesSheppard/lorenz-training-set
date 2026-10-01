@@ -1,5 +1,17 @@
 # Decision log
 
+## 2026-10-01 - Add bounded depth on the fixed expanded support
+
+The expanded-support test fails its AMR3 reproduction gate at `0.0150712`
+but reduces dynamic QP correction by 80.7% relative to AMR2. Retain the
+expanded base and second-depth marks in the next test and change only local
+depth. Refine the 512 highest saved discrepancy voxels with a one-cell buffer,
+giving 1,889 marks and 39.1% discrepancy coverage. The 2,048-mark ceiling is
+prospective and reflects available local memory; refining the whole support
+would greatly exceed earlier mesh sizes. Preserve the `0.00785326` difference
+gate and all invariant/statistical gates. A pass is a targeted sensitivity
+result with partial coverage; complete spatial certification remains open.
+
 ## 2026-10-01 - Test refinement support identified by density differences
 
 The third-depth halving gate failed at `0.0106884` against `0.00785326`;
