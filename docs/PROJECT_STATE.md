@@ -1,6 +1,6 @@
 # Project state
 
-Updated: 2026-09-23
+Updated: 2026-10-01
 
 ## Objective
 
@@ -25,6 +25,7 @@ MFEM_STATIC_NC_HEX_AMR = AUTHORIZED
 MFEM_STATIC_AMR_REPRODUCTION = PASSED_NUMERICALLY
 MFEM_STATIC_AMR_RESOURCE_EFFICIENCY = OPEN
 MFEM_SECOND_AMR_VOXEL_GATES = PASSED
+MFEM_THIRD_DEPTH_VOXEL_CONTRACTION = FAILED_PREDECLARED_GATE
 PRODUCTION_DATASET_AUTHORIZED = false
 NEXT_REQUIRED_GATE = LOCALLY_REFINED_MATURE_DENSITY_CONVERGENCE
 ```
@@ -32,6 +33,17 @@ NEXT_REQUIRED_GATE = LOCALLY_REFINED_MATURE_DENSITY_CONVERGENCE
 - Method-selection classification: `MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED`.
 - Next required gate: `LOCALLY_REFINED_MATURE_DENSITY_CONVERGENCE`.
 - Large neural-operator dataset generation: `NO`.
+- The third-depth trajectory completed all 320 steps but failed its halving
+  gate: `D_AMR2,AMR3=0.0106884 > 0.00785326`, ratio `0.6805`.
+  All positivity, mass, optimizer, export and statistical gates passed.
+  Runtime was 5.23 hours and peak RSS 7.16 GiB/rank. Evidence:
+  `runs/mfem-static-amr-level3/20260923T181337Z`.
+  The saved density-difference diagnostic places 80.1% of the difference
+  outside the second-depth marking support. The next controlled test expands
+  that support using 95% of the final AMR2/AMR3 absolute density difference,
+  one child-cell buffer, and retained original marks. Its finest cell size
+  equals AMR2; it tests support sensitivity on conservative voxel averages.
+  A large difference would show that the old replay support remained inadequate.
 - The first full 320-step static MFEM NC-hex AMR trajectory passes its
   predeclared numerical reproduction gates:
   `D_AMR1,gf = 0.01871569 < 0.02`, mean relative local-QP correction

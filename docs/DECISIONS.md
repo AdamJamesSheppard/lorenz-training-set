@@ -1,5 +1,23 @@
 # Decision log
 
+## 2026-10-01 - Test refinement support identified by density differences
+
+The third-depth halving gate failed at `0.0106884` against `0.00785326`;
+all other gates passed. Preserve this failure. Inspection of the saved common
+grid puts 80.1% of the AMR2/AMR3 absolute difference outside the region marked
+for second-depth refinement. This is a spatial association, not a causal proof:
+transport can carry differences outside the cells where they originate.
+
+Authorize a controlled support expansion at the same finest spacing as AMR2.
+Mark 95% of the summed absolute final-density difference on child cells, add one
+child-cell buffer, retain the earlier marks, and refine their base parents.
+The buffered union covers 98.8% of the measured discrepancy and estimates
+186,618 cells before balancing. Predeclare reproduction of AMR3 within
+`0.00785326`, alongside the existing invariants and statistics. Report both
+AMR2 and AMR3 differences even when the gate fails. The final-state indicator
+is empirical and may miss earlier trajectory error; it is not a residual bound.
+Production authorization and full-density/domain certification remain open.
+
 Decisions here are dated and revisable. Add a new entry that marks an older
 decision `superseded`, `narrowed`, or `confirmed` rather than rewriting history
 to make the current direction look inevitable.

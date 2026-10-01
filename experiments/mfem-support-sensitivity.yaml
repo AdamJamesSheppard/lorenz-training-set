@@ -1,0 +1,33 @@
+id: mfem-support-sensitivity
+status: predeclared
+purpose: test_spatial_support_missed_by_positivity_replay_indicator
+source_difference: AMR2_AMR3_final_conservative_voxel_averages
+base_mesh: [45, 54, 54]
+refinement_depth: 2
+marking:
+  score: summed_absolute_density_difference
+  coverage: 0.95
+  buffer_child_cells: 1
+  retain_original_base_and_second_depth_marks: true
+  maximum_estimated_cells_before_balance: 220864
+method:
+  element: Q2_DG_hex
+  timestep: 0.00015625
+  steps: 320
+  diffusion: [[1, 0.4, 0.2], [0.4, 1, 0.3], [0.2, 0.3, 1]]
+  time_integrator: Crank_Nicolson
+  positivity: frozen_average_repair_and_local_QP
+  common_grid: [180, 216, 216]
+gates:
+  maximum_density_l1_to_amr3: 0.007853258960160175
+  maximum_mean_relative_l1_correction: 0.0008
+  maximum_mass_error: 1.0e-10
+  maximum_negative_mass: 1.0e-13
+  maximum_export_mass_error: 1.0e-10
+  zero_uncertified_cells: true
+  zero_optimizer_failures: true
+  zero_fallbacks: true
+  maximum_statistical_degradation_vs_fine_graded_mc_metrics: 0.005
+  maximum_dg_dofs_exclusive: 5963328
+interpretation: A large change exposes unresolved support sensitivity; a pass establishes reproduction on the common voxel grid only. Domain and subvoxel convergence remain open.
+production_dataset_authorized: false

@@ -1,5 +1,20 @@
 {
-  "report_date": "2026-09-23",
+  "report_date": "2026-10-01",
+  "mfem_third_depth": {
+    "classification": "FAILED_THIRD_DEPTH_VOXEL_GATES",
+    "evidence_run": "runs/mfem-static-amr-level3/20260923T181337Z",
+    "density_l1_to_second_amr": 0.010688374008193405,
+    "density_contraction_limit": 0.007853258960160175,
+    "difference_ratio": 0.6805056386409677,
+    "mean_relative_l1_correction": 0.00007414688332246748,
+    "maximum_absolute_mass_error": 2.1027624086400465e-13,
+    "runtime_seconds": 18826.98499244,
+    "maximum_rank_peak_rss_kib": 7509484,
+    "all_other_predeclared_gates_passed": true,
+    "difference_fraction_outside_second_support": 0.8011728748050753,
+    "mature_density_convergence_certified": false,
+    "next_required_experiment": "density_discrepancy_driven_support_sensitivity"
+  },
   "classification": "MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED",
   "method_status": "MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED",
   "production_dataset_authorized": false,
