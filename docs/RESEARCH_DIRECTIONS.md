@@ -1,6 +1,11 @@
 # Research directions
 
-Updated: 2026-09-23
+Updated: 2026-10-02
+
+Immediate controlled test: broader support at fixed second depth, following
+small targeted-depth sensitivity (`0.000316854`). Keep timestep and method
+fixed; report initialization differences. Coverage dominance remains a
+hypothesis. Domain and mature temporal sensitivity remain required.
 
 This is a living portfolio, not a queue that must be executed in order. Agents
 are welcome to add, remove, split, merge, or re-rank branches as the production

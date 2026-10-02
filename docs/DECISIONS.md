@@ -1,5 +1,26 @@
 # Decision log
 
+## 2026-10-02 - Test broader support at fixed second depth
+
+The bounded-depth test passes with final voxel L1 change 0.000316854 and
+initial voxel difference 4.07e-15. This supports small selected-region depth
+sensitivity, without certifying subvoxel or global convergence. Retain the
+expanded-support mesh as working comparator. Increase the old AMR2/AMR3
+discrepancy marking target from 95% to 99%, keep one child-cell buffer and
+retain all expanded-support marks. Preflight covers 99.735% of the indicator
+with 204,552 estimated cells. A 99.5% target with two-cell buffer exceeded the
+unchanged 220,864 ceiling and was rejected before propagation.
+
+Freeze finest spacing, Q2/CN, diffusion, timestep, continuous initial law and
+QP mathematics. Predeclare final voxel difference to expanded support at
+most 0.007853258960160175, plus inherited invariants/statistics/DOF gates.
+Report initial differences separately; equal voxel averages do not establish
+equal FE polynomials. Indicator coverage is not a rigorous error bound.
+Temporal sensitivity, domain sensitivity and production authorization remain
+open. Entry point: `mfem/run_broader_support.py`. Evidence goes to immutable
+`runs/mfem-broader-support/<UTC timestamp>/`; ignored preflight design is
+`runs/mfem-broader-support/20261002-preflight/design/`.
+
 ## 2026-10-01 - Add bounded depth on the fixed expanded support
 
 The expanded-support test fails its AMR3 reproduction gate at `0.0150712`

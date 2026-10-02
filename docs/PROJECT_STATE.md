@@ -1,6 +1,6 @@
 # Project state
 
-Updated: 2026-10-01
+Updated: 2026-10-02
 
 ## Objective
 
@@ -33,6 +33,12 @@ NEXT_REQUIRED_GATE = LOCALLY_REFINED_MATURE_DENSITY_CONVERGENCE
 - Method-selection classification: `MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED`.
 - Next required gate: `LOCALLY_REFINED_MATURE_DENSITY_CONVERGENCE`.
 - Large neural-operator dataset generation: `NO`.
+- Bounded extra depth passes with voxel L1 change `0.000316854`, mean
+  correction `2.02951e-5`, runtime 5.06 hours and zero invariant failures.
+  Evidence: `runs/mfem-support-depth/20261001T224713Z`.
+  Next: broader support at unchanged second depth, 99% discrepancy target,
+  retained expanded marks and 204,552 estimated cells. Run entry point:
+  `mfem/run_broader_support.py`; certification remains withheld.
 - Expanded-support run `runs/mfem-support-sensitivity/20261001T144235Z`
   completed 320 steps. It failed reproduction of AMR3 at `0.0150712`
   against `0.00785326`; every invariant and statistical gate passed.

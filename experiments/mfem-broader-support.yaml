@@ -1,0 +1,18 @@
+id: mfem-broader-support
+status: predeclared
+baseline: runs/mfem-support-sensitivity/20261001T144235Z
+coverage: 0.99
+buffer_child_cells: 1
+retain_expanded_support_marks: true
+maximum_estimated_cells_exclusive: 220864
+base_mesh: [45, 54, 54]
+refinement_depth: 2
+method: frozen_Q2_CN_full_SPD_local_QP
+timestep: 0.00015625
+steps: 320
+common_grid: [180, 216, 216]
+maximum_final_density_l1_to_support: 0.007853258960160175
+other_gates: inherited_support_test_invariant_statistical_and_DOF_gates
+initial_law: identical_continuous_mature_mixture_posterior
+initialization: report_initial_voxel_difference_separately_no_claim_of_identical_FE_polynomials
+production_dataset_authorized: false
