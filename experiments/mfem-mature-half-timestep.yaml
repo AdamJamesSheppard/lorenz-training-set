@@ -1,0 +1,14 @@
+id: mfem-mature-half-timestep
+status: predeclared
+baseline: runs/mfem-broader-support/20261002T080644Z
+mesh: identical_saved_base_and_child_marks
+initial_law: identical_mature_mixture_posterior_and_projection
+method: frozen_Q2_CN_full_SPD_local_QP
+timestep: 0.000078125
+steps: 640
+final_time: 0.05
+maximum_final_voxel_density_l1_to_baseline: 0.0025
+maximum_initial_voxel_density_l1_to_baseline: 1.0e-10
+other_gates: inherited_invariant_statistics_DOF_and_export_gates
+scope: two_level_mature_temporal_sensitivity_not_observed_order
+production_dataset_authorized: false

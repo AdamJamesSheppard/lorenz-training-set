@@ -33,6 +33,12 @@ NEXT_REQUIRED_GATE = LOCALLY_REFINED_MATURE_DENSITY_CONVERGENCE
 - Method-selection classification: `MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED`.
 - Next required gate: `LOCALLY_REFINED_MATURE_DENSITY_CONVERGENCE`.
 - Large neural-operator dataset generation: `NO`.
+- Broader support completed all gates: final change `0.00177608`, correction
+  `7.98372e-6`, runtime 2.93 hours. Evidence:
+  `runs/mfem-broader-support/20261002T080644Z`. Working comparator is now
+  this broader mesh. Next controlled test halves dt for 640 steps on exactly
+  the same mesh; final voxel L1 gate is `0.0025`. Domain and production
+  certification remain open.
 - Bounded extra depth passes with voxel L1 change `0.000316854`, mean
   correction `2.02951e-5`, runtime 5.06 hours and zero invariant failures.
   Evidence: `runs/mfem-support-depth/20261001T224713Z`.

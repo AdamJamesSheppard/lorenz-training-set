@@ -1,5 +1,23 @@
 # Decision log
 
+## 2026-10-02 - Freeze broader mesh for mature half-timestep sensitivity
+
+Broader support passes all declared gates: final voxel L1 change 0.00177608,
+initial change 0.000216803, mean correction 7.98372e-6, maximum mass error
+8.7641e-13, runtime 10530.5 seconds, zero positivity/optimizer failures.
+Evidence: `runs/mfem-broader-support/20261002T080644Z`.
+Retain this mesh as working reference, without certifying spatial convergence.
+
+Authorize a 640-step half-timestep run to the same t=0.05 with identical
+marks, continuous initial law, projection, diffusion and CN/QP method.
+Predeclare final voxel L1 difference <=0.0025 (the existing temporal density
+tolerance), initial agreement <=1e-10, and inherited invariant/statistical
+gates. Two levels measure sensitivity, not temporal order. Build a separate
+binary with LORENZ_TIMESTEP=0.000078125; preserve the default binary.
+Entry point: `mfem/run_broader_support.py --half-timestep`; evidence in
+`runs/mfem-mature-half-timestep/<timestamp>/`. Domain and production gates
+remain open.
+
 ## 2026-10-02 - Test broader support at fixed second depth
 
 The bounded-depth test passes with final voxel L1 change 0.000316854 and

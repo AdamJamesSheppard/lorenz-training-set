@@ -22,7 +22,11 @@ namespace
 constexpr double x_min = -30.0, x_max = 30.0;
 constexpr double y_min = -40.0, y_max = 40.0;
 constexpr double z_min = -10.0, z_max = 70.0;
-constexpr double dt = 0.00015625;
+#ifndef LORENZ_TIMESTEP
+#define LORENZ_TIMESTEP 0.00015625
+#endif
+constexpr double dt = LORENZ_TIMESTEP;
+static_assert(dt > 0.0 && dt <= 0.00015625, "invalid diagnostic timestep");
 constexpr int subcells = 3;
 constexpr int test_count = 4;
 
@@ -1534,7 +1538,7 @@ int main(int argc, char *argv[])
       const int steps = amr3_mode && argc == 11 ? std::stoi(argv[10])
                         : (amr2_mode && argc == 10 ? std::stoi(argv[9])
                         : (amr_mode && argc == 9 ? std::stoi(argv[8]) : 320));
-      MFEM_VERIFY(steps > 0 && steps <= 320, "AMR diagnostic step count is invalid");
+      MFEM_VERIFY(steps > 0 && steps * dt <= 0.050000000001, "AMR diagnostic horizon is invalid");
       std::vector<double> masses;
       std::vector<double> relative_corrections;
       std::vector<int> qp_cells;
@@ -1630,6 +1634,8 @@ int main(int argc, char *argv[])
                  << "  \"initial_projection_l1_correction\": "
                  << initial_projection_correction << ",\n"
                  << "  \"steps\": " << steps << ",\n"
+                 << "  \"timestep\": " << dt << ",\n"
+                 << "  \"final_time\": " << steps * dt << ",\n"
                  << "  \"initial_mass\": " << initial_mass << ",\n"
                  << "  \"final_mass\": " << masses.back() << ",\n"
                  << "  \"maximum_absolute_mass_error\": "

@@ -2,6 +2,10 @@
 
 Updated: 2026-10-02
 
+Broader-support sensitivity passed at L1=0.00177608. The next controlled
+branch freezes that mesh and halves the timestep to test the mature law;
+two levels will not establish temporal order. Domain sensitivity follows.
+
 Immediate controlled test: broader support at fixed second depth, following
 small targeted-depth sensitivity (`0.000316854`). Keep timestep and method
 fixed; report initialization differences. Coverage dominance remains a
