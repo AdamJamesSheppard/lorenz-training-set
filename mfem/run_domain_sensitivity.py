@@ -11,6 +11,7 @@ import sys
 import time
 from datetime import datetime, timezone
 import numpy as np
+from memory_backpressure import wait_with_backpressure
 
 repo = Path(__file__).resolve().parents[1]
 root = repo / 'runs/mfem-domain-sensitivity' / datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')
@@ -65,16 +66,11 @@ try:
         (run/'command.json').write_text(json.dumps(command,indent=2))
         status('RUNNING_DOMAIN_SENSITIVITY', padding=pad,steps=320)
         process=subprocess.Popen(command,env=environment,start_new_session=True)
-        minimum_available=None
-        while process.poll() is None:
-            available=int(next(line.split()[1] for line in Path('/proc/meminfo').read_text().splitlines() if line.startswith('MemAvailable:')))
-            minimum_available=available if minimum_available is None else min(minimum_available,available)
-            (run/'memory_guard.json').write_text(json.dumps(dict(available_kib=available,minimum_available_kib=minimum_available,threshold_kib=2*1024*1024),indent=2))
-            if available < 2*1024*1024:
-                os.killpg(process.pid,signal.SIGTERM)
-                process.wait()
-                raise RuntimeError('Stopped safely: less than 2 GiB available RAM')
-            time.sleep(30)
+        def memory_update(measurement):
+            (run/'memory_guard.json').write_text(json.dumps(measurement,indent=2))
+            status('PAUSED_LOW_MEMORY' if measurement['paused'] else 'RUNNING_DOMAIN_SENSITIVITY',
+                   padding=pad,steps=320,**measurement)
+        wait_with_backpressure(process,memory_update)
         if process.returncode:
             raise RuntimeError(f'Solver exit {process.returncode}')
         p=np.fromfile(run/'mfem/final_q2_subcell_averages.bin',dtype=np.float64).reshape(tuple(n+8*pad for n in shape0))

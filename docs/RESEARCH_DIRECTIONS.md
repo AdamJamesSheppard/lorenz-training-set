@@ -2,6 +2,12 @@
 
 Updated: 2026-10-03
 
+Local memory handling now automatically pauses/resumes live MPI jobs at
+2/4 GiB available RAM instead of terminating them. This retains allocations
+and needs external RAM recovery; persistent pressure requires lower-memory
+assembly or checkpoint/restart work. Completed first-domain evidence remains
+valid; the second expansion remains incomplete.
+
 The first domain launch was resource-limited, with only an initial export.
 Restart uses reduced retained assembly storage, without changing the scheme
 or acceptance criteria; memory headroom must be observed during propagation.

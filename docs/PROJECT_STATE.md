@@ -33,6 +33,11 @@ NEXT_REQUIRED_GATE = LOCALLY_REFINED_MATURE_DENSITY_CONVERGENCE
 - Method-selection classification: `MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED`.
 - Next required gate: `LOCALLY_REFINED_MATURE_DENSITY_CONVERGENCE`.
 - Large neural-operator dataset generation: `NO`.
+- First domain expansion completed all gates (`L1=1.3213e-12`); second
+  expansion stopped for RAM. Evidence: domain run `20261003T113423Z`.
+  New wrapper preserves live jobs by pausing below 2 GiB and resuming above
+  4 GiB. Paused jobs retain RAM and may require external memory recovery.
+  Domain sequence and production authorization remain incomplete.
 - Domain test `20261003T105837Z` stopped at the RAM safeguard before a
   completed forecast. Restart releases redundant mesh/assembly storage and
   the spatial matrix after independent CN matrices are built. Scientific

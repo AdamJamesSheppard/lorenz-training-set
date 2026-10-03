@@ -1,5 +1,17 @@
 # Decision log
 
+## 2026-10-03 - Preserve live jobs under temporary RAM pressure
+
+Replace wrapper SIGTERM at 2 GiB available RAM with scheduling backpressure:
+SIGSTOP the MPI process group below 2 GiB, SIGCONT above 4 GiB, checking every
+five seconds. Publish PAUSED_LOW_MEMORY and thresholds in status. Never
+automatically terminate for this condition. Pausing retains allocations;
+external memory recovery is needed to resume and persistent pressure can
+leave a job paused indefinitely. This does not provide disk-backed matrices
+or guarantee survival of a kernel OOM event. Scientific gates are unchanged.
+Regression test checks pause/resume hysteresis and absence of termination.
+No new forecast is launched by this scheduling change.
+
 ## 2026-10-03 - Release redundant assembly storage before domain restart
 
 The domain run `runs/mfem-domain-sensitivity/20261003T105837Z` stopped
