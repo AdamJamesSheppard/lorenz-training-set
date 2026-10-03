@@ -1,0 +1,285 @@
+\part{The recorded research programme}
+\chapter{The baseline audit: initial laws, analysis and independent references}
+\section{The first hidden error was already present at time zero}
+An early FE comparison used a normalized nodal Q1 interpolant while Monte Carlo sampled the whole-space analytic Gaussian. Its endpoint discrepancy included initial representation error. The audit established this confound directly, rather than attributing the entire discrepancy to PDE propagation.
+
+On the $30\times36\times36$ Q1 mesh, the nodal initial-law density discrepancy was about 0.141348 in $L^1$, compared with about 0.0555363 for unlimited $L^2$ projection and 0.0580728 after limiting that projection. The corresponding normalized covariance discrepancies were about 0.126186, $5.10\times10^{-9}$ and 0.006835. The projected field's minimum was about $-4.91\times10^{-5}$. Its excellent moment agreement therefore coexisted with an inadmissible polynomial and appreciable density error.
+
+The small covariance discrepancy does not establish a small full-density error. Projection preserves integrals against test functions in its space; second moments outside that space need separate analysis. The listed values are measured quantities, not a general moment-exactness theorem for Q1.
+
+The quadrature study compared initial-projection coefficient vectors with an order-16 comparator. Relative discrepancies fell from about 0.01065 at order 4 to $5.97\times10^{-4}$ at order 6, $2.27\times10^{-5}$ at order 8, $6.14\times10^{-7}$ at order 10, $1.28\times10^{-8}$ at order 12 and $2.66\times10^{-10}$ at order 14. This justified order 14 for those laws. The order-16 field is itself a numerical comparator, and a narrower later mixture can require another quadrature check.
+
+\evidence{The \code{initial_representation} section of \code{method_selection_report.json}, the initialization study scripts and associated comparison records provide the numbers and conventions.}
+
+\section{The sampler must represent the law actually propagated}
+A nodal or projected FE field defines its own normalized law when admissible. If a native sampler draws from that FE law, it tests propagation without silently substituting a different analytic law. Alternatively, both methods may start from one analytic law, provided FE representation error is explicitly measured. These are distinct controlled experiments.
+
+The same-native-law Q1 forecast used $\Delta t=.000625$, horizon .05, 200,000 particles and MC timestep .000125. Covariance discrepancy about 0.0855765 was roughly 13.62 times the reference bootstrap p95 about 0.00628239. Halving the MC timestep changed normalized covariance by about 0.000110865. This isolated a substantial deterministic-method discrepancy which could not plausibly be explained by the measured MC timestep change alone. It did not provide an exact covariance-error decomposition.
+
+Native sampling of a polynomial requires more than interpreting nodal coefficients as probabilities. The density includes basis shape and volume. A sampler must integrate or bound the nonnegative polynomial within cells, draw cell mass correctly and use an accepted local law. The corresponding source-level sampling contracts are part of the validation interface; an analytic Gaussian sampler serves a different input contract.
+
+\section{Analysis projection replaced a nodal product}
+The analytic Bayesian posterior is proportional to $\ell p$. Evaluating that product at FE nodes and interpolating it can alias a concentrated likelihood. The replacement solves the weak projection of $\ell p$, normalizes by FE evidence and applies conservative admissibility correction.
+
+In the analytic Gaussian test on the fine Q1 mesh, nodal analysis gave mean-error norm about 0.07468, $L^1$ about 0.19361 and covariance discrepancy about 0.14494. Projected analysis improved these to about 0.002055, 0.11554 and 0.03706. Its limiter correction was still about 0.05688. The change was retained because it improved the controlled posterior representation; the remaining intervention precluded using the test as production posterior certification.
+
+Analytic mixture conditioning offers a useful independent oracle: each Gaussian component updates by a linear-Gaussian formula, and its weight changes by its observation evidence. This preserves multimodality rather than fitting a single Gaussian. The mature mixture later used exactly this principle to separate a continuous posterior law from a mesh-specific representation.
+
+\section{The coarse repeated-analysis studies}
+The earlier \code{mature_da_report.json} evolved 20 independent trajectories for 20 cycles on $8\times10\times10$ Q1 cells, with $\Delta t=.005$, observation interval .05, observed coordinates $(x,z)$, observation variance 9 and seed 71023. The 800 cells provided only 6,400 DG unknowns. The reported corner drift speed approached 1,975 and the corresponding coarse P\'eclet estimate was approximately 15,801, indicating a strongly transport-dominated discretisation by that diagnostic.
+
+The report's explicit classification was exploratory coarse distribution study, not ground truth. Cycle-mean relative limiter intervention ranged from about 0.06781 to 0.11344. A feature-stationarity criterion did not establish stable burn-in in the available horizon; the suggested cycle 15 was provisional.
+
+Regeneration with projected analysis, documented in \code{mature_da_projected_report.json}, retained the trajectory/cycle counts, mesh, observation model and seed. Cycle-mean intervention ranged from about 0.06577 to 0.10214. The specified feature criterion selected burn-in 12, using the final-window comparison. This tests stability of those selected feature means, not stationarity of the entire posterior law, convergence to an invariant density or accuracy of the coarse FE trajectory.
+
+Reported wall times were approximately 97.2 and 102.5 seconds. Their low cost reflects the coarse exploratory configuration. Those outputs remain valuable for testing data schemas, trajectory splits and analysis workflows. They cannot be relabelled as the later high-resolution mature NC-hex pilot merely because both involve data assimilation.
+
+\section{Independent finite volumes were informative but unresolved}
+The diagonal-noise independent reference refined cell-centred upwind transport and centred diffusion under SSPRK(3,3). At refinement factors 1, 2 and 4, normalized covariance discrepancy versus the same MC reference was about 0.58833, 0.27181 and 0.13084. The finest grid was $120\times144\times144$ and took about 66.0 seconds for its recorded run. Q1 versus finest FV density difference was about 0.15390.
+
+The trend supports reference improvement, yet the remaining discrepancy is too large to call the finest FV field truth. Two numerical methods approaching each other can share error, and two methods disagreeing substantially do not identify which is correct without further evidence. The FV hierarchy remained an independent diagonal comparator with a first-order spatial transport limitation.
+
+\section{Monte Carlo density reconstruction was not selected as ground truth}
+The 200,000-particle experiment had accurate and cheap moment diagnostics but sparse occupancy on a $120\times144\times144$ output grid. Raw-histogram differences were about 0.19824 versus FV and 0.24284 versus Q1. Five batch histogram TVs from the full histogram were around 0.119--0.122, showing appreciable reconstruction variability.
+
+Kernel smoothing reduced one comparison at selected bandwidths but introduced strong bandwidth dependence: $L^1$ versus FV was about 0.09896, 0.08899, 0.17392 and 0.30175 for bandwidths 0.75, 1.0, 1.5 and 2.0 voxels. A tail region with fewer than one expected particle per voxel carried about 0.01378 probability in the FV representation but about 0.006205 in the MC histogram. These quantities are comparisons of estimators, with FV error also present; they are evidence against treating a sparse raw histogram as a stable full-density target.
+
+\section{Researched alternatives with no executed solver branch}
+The method-selection record considered a boundary-consistent characteristic remap, translated/scaled Hermite-Galerkin references and directional exponentially fitted families. The characteristic challenger explicitly remained unimplemented because its available theory did not establish the intended reflecting Lorenz boundary and whole-cell positivity in three dimensions. A Hermite expansion could represent a whole-space smooth density economically, but spectral coefficients do not automatically define a nonnegative density; mode and domain/reference checks would still be needed.
+
+These proposals belong in the portfolio and literature context. They are not archived successful ancestors of the final method. Likewise, the early finite-volume source uses the upwind formula derived in Chapter~\ref{ch:fv}, with no confirmed Chang--Cooper implementation. Preserving this distinction prevents a plausible textbook narrative from replacing the actual record.
+
+\chapter{How the evidence changed the numerical question}
+\section{A development history needs controlled comparisons}
+A software history and a scientific history answer different questions. A commit can show when an implementation changed. It cannot, by itself, show that the new implementation solved the intended equation more accurately. A run directory can contain a completed process while its scientific decision rejects the result. The development below therefore follows a chain of hypotheses, controlled comparators, measured quantities and decisions. Appendix~\ref{app:ledger} records the source inventory; the following chronological appendix preserves all 69 available commit messages rather than inventing a history before the first recorded baseline.
+
+At each stage, write the numerical output as
+\begin{equation}
+ p_{h,\Delta t,\Omega,\mathcal L,\mathcal I},
+\end{equation}
+where $\mathcal L$ denotes the positivity treatment and $\mathcal I$ the initial representation. A difference between two such fields can be attributed to one factor only when the other factors are fixed, or when their influence is independently bounded. This is a practical experimental-design principle rather than a claim that nonlinear numerical errors add independently.
+
+For example, the inequality
+\begin{align}
+ \|p_{h_1,\Delta t_1,\mathcal L_1}-p_{h_2,\Delta t_2,\mathcal L_2}\|_1
+ \le{}&\|p_{h_1,\Delta t_1,\mathcal L_1}-p_{h_1,\Delta t_2,\mathcal L_1}\|_1\\
+ &+\|p_{h_1,\Delta t_2,\mathcal L_1}-p_{h_2,\Delta t_2,\mathcal L_1}\|_1
+ +\|p_{h_2,\Delta t_2,\mathcal L_1}-p_{h_2,\Delta t_2,\mathcal L_2}\|_1
+\end{align}
+is a triangle inequality. It identifies useful intermediate comparators. It does not make a single mixed comparison a measurement of any one of these terms.
+
+\section{The equal-DOF experiment and its confounders}
+The early comparison used Q1 on $30\times36\times36$ cells and Q2 on $20\times24\times24$ cells. Both have 311,040 scalar DG unknowns:
+\begin{equation}
+ 30\cdot36\cdot36\cdot8=20\cdot24\cdot24\cdot27.
+\end{equation}
+Equal algebraic dimension is useful for a cost comparison. Here it also changes cell size. The timesteps differed: $6.25\times10^{-4}$ for Q1 and $1.25\times10^{-3}$ for Q2. Reported covariance discrepancies of approximately 0.08558 and 0.25484 therefore did not isolate polynomial degree. Limiting, spatial resolution and temporal error could all explain the ranking.
+
+The corrective experiment fixed the mesh and examined Q2 under controlled timestep and limiter variants. The higher-order unlimited polynomial had useful accuracy which the original corrected trajectory failed to retain. This changed the research objective from finding a satisfactory Q1 baseline to preserving the benefit of Q2 without allowing a negative density.
+
+\scope{The same-mesh evidence invalidates the early degree-only interpretation. It does not imply that Q2 wins every accuracy-per-DOF comparison, or that a high polynomial degree compensates for unresolved spatial structures.}
+
+\section{The limiter invariant and the roundoff bug}
+The global scaling step assumes a nonnegative cell average. An additive conservation repair made some nearly empty cell averages slightly negative. A scaling factor computed from that average could then become inadmissible. The failure was a software violation of the prerequisite for the mathematical scaling argument, not a counterexample to that argument.
+
+The repaired average stage enforces nonnegativity and the prescribed total mass together. This motivates a general rule: roundoff corrections must preserve the feasible set of the next stage. A change intended to improve one diagnostic can invalidate the hypotheses behind another operation. The current test suite checks average repair, limiter invariants and conservation separately.
+
+\section{Attribution by removing the limiter}
+Unlimited backward-Euler Q2 still produced a temporal density difference of about 0.00541, exceeding the 0.0025 gate. Thus the claim that all observed temporal error came from positivity projection was falsified. The time integrator itself needed attention.
+
+Unlimited Q2--CN then gave a much smaller full/half-step difference, approximately $4.19\times10^{-5}$, and covariance discrepancy about 0.00371. Its measured negative probability was approximately $8.28\times10^{-4}$. The global corrected CN trajectory was admissible but its corresponding density difference was about 0.01088 and covariance discrepancy about 0.02192. The contrast supplied a controlled target: retain the accurate CN update while repairing its negative polynomial as locally as possible.
+
+The measured negative mass is a global scalar. It does not locate where the negativity occurs or say how much polynomial alteration is required. A thin negative region can force a correction to coefficients over an entire element. Conversely, a large number of almost empty troubled cells can have little probability significance. Subsequent diagnostics therefore added correction norms and affected probability.
+
+\chapter{From global scaling to repeated local optimisation}
+\section{Terminal projection was a diagnostic, not an evolution method}
+A terminal-only QP assesses how much of a completed high-order state can be recovered by local admissibility correction. It leaves intermediate states uncorrected and cannot establish stepwise positivity. Furthermore, preserving each cell's mass while making its polynomial nonnegative is infeasible if that cell's average is negative. The diagnostic exposed roughly 17,500 negative-average cells and about $4.34\times10^{-6}$ negative-average probability.
+
+This is a direct mathematical obstruction: if $p\ge0$ almost everywhere on $K$, then $\int_Kp\,dx\ge0$. It cannot equal a strictly negative prescribed integral. The hybrid method therefore first repaired averages conservatively, then solved feasible fixed-average local QPs. Early SLSQP-based branches still recorded 13 and 14 fallback events. Those records remain failures of the zero-fallback requirement even if their terminal statistics improved.
+
+\section{The optimiser became part of the scientific contract}
+An optimiser's success flag is insufficient. The actual requirements are that the equality and inequalities are satisfied to declared tolerances, that the objective is appropriate to the physical polynomial, and that a failed local solve cannot be silently accepted. The reduced formulation eliminates one average degree of freedom, leaving a 26-dimensional QP. Cached sparse OSQP workspaces replace repeated generic dense constrained optimisation. Independent SLSQP comparisons serve as an oracle diagnostic rather than a production fallback policy.
+
+The performance study included 2,413 local problems. Its speed gate passed, motivating repeated in-loop use. Performance certification and numerical certification remain distinct: a faster optimiser does not prove that the projection preserves the temporal order of CN.
+
+\section{The first dynamic study and the fourth temporal level}
+Repeated correction changes the numerical method. It must be tested as a complete update map
+\begin{equation}
+ u^{n+1}=\mathcal P_h\bigl(\mathcal T_{h,\Delta t}u^n\bigr),
+\end{equation}
+where $\mathcal T$ is the raw CN map and $\mathcal P$ includes average repair and polynomial QP projection. A theorem about $\mathcal T$ alone does not establish the order of this composition.
+
+The initial three-level study gave insufficient temporal evidence. Tightening the Krylov solve and adding a fourth level produced the adjacent common-grid differences in Table~\ref{tab:temporal}. All 1,200 accepted steps were Bernstein-certified, with zero measured negative mass, optimiser failures and scalar fallbacks. Covariance discrepancies stayed near 0.00749--0.00752.
+\begin{table}[htbp]\centering
+\caption{Four-level local-QP Q2--CN temporal evidence. The order is computed from adjacent differences; it is not a proof of a global error expansion.}\label{tab:temporal}
+\begin{tabular}{lrr}\toprule Comparison & Density $L^1$ & Observed order\\\midrule
+$\Delta t,\Delta t/2$ & $5.238\times10^{-4}$ & ---\\
+$\Delta t/2,\Delta t/4$ & $5.418\times10^{-4}$ & $-0.049$\\
+$\Delta t/4,\Delta t/8$ & $1.620\times10^{-4}$ & $1.741$\\\bottomrule\end{tabular}
+\end{table}
+All three differences lie below 0.0025. The flat first pair followed by a smaller finest difference is consistent with a pre-asymptotic regime. There is only one encouraging fine-level rate estimate. Describing this as demonstrated second-order convergence would exceed the evidence.
+
+Figure~\ref{fig:convergence} plots the temporal sequence alongside the separate mature correction study. Its panels concern different initial laws and must be interpreted separately.
+
+\section{Identity-diffusion spatial refinement}
+With the temporal configuration fixed at $\Delta t=1.5625\times10^{-4}$, the $20\to30\to45$ startup hierarchy gave differences 0.141394 and 0.0355845. Since successive linear resolution ratios are 1.5,
+\begin{equation}
+ p_h=\frac{\log(0.141394/0.0355845)}{\log(1.5)}\simeq3.4026.
+\end{equation}
+This is an observed rate for the particular common-grid observable. It exceeds neither a theorem's hypotheses nor the possibility of cancellation, projection effects or pre-asymptotic behaviour. The report correctly archives it as evidence, not formal order.
+
+All 960 steps passed the adopted positivity and optimiser gates; the maximum mass error was about $1.20\times10^{-11}$. Covariance discrepancy decreased from 0.03033 to 0.005209 to 0.002340. The finest value lay below the Monte Carlo bootstrap p95 of about 0.00649, so that reference could no longer resolve finer covariance improvement reliably. The deterministic density differences remained informative independently of Monte Carlo sampling noise.
+
+\chapter{Full-SPD diffusion and a stronger reference}
+\section{What the mixed-diffusion gate changed}
+The controlled tensor was
+\begin{equation}
+D=\begin{pmatrix}1&.4&.2\\.4&1&.3\\.2&.3&1\end{pmatrix},\qquad
+\lambda(D)\simeq(.581212,.811321,1.607467).
+\end{equation}
+Its positive eigenvalues establish uniform ellipticity for this constant tensor. Off-diagonal coefficients introduce mixed derivatives. A diagonal directional finite-volume comparator cannot certify these terms by pretending that they are absent.
+
+Because the stochastic factor satisfies $D=BB^T/2$, the configuration uses $B=\sqrt2\operatorname{chol}(D)$. Supplying the entries of $D$ in a field interpreted as $B$ would solve a different stochastic model. The controlled $30\times36\times36$ case retained the continuous Gaussian law, Q2, CN and local QP; it changed the diffusion factor explicitly.
+
+That control gave covariance discrepancy about 0.004163, off-diagonal covariance discrepancy about 0.003806 and correlation discrepancy about 0.007067. Its mean correction was about $7.61\times10^{-5}$, maximum about $9.66\times10^{-4}$, and maximum mass error about $3.86\times10^{-12}$. This cleared the continuation gate for a spatial hierarchy.
+
+\section{The full-SPD hierarchy}
+The same $20\to30\to45$ hierarchy produced adjacent density differences 0.139500 and 0.0348401, giving an observed common-grid rate near 3.4215. Covariance discrepancies were approximately 0.02879, 0.004163 and 0.002261; the largest reported correlation discrepancies decreased from about 0.0551 to 0.00707 to 0.00178. All 960 accepted steps passed whole-cell positivity, with zero reported optimisation failures/fallbacks and mass error bounded by about $3.87\times10^{-12}$. The aggregate propagation runtime was about 4,817 seconds; 8,881,349 local QP operations were recorded.
+
+\scope{This demonstrates robustness for one full-SPD matrix in a short Gaussian forecast. It does not certify every SPD tensor, every condition number, a rank-deficient diffusion, or a mature posterior.}
+
+\section{Monte Carlo resolution}
+The strengthened reference used one million particles and a fixed bootstrap design. The p95 covariance sampling scale was about 0.002735, closer to the finest FE discrepancy than the earlier 200,000-particle uncertainty. Common random numbers make differences between reference estimates less noisy, but they do not turn either estimate into an exact solution.
+
+For independent samples $X_i$ and a scalar observable $g$ with finite variance,
+\begin{equation}
+ \operatorname{Var}\left(N^{-1}\sum_{i=1}^{N}g(X_i)\right)
+ =\operatorname{Var}(g(X))/N.
+\end{equation}
+Thus increasing the particle count fivefold improves a standard-error scale by about $\sqrt5$, subject to the chosen observable and discretisation bias. Increasing bootstrap replicates stabilises a percentile estimate; it does not create more information about the population than the original sample contains. The reference also has an SDE timestep error, finite-horizon initialization error and histogram/smoothing choices.
+
+The adopted comparison therefore uses MC moments and low-dimensional marginals as independent diagnostics while retaining deterministic mesh-to-mesh density differences as primary convergence evidence. The bootstrap p95 is an uncertainty scale associated with the specified resampling procedure, not a confidence guarantee for arbitrary solver bias.
+
+\chapter{Mature densities exposed a different failure mechanism}
+\section{A common physical law, an expensive representation}
+The mature initial law was constructed from a Lorenz spinup ensemble and a Bayesian observation, then represented by a continuous Gaussian mixture. It is a specified smooth law with stretched lobes and low-density tails. It is neither a single Lorenz orbit nor an empirical point cloud passed directly into a finite-element density.
+
+The original mature hierarchy retained the full-SPD tensor, Q2--CN, timestep and local-QP policy. On $20^*$, $30^*$ and $45^*$ meshes, where the asterisk abbreviates the corresponding $y,z$ counts, the initial representation corrections were roughly 0.380, 0.158 and 0.0313. These values matter before the first dynamical update. A later experiment that changes both initialization and evolution cannot isolate the latter.
+
+The dynamic mean corrections were approximately 0.003047, 0.002789 and 0.001840. All exceed the frozen mature threshold 0.001. Affected probability stayed near 0.9986, 0.9988 and 0.9425. In contrast, covariance discrepancies improved to approximately 0.005844, 0.003636 and 0.000858; joint-TV discrepancies improved from about 0.02102 to 0.01370 to 0.005184. Accurate moments therefore coexisted with substantial full-polynomial intervention.
+
+Adjacent density differences 0.420590 and 0.353734 gave only $p_h\simeq0.427$. All 960 baseline mature steps remained certified with zero optimiser failures/fallbacks and maximum mass error about $4.01\times10^{-12}$. The baseline aggregate gate failed on correction and density resolution, rather than loss of conservation.
+
+\section{Deeper certificates tested a falsifiable explanation}
+A Bernstein coefficient can be negative while the polynomial itself is nonnegative. Deeper subdivision could therefore conceivably rescue a large number of false-positive troubled cells. The diagnostic compared depths 4 and 8 and also searched for actual negative witnesses.
+
+At most about 0.0788\% of cells were rescued in the tested states; correction $L^1$ reduction reached about 2.89\% in the best case, with mean about 0.779\%. On the finest terminal state, deeper analysis eliminated 39 unresolved classifications while finding additional negative witnesses. The number of witnessed negative cells changed from 130,873 to 130,881. This is evidence of genuine negative Q2 polynomials, not merely a pessimistic coefficient test.
+
+Scalar correction changed the tested states between about 1.96 and 6.70 times as much as the QP, with mean ratio about 5.02. Greater certificate depth and more global scaling did not supply the needed accuracy gain. These findings justify retaining the local QP as the comparator; they do not prove that every possible polynomial positivity method must be worse.
+
+\section{Average-level AFC and its recorded failures}
+The AFC experiment separated initial representation from dynamics by starting candidates from the same positive projected mature state. Its low-order conservative average update accepted more than 99.9998\% of the high-order correction. Cell averages were already almost completely admissible. The subsequent polynomial correction remained close to the baseline $10^{-3}$ scale, placing the unresolved problem inside the high-order cell polynomial.
+
+The compact scientific decision must be read alongside the wrapper status. The wrapper returned zero and marked process completion successful. The scientific classification was \code{FAILED_PREDECLARED_MATURE_BIMODAL_GATES}. Moreover, this branch recorded the failures in Table~\ref{tab:afcfail}; it cannot inherit the zero-fallback claim of the successful baseline.
+\begin{table}[htbp]\centering\caption{AFC branch: reported optimizer failures and scaling fallback cells. Counts are events accumulated over the branch.}\label{tab:afcfail}
+\begin{tabular}{lrrr}\toprule Mesh & Mean correction & Optimizer failures & Fallback cells\\\midrule
+$20\times24\times24$ & 0.00304661 & 1,687 & 1,687\\
+$30\times36\times36$ & 0.00278861 & 1,762 & 1,762\\
+$45\times54\times54$ & 0.00184036 & 4,592 & 4,592\\\bottomrule\end{tabular}\end{table}
+The near-unity antidiffusive acceptance addresses average positivity; it supplies no guarantee for within-cell minima. The failure counts add an independent reason to reject this particular implementation for dataset generation. The compact evidence does not by itself identify a unique numerical cause of each local optimizer failure.
+
+\section{The DOF diagnostic and what it actually implemented}
+The next diagnostic operated on Bernstein coefficients and compared a convex/simplex-type nonnegative repair with the current mass-metric QP on saved raw states. This is a useful constrained-polynomial experiment. It is narrower than constructing a conservative invariant-domain subcell flux graph for the whole anisotropic DG operator.
+
+On the $45^*$ one-step state, its $L^1$ modification was about 0.0121874, roughly 22.10 times the QP modification. On the targeted $60^*$ state, it was about 0.00648577, roughly 40.08 times the QP modification. Neither passed the predeclared $C_{\rm DOF}<0.5C_{\rm QP}$ continuation gate. The result rejects this prototype, with its chosen coefficient constraints and metric. It leaves more elaborate flux-based subcell constructions untested.
+
+The targeted finer-state QP intervention decreased substantially. Together with the steep reduction in initialization correction, this supported localized spatial under-resolution as the most useful next hypothesis. Refinement creates representational capacity; changing a constraint does not create missing spatial scales.
+
+\chapter{Uniform and graded refinement: accuracy versus topology}
+\section{Uniform 60 passed the original correction gate}
+The $60\times72\times72$ trajectory used 311,040 cells and 8,398,080 Q2 DOFs. Its mean relative correction was $8.313\times10^{-4}$, below the original mature threshold $10^{-3}$. Positivity, mass, optimizer and statistical gates also passed. It cost about 69.4 minutes and 6.05 GiB per rank at peak.
+
+The $45^*$--$60^*$ density difference remained about 0.20997 and the heuristic observed rate was about 0.51. The method could now handle this law's statistical and positivity requirements at the tested resolution, while full-density convergence and cost remained open. The subsequent $8\times10^{-4}$ adaptive target was a new branch gate; it must not retroactively overturn the original $10^{-3}$ criterion.
+
+\section{Static tensor grading reproduced uniform 60}
+The first graded mesh had $44\times52\times46$ cells: 105,248 cells and 2,841,696 unknowns. It concentrated fine axis spacings around the mature structures and coarsened the exterior. It reproduced the uniform-60 common-grid density to about 0.001688, reduced DOFs by 66.2\%, runtime by about 53\% and memory per rank by about 61.7\%.
+
+Its mean correction $8.3837\times10^{-4}$ exceeded the branch's predeclared $8\times10^{-4}$ threshold. That failed aggregate decision is retained. Since it was almost the same intervention as uniform 60, the result supports efficiency of grading for reproducing that reference, without certifying the reference's spatial accuracy.
+
+An initial marginal-statistics comparison used inconsistent histogram resolutions. Re-evaluating the matched-grid quantities left maximum marginal degradation about $1.75\times10^{-4}$, within the fixed 0.005 tolerance. This is a comparison bug correction, not a change in the solver trajectory or a post hoc relaxation of the gate.
+
+\section{Finer grading revealed missing structure}
+The $58\times68\times56$ design used 220,864 cells and 5,963,328 DOFs. Mean correction fell to approximately $1.128\times10^{-4}$ and affected probability to about 0.004179. Yet its density moved by 0.108680 relative to uniform 60 and 0.107936 relative to the previous graded mesh.
+
+The simultaneous decrease in correction and substantial change in density is strong evidence that finer resolution reveals physical polynomial structure which the earlier meshes did not represent. A small limiter norm alone would have missed the unresolved density. The runtime rose to about 76.4 minutes despite fewer DOFs than uniform 60. Local QP activity, assembly, conditioning and solver iteration cost determine time alongside algebraic dimension.
+
+\section{Time aggregation succeeded; tensor topology did not}
+The replay used 11 representative snapshots over $0\le t\le0.05$. Reconstructed fields agreed at approximately $3.61\times10^{-11}$ in $L^1$, validating replay fidelity for those snapshots. D\"orfler-style marking identified 71 important cells at the chosen indicator fraction.
+
+In a tensor mesh, refining intervals selected along each axis creates their Cartesian product. If selected axis intervals occupy fractions $r_x,r_y,r_z$, their product can force fine resolution in combinations never identified as important physical cells. Here the proposed design covered roughly 75\% of axis ranges and expanded to about 699,600 cells, exceeding the 311,040-cell ceiling.
+
+The failure localized an architectural limitation. The trajectory indicator found sparse three-dimensional regions; the mesh representation could only express rectangular products of one-dimensional bands. The next implementation therefore required local hexahedral refinement without changing the PDE, polynomial degree, time integrator or projection.
+
+\chapter{MFEM equivalence before nonconforming refinement}
+\section{Porting one variable at a time}
+The DOLFINx solver remained the frozen reference. MFEM supplied an alternative mesh infrastructure, with a mathematically matched Q2 DG operator on ordinary conforming hexes before enabling hanging faces. This avoids attributing a discrepancy simultaneously to a framework port and to an AMR topology.
+
+The first structural probes found errors in physical extents and signs. A unit-length construction in an intended 60-unit direction changes Jacobians, gradients and mass, even if the number of cells agrees. Similarly, swapping the sign of a diffusion or convection contribution changes the PDE. These faults were localized in cheap operator probes and corrected before using mature trajectories as comparators.
+
+The large-vector absolute conservation residual, approximately $-5.6\times10^{-10}$, initially appeared concerning. Normalizing the mass-functional defect across five production-scale actions gave about $1.93\times10^{-17}$. This is evidence of a near-roundoff cancellation, consistent with conservative assembly. Both absolute and normalized quantities are valuable: normalization diagnoses scaling; stepwise mass remains the practical forecast gate.
+
+\section{Physical basis mapping}
+MFEM and DOLFINx may represent the same polynomial in differently ordered local vectors. Let $T_K$ map the source coefficients to common physical nodal values. A meaningful comparison uses $T_Ku_K$ or evaluations of $p_h$, not raw vector entry equality. For an operator action, compare the mass-inverted physical derivative $M^{-1}K_hu$ after mapping, rather than mixing dual residual coefficients with primal polynomial coefficients.
+
+The small $4\times5\times5$ probe gave mapping error about $2.55\times10^{-16}$, relative operator discrepancy $4.95\times10^{-15}$, raw CN discrepancy $2.43\times10^{-15}$, and corrected-step discrepancy $7.81\times10^{-12}$. On $30\times36\times36$, the corresponding values were about $1.19\times10^{-15}$, $7.96\times10^{-14}$, $9.43\times10^{-15}$ and $1.21\times10^{-11}$.
+
+An early port bypassed adaptive certificate checks in one branch. That result was superseded after the missing checks were added. Passing assembly and raw CN tests cannot compensate for an omitted admissibility gate.
+
+\section{Full uniform trajectory}
+The primary clean full-equivalence artifact is
+\code{runs/mfem-mature-uniform-equivalence/20260915T193445Z}.
+Both frameworks used the same projected initial polynomial, 320 steps, common timestep and conservative common-grid export. The final density difference was approximately $5.26\times10^{-11}$; the covariance Frobenius difference was approximately $3.70\times10^{-11}$. Common-voxel moment differences were on the $10^{-11}$ scale. Differences of the mean and maximum correction summaries were $7.52\times10^{-15}$ and $1.72\times10^{-13}$ respectively. The saved MFEM summary does not provide every step's correction value, so this is aggregate agreement rather than a pointwise history comparison. Maximum reported mass drift was about $3.98\times10^{-13}$.
+
+This establishes practical numerical equivalence for the tested configuration. It is stronger evidence than agreement of low-dimensional statistics alone. A later rerun had a successful solver result but a wrapper quoting error during postprocessing; that provenance problem is recorded separately. It does not supersede the clean primary run.
+
+\section{Hanging-face gate}
+Before the complete AMR trajectory, a small two-rank mesh tested representative 2:1 interfaces. Common physical weak-operator actions agreed with a conforming comparator at relative scale about $5.87\times10^{-14}$. Matching SIPG penalty geometry was essential: a framework's default inverse-normal-length convention need not equal the DOLFINx cell-diameter convention.
+
+The NC test supports conservative, correctly scaled face assembly on those interfaces. It does not prove convergence of a long AMR forecast. MFEM's documented \code{nc_limit} mechanism can add neighbouring refinements, so actual cell counts must be measured after constructing and balancing the mesh \cite{mfemnc}.
+
+\chapter{Local AMR, support sensitivity and the final domain sequence}
+\section{First and second AMR levels}
+Static AMR1 used 140,418 cells and 3,791,286 DOFs, 36.4\% fewer than the fine graded reference. It gave $D_{\rm AMR1,g_f}=0.01871569<0.02$, mean correction $2.07549\times10^{-4}$ and maximum mass error $7.53\times10^{-13}$. All recorded invariant and statistical gates passed. Propagation cost 9,780 seconds, approximately 2.13 times the fine graded runtime; peak memory was not recorded. Numerical reproduction passed while resource efficiency remained open.
+
+AMR2 used 163,728 cells and 4,420,656 DOFs. The adjacent difference $D_{1,2}=0.0157065$ passed its 0.05 gate. Mean correction fell to $1.04980\times10^{-4}$ and mass error stayed below about $8.40\times10^{-13}$. However $D_{2,g_f}=0.0191270$ slightly exceeded $D_{1,g_f}$. One bounded adjacent difference is valuable, but it cannot establish monotone approach to an exact density.
+
+\section{The third-depth contraction failed}
+AMR3 produced $D_{2,3}=0.0106884$. The predeclared halving gate was $0.5D_{1,2}=0.00785326$. The observed ratio was about 0.6805, so the contraction gate failed even though positivity, mass, optimiser and statistical tests passed. Initial discrepancy was about 0.000812314; runtime was about 5.23 hours and peak memory about 7.16 GiB per rank.
+
+The saved density-difference map placed 80.1\% of the AMR2--AMR3 difference outside the second-depth marking support. This gave a concrete falsifiable explanation: the replay-defined fine region was too narrow, so adding depth within it could not resolve error outside it.
+
+\section{Support and depth were disentangled}
+The expanded-support study retained existing marks, added regions covering 95\% of the final absolute density difference and one child-cell buffer, and held the finest cell size equal to AMR2. Its change from AMR3 was 0.0150712, exceeding 0.00785326. It therefore failed reproduction of AMR3, while reducing mean correction to about $2.02955\times10^{-5}$. A substantial support effect is evidence that AMR3 itself is an inadequate universal reference.
+
+The targeted extra-depth study then held that support fixed and refined 1,889 buffered cells, covering about 39.1\% of the chosen indicator. Its difference from the support comparator was only 0.000316854 and mean correction $2.02951\times10^{-5}$. This bounded test passed its own continuation gate. Because it covered a selected fraction, it cannot certify the untested remainder by logical implication.
+
+The broader-support study increased the discrepancy target to 99\% and retained previous expanded marks. Actual forced-neighbour refinement produced 208,787 cells rather than the estimated 204,552. Relative to the support comparator it changed the density by 0.00177608, while mean correction fell to $7.98372\times10^{-6}$. The old AMR2--AMR3 discrepancy coverage reached 99.735\%. All configured broader-support gates passed. The authoritative file is \code{broader_support_comparison.json}; inherited failed comparator files in the same directory answer older questions and retain their original classifications.
+
+\section{Temporal sensitivity of the broader working mesh}
+The half-timestep run used exactly the same initial voxel field and mesh, with 640 steps at $7.8125\times10^{-5}$. Final full/half-step density difference was $1.97036\times10^{-5}$, far below the 0.0025 gate. Mean correction per step was about $4.0187\times10^{-6}$, but the sum over 640 steps was about 0.002572, close to the 320-step sum about 0.002555. Halving a per-step intervention while doubling the number of steps is not evidence of a halved total modification.
+
+Mass error stayed below about $2.76\times10^{-13}$ and every accepted state passed the declared gates. Runtime was approximately 4.47 hours. These data support retaining the original timestep for this working mesh and horizon; they do not supply a temporal asymptotic order from only one pair.
+
+\section{Two aligned domain expansions completed}
+The initial domain attempt stopped at the memory safeguard. Later runs released redundant mesh and assembly storage, then completed both expansions with unchanged physical interior resolution. The first expansion had 224,959 cells; the second had 242,403. They were compared on aligned conservative voxel grids, with separate added-shell probability diagnostics.
+
+The first interior $L^1$ change was $1.32129\times10^{-12}$. The second change, independently recomputed from the two binary voxel arrays, was $1.9549638427469373\times10^{-12}$. Relative covariance changes were approximately $8.06\times10^{-14}$ and $1.59\times10^{-13}$; maximum marginal-TV changes were approximately $5.47\times10^{-13}$ and $8.17\times10^{-13}$. Measured added-shell mass was zero in the audited second comparison.
+
+All 320 steps of the second expansion were certified, with zero reported optimiser failures/fallbacks. Maximum mass error was approximately $1.40\times10^{-12}$. Its final FE mass and export mass differed by about $7.64\times10^{-14}$. Propagation wall time was 23,804.9 seconds, including memory-pressure pauses, and peak RSS was about 6.36 GiB per rank.
+
+\scope{The two-expansion gate is passed numerically for this mature law, tensor and $0.05$ horizon. The nearly machine-precision differences reflect dormant tested exterior effects; they are not a theorem about the unbounded-domain problem or every longer forecast. The final scientific artifact explicitly keeps production authorization false.}
+
+\section{The resulting decision}
+The late evidence supports a bounded provisional pilot using the broader-support comparator and its declared law/tensor/horizon neighbourhood. It leaves a continuum full-density error certificate open. A finite sequence of small support, timestep and domain differences does not bound an untested error component. The conditional pilot is a research decision to learn whether this target family is useful, with per-sample rejection gates; it is not permission for a large unattended production dataset.
+
+The scientifically durable state has three separate entries: statistical and positivity gates passed; both tested domain expansions passed; mature-density continuum convergence remains open. Preserving those distinctions is the most important outcome of the complete development history.

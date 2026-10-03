@@ -1,0 +1,194 @@
+\chapter{Local polynomial algebra and constrained optimisation}\label{app:local-algebra}
+\section{Deriving the Q2 mass metric}
+On $[0,1]$, use nodal Lagrange functions at $0,1/2,1$. Direct polynomial integration gives
+\begin{equation}
+ H_1=\left(\int_0^1l_i l_j\,d\xi\right)_{i,j=0}^{2}
+ =\frac1{30}\begin{pmatrix}4&2&-1\\2&16&2\\-1&2&4\end{pmatrix},
+ \qquad a_1=\begin{pmatrix}1/6\\2/3\\1/6\end{pmatrix}.
+\end{equation}
+For any nonzero coefficient vector $c$, $c^TH_1c=\int_0^1(\sum c_il_i)^2>0$, because a nonzero polynomial cannot vanish almost everywhere. This proves positive definiteness without inspecting eigenvalues. The negative off-diagonal entries are compatible with a positive quadratic form; they also explain why positivity of nodal coefficients and positivity of the function are different questions.
+
+On the cube,
+\begin{equation}
+ H=H_1\otimes H_1\otimes H_1,\qquad
+ a=a_1\otimes a_1\otimes a_1.
+\end{equation}
+Fubini's theorem applies to continuous polynomial products on a compact cube. On an affine cell, the physical mass matrix is $|K|H$. Therefore
+\begin{equation}
+ \|p_c-p_{c_0}\|_{L^2(K)}^2=|K|(c-c_0)^TH(c-c_0).
+\end{equation}
+This is the physical interpretation of the QP objective; choosing an arbitrary Euclidean norm of nodal values would weight the polynomial differently.
+
+\section{Bernstein conversion and subdivision}
+For degree two, the Bernstein basis is $(1-\xi)^2$, $2\xi(1-\xi)$, $\xi^2$. Evaluating at the three nodal locations gives
+\begin{equation}
+ \beta_0=c_0,\quad \beta_2=c_2,\quad
+ \beta_1=2c_1-\tfrac12(c_0+c_2),\qquad
+ T=\begin{pmatrix}1&0&0\\-1/2&2&-1/2\\0&0&1\end{pmatrix}.
+\end{equation}
+The cube conversion is $T\otimes T\otimes T$, with ordering matched to the chosen canonical vector. A midpoint split uses de Casteljau averages:
+\begin{align}
+ \beta^{L}&=(\beta_0,(\beta_0+\beta_1)/2,(\beta_0+2\beta_1+\beta_2)/4),\\
+ \beta^{R}&=((\beta_0+2\beta_1+\beta_2)/4,(\beta_1+\beta_2)/2,\beta_2).
+\end{align}
+Every new coefficient is a convex combination of previous coefficients. Subdivision preserves the exact polynomial while making local bounds tighter. Tensor subdivision creates eight subcubes; their coefficient inequalities define the fixed-subcell constraint matrix $C$ used by the local QP.
+
+All Bernstein basis functions integrate to $1/3$ in one dimension and $1/27$ in three dimensions. Consequently the cell average is the mean of whole-cell Bernstein coefficients, even though it is a weighted mean of Lagrange coefficients. Confusing these two statements changes the conservation constraint.
+
+\section{Nullspace elimination of the equality}
+Let $a\ne0$ and choose $Z\in\R^{27\times26}$ whose columns span $\ker a^T$. Every vector with average $m$ is representable as
+\begin{equation}
+ c=m\mathbf1+Zy,
+\end{equation}
+because $a^T\mathbf1=1$. The reduced objective is
+\begin{equation}
+ \tfrac12y^T(Z^THZ)y+y^TZ^TH(m\mathbf1-c_0)+\text{constant},
+\end{equation}
+with inequalities $CZy\ge-Cm\mathbf1$ (or the declared interior margin). The Hessian is SPD: $y\ne0$ implies $Zy\ne0$, so $y^TZ^THZy>0$. The equality is now satisfied algebraically, subject only to the numerical accuracy of $Z$ and transformations.
+
+For $m>0$, normalizing by $m$ makes the problem's scale comparable across probability-rich and low-density cells. The returned vector must still be checked in physical scale. A fixed absolute tolerance acceptable near a peak may overwhelm the mass of a tail cell; normalization and explicit tolerances are both necessary.
+
+\section{KKT conditions as an independent check}
+For the full problem with $Cc\ge b$ and $a^Tc=m$, let $\mu\ge0$ multiply $b-Cc$ and $\lambda$ multiply the equality. At an optimum,
+\begin{align}
+ H(c-c_0)+\lambda a-C^T\mu&=0,\\
+ a^Tc=m,\quad Cc-b&\ge0,\quad\mu\ge0,\\
+ \mu_i(Cc-b)_i&=0.
+\end{align}
+These are primal feasibility, dual feasibility, stationarity and complementarity. For a strictly convex feasible quadratic problem, any point satisfying them is the unique minimizer. In finite precision, scaled residuals of these relations are diagnostic. The operational acceptance still checks the returned polynomial and mass; an optimiser's termination message cannot replace those checks.
+
+\section{Objective guarantees and their limits}
+If the input is feasible, its zero correction is uniquely optimal. If a scalar-scaled polynomial is feasible, the QP objective cannot exceed its objective. For two coefficient norms related by constants $\alpha,\beta>0$, bounds can be transferred with those constants; there is no universal identity between mass-metric and $L^1$ correction. Nor does minimal distance to the feasible set imply minimal distance to the unknown PDE solution. The raw target itself can be inaccurate.
+
+\chapter{PDE spaces, stability and linear algebra}
+\section{Why a weak formulation uses different regularity}
+$L^2(\Omega)$ consists of square-integrable functions, identified up to equality almost everywhere. $H^1(\Omega)$ consists of functions in $L^2$ whose weak first derivatives are also in $L^2$. A weak derivative is defined by integration against smooth compactly supported tests, avoiding pointwise differentiability assumptions. The conforming diffusion weak form naturally uses $H^1$ because it contains one derivative of each function.
+
+DG functions lie in broken $H^1$: they are $H^1$ on each cell but can jump at faces. Ordinary distributional derivatives across jumps include face distributions, so simply inserting a discontinuous function into a continuous $H^1$ formula is incomplete. Numerical flux, consistency and penalty terms supply the missing interface information. Trace inequalities control face quantities in terms of cell norms and gradients; inverse inequalities bring explicit powers of polynomial degree and cell size.
+
+SIPG coercivity requires a sufficiently large penalty relative to those trace constants, shape regularity and tensor bounds. The project's chosen penalty is numerically verified for its adopted geometry. This monograph derives the usual absorption argument in the diffusion chapter, without pretending that one numerical constant is valid for every mesh and tensor.
+
+\section{Scalar stability functions explain the timestep change}
+For $y'=\lambda y$, the amplification factors are
+\begin{equation}
+ R_{\rm FE}(z)=1+z,\quad R_{\rm BE}(z)=\frac1{1-z},\quad
+ R_{\rm CN}(z)=\frac{1+z/2}{1-z/2},\qquad z=\Delta t\lambda.
+\end{equation}
+If $\Re z\le0$, then $|1+z/2|\le|1-z/2|$, so CN is A-stable on this scalar test equation. Yet $R_{\rm CN}(z)\to-1$ as real $z\to-\infty$: stiff modes alternate rather than being strongly damped. BE tends to zero and is L-stable. This explains why CN can improve smooth temporal accuracy while leaving oscillatory admissibility problems. Scalar A-stability does not prove nonnegative coefficients, nonnegative polynomials or contraction for a nonsymmetric nonnormal matrix in an arbitrary norm.
+
+Taylor expansion of a smooth exact solution about the midpoint gives
+\begin{equation}
+ \frac{y(t+\Delta t)-y(t)}{\Delta t}
+ -\tfrac12\{y'(t+\Delta t)+y'(t)\}
+ =-\frac{\Delta t^2}{12}y'''(t)+O(\Delta t^3).
+\end{equation}
+The unscaled step defect is $O(\Delta t^3)$. Under a uniform finite-time stability bound and sufficient smoothness this yields global $O(\Delta t^2)$ error for raw CN. Repeated nonlinear projection introduces additional defects; a separate bound is required to preserve that order. The empirical four-level test addresses this composition, rather than importing the raw-CN proof unchanged.
+
+\section{Residual error and preconditioning}
+For $Lx=b$ and approximate $\widetilde x$, residual $r=b-L\widetilde x$ satisfies
+\begin{equation}
+ x-\widetilde x=L^{-1}r,\qquad
+ \|x-\widetilde x\|\le\|L^{-1}\|\,\|r\|.
+\end{equation}
+A small relative residual can coexist with a larger forward error if conditioning is poor. A preconditioned residual also depends on the chosen preconditioner. GMRES minimizes a residual over a Krylov space for nonsymmetric systems; its restarted variant retains a bounded basis at the cost of potentially slower convergence. ILU approximates factorization sparsely. Neither name establishes the achieved physical-field error; production-scale basis-transformed probes provide additional evidence.
+
+The mass matrix is SPD and block-local for DG, making PCG a sensible initial-projection solver. The implementation uses Hypre diagonal scaling, relative $10^{-14}$, absolute $10^{-16}$ and maximum 500 iterations for that solve. The CN matrix contains advection and is nonsymmetric, so the algorithm uses GMRES rather than importing the SPD assumptions of PCG.
+
+\section{Dimensional complexity}
+For a tensor grid with $n$ cells per axis in dimension $d$, the number of Qk DG unknowns scales as $n^d(k+1)^d$. Doubling every spatial resolution multiplies cells by $2^d$. At $d=3$ this is eightfold; at $d=6$ it is sixty-four-fold. This dimensional growth explains why resolving a three-dimensional law can already be expensive and why direct high-dimensional density propagation needs fundamentally different representations.
+
+Element-local correction can be parallelized, but global mass repair requires reductions and sparse implicit solves require communication. A graph partition with many hanging faces can increase communication and face work. Peak sparse-matrix storage depends on stencil connectivity and fill, so DOF count alone cannot predict memory. Low-dimensional latent representations, particles and neural operators can be useful future tools, but their approximation errors need separate validation.
+
+\chapter{Verification, gates and assumptions}\label{app:assumptions}
+\section{Verification and validation answer different questions}
+Verification asks whether the code solves its specified discrete problem correctly. Unit tests of average repair, basis maps, operator conservation and conservative export are examples. Validation asks whether the specified model and numerical solution adequately represent the intended physical/statistical problem. Full-SPD reference comparisons, mature-state refinement and domain sensitivity address parts of validation. Neither substitutes for the other.
+
+\begin{longtable}{p{.27\textwidth}p{.31\textwidth}p{.33\textwidth}}
+\caption{Representative predeclared gates and their evidenced outcomes. Thresholds belong to their named experiments.}\\
+\toprule Gate & Definition / threshold & Outcome and scope\\\midrule\endhead
+Accepted-state positivity & Whole-cell Bernstein certification at each step; zero measured negative mass & Passed on final mature comparator and both domain expansions. Floating acceptance uses declared tolerances.\\
+Mass & MFEM reported maximum $|M_n-M_0|<10^{-10}$, with initial normalization error also recorded & Final second domain drift approximately $1.40\times10^{-12}$; absolute-to-one bound adds $|M_0-1|$.\\
+Optimizer & Zero failures and fallbacks & Successful guarded MFEM trajectories pass; AFC hierarchy failed with thousands of events.\\
+Startup temporal & Every adjacent exported $L^1<0.0025$ & Four-level sequence passes; clean second-order theorem absent.\\
+Startup spatial & Decreasing adjacent differences; positive observed rate & Identity and full-SPD hierarchies pass; rates 3.4026 and 3.4215 are observed common-grid diagnostics.\\
+Original mature correction & Mean relative intervention $\le10^{-3}$ & Uniform $60^*$ passes; earlier $20^*$--$45^*$ fail.\\
+Graded branch correction & Mean relative intervention $<8\times10^{-4}$ & First graded fails at $8.3837\times10^{-4}$; finer/broader pass.\\
+DOF prototype & $C_{\rm DOF}<0.5C_{\rm QP}$ & Failed: ratios about 22.10 and 40.08 on one-step states.\\
+AMR1 reproduction & $D_{{\rm AMR1},g_f}<0.02$ & Passed at 0.01871569; resource efficiency open.\\
+AMR2 continuation & $D_{1,2}<0.05$ & Passed at 0.0157065; one pair supplies no asymptotic proof.\\
+AMR3 contraction & $D_{2,3}<0.5D_{1,2}$ & Failed: 0.0106884 exceeds 0.00785326.\\
+Broader temporal & Final full/half $L^1<0.0025$ & Passed at $1.97036\times10^{-5}$.\\
+Domain density & Interior exported $L^1<0.0025$, initial interior $L^1<10^{-6}$ & Both expansions pass at near-roundoff differences.\\
+Domain statistics & Relative covariance and marginal TV changes $<0.005$; absolute mean changes $<0.005$; principal direction angles $<1$ degree & Both aligned expansions pass numerically.\\
+Domain boundary & Outer-layer probability $<10^{-6}$; mass/export error $<10^{-10}$; negative mass $\le10^{-13}$ & Recorded shell/layer probability is negligible, with certified accepted states.\\
+Production & Explicit authorization after required evidence & False in final scientific artifact.\\\bottomrule\end{longtable}
+
+\section{Repository assumptions translated into mathematics}
+\begin{description}
+\item[A1] Affine axis-aligned hexahedra support the tensor-basis transforms and exact polynomial voxel integration. The file's original Q1 implication is historical; Q2 uses Bernstein constraints instead of vertex positivity alone.
+\item[A2] Zero total probability flux is the finite-domain boundary target. It is distinct from separately imposing zero drift flux and zero diffusive flux.
+\item[A3] Default $B=I$ gives $D=I/2$. The production target includes constant general $B$ and full-SPD $D$; a diagonal-only reference has narrower applicability.
+\item[A4] Rank deficiency does not establish uniform ellipticity. Hypoelliptic regularity, if relevant, requires a separate analysis of drift/noise brackets.
+\item[A5] Backward Euler is a validated baseline; it is no mandate to keep its first-order temporal error when CN is better supported.
+\item[A6] Adopted projection quadrature is numerically adequate for tested laws. This does not establish exact Gaussian integration or universal adequacy for narrower future mixtures.
+\item[A7] Nonnegative fixed-subcell Bernstein coefficients are sufficient and can be conservative. They are not a necessary condition for every positive Q2 polynomial.
+\item[A8] Q1 is not certified for large dataset generation. Positivity alone cannot establish target accuracy.
+\item[A9] Exact-native-law MC sampling is an independent short-time reference subject to finite samples and SDE discretisation. It is not an exact high-resolution density oracle.
+\item[A10] A current method ranking is revisable when controlled evidence changes accuracy, cost or applicability.
+\item[A11] DOLFINx is a reference implementation rather than a permanent framework restriction. A port must meet model and equivalence contracts.
+\end{description}
+These assumptions are quoted conceptually from the current registry. Their status matters as much as their wording: several are deliberately recorded as false propositions to prevent recurring mistakes.
+
+\section{A failure catalogue with bounded conclusions}
+\begin{longtable}{p{.28\textwidth}p{.31\textwidth}p{.31\textwidth}}
+\caption{What each rejected path established, and what it left untested.}\\
+\toprule Episode & Established failure & Boundary of inference\\\midrule\endhead
+Equal-DOF ranking & Degree, mesh and dt confounded & Does not rank all Q1/Q2 cost tradeoffs.\\
+Roundoff average fix & Broke nonnegative-average prerequisite & Fix concerns implementation, not a failure of the scaling proof.\\
+Unlimited BE refinement & Temporal density gate failed without limiter & Projection cannot be the sole explanation.\\
+Global scaling CN & Accurate shape strongly degraded & Other local feasible methods remain possible.\\
+Pure fixed-mass QP & Negative-average cells infeasible & Average repair is mathematically required for that constraint.\\
+Three temporal levels & Insufficient finest decrease & Fourth level supplies new numerical evidence, not a theorem.\\
+Mature coarse Q2 & Large initialization/dynamic corrections and slow density contraction & Accurate moments alone do not certify density.\\
+Deeper certificates & Almost no relief; negative witnesses persisted & A certificate cannot repair a negative polynomial.\\
+Average-level AFC & Averages already admissible; polynomial intervention and fallbacks remained & No rejection of every subcell flux construction.\\
+Bernstein-DOF prototype & Much larger $L^1$ change than QP & Euclidean repair and strict constraints differ from physical-metric subcell QP.\\
+First grading & Failed $8\times10^{-4}$ gate by a small margin & Efficient reproduction of uniform 60 still supported.\\
+Tensor replay mesh & Cartesian product exceeded cell ceiling & Time-aggregated indicator itself remained useful.\\
+MFEM early probes & Extent, signs, penalty/certificate issues & Corrected controlled port later passed equivalence.\\
+AMR3 & Halving gate failed & Invariant/statistical successes remain valid components.\\
+Narrow support & Density change outside marked region dominated & Depth alone did not address support error.\\
+Initial domain job & RAM safeguard stopped completion & No scientific boundary conclusion from incomplete trajectory.\\\bottomrule\end{longtable}
+
+\chapter{Reading figures and further study}
+\section{A conceptual hanging-face diagram}
+\begin{figure}[htbp]\centering
+\begin{tikzpicture}[scale=.9]
+\draw[thick] (0,0) rectangle (3,3);\draw[thick] (3,0) rectangle (6,3);
+\draw (3,1.5)--(6,1.5);\draw (4.5,0)--(4.5,3);
+\draw[very thick,blue] (3,0)--(3,3);
+\node at (1.5,1.5) {coarse DG cell};
+\node[align=center] at (4.5,3.55) {refined neighbouring cells};
+\draw[-{Stealth},red,thick] (2.4,.75)--(3.6,.75);
+\draw[-{Stealth},red,thick] (2.4,2.25)--(3.6,2.25);
+\node[align=center] at (3,-.65) {shared physical flux on each fine face segment};
+\end{tikzpicture}
+\caption{Conceptual two-dimensional section of a nonconforming hex interface. This schematic is not a rendering of the archived 3-D mesh. Independent cell polynomials exchange probability through integrated shared face segments.}\end{figure}
+
+\section{Which requested figures are supported}
+The density and marginal figures use archived full three-dimensional voxel arrays. The convergence figure plots reported comparisons. The dependency diagram and hanging-face illustration are conceptual. An attractor trajectory or stochastic path figure would need an appropriately archived path with a documented horizon and law. The present short forecast arrays do not supply that evidence. No synthetic butterfly or invented trajectory was inserted to make the figures resemble a familiar Lorenz image.
+
+The initial and final density panels describe only $0\le t\le0.05$ evolution of the specified mature posterior. They neither illustrate convergence to a stationary law nor establish that the deterministic strange attractor is the support of the noisy density. Full-rank noise changes that interpretation.
+
+\section{Worked diagnostic exercises}
+\begin{enumerate}
+\item For $q(\xi)=(\xi-1/4)^2-1/100$, compute its three Q2 nodal values, Bernstein coefficients and minimum. Determine which tests detect the negative region. Then integrate $q$ to show that positive average does not imply positive polynomial.
+\item Verify $\mathbf1^TH_1\mathbf1=1$ and $H_1\mathbf1=a_1$. Tensorize the identity to show that the Q2 constant's mass is the cell volume.
+\item Take equal-volume raw averages $(-.1,.4,.7)$. Solve the water-filling projection with target sum one. The active positive components lose the same amount; check that the resulting vector is $(0,.35,.65)$ and derive its multiplier.
+\item On unequal volumes $(1,2,1)$ with the same averages, recompute the weighted projection. Explain why using the previous unweighted answer would conserve the wrong mass.
+\item Construct two symmetric normalized densities with mean zero and variance one but different shapes. Use this to refute inference of full-density closeness from covariance alone.
+\item With $D_1=.0157065$ and $D_2=.0106884$, compute the contraction ratio and compare it with a halving gate. Explain why no nonuniform formal order follows from this ratio alone.
+\item Let $p-q$ alternate sign within every export voxel with zero voxel integral. Verify $P_V(p-q)=0$ while $\|p-q\|_1>0$. This is the edge case behind the export-contraction qualification.
+\item For a stiff mode $z=-100$, compare BE and CN amplification. Relate the signs to positivity and the magnitudes to damping, keeping those two questions separate.
+\end{enumerate}
+The exercises make the method's failure modes reproducible with small calculations. None requires accepting an undocumented numerical run as a premise.

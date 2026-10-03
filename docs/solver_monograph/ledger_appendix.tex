@@ -1,0 +1,327 @@
+\chapter{Source ledger and evidence index}
+\label{app:ledger}
+This index inventories the entire tracked tree and available compact run records. Inventory does not imply that every recorded claim is correct. Primary interpreted evidence is cited in the main chapters. The companion JSON retains SHA256 hashes, sizes, decision fields and exact commit chronology.
+\section{Tracked source and preserved compact records}
+\small
+\begin{longtable}{p{.70\textwidth}r}
+\toprule Source path & Bytes\\\midrule\endhead
+\code{.gitignore} & 470\\
+\code{.python-version} & 9\\
+\code{AGENTS.md} & 6944\\
+\code{METHOD_SELECTION_REPORT.md} & 79221\\
+\code{NUMERICAL_METHOD.md} & 8022\\
+\code{POSITIVITY_AUDIT.md} & 9733\\
+\code{PRODUCTION_READINESS.md} & 15164\\
+\code{README.md} & 10445\\
+\code{benchmark_scaling.py} & 2556\\
+\code{boundary_flux_report.json} & 12404\\
+\code{build_experiment_manifest.py} & 5725\\
+\code{corrected_q2_crank_nicolson_report.json} & 2197\\
+\code{crank_nicolson_mc_20x24x24.json} & 13763\\
+\code{docs/ACTIVE_TASK.md} & 143\\
+\code{docs/ARCHITECTURE.md} & 5077\\
+\code{docs/CLAIMS.md} & 12335\\
+\code{docs/DECISIONS.md} & 40158\\
+\code{docs/DENSITY_VISUALIZATION.md} & 2332\\
+\code{docs/MATHEMATICAL_SPEC.md} & 4507\\
+\code{docs/MATH_PROTOCOL.md} & 1895\\
+\code{docs/PROJECT_STATE.md} & 16872\\
+\code{docs/REFERENCES.md} & 3057\\
+\code{docs/RESEARCH_DIRECTIONS.md} & 9531\\
+\code{docs/assumptions.yaml} & 2245\\
+\code{docs/generated/REPO_MAP.md} & 25417\\
+\code{docs/tasks/TASK_TEMPLATE.md} & 1179\\
+\code{environment-linux-64.lock} & 57257\\
+\code{environment.yml} & 561\\
+\code{experiment_manifest.json} & 25651\\
+\code{experiments/corrected-q2-crank-nicolson.yaml} & 1211\\
+\code{experiments/local-q2-cn-full-spd-controlled.yaml} & 2384\\
+\code{experiments/local-q2-cn-full-spd-spatial-refinement.yaml} & 3429\\
+\code{experiments/local-q2-cn-spatial-refinement.yaml} & 3162\\
+\code{experiments/local-q2-cn-tight-ksp-refinement.yaml} & 3322\\
+\code{experiments/local-q2-crank-nicolson.yaml} & 2757\\
+\code{experiments/local-q2-optimizer-validation.yaml} & 1019\\
+\code{experiments/local-q2-osqp-profile.yaml} & 839\\
+\code{experiments/local-q2-positivity-projection.yaml} & 1805\\
+\code{experiments/mature-afc-update.yaml} & 5681\\
+\code{experiments/mature-dof-convex-diagnostic.yaml} & 2118\\
+\code{experiments/mature-graded-fine-axes.json} & 1503\\
+\code{experiments/mature-graded-fine-comparison.yaml} & 4515\\
+\code{experiments/mature-graded-static-axes.json} & 1589\\
+\code{experiments/mature-graded-static-comparison.yaml} & 4080\\
+\code{experiments/mature-positivity-certificate-diagnostic.yaml} & 2695\\
+\code{experiments/mature-state-decision.yaml} & 4573\\
+\code{experiments/mature-time-aggregated-level3-pipeline.yaml} & 2588\\
+\code{experiments/mature-uniform60-reference.yaml} & 2174\\
+\code{experiments/method-selection-research.yaml} & 2368\\
+\code{experiments/mfem-broader-support.yaml} & 683\\
+\code{experiments/mfem-domain-sensitivity.yaml} & 1153\\
+\code{experiments/mfem-mature-half-timestep.yaml} & 569\\
+\code{experiments/mfem-mature-uniform-equivalence.yaml} & 973\\
+\code{experiments/mfem-physical-equivalence-gate.yaml} & 1627\\
+\code{experiments/mfem-static-nc-hex-level2.yaml} & 1622\\
+\code{experiments/mfem-static-nc-hex-level3.yaml} & 1877\\
+\code{experiments/mfem-static-nc-hex-reproduction.yaml} & 1728\\
+\code{experiments/mfem-support-depth.yaml} & 605\\
+\code{experiments/mfem-support-sensitivity.yaml} & 1267\\
+\code{experiments/mfem-uniform-equivalence-gate.yaml} & 1738\\
+\code{experiments/same-mesh-q2-corrected.yaml} & 1629\\
+\code{experiments/same-mesh-q2-falsification.yaml} & 1235\\
+\code{experiments/same-mesh-q2-timestep.yaml} & 677\\
+\code{experiments/smoke-forecast.yaml} & 363\\
+\code{experiments/unlimited-q2-crank-nicolson.yaml} & 1251\\
+\code{experiments/unlimited-q2-timestep-attribution.yaml} & 1168\\
+\code{generate_dataset.py} & 2060\\
+\code{high_resolution_monte_carlo_report.json} & 3264\\
+\code{higher_order_report.json} & 49522\\
+\code{independent_reference_refined_report.json} & 22627\\
+\code{independent_reference_report.json} & 21418\\
+\code{independent_reference_study.py} & 938\\
+\code{jupytext.toml} & 109\\
+\code{limiter_impact_20x24x24.json} & 60388\\
+\code{local_projection_optimizer_study.py} & 9438\\
+\code{local_projection_study.py} & 9008\\
+\code{local_q2_dynamic_projection_report.json} & 3331\\
+\code{local_q2_full_spd_control_report.json} & 1691\\
+\code{local_q2_full_spd_spatial_report.json} & 4246\\
+\code{local_q2_mature_bimodal_report.json} & 5098\\
+\code{local_q2_optimizer_validation_report.json} & 1467\\
+\code{local_q2_positivity_projection_report.json} & 3880\\
+\code{local_q2_projection_performance_report.json} & 3322\\
+\code{local_q2_spatial_refinement_report.json} & 3215\\
+\code{local_q2_tight_refinement_report.json} & 1982\\
+\code{lorenz_fpe/__init__.py} & 701\\
+\code{lorenz_fpe/afc.py} & 16273\\
+\code{lorenz_fpe/core.py} & 70134\\
+\code{lorenz_fpe/dataset.py} & 11139\\
+\code{lorenz_fpe/finite_volume.py} & 6384\\
+\code{lorenz_fpe/local_projection.py} & 26722\\
+\code{lorenz_fpe/validation.py} & 47176\\
+\code{mature_da_projected_report.json} & 440903\\
+\code{mature_da_report.json} & 417269\\
+\code{mature_da_study.py} & 8860\\
+\code{mature_dof_convex_diagnostic.py} & 10036\\
+\code{mature_forecast_validation.json} & 28581\\
+\code{mature_forecast_validation.py} & 4285\\
+\code{mature_graded_efficiency_report.json} & 2890\\
+\code{mature_graded_fine_report.json} & 1825\\
+\code{mature_positivity_certificate_diagnostic_report.json} & 4695\\
+\code{mature_positivity_diagnostic.py} & 8700\\
+\code{mature_time_aggregated_pipeline.py} & 13649\\
+\code{mc_timestep_repair.py} & 352\\
+\code{mc_timestep_same_initial_law.json} & 1795\\
+\code{method_selection_report.json} & 33968\\
+\code{mfem/compare_mature_equivalence.py} & 5078\\
+\code{mfem/compare_physical_equivalence.py} & 4637\\
+\code{mfem/compare_static_amr.py} & 6193\\
+\code{mfem/compare_static_amr_level2.py} & 6016\\
+\code{mfem/compare_static_amr_level3.py} & 7584\\
+\code{mfem/compare_support_depth.py} & 2046\\
+\code{mfem/compare_support_test.py} & 2812\\
+\code{mfem/dolfinx_physical_equivalence.py} & 8098\\
+\code{mfem/export_mature_initial.py} & 3617\\
+\code{mfem/launch_uniform_equivalence_gate.sh} & 1171\\
+\code{mfem/memory_backpressure.py} & 2647\\
+\code{mfem/mfem_physical_equivalence.cpp} & 75955\\
+\code{mfem/mfem_uniform_equivalence_probe.cpp} & 10665\\
+\code{mfem/prepare_static_amr.py} & 3066\\
+\code{mfem/prepare_static_amr_level2.py} & 3389\\
+\code{mfem/prepare_static_amr_level3.py} & 3248\\
+\code{mfem/prepare_support_depth.py} & 2104\\
+\code{mfem/prepare_support_test.py} & 3711\\
+\code{mfem/run_broader_support.py} & 5464\\
+\code{mfem/run_domain_sensitivity.py} & 8061\\
+\code{mfem/run_mature_uniform_equivalence.sh} & 2364\\
+\code{mfem/run_physical_equivalence_gate.sh} & 1414\\
+\code{mfem/run_static_amr_level2.sh} & 2869\\
+\code{mfem/run_static_amr_level3.sh} & 3026\\
+\code{mfem/run_static_amr_reproduction.sh} & 2768\\
+\code{mfem/run_support_depth.sh} & 2035\\
+\code{mfem/run_support_test.sh} & 2169\\
+\code{mfem/run_uniform_equivalence_probe.sh} & 576\\
+\code{monte_carlo_fixed_dt_20x24x24.json} & 13811\\
+\code{monte_carlo_uncertainty_20x24x24.json} & 12815\\
+\code{monte_carlo_uncertainty_30x36x36.json} & 13931\\
+\code{pyproject.toml} & 545\\
+\code{q1_fine_bayesian_update_report.json} & 9824\\
+\code{q2_bayesian_update_report.json} & 18427\\
+\code{q2_bayesian_update_subcell_report.json} & 9776\\
+\code{q2_common_law_monte_carlo.json} & 14748\\
+\code{q2_common_law_subcell_monte_carlo.json} & 14650\\
+\code{resplit_dataset.py} & 718\\
+\code{same_mesh_q2_corrected_report.json} & 2203\\
+\code{same_mesh_q2_falsification_report.json} & 4473\\
+\code{same_mesh_q2_study.py} & 42675\\
+\code{sample_dataset/dataset_manifest.json} & 6827\\
+\code{sample_dataset/dataset_schema.json} & 445\\
+\code{sample_dataset/posterior_distribution_report.json} & 1592\\
+\code{sample_dataset/solver_metadata.json} & 1940\\
+\code{sample_dataset/trajectories/trajectory_000000/cycle_000000/diagnostics.json} & 6244\\
+\code{sample_dataset/trajectories/trajectory_000000/cycle_000001/diagnostics.json} & 6748\\
+\code{sample_dataset/trajectories/trajectory_000000/cycle_000002/diagnostics.json} & 6746\\
+\code{sample_dataset/trajectories/trajectory_000000/cycle_000003/diagnostics.json} & 6717\\
+\code{sample_dataset/trajectories/trajectory_000000/cycle_000004/diagnostics.json} & 6702\\
+\code{sample_dataset/trajectories/trajectory_000000/cycle_000005/diagnostics.json} & 6723\\
+\code{sample_dataset/trajectories/trajectory_000000/cycle_000006/diagnostics.json} & 6719\\
+\code{sample_dataset/trajectories/trajectory_000000/cycle_000007/diagnostics.json} & 6709\\
+\code{sample_dataset/trajectories/trajectory_000000/trajectory_metadata.json} & 633\\
+\code{sample_dataset/trajectories/trajectory_000001/cycle_000000/diagnostics.json} & 6793\\
+\code{sample_dataset/trajectories/trajectory_000001/cycle_000001/diagnostics.json} & 6589\\
+\code{sample_dataset/trajectories/trajectory_000001/cycle_000002/diagnostics.json} & 6568\\
+\code{sample_dataset/trajectories/trajectory_000001/cycle_000003/diagnostics.json} & 6688\\
+\code{sample_dataset/trajectories/trajectory_000001/cycle_000004/diagnostics.json} & 6749\\
+\code{sample_dataset/trajectories/trajectory_000001/cycle_000005/diagnostics.json} & 6759\\
+\code{sample_dataset/trajectories/trajectory_000001/cycle_000006/diagnostics.json} & 6740\\
+\code{sample_dataset/trajectories/trajectory_000001/cycle_000007/diagnostics.json} & 6731\\
+\code{sample_dataset/trajectories/trajectory_000001/trajectory_metadata.json} & 630\\
+\code{sample_dataset/trajectories/trajectory_000002/cycle_000000/diagnostics.json} & 6778\\
+\code{sample_dataset/trajectories/trajectory_000002/cycle_000001/diagnostics.json} & 6753\\
+\code{sample_dataset/trajectories/trajectory_000002/cycle_000002/diagnostics.json} & 6726\\
+\code{sample_dataset/trajectories/trajectory_000002/cycle_000003/diagnostics.json} & 6706\\
+\code{sample_dataset/trajectories/trajectory_000002/cycle_000004/diagnostics.json} & 6720\\
+\code{sample_dataset/trajectories/trajectory_000002/cycle_000005/diagnostics.json} & 6725\\
+\code{sample_dataset/trajectories/trajectory_000002/cycle_000006/diagnostics.json} & 6755\\
+\code{sample_dataset/trajectories/trajectory_000002/cycle_000007/diagnostics.json} & 6710\\
+\code{sample_dataset/trajectories/trajectory_000002/trajectory_metadata.json} & 633\\
+\code{scaling_30_rank1.json} & 781\\
+\code{scaling_30_rank8.json} & 778\\
+\code{scaling_q2_20_rank1.json} & 793\\
+\code{scaling_q2_20_rank8.json} & 795\\
+\code{scaling_rank1.json} & 785\\
+\code{scaling_rank2.json} & 784\\
+\code{scaling_rank4.json} & 785\\
+\code{scaling_rank8.json} & 790\\
+\code{scripts/bootstrap} & 509\\
+\code{scripts/check} & 393\\
+\code{scripts/context} & 1068\\
+\code{scripts/plot_saved_density.py} & 5330\\
+\code{scripts/repo-map} & 606\\
+\code{scripts/run-experiment} & 225\\
+\code{scripts/run-in-env} & 263\\
+\code{scripts/run_experiment.py} & 50153\\
+\code{scripts/verify-math} & 320\\
+\code{scripts/verify_math.py} & 23634\\
+\code{separate_convergence_report.json} & 4004\\
+\code{solver.py} & 1844\\
+\code{tests/__init__.py} & 18\\
+\code{tests/mpi_probe_worker.py} & 455\\
+\code{tests/test_accuracy_repairs.py} & 18421\\
+\code{tests/test_limiter.py} & 1501\\
+\code{tests/test_memory_backpressure.py} & 1059\\
+\code{tests/test_mfem_mature_compare.py} & 512\\
+\code{tests/test_mpi_consistency.py} & 1265\\
+\code{tests/test_solver_smoke.py} & 3761\\
+\code{tests/test_spatial_experiment.py} & 6001\\
+\code{tests/test_validation.py} & 834\\
+\code{unlimited_q2_crank_nicolson_report.json} & 1736\\
+\code{unlimited_q2_timestep_report.json} & 2350\\
+\code{validate.py} & 299\\
+\code{validation_repair.py} & 1239\\
+\code{validation_repair_report.json} & 123701\\
+\code{validation_report.json} & 81824\\
+\code{voxel_projection_20x24x24.json} & 5486\\
+\bottomrule\end{longtable}\normalsize
+\section{Run records inspected}
+The following distinct run directories have compact records in the ledger. Failed, partial and superseded runs remain visible.
+\begin{itemize}
+\item \code{runs/corrected-q2-crank-nicolson/20260911T002101Z}
+\item \code{runs/density-visualization/20261002-saved-density}
+\item \code{runs/local-q2-cn-full-spd-controlled/20260913T133432Z}
+\item \code{runs/local-q2-cn-full-spd-mature-bimodal/20260913T185157Z}
+\item \code{runs/local-q2-cn-full-spd-spatial-refinement/20260913T135455Z}
+\item \code{runs/local-q2-cn-spatial-refinement/20260912T185711Z}
+\item \code{runs/local-q2-cn-spatial-refinement/20260912T194930Z}
+\item \code{runs/local-q2-cn-tight-ksp-refinement/20260912T001343Z}
+\item \code{runs/local-q2-cn-tight-ksp-refinement/20260912T003213Z}
+\item \code{runs/local-q2-crank-nicolson/20260911T115805Z}
+\item \code{runs/local-q2-crank-nicolson/20260911T165516Z}
+\item \code{runs/local-q2-optimizer-validation/20260911T165132Z}
+\item \code{runs/local-q2-optimizer-validation/20260911T165327Z}
+\item \code{runs/local-q2-osqp-profile/20260911T165425Z}
+\item \code{runs/local-q2-positivity-projection/20260911T114352Z}
+\item \code{runs/local-q2-positivity-projection/20260911T114732Z}
+\item \code{runs/local-q2-positivity-projection/20260911T114957Z}
+\item \code{runs/local-q2-spatial-runner-smoke/20260912T185453Z}
+\item \code{runs/mature-dof-convex-diagnostic/20260914T184021Z}
+\item \code{runs/mature-full-spd-afc-update/20260913T222328Z}
+\item \code{runs/mature-full-spd-graded-fine-comparison/20260914T231639Z}
+\item \code{runs/mature-full-spd-graded-static-comparison/20260914T210354Z}
+\item \code{runs/mature-full-spd-uniform60-reference/20260914T190730Z}
+\item \code{runs/mature-positivity-certificate-diagnostic/20260913T200251Z}
+\item \code{runs/mature-time-aggregated-grid-pipeline/20260915T134916Z}
+\item \code{runs/mfem-broader-support/20261002-preflight}
+\item \code{runs/mfem-broader-support/20261002T080644Z}
+\item \code{runs/mfem-domain-memory-regression/20261003-after}
+\item \code{runs/mfem-domain-memory-regression/20261003-before}
+\item \code{runs/mfem-domain-sensitivity/20261003T105837Z}
+\item \code{runs/mfem-domain-sensitivity/20261003T113423Z}
+\item \code{runs/mfem-domain-sensitivity/20261003T143701Z}
+\item \code{runs/mfem-domain-sensitivity/20261003T143753Z}
+\item \code{runs/mfem-mature-half-timestep/20261002-preflight}
+\item \code{runs/mfem-mature-half-timestep/20261002T171744Z}
+\item \code{runs/mfem-mature-uniform-equivalence/20260915T192747Z}
+\item \code{runs/mfem-mature-uniform-equivalence/20260915T192800Z}
+\item \code{runs/mfem-mature-uniform-equivalence/20260915T192954Z}
+\item \code{runs/mfem-mature-uniform-equivalence/20260915T193057Z}
+\item \code{runs/mfem-mature-uniform-equivalence/20260915T193238Z}
+\item \code{runs/mfem-mature-uniform-equivalence/20260915T193445Z}
+\item \code{runs/mfem-mature-uniform-equivalence/20260916T213458Z}
+\item \code{runs/mfem-nc-face-probe/20260916T-probe}
+\item \code{runs/mfem-physical-equivalence-production/20260915T184539Z}
+\item \code{runs/mfem-physical-equivalence-production/20260915T184604Z}
+\item \code{runs/mfem-physical-equivalence-production/20260915T185006Z}
+\item \code{runs/mfem-physical-equivalence/20260915T182726Z}
+\item \code{runs/mfem-physical-equivalence/20260915T182747Z}
+\item \code{runs/mfem-physical-equivalence/20260915T182953Z}
+\item \code{runs/mfem-physical-equivalence/20260915T183056Z}
+\item \code{runs/mfem-physical-equivalence/20260915T183234Z}
+\item \code{runs/mfem-physical-equivalence/20260915T183333Z}
+\item \code{runs/mfem-physical-equivalence/20260915T183412Z}
+\item \code{runs/mfem-physical-equivalence/20260915T183510Z}
+\item \code{runs/mfem-physical-equivalence/20260915T183709Z}
+\item \code{runs/mfem-physical-equivalence/20260915T184057Z}
+\item \code{runs/mfem-physical-equivalence/20260915T184304Z}
+\item \code{runs/mfem-physical-equivalence/20260915T184941Z}
+\item \code{runs/mfem-physical-equivalence/20260915T184954Z}
+\item \code{runs/mfem-physical-equivalence/20260915T193047Z}
+\item \code{runs/mfem-physical-equivalence/20260915T193227Z}
+\item \code{runs/mfem-physical-equivalence/20260916T213441Z}
+\item \code{runs/mfem-physical-equivalence/20260916T220950Z}
+\item \code{runs/mfem-physical-equivalence/serial-debug-20260915T183529Z}
+\item \code{runs/mfem-static-amr-level2/20260922T231219Z}
+\item \code{runs/mfem-static-amr-level3/20260923T181337Z}
+\item \code{runs/mfem-static-amr-reproduction/20260916T221235Z}
+\item \code{runs/mfem-static-amr-reproduction/design-20260916}
+\item \code{runs/mfem-static-amr-smoke/20260916}
+\item \code{runs/mfem-static-amr-smoke/20260916-amr45}
+\item \code{runs/mfem-static-amr-smoke/20260916-coverage}
+\item \code{runs/mfem-static-amr-smoke/20260916-uniform30}
+\item \code{runs/mfem-support-depth/20261001T224713Z}
+\item \code{runs/mfem-support-sensitivity/20261001T144235Z}
+\item \code{runs/mfem-uniform-equivalence-gate/20260915T163908Z}
+\item \code{runs/mfem-uniform-equivalence-gate/20260915T165354Z}
+\item \code{runs/mfem-uniform-equivalence-gate/20260915T170152Z}
+\item \code{runs/mfem-uniform-equivalence-gate/20260915T170429Z}
+\item \code{runs/same-mesh-q2-corrected/20260910T234135Z}
+\item \code{runs/same-mesh-q2-falsification/20260910T185420Z}
+\item \code{runs/same-mesh-q2-recovery/20260910T190900Z}
+\item \code{runs/same-mesh-q2-timestep/20260910T190840Z}
+\item \code{runs/smoke-forecast-q1/20260909T020228Z}
+\item \code{runs/smoke-forecast-q1/20260910T185328Z}
+\item \code{runs/unlimited-q2-crank-nicolson/20260911T001508Z}
+\item \code{runs/unlimited-q2-timestep-attribution/20260911T000813Z}
+\end{itemize}
+\section{Independent recomputation}
+\begin{lstlisting}[basicstyle=\ttfamily\footnotesize]
+{
+  "l1": 1.9549638427469373e-12,
+  "mass": 0.9999999999986662,
+  "negative_mass": 0.0,
+  "added_shell_mass": 0.0,
+  "finite": true,
+  "input_hashes": {
+    "runs/mfem-domain-sensitivity/20261003T143753Z/padding2/mfem/final_q2_subcell_averages.bin": "2014ef4a230cb172ff3235b1df243927e41fc5eb42e8a41b0fd18200d1a0a455",
+    "runs/mfem-domain-sensitivity/20261003T113423Z/padding1/mfem/final_q2_subcell_averages.bin": "af7d4d34f3fca596c6f9ec4e2ea02485a3de37ee51739c8dcb7ee2655ebe8875"
+  }
+}
+\end{lstlisting}

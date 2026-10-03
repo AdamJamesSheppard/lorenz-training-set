@@ -7,7 +7,7 @@ documentation, experiment, or architecture when a better-supported direction
 emerges; see `AGENTS.md` and `docs/RESEARCH_DIRECTIONS.md` for the maintenance
 and comparison policy.
 
-> **Current method-selection status (2026-09-13): `FULL_SPD_DIFFUSION_CERTIFIED`.**
+> **Current method-selection status (2026-10-03): `MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED`.**
 > Do not generate a large training dataset. The authoritative corrected
 > evidence is [METHOD_SELECTION_REPORT.md](METHOD_SELECTION_REPORT.md).
 > Older readiness files and the sample dataset remain as audit history.
@@ -20,8 +20,20 @@ and comparison policy.
 > full-SPD hierarchy also passes, with observed common-grid rate `3.421` and
 > zero measured negative mass over 960 steps. The first mature bimodal hierarchy
 > remains positive and convergent but fails its fixed mean-correction gate on
-> every mesh. Mature-state and domain gates remain before any production dataset
-> can be authorized.
+> every mesh. Later uniform/refined mature tests pass statistical and positivity
+> gates. Both aligned domain expansions pass for the tested law and `t=0.05`;
+> mature full-density continuum convergence remains open and production dataset
+> authorization is false. See [current project state](docs/PROJECT_STATE.md).
+
+## Mathematical and development monograph
+
+The editable book source is [docs/solver_monograph/book.tex](docs/solver_monograph/book.tex).
+Its chapters derive the stochastic/PDE/DG/CN/QP formulation, reconstruct the
+recorded successful and failed branches, and specify the tested static MFEM
+NC-hex solver. The hashed evidence ledger covers the pre-documentation solver
+snapshot `1781b40`; figures use archived density arrays. Generated PDF/figures
+live under ignored `output/pdf/`, with provenance in the tracked monograph
+manifest. No solver equations were changed during document preparation.
 
 This project implements the forecast step of a continuous-discrete Bayesian
 filter for the stochastic Lorenz-63 model.  It uses modern DOLFINx 0.11, UFL,

@@ -1,0 +1,287 @@
+\part{From uncertain states to a conservative PDE}
+\chapter{The problem the solver actually solves}\label{ch:purpose}
+\section{Why an individual trajectory is insufficient}
+Lorenz--63 supplies three coupled state coordinates, yet a state estimator rarely knows all three exactly. An observation may constrain $z$ while leaving two lobes in $(x,y)$ plausible. A covariance matrix describes spread around a mean, but a mean near the gap between lobes can correspond to very little probability. The object required for propagation is therefore a probability law, with enough structure to represent multimodality and tails.
+
+The solver computes how that law changes under a specified stochastic differential equation. Its output is a function over the full three-dimensional state space. A point in that space is a possible system state; a computational cell is a small collection of possible states. It is not a parcel of physical atmospheric fluid. This distinction gives the boundary condition its probabilistic interpretation: boundary flux measures the probability assigned to states crossing the artificial computational box.
+
+There are two broad computational representations. An ensemble advances many sample paths and estimates probabilities from the samples. A density solver advances a deterministic function satisfying a forward equation. The ensemble retains path information and avoids a full state-space mesh; the density solver resolves a field directly and supports a likelihood update without reducing it to moments. Neither representation eliminates numerical error. Sampling error, ensemble integration bias and density-reconstruction bias enter the first; spatial, temporal, boundary, projection and algebraic errors enter the second.
+
+The project uses both. DG density forecasts are the candidate training targets, while Monte Carlo particles supply independent moment and distribution comparisons. The comparison must use the same initial law. Drawing particles from an analytic Gaussian while evolving an inaccurately represented finite-element approximation confounds initial representation with dynamical error. This issue was consequential in the original method ranking and motivates the exact-native-law samplers discussed later.
+
+\section{A forecast within a Bayesian cycle}
+Let $p_{k|k}$ denote the density after observations through time $t_k$. Propagation over $\tau=t_{k+1}-t_k$ produces $p_{k+1|k}$. An observation $y_{k+1}$ then gives
+\begin{equation}\label{eq:bayes-overview}
+p_{k+1|k+1}(x)=\frac{\ell(y_{k+1}|x)p_{k+1|k}(x)}{\int_\Omega \ell(y_{k+1}|s)p_{k+1|k}(s)\dd s}.
+\end{equation}
+The training contract is the map from the complete posterior to the complete forecast. It is not a map from a posterior mean to a forecast mean. The early dataset scaffold stores posterior and forecast arrays, records failed and burn-in cycles, and splits independent trajectories rather than adjacent timesteps. Those engineering contracts remain useful even though the mature MFEM implementation is not wired into that serial DOLFINx writer as a production generator.
+
+\section{The causal architecture}
+The mathematical path is short enough to state before deriving it. Stochastic increments specify a generator. Its adjoint governs density. Density is a conserved nonnegative quantity. Conservation motivates flux-based element coupling. Local polynomial approximation improves resolution but can generate negative values. Implicit integration controls stiffness without automatically controlling positivity. Constrained repair restores admissibility, and the magnitude of that repair becomes evidence about the underlying approximation. Mature laws require local resolution, prompting mesh adaptivity rather than indefinitely stronger limiting.
+
+\begin{figure}[ht]\centering
+\begin{tikzpicture}[node distance=6mm, every node/.style={draw,rounded corners,align=center,font=\small,text width=10.5cm},>=Stealth]
+\node(a){Uncertain Lorenz state: a probability law};
+\node(b)[below=of a]{Stochastic increments $\longrightarrow$ generator $\longrightarrow$ forward PDE};
+\node(c)[below=of b]{Total probability flux $\longrightarrow$ conservative DG interfaces};
+\node(d)[below=of c]{Q2 and Crank--Nicolson $\longrightarrow$ accurate raw target with possible negativity};
+\node(e)[below=of d]{Average repair and local QP $\longrightarrow$ admissible density};
+\node(f)[below=of e]{Correction and density differences $\longrightarrow$ resolution diagnosis and static AMR};
+\draw[->](a)--(b);\draw[->](b)--(c);\draw[->](c)--(d);\draw[->](d)--(e);\draw[->](e)--(f);
+\end{tikzpicture}
+\caption{Conceptual dependency diagram. It illustrates mathematical causality and contains no simulated numerical result.}\label{fig:causality}
+\end{figure}
+
+\evidence{\code{lorenz_fpe/core.py}, \code{lorenz_fpe/dataset.py}, \code{mfem/mfem_physical_equivalence.cpp} and \code{sample_dataset/dataset_schema.json} establish the implemented state and output contracts.}
+
+\chapter{Probability as a computational invariant}\label{ch:probability}
+\section{Measures, random vectors and densities}
+A probability space $(\mathcal S,\mathcal F,\Prob)$ consists of outcomes, measurable events and a countably additive measure of total mass one. A random vector $X:\mathcal S\to\R^3$ is measurable. Its law is the pushforward measure $\mu(A)=\Prob(X\in A)$ on Borel sets $A\subset\R^3$. The outcomes are never enumerated by the density solver; it operates on the law.
+
+If $\mu$ is absolutely continuous with respect to Lebesgue measure, there exists an integrable density $p\ge0$ satisfying
+\begin{equation}\label{eq:density-def}
+\mu(A)=\int_A p(x)\dd x,\qquad \int_{\R^3}p(x)\dd x=1.
+\end{equation}
+Absolute continuity is an assumption, not a property of every random vector. A point mass has no ordinary Lebesgue density. Nondegenerate diffusion provides smoothing for positive times under suitable conditions, but a rank-deficient noise matrix does not automatically provide the same elliptic argument. The implemented constant full-SPD experiment avoids that degeneracy.
+
+A density has units inverse to state-space volume. If a voxel has volume $V$, its probability is $V\bar p$, not $\bar p$. The distinction becomes crucial when refining a mesh or comparing nonuniform cells: adding density values without volume weights is not a probability integral. This is why the global average-repair problem uses actual cell volumes on AMR meshes.
+
+\section{Expectations and moments}
+For measurable $g$ with $\int|g|p<\infty$, define $\E[g(X)]=\int gp$. The mean $\mu\in\R^3$ and covariance $\Sigma\in\R^{3\times3}$ are
+\begin{equation}\label{eq:moments}
+\mu_i=\int x_i p(x)\dd x,\quad
+\Sigma_{ij}=\int(x_i-\mu_i)(x_j-\mu_j)p(x)\dd x.
+\end{equation}
+On the finite box these integrals exist for every integrable density, since the coordinate functions are bounded. Covariance is symmetric positive semidefinite: for every vector $a$, $a^T\Sigma a=\E[(a^T(X-\mu))^2]\ge0$. A materially negative covariance eigenvalue therefore indicates a defective statistical calculation, a signed distribution, or numerical roundoff beyond the intended tolerance.
+
+Means and covariances are summaries. Consider a one-dimensional mixture of equal narrow Gaussians centred at $\pm a$. Its mean is zero and its variance is $a^2+s^2$. A single Gaussian with that variance shares the first two moments while assigning entirely different probability near the centre. In three dimensions the Lorenz lobe geometry makes this discrepancy operational: a posterior can remain ambiguous across lobes even after a $z$ observation.
+
+\section{Marginals and conditioning}
+The $x$ marginal is $p_x(x)=\int p(x,y,z)\dd y\dd z$. Tonelli's theorem justifies exchanging these integrals for nonnegative $p$. For integrable signed numerical fields, Fubini requires absolute integrability. Marginalisation preserves total mass and decreases $L^1$ discrepancy:
+\begin{equation}\label{eq:marginal-contraction}
+\int\left|\int(p-q)\dd y\dd z\right|\dd x\le\int|p-q|\dd x\dd y\dd z.
+\end{equation}
+Thus a small full-density error controls marginal errors; small marginal errors cannot control the full joint dependence. Two densities can share every one-dimensional marginal and have different correlations or multimodal connections.
+
+Conditioning on a continuous observation is expressed through a likelihood, not by restricting to an event of positive probability $X=x$. For Gaussian measurement noise, $\ell(y|x)$ is a positive function. Multiplication by that likelihood changes the law and normalization restores total probability. In a discrete solver the product must be projected into the finite-element space. Projection can introduce oscillations even though the analytic product is positive; positivity protection is consequently needed after analysis as well as propagation.
+
+\section{Signed fields and the meaning of negative mass}
+Let $p^- =\max(-p,0)$ and $p^+=\max(p,0)$. A signed field can integrate to one while containing a negative region because
+\begin{equation}
+\int p=\int p^+-\int p^-=1.
+\end{equation}
+The negative mass $m^-=\int p^-$ is an admissibility defect. It is not removed by dividing by $\int p$. Pointwise clipping removes it but increases total mass; renormalizing the clipped field changes all cells. The project instead repairs averages and polynomial shape with explicit conservation constraints.
+
+A quadrature estimate of $m^-$ can miss a narrow negative region. A sufficient whole-cell polynomial certificate addresses that gap. The recorded phrase ``zero measured negative mass'' is therefore accompanied by certification counts and tolerance information rather than presented alone as a theorem.
+
+\begin{example}[Conservation without admissibility]
+On two unit-volume cells, averages $(1.2,-0.2)$ have mass one. The nonnegative equal-mass Euclidean projection is $(1,0)$. The total mass was already correct; positivity required a redistribution. Within a single cell, a positive average can coexist with a negative quadratic polynomial near an interior point. The two defects require different constraints.
+\end{example}
+
+\chapter{Lorenz dynamics and the origin of difficult densities}\label{ch:lorenz}
+\section{Equations and equilibria}
+The deterministic drift is
+\begin{equation}\label{eq:lorenz}
+f(x,y,z)=\begin{pmatrix}\sigma(y-x)\\x(\rho-z)-y\\xy-\beta z\end{pmatrix},
+\qquad (\sigma,\rho,\beta)=(10,28,8/3).
+\end{equation}
+The coordinates are nondimensional in this project. The original Lorenz model and its sensitivity motivation are established in Lorenz's paper~\cite{lorenz}. We use the equations as a nonlinear state-estimation benchmark, rather than claiming quantitative atmospheric validation.
+
+The origin is an equilibrium. For $\rho>1$, two further equilibria are
+\begin{equation}
+E_\pm=(\pm\sqrt{\beta(\rho-1)},\ \pm\sqrt{\beta(\rho-1)},\ \rho-1).
+\end{equation}
+To derive them, the first equation gives $y=x$. The third gives $z=x^2/\beta$. The second becomes $x(\rho-1-x^2/\beta)=0$. For the chosen parameters the nonzero equilibria lie at $(\pm\sqrt{72},\pm\sqrt{72},27)$. This geometry motivates symmetric lobe components, but does not say that a mature stochastic density equals two Gaussians at these points.
+
+The drift has symmetry $f(Rx)=Rf(x)$ for $R=\operatorname{diag}(-1,-1,1)$. A symmetric initial law remains symmetric in the deterministic model. For additive noise, symmetry of the generator additionally requires $RDR^T=D$. The tested full tensor has nonzero $D_{13}$ and $D_{23}$, so that condition fails. Symmetrizing the mature mixture is a chosen initial-law construction; it does not establish that the full-SPD stochastic invariant law has exact lobe symmetry.
+
+\section{Compressibility and dissipation}
+The divergence is constant:
+\begin{equation}\label{eq:divergence}
+\divg f=-\sigma-1-\beta=-41/3.
+\end{equation}
+For the deterministic flow $\Phi_t$ where it exists smoothly, Jacobi's formula gives
+$\frac{d}{dt}\det D\Phi_t=(\divg f)(\Phi_t)\det D\Phi_t$.
+Hence local state-space volume contracts as $e^{-41t/3}$. This concerns volume, not probability: probability is transported into a shrinking volume and density can increase.
+
+To see that boundedness is compatible with nonlinear coupling, take
+$V=\rho x^2+\sigma y^2+\sigma(z-2\rho)^2$. Differentiating along~\eqref{eq:lorenz} cancels the $xyz$ and $xy$ cross terms and yields
+\begin{equation}\label{eq:lyapunov}
+\dot V=-2\sigma\rho x^2-2\sigma y^2-2\sigma\beta(z-\rho)^2+2\sigma\beta\rho^2.
+\end{equation}
+Since $(z-\rho)^2\ge\frac12(z-2\rho)^2-\rho^2$, there exist positive $c,C$ depending on the parameters with $\dot V\le-cV+C$. The scalar comparison equation then bounds $V(t)$ by $e^{-ct}V(0)+C/c$. This is an absorbing-set argument for the deterministic system, not a proof of a particular chaotic invariant measure.
+
+For additive noise, It\^o's formula introduces $\operatorname{tr}(D\nabla^2V)$, a constant. A stopped-process Lyapunov argument gives the same type of expectation bound and helps exclude finite-time explosion. Local Lipschitz continuity of the polynomial drift supplies local existence/uniqueness; the Lyapunov bound is needed to extend the solution globally. Merely calling the drift smooth would omit the growth issue.
+
+\section{Stretching, folding and resolution}
+Negative divergence does not mean contraction in every direction. The Jacobian of the drift contains off-diagonal couplings. Perturbations satisfy $\dot\delta= Df(X_t)\delta$ to first order, and directions can stretch while total volumes shrink. This produces narrow extended probability structures. Noise broadens those structures, but on a short interval anisotropic drift and mixed diffusion still generate strongly non-Gaussian shapes.
+
+The deterministic attractor is a long-time geometric object. A stochastic density with nondegenerate noise is a volume distribution, not a set of zero volume. A short forecast from a conditioned Gaussian mixture need not display the full familiar butterfly outline. The saved initial density represents the chosen posterior law, constructed from a spun-up ensemble and fitted components; it should not be judged by whether an isosurface resembles an artistic attractor rendering.
+
+\evidence{The mature configuration specifies 200,000 spin-up particles, spin-up time 2, spin-up step 0.001, eight components per lobe and a $z=25$ likelihood with variance 16. These are experiment choices from \code{experiments/mature-state-decision.yaml}; they do not establish stationary sampling or exactness of the mixture fit.}
+
+\chapter{Stochastic increments and the diffusion convention}\label{ch:sde}
+\section{Brownian motion and the integral equation}
+A standard $m$-dimensional Wiener process $W_t$ has independent increments, continuous paths, $W_0=0$ and $W_{t+h}-W_t\sim N(0,hI_m)$. Its pathwise derivative does not exist as an ordinary smooth function. The SDE notation
+\begin{equation}\label{eq:sde}
+\mathrm dX_t=f(X_t)\dd t+B\mathrm dW_t
+\end{equation}
+means $X_t=X_0+\int_0^tf(X_s)\dd s+\int_0^tB\mathrm dW_s$. For constant $B$, the second integral is $BW_t$. The adaptedness and integrability conditions defining an It\^o integral are part of the stochastic model; a Gaussian random number inserted without the correct $\sqrt h$ scaling would define a different process.
+
+For a short step conditional on $X_t=x$, the leading approximation is
+\begin{equation}
+X_{t+h}-x=f(x)h+B\sqrt h\,\xi+\text{higher-order terms},\quad \xi\sim N(0,I_m).
+\end{equation}
+The leading conditional covariance is $hBB^T$. The forward PDE convention uses half of this covariance rate:
+\begin{equation}\label{eq:diffusion-convention}
+D=\tfrac12BB^T.
+\end{equation}
+This factor is a recurring audit point. In the original identity-noise experiments $B=I$ implies $D=I/2$. In the later mixed-diffusion experiment the diagonal entries of $D$ are one. It is not the same noise magnitude with additional off-diagonal entries.
+
+\section{From a target tensor to a noise factor}
+For a real symmetric positive-definite $D$, Cholesky factorization gives $D=LL^T$ with positive diagonal entries of $L$. Taking $B=\sqrt2L$ realizes~\eqref{eq:diffusion-convention}. The tested tensor is
+\begin{equation}\label{eq:spd-tensor}
+D=\begin{pmatrix}1&0.4&0.2\\0.4&1&0.3\\0.2&0.3&1\end{pmatrix}.
+\end{equation}
+Its eigenvalues are approximately $(0.581212,0.811321,1.607467)$. The smallest is strictly positive, so $v^TDv\ge\lambda_{\min}\|v\|^2$. Its noise factor is approximately
+\begin{equation}
+B=\begin{pmatrix}1.4142135624&0&0\\0.5656854249&1.2961481397&0\\0.2828427125&0.3394673699&1.3434142715\end{pmatrix}.
+\end{equation}
+Using a square root other than Cholesky gives the same law for constant additive Gaussian noise when $BB^T$ agrees. The implementation stores $B$ in the Python model and derives $D$; the MFEM comparator uses the fixed tensor directly. Their equivalence checks therefore include the physical diffusion convention.
+
+Mixed terms matter. For constant symmetric $D$, $\divg(D\grad p)=\sum_iD_{ii}p_{x_ix_i}+2\sum_{i<j}D_{ij}p_{x_ix_j}$. Omitting the factor two or using only diagonal entries changes the operator. A covariance check limited to diagonal entries can miss such a change; off-diagonal covariance and correlations were explicitly included in the full-SPD gate.
+
+\section{It\^o's formula and the generator}
+For $\varphi\in C^2$ with appropriate growth/integrability, It\^o's formula gives
+\begin{equation}\label{eq:ito}
+\mathrm d\varphi(X_t)=\grad\varphi(X_t)^Tf(X_t)\dd t
++\tfrac12\operatorname{tr}(BB^T\nabla^2\varphi(X_t))\dd t
++\grad\varphi(X_t)^TB\mathrm dW_t.
+\end{equation}
+The martingale term has zero expectation when square-integrable. The generator acting on observables is
+\begin{equation}\label{eq:generator}
+L\varphi=f\cdot\grad\varphi+D:\nabla^2\varphi.
+\end{equation}
+Here $A:C=\sum_{ij}A_{ij}C_{ij}$. The conditional expectation definition is
+\begin{equation}
+ L\varphi(x)=\lim_{h\downarrow0}\frac{\E[\varphi(X_h)|X_0=x]-\varphi(x)}h.
+\end{equation}
+It agrees with~\eqref{eq:generator} under the stated regularity. The stochastic integral and generator conventions are developed in the verified SDE reference~\cite{sarkka}; the subsequent derivation is given explicitly rather than delegated to that citation.
+
+\section{Monte Carlo propagation and its errors}
+Euler--Maruyama takes $X_{n+1}=X_n+f(X_n)h+B\sqrt h\xi_n$. Particle counts reduce statistical uncertainty but do not remove timestep bias. Common random numbers across comparisons reduce the variance of differences by correlating the approximations. A bootstrap estimates sampling variability under its resampling model; increasing bootstrap replicates improves estimation of that variability, while increasing particle count can reduce it. Neither operation proves that ensemble integration or density smoothing is unbiased.
+
+The strengthened project reference uses up to one million paths and fixed bootstrap seeds. This was necessary because a finest deterministic covariance discrepancy of 0.00234 lay below a 200,000-path bootstrap p95 of 0.00649. Comparing numbers below the reference uncertainty floor cannot demonstrate further solver improvement. Deterministic density differences remain useful when covariance resolution is exhausted.
+
+\chapter{Deriving the forward equation}\label{ch:forward}
+\section{Weak evolution before a classical PDE}
+Take a compactly supported smooth $\varphi$. Under nonexplosion and integrability, expectation of~\eqref{eq:ito} yields
+\begin{equation}\label{eq:weak-law}
+\frac{\mathrm d}{\mathrm dt}\int\varphi(x)p(x,t)\dd x
+=\int\big(f\cdot\grad\varphi+D:\nabla^2\varphi\big)p\dd x.
+\end{equation}
+This can first be interpreted in integrated time form. Writing a time derivative under the integral needs enough time regularity, or a distributional interpretation. A law may be defined even before a smooth density is justified; weak evolution is therefore the appropriate starting point.
+
+For constant $D$, integrate once by parts in the drift and twice in diffusion. Compact support removes boundary terms on $\R^3$:
+\begin{align}
+\int f_i p\,\partial_i\varphi\dd x&=-\int\varphi\,\partial_i(f_i p)\dd x,\\
+\int D_{ij}p\,\partial_i\partial_j\varphi\dd x&=\int\varphi\,D_{ij}\partial_i\partial_jp\dd x.
+\end{align}
+The adjoint of $L$ acting on densities is consequently
+\begin{equation}\label{eq:forward}
+\partial_t p=L^*p=-\divg(fp)+\divg(D\grad p).
+\end{equation}
+For spatially varying noise, the adjoint is $\frac12\partial_i\partial_j((BB^T)_{ij}p)$ rather than automatically $\divg(D\grad p)$. The project's constant matrix assumption is essential to its current formula. Changing $B$ to depend on state requires a fresh model and flux audit.
+
+\section{Compressibility cannot be omitted}
+Expanding the drift gives $-\divg(fp)=-f\cdot\grad p-(\divg f)p$. The Lorenz divergence~\eqref{eq:divergence} is nonzero. A code evolving $p_t=-f\cdot\grad p+\divg(D\grad p)$ would transport a scalar concentration along characteristics while omitting the compressibility factor. It would not evolve the intended probability density.
+
+In the diffusion-free smooth case, the characteristic identity is
+\begin{equation}
+p(\Phi_t(x),t)\det D\Phi_t(x)=p(x,0).
+\end{equation}
+This follows by differentiating both factors along the flow. The density grows where volume contracts so that probability stays fixed. Conservative weak advection incorporates this automatically through $-\int fp\cdot\grad v$ and interface fluxes; an additional explicit $-(\divg f)p$ term there would double count it.
+
+\section{Moment evolution and unclosed statistics}
+On whole space with sufficient decay and finite moments, testing with $x_i$ gives $\dot\mu_i=\E[f_i(X)]$. Testing with $x_ix_j$ gives
+\begin{equation}
+\frac{\mathrm d}{\mathrm dt}\E[X_iX_j]=\E[X_if_j+X_jf_i]+2D_{ij}.
+\end{equation}
+Because Lorenz drift is quadratic, these expressions involve higher moments. They do not form a closed Gaussian system. This explains why advancing mean and covariance alone cannot reproduce the full forecast without an additional approximation.
+
+On a reflecting finite box, integration by parts for nonconstant test functions leaves boundary contributions. The mass test is special because its gradient vanishes. Whole-space moment identities must not be copied unchanged into a bounded-domain verifier without checking boundary terms. In the tested case negligible boundary probability supports approximate agreement, but it does not change the mathematical boundary model.
+
+\section{Regularity and positivity}
+The principal part is uniformly elliptic when $D$ is SPD. On a bounded box the drift is smooth and bounded; diffusion has positive energy $\int\grad p^TD\grad p$. Classical maximum-principle arguments, or positivity of the corresponding reflected diffusion semigroup, give nonnegative evolution under their boundary and regularity hypotheses. Corners of a box require care for classical boundary regularity; weak solutions provide a natural framework.
+
+This continuous positivity property does not transfer automatically to an arbitrary Galerkin matrix. Basis functions change sign, the consistent mass inverse couples coefficients, and CN can have negative amplification for stiff modes. The rest of the book derives how conservation is retained discretely and how positivity is imposed separately.
+
+\chapter{Flux, boundaries and what domain tests establish}\label{ch:flux}
+\section{Local and global balance}
+Define $J=fp-D\grad p$. Then $p_t+\divg J=0$. Integrating over a fixed region $A$ and applying the divergence theorem gives
+\begin{equation}\label{eq:balance}
+\frac{\mathrm d}{\mathrm dt}\int_Ap\dd x=-\int_{\partial A}J\cdot n\dd s.
+\end{equation}
+The sign is determined by the outward normal. Positive $J\cdot n$ removes probability from $A$. Internal face contributions cancel when regions are combined, provided the same numerical flux is used with opposite normal orientation on the two sides.
+
+For $A=\Omega$, imposing $J\cdot n=0$ gives mass conservation. This is a condition on the \emph{total} flux. If drift pushes towards a wall, a diffusive gradient can balance it. Imposing separately $(fp)\cdot n=0$ and $(D\grad p)\cdot n=0$ would in general overconstrain or change the model. The implemented weak form omits exterior total-flux contributions; it does not independently prescribe two zero boundary fluxes.
+
+\section{A one-dimensional boundary example}
+For constant drift $a$ and diffusion $d>0$ on $[0,L]$, zero stationary flux satisfies $ap-dp'=0$. Thus $p(x)=Ce^{ax/d}$ with $C$ chosen to normalize. If $a\ne0$, the gradient at the boundary is nonzero. A homogeneous diffusion Neumann condition $p'=0$ would be incompatible with that zero-total-flux equilibrium. The example isolates why the probabilistic boundary convention matters before the full Lorenz tensor is introduced.
+
+\section{The finite box changes the stochastic problem}
+The original whole-space SDE permits paths outside the computational box. A reflecting FPE corresponds to a bounded-domain diffusion with an appropriate reflection mechanism; for anisotropic diffusion the associated conormal boundary structure must be respected. The solver is consequently a truncated approximation to the whole-space law, not a literal implementation of unconstrained trajectories on all $\R^3$.
+
+Boundary placement error is small when the law has negligible interaction with the artificial boundary over the tested horizon. A boundary-layer probability is a useful indicator, but small mass in one layer does not by itself bound every observable. Domain expansion compares the solution while preserving physical interior resolution, isolating sensitivity to boundary placement.
+
+\section{The completed aligned expansions}
+The base box has volume $60\cdot80\cdot80=384000$. The broader AMR mesh has background dimensions $45\times54\times54$. Adding $r$ background cells on each side produces extents
+\begin{equation}
+[-30-r(60/45),30+r(60/45)]\times[-40-r(80/54),40+r(80/54)]\times[-10-r(80/54),70+r(80/54)].
+\end{equation}
+The two tested values are $r=1,2$. Background counts become $47\times56\times56$ and $49\times58\times58$. Original interior coordinates and refinement marks are retained. The export adds four voxels per background cell per side, so shapes are $188\times224\times224$ and $196\times232\times232$.
+
+For the second comparison, removing four outer voxels per axis produces precisely the first-expanded grid. Independent recomputation gives $1.9549638427469373\times10^{-12}$ for the volume-weighted $L^1$ difference and zero directly summed mass in the added shell. The report's $6.66\times10^{-16}$ outside-box probability comes from subtracting nearly equal totals and is a roundoff residual. These statements agree within arithmetic precision, but the direct shell sum is the clearer measurement.
+
+\scope{The result establishes numerical boundary insensitivity for this mature law, this $D$ and $t=0.05$. It does not establish spatial convergence, long-time accuracy, or independence for new posteriors. Both expanded runs retain the same interior discretisation and can share the same interior bias.}
+\evidence{\code{runs/mfem-domain-sensitivity/20261003T143753Z/domain_decision.json}; reused first expansion \code{20261003T113423Z/padding1}; source ledger records both final-array hashes and the independent recomputation.}
+
+\chapter{Bayesian laws and the mature initial condition}\label{ch:bayes}
+\section{Likelihood and evidence}
+For $y=Hx+\eta$ with $\eta\sim N(0,R)$ independent of the forecast state and SPD $R$, the likelihood is
+\begin{equation}
+\ell(y|x)=(2\pi)^{-m/2}|R|^{-1/2}\exp\{-\tfrac12(y-Hx)^TR^{-1}(y-Hx)\}.
+\end{equation}
+The evidence $Z=\int\ell p$ is positive when the prior is a nonzero nonnegative law. Equation~\eqref{eq:bayes-overview} follows from the joint density and conditional-density definition. The constant likelihood prefactor cancels in the normalized posterior, but the remaining evidence is still required.
+
+The implemented observation choices include full state, $x$ only, and $(x,z)$. A $z$-only synthetic likelihood is used to construct the mature certification law. Partial observation can retain ambiguity; a Gaussian closure would remove multimodality by design. The density solver propagates the actual represented posterior instead.
+
+\section{Projected analysis is a new approximation}
+Let $q=\ell p_h$. The DG analysis solves $(q_h,v_h)=(q,v_h)$ for all $v_h$ using quadrature-controlled $L^2$ projection. Constants in the space imply preservation of the quadrature-defined integral before normalization. The positive product $q$ can project to a signed $q_h$, because an orthogonal projection onto a polynomial space does not preserve order. The same average repair and positivity machinery must therefore be applied after normalization or in the implementation's declared sequence.
+
+Nodal multiplication is cheaper but differs mathematically: multiplying values at FE nodes creates an interpolant of the product, whose integral need not agree with the evidence integral. The repository retains it as an explicitly labelled comparator. Quadrature degree 14 was adopted to reduce errors for Gaussian laws and likelihood products, whose integrands are not polynomials.
+
+\section{Analytic conditioning of Gaussian mixtures}
+For component $N(m,C)$ and a linear Gaussian observation, completing the square gives
+\begin{equation}
+C^+=(C^{-1}+H^TR^{-1}H)^{-1},\quad
+m^+=C^+(C^{-1}m+H^TR^{-1}y).
+\end{equation}
+The equivalent Kalman form is $m^+=m+CH^T(HCH^T+R)^{-1}(y-Hm)$ and $C^+=C-CH^T(HCH^T+R)^{-1}HC$. Mixture weights are multiplied by the component evidences $N(y;Hm,HCH^T+R)$ and renormalized. Conditioning therefore preserves a finite Gaussian-mixture form without replacing it by one Gaussian.
+
+The mature experiment fits and mirrors sixteen components, then applies the $z=25$, variance-16 likelihood analytically. This creates one reproducible non-Gaussian posterior. It is a test law assembled from an independent spin-up ensemble, not evidence that every operational analysis posterior has the same widths, smoothness or refinement support.
+
+\section{Saved density rather than an imagined shape}
+Figure~\ref{fig:mature-density} uses the saved broader-support initial and final arrays. Integrating out one coordinate gives each joint marginal. The logarithmic colour scale makes tails visible but its $10^{-12}$ plotting floor is a display choice, not solver clipping. The figure documents the law actually used. A 2-D marginal cannot establish its complete 3-D structure, but complements the exact mass and array evidence.
+
+\begin{figure}[p]\centering\includegraphics[width=\textwidth]{density_marginals.pdf}
+\caption{Joint marginal densities from the saved broader-support MFEM run, initial projected mature law (top) and $t=0.05$ forecast (bottom). Axes are nondimensional Lorenz coordinates; colour represents $\log_{10}$ density with a display floor of $10^{-12}$. Source: \code{runs/mfem-broader-support/20261002T080644Z/mfem/*averages.bin}.}\label{fig:mature-density}
+\end{figure}
+\begin{figure}[ht]\centering\includegraphics[width=\textwidth]{marginal_lines.pdf}
+\caption{One-dimensional marginals of the same saved initial and final fields. Coordinate axes are overlaid for comparison; each marginal separately integrates to approximately one. These plots describe a short posterior forecast, not a long-time invariant attractor.}\label{fig:marginals}
+\end{figure}
+
+\section{Learning checkpoints}
+The initial-law contract has three distinct levels: the analytic mixture, its finite-element projection, and its exported voxel averages. Across different meshes the analytic law is identical while the projected polynomials can differ. Across the uniform framework equivalence test, the same already-projected positive FE law is transferred. Across half-timestep runs, matching initial voxel hashes establish the exported initial state is unchanged. These conditions answer different questions and must remain explicit.
+
+To check understanding, derive the posterior weight update for two equally weighted Gaussian components observed only in $z$. Determine when the posterior weights remain equal and when unequal component $z$ variances break that equality. Then compare this analytic argument with the weaker statement that the Lorenz drift is symmetric. The noise and the observation determine whether that symmetry persists.

@@ -26,6 +26,7 @@ MFEM_STATIC_AMR_REPRODUCTION = PASSED_NUMERICALLY
 MFEM_STATIC_AMR_RESOURCE_EFFICIENCY = OPEN
 MFEM_SECOND_AMR_VOXEL_GATES = PASSED
 MFEM_THIRD_DEPTH_VOXEL_CONTRACTION = FAILED_PREDECLARED_GATE
+MATURE_TESTED_DOMAIN_SENSITIVITY = PASSED_TWO_ALIGNED_EXPANSIONS
 PRODUCTION_DATASET_AUTHORIZED = false
 NEXT_REQUIRED_GATE = LOCALLY_REFINED_MATURE_DENSITY_CONVERGENCE
 ```
@@ -33,11 +34,14 @@ NEXT_REQUIRED_GATE = LOCALLY_REFINED_MATURE_DENSITY_CONVERGENCE
 - Method-selection classification: `MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED`.
 - Next required gate: `LOCALLY_REFINED_MATURE_DENSITY_CONVERGENCE`.
 - Large neural-operator dataset generation: `NO`.
-- First domain expansion completed all gates (`L1=1.3213e-12`); second
-  expansion stopped for RAM. Evidence: domain run `20261003T113423Z`.
-  New wrapper preserves live jobs by pausing below 2 GiB and resuming above
-  4 GiB. Paused jobs retain RAM and may require external memory recovery.
-  Domain sequence and production authorization remain incomplete.
+- Both aligned domain expansions completed all configured gates. First
+  interior voxel `L1=1.3213e-12`; second `L1=1.95496e-12`, independently
+  recomputed during the monograph audit. Final decision:
+  `runs/mfem-domain-sensitivity/20261003T143753Z/domain_decision.json`.
+  Scope is the tested mature law, full-SPD tensor and `t=0.05`; continuum
+  mature-density convergence remains open and production authorization false.
+  The completed wrapper used 2 GiB pause / 4 GiB resume thresholds; current
+  defaults are 2/2 GiB. Paused jobs retain RAM rather than checkpointing.
 - Domain test `20261003T105837Z` stopped at the RAM safeguard before a
   completed forecast. Restart releases redundant mesh/assembly storage and
   the spatial matrix after independent CN matrices are built. Scientific
@@ -221,7 +225,8 @@ NEXT_REQUIRED_GATE = LOCALLY_REFINED_MATURE_DENSITY_CONVERGENCE
 6. The reduced fixed-matrix OSQP backend passed a 2,413-problem SLSQP comparison
    and a 10x projection-speed gate. Optimizer cost and startup-state temporal
    positivity are no longer the active blockers.
-7. Finite-domain sensitivity remains unvalidated for the leading candidate.
+7. Both tested aligned domain expansions pass for the current mature law at
+   `t=0.05`; longer horizons and other posterior families remain unvalidated.
 8. A converged independent deterministic full-density reference remains absent.
 
 ## Near-term research portfolio

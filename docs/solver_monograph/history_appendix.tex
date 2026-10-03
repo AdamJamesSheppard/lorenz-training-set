@@ -1,0 +1,76 @@
+\chapter{Complete recorded Git chronology}
+\label{app:git}
+Commit dates record when changes were logged. They do not prove when uncommitted experiments ran; immutable run timestamps provide the separate execution chronology.
+\small
+\begin{longtable}{p{.12\textwidth}p{.20\textwidth}p{.56\textwidth}}
+\toprule Commit & Recorded date & Purpose\\\midrule\endhead
+127f8ac & 2026-09-09 & chore: establish numerical research baseline\\
+627ca4d & 2026-09-09 & chore: add agent-legible numerical research harness\\
+1a7dc37 & 2026-09-09 & docs: keep numerical research scaffold adaptive\\
+5d7973a & 2026-09-09 & docs: define minimal change logging policy\\
+d0b2668 & 2026-09-10 & Audit Lorenz Fokker-Planck method selection\\
+242ccf6 & 2026-09-10 & Implement same-mesh Q2 positivity experiment\\
+ad9258d & 2026-09-10 & Preserve Q2 states for timestep validation\\
+3d8e3b2 & 2026-09-11 & Record same-mesh Q2 gate results\\
+43b83d2 & 2026-09-11 & Repair positivity limiter invariants\\
+ef6ea7d & 2026-09-11 & Record corrected and unlimited Q2 evidence\\
+2ffda91 & 2026-09-11 & Record Crank-Nicolson Q2 diagnostic\\
+0492599 & 2026-09-11 & Reject global scaling for Crank-Nicolson Q2\\
+7df38b7 & 2026-09-11 & Synchronize Q2 Crank-Nicolson evidence\\
+561ec4e & 2026-09-11 & Add local Q2 positivity projection diagnostic\\
+137e101 & 2026-09-11 & Handle zero-average local projection cells\\
+aeaeac8 & 2026-09-11 & Certify local projection against roundoff\\
+a27bc56 & 2026-09-11 & Advance local Q2 projection to dynamic test\\
+03d7803 & 2026-09-11 & Profile dynamic local Q2 projection\\
+7f5e97c & 2026-09-11 & Specialize local Q2 positivity projection\\
+83978df & 2026-09-11 & Record dynamic local Q2 projection decision\\
+7226fdc & 2026-09-12 & Predeclare tighter local Q2 refinement\\
+6ae6b1e & 2026-09-12 & Advance local Q2 CN to spatial refinement\\
+c8d382b & 2026-09-12 & Refresh certified evidence manifest\\
+c573c7a & 2026-09-13 & Advance certified solver to full-SPD gate\\
+4a5336a & 2026-09-13 & Refresh full-SPD evidence manifest\\
+619b8b4 & 2026-09-13 & Archive passing full-SPD control\\
+062a175 & 2026-09-13 & Refresh full-SPD control manifest\\
+8904a11 & 2026-09-13 & Record Fokker-Planck visualization utility\\
+5fd0170 & 2026-09-13 & Clarify Lorenz visualization context\\
+cc5eb35 & 2026-09-13 & Promote solver after full-SPD hierarchy\\
+5742f7c & 2026-09-13 & Refresh full-SPD hierarchy manifest\\
+e81e4fd & 2026-09-13 & Make mature bimodal certification executable\\
+2cc76df & 2026-09-13 & Refresh mature certification manifest\\
+d1328d7 & 2026-09-13 & Archive failed mature bimodal gate\\
+0c9c51d & 2026-09-13 & Refresh mature failure manifest\\
+e9d3ba9 & 2026-09-13 & Add mature positivity certificate diagnostic\\
+ec11957 & 2026-09-13 & Refresh positivity diagnostic manifest\\
+a3b4af5 & 2026-09-13 & Archive mature certificate diagnosis\\
+e238fdb & 2026-09-13 & Refresh mature diagnosis manifest\\
+592a595 & 2026-09-13 & Add mature AFC update comparator\\
+ad1deef & 2026-09-14 & Add mature Bernstein DOF convex diagnostic\\
+c0e413b & 2026-09-14 & Predeclare uniform mature 60 mesh reference\\
+c04dc74 & 2026-09-14 & Add graded mature-state efficiency experiment\\
+c91a57e & 2026-09-15 & Advance mature state and launch finer graded gate\\
+eebc8b0 & 2026-09-15 & Support reliable experiment postprocess recovery\\
+203186d & 2026-09-15 & Launch time-aggregated mature refinement gate\\
+3aa1136 & 2026-09-15 & Start gated MFEM uniform equivalence branch\\
+6bc17db & 2026-09-15 & Ignore local MFEM build products\\
+9a42c4c & 2026-09-15 & Normalize MFEM conservation equivalence gate\\
+bee0da6 & 2026-09-15 & Add explicit MFEM Crank Nicolson gate\\
+cefdc4a & 2026-09-15 & Use ILU for nonsymmetric MFEM CN solve\\
+c7c2fcd & 2026-09-15 & Calibrate MFEM CN residual tolerance\\
+0f0e733 & 2026-09-15 & Gate MFEM physical equivalence before AMR\\
+e6b4144 & 2026-09-15 & Match adaptive positivity certificate in MFEM gate\\
+03db8af & 2026-09-16 & Add and audit MFEM mature trajectory equivalence\\
+26d94f8 & 2026-09-16 & Implement gated MFEM static NC-hex mature reproduction\\
+bd555b8 & 2026-09-23 & Add second-level static NC-hex mature convergence run\\
+531c4e2 & 2026-09-23 & Add third-depth static AMR voxel contraction gate\\
+f3f1123 & 2026-10-01 & Diagnose missed AMR support and add density-driven support test\\
+ee1332a & 2026-10-01 & Add bounded depth test on fixed expanded AMR support\\
+0603dce & 2026-10-02 & Visualize archived initial and evolving Lorenz densities\\
+b49a35f & 2026-10-02 & Predeclare broader mature-density support sensitivity at fixed depth\\
+9b92ecf & 2026-10-02 & Freeze broader mesh for mature half-timestep sensitivity\\
+6255f87 & 2026-10-03 & Predeclare aligned mature-density domain sensitivity\\
+84bdb48 & 2026-10-03 & Release redundant assembly storage for domain sensitivity restart\\
+7e9141a & 2026-10-03 & Automatically pause and resume MPI jobs under RAM pressure\\
+37f6704 & 2026-10-03 & Reuse completed first domain when restarting the second expansion\\
+a1df9e8 & 2026-10-03 & Include separately grouped MPI workers in automatic RAM pausing\\
+1781b40 & 2026-10-03 & Set automatic RAM resume threshold to user-requested 2 GiB\\
+\bottomrule\end{longtable}\normalsize

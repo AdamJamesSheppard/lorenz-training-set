@@ -5,9 +5,11 @@
 **Classification: `MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED`.**
 The local-QP Q2--Crank--Nicolson candidate has passed its startup-state
 temporal/positivity, identity-noise spatial, non-diagonal full-SPD spatial, and
-mature-state positivity/statistical gates. Mature full-density convergence and
-domain sensitivity remain mandatory before generating a large neural-operator
-training set. Static grading is supported as an efficiency mechanism while its
+mature-state positivity/statistical gates. Both aligned domain sensitivity
+expansions now pass for the tested mature law at `t=0.05`; see the final
+`runs/mfem-domain-sensitivity/20261003T143753Z/domain_decision.json`.
+Mature full-density continuum convergence and production authorization remain
+open/false. Static grading is supported as an efficiency mechanism while its
 separate predeclared `0.0008` correction failure remains recorded.
 
 The controlled same-mesh and two-timestep experiments have been completed.
@@ -75,14 +77,14 @@ solution within `L1=0.01872`. A second mesh passes its predeclared gates with
 `D_AMR1,AMR2=0.01571`, but its distance to the fine graded solution rises
 slightly from `0.01872` to `0.01913`. A third geometric depth now tests
 whether conservative common-grid differences at least halve; subvoxel Q2
-convergence and domain sensitivity remain open, and production dataset
+convergence remains open; later tested domain sensitivity passes, and production dataset
 generation is unauthorized.
 
 Role assignments are separate:
 
 | Role | Decision |
 |---|---|
-| Production reference solver | **Unfilled.** Local-QP Q2--Crank--Nicolson is the leading admissible candidate after passing startup-state temporal/positivity, identity-noise spatial, full-SPD spatial and mature positivity/statistical gates; mature full-density convergence and domain evidence remain required. |
+| Production reference solver | **Unfilled.** Local-QP Q2--Crank--Nicolson is the leading admissible candidate after startup temporal/positivity, identity/full-SPD spatial, mature statistical/positivity and tested short-horizon domain gates; full-density continuum accuracy and production authorization remain open/false. |
 | Independent verification solver | **Develop alongside correction work:** a dynamically scaled, translated whole-space Hermite-Galerkin solver, checked by mode decay and moment convergence, plus Monte Carlo for moments. Spectral positivity is not assumed. |
 | Current baseline | Q1 upwind/SIPG, backward Euler, quadrature-14 L2 initialization, projected Bayesian analysis and conservative postprocessing. It is a controlled comparator rather than a production selection. |
 

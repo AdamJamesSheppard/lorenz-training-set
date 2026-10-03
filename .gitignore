@@ -19,6 +19,7 @@ tmp/
 build/
 runs/
 results/
+output/
 .cache/
 
 # Large numerical payloads; keep schemas, manifests, and summaries in Git

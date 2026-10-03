@@ -679,6 +679,30 @@ The next Q2 branch should first distinguish failed positivity certification
 from genuine negativity, then compare less intrusive corrections on equal
 physical meshes.
 
+## 2026-10-03 - Monograph evidence audit and completed domain record
+
+The solver monograph inventories the pre-documentation `1781b40` snapshot:
+883 tracked/compact evidence records, 86 run directories and 69 commits.
+`docs/solver_monograph/source_ledger.json` records hashes and direct binary-array
+checks. Both completed aligned domain expansions are now reflected in the
+current snapshot and claim C-033; the second interior voxel L1 independently
+recomputes to `1.9549638427469373e-12`. Historical failed and partial attempts
+remain preserved. Mature-density continuum convergence stays open and large
+dataset authorization stays false. No gates or solver equations were changed.
+
+Claim C-031 is narrowed to the quantities actually persisted: final common-grid
+field, voxel-centre moments and aggregate mean/maximum correction statistics.
+It does not establish pointwise agreement of unrecorded timestep histories.
+MFEM's reported maximum mass error is initial-relative drift; absolute-to-one
+error additionally includes initial normalization. These are interpretation
+clarifications, without changing a numerical result or acceptance threshold.
+
+The audit also retains the AFC branch's scientific failure and its optimizer
+fallback counts separately from successful baseline/guarded MFEM runs, and
+distinguishes successful process completion from scientific acceptance.
+Generated PDF/figures remain ignored with a tracked artifact manifest;
+the editable source and reproducible evidence generator are versioned.
+
 ## 2026-09-09 - Challenger priority depends on the production noise model
 
 If production `B` is identity or diagonal, directional FCDF and

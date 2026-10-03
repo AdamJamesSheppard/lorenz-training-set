@@ -1,0 +1,65 @@
+{
+  "created_utc": "2026-10-03T23:05:36.122835+00:00",
+  "solver_evidence_revision": "1781b40ad156f01702aeeb16eaf7e0240ede7378",
+  "scope": "Complete recorded source/history audit and tested Lorenz solver monograph; no solver equations changed, no production authorization.",
+  "pdf": {
+    "path": "output/pdf/lorenz_solver_monograph.pdf",
+    "sha256": "29916ac1fe3a316a74c998e9412ee2d952196f361490eb503533bed91cdecc9f",
+    "pages": 110,
+    "word_count_approximate": 32535
+  },
+  "editable_archive": "output/pdf/lorenz_solver_monograph_source.zip",
+  "source_files": {
+    "docs/solver_monograph/README.md": "70ef25eeecfe3b4738e2bbe3abd89e83f38462de675cc777bbc640bb605809b1",
+    "docs/solver_monograph/bibliography.tex": "99c8eb8802f822d96bf3224806d7bf8c6ac10ddf119e124a0b1a8ea7312eb74d",
+    "docs/solver_monograph/book.tex": "7d1c5d39d02bc615cb63da982cf7bb4184a75f46fcefedd7c49d0d8579b11b25",
+    "docs/solver_monograph/development.tex": "fa8b3a8f23655e78fc01031dbead58491d7a8fd3f2f0494df3621b0c8c0a7721",
+    "docs/solver_monograph/discretisation.tex": "db7ce5588606c4f3f50bb0e92c24769c22a06edbe93e7d247eea34fa20134302",
+    "docs/solver_monograph/foundations.tex": "c222f5c5701a456ab10098e6fff530ba2114e6b286aa204029242d548af5c923",
+    "docs/solver_monograph/history_appendix.tex": "fb3a37967164e1eb7315e3afccbb876ce123f9c6c0de590cc676de12df96ed2a",
+    "docs/solver_monograph/implementation.tex": "279f1a5bc43136c0c3968f5c0bbf2c4d2744f963d1dcbd55297e1f783d353c05",
+    "docs/solver_monograph/ledger_appendix.tex": "ac7303ec4d9d6e9cb3e800aff7a0ae4dfb0c4d6291999397f93b5fb7e549a3dc",
+    "docs/solver_monograph/source_ledger.json": "b474ccf2da8d914af377ca2c33f4edda79616a2e941004d9b7be535e5a4806c5",
+    "docs/solver_monograph/technical_appendices.tex": "4d43f7b8f258f64a56364ec866a7fcfa471ffef6e6ccba62ece753784302ff9d"
+  },
+  "figures": {
+    "output/pdf/solver_monograph/convergence_evidence.pdf": "4c65cb1d7d6ee29fb1bb53cb6727570beba426791769457f81d0a35c80cd561a",
+    "output/pdf/solver_monograph/density_marginals.pdf": "ca976dd0888b1e4710a78ad4f74dda6033b687c89e10499e097c707d425bb7ba",
+    "output/pdf/solver_monograph/marginal_lines.pdf": "b1e80f23bdfc7aad4849fa8e58f58bbd46abb5ab22dfaa5cceec39e3a9d894bc"
+  },
+  "evidence_counts": {
+    "tracked_source_files": 215,
+    "compact_inventory_records": 883,
+    "commits": 69
+  },
+  "validation": {
+    "repository_check": "PASS: 42 tests, static/compilation/whitespace checks",
+    "solver_invariants": "PASS: 10 tests",
+    "mathematical_verifier": "PASS; method_certified remains false",
+    "pdf_qa": {
+      "pdf": "output/pdf/lorenz_solver_monograph.pdf",
+      "sha256": "29916ac1fe3a316a74c998e9412ee2d952196f361490eb503533bed91cdecc9f",
+      "pages": 110,
+      "word_count_approximate": 32535,
+      "latex_error_checks": "PASS",
+      "text_bounds_check": "PASS",
+      "poppler_xml_control_glyph_mappings_removed": 8,
+      "all_pages_rendered": 110,
+      "contact_sheets": [
+        "tmp/pdfs/solver_monograph_qa/contact-01.png",
+        "tmp/pdfs/solver_monograph_qa/contact-02.png",
+        "tmp/pdfs/solver_monograph_qa/contact-03.png",
+        "tmp/pdfs/solver_monograph_qa/contact-04.png",
+        "tmp/pdfs/solver_monograph_qa/contact-05.png",
+        "tmp/pdfs/solver_monograph_qa/contact-06.png",
+        "tmp/pdfs/solver_monograph_qa/contact-07.png"
+      ],
+      "visual_review": "PASS: every-page contact sheets and detailed equation/figure/table review"
+    }
+  },
+  "limitations": [
+    "Selected large arrays independently audited; other payloads indexed by compact evidence.",
+    "Successful MFEM summary guards are not full persisted residual/correction histories.",
+    "Mature-density continuum error remains open; domain evidence is tested-law/horizon scoped."
+  ]
+}

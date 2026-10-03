@@ -2,11 +2,20 @@
 
 Updated: 2026-10-03
 
-Local memory handling now automatically pauses/resumes live MPI jobs at
-2/4 GiB available RAM instead of terminating them. This retains allocations
-and needs external RAM recovery; persistent pressure requires lower-memory
-assembly or checkpoint/restart work. Completed first-domain evidence remains
-valid; the second expansion remains incomplete.
+The monograph audit confirms both aligned domain expansions completed all
+configured gates for the tested broader-support mature law at `t=0.05`.
+Second interior voxel L1 independently recomputes to `1.95496e-12`;
+evidence: `runs/mfem-domain-sensitivity/20261003T143753Z/domain_decision.json`.
+Full-density continuum convergence and production authorization remain open/false.
+The completed memory supervisor used 2/4 GiB thresholds; current defaults
+are 2/2 GiB. Pausing retains allocations and provides no checkpoint.
+
+The bounded provisional pilot discussed with the user is a research next step,
+with sample-level numerical rejection, rather than a completed dataset or a
+waiver of all untested laws/horizons. The mathematical/development record is
+`docs/solver_monograph/book.tex` and its hashed evidence ledger.
+
+## Preserved earlier planning notes (superseded by the snapshot above)
 
 The first domain launch was resource-limited, with only an initial export.
 Restart uses reduced retained assembly storage, without changing the scheme

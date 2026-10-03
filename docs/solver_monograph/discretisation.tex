@@ -1,0 +1,357 @@
+\part{Constructing the numerical method from the probability flux}
+\chapter{Approximation spaces and the competing discretisations}\label{ch:spaces}
+\section{What a finite-dimensional density means}
+A PDE evolves a function with infinitely many possible spatial degrees of freedom. A discretisation selects a finite space and determines evolution of its coefficients. The choice must represent the resolved density structure, conserve the appropriate integral, and support the boundary and flux conventions. No finite-dimensional approximation can manufacture information about structures finer than its resolution.
+
+A finite-volume state consists of average densities on cells. A finite-element state consists of coefficients in local or global basis functions. Continuous Galerkin enforces agreement of traces between elements; discontinuous Galerkin allows independent polynomial values on each cell and introduces interface fluxes. These are mathematical choices about the trial space and weak balance, rather than merely framework names.
+
+The implemented DG space on affine hexahedra is
+\begin{equation}\label{eq:dg-space}
+V_h=\{v\in L^2(\Omega):v|_K\circ F_K\in Q_k([0,1]^3)\text{ for each }K\},
+\end{equation}
+where $F_K$ is the affine cell map and $Q_k$ contains tensor polynomials with degree at most $k$ in each coordinate. $Q_2$ has $(2+1)^3=27$ local DOFs. Its monomial $x^2y^2z^2$ has total degree six, so calling it ``quadratic'' must mean tensor degree, not total-degree-$2$ polynomials on a tetrahedron.
+
+An affine diagonal Jacobian on axis-aligned boxes preserves the tensor structure and makes all cells share the same reference mass and Bernstein transformations up to scaling. This enables the reused local QP. Arbitrary warped cells would require new mapping and positivity analysis; the current claims are explicitly tied to affine cells.
+
+\section{Why discontinuity helps and costs}
+Independence of neighbouring cell polynomials permits element-local slope or QP corrections without altering continuity constraints. Constant test functions on each cell expose a local probability balance. A high-order polynomial captures variation inside a cell, while an upwind trace determines which side supplies transported probability. These are direct responses to the transport and admissibility requirements.
+
+DG also increases unknown count. Q1 has eight local values, Q2 has 27 and Q3 has 64. On a uniform $60\times72\times72$ Q2 mesh there are $311040$ cells and $8398080$ DOFs. Matrix storage, face work, optimization calls and global output then become substantial. Equal DOFs do not imply equal cell widths or equal ability to resolve a narrow lobe: Q1 and Q2 can allocate their unknowns very differently.
+
+\section{One-dimensional polynomial coordinates}
+At nodes $0,1/2,1$, the quadratic Lagrange basis is
+\begin{equation}
+\ell_0=2\xi^2-3\xi+1,\quad \ell_1=4\xi(1-\xi),\quad \ell_2=2\xi^2-\xi.
+\end{equation}
+These functions sum to one but individual functions can be negative. Positive nodal coefficients therefore need not give a nonnegative Q2 polynomial. For example $q(\xi)=(\xi-1/4)^2-1/100$ is positive at $0,1/2,1$ and negative at $1/4$. In contrast Q1 basis functions $1-\xi$ and $\xi$ are nonnegative and partition unity, so nonnegative Q1 nodal values imply whole-interval positivity.
+
+The exact one-dimensional average weights are $a=(1/6,2/3,1/6)$. Tensor products give $a_i a_j a_k$ in 3-D. Those weighted nodal sums provide the true average, rather than an unweighted mean of 27 Q2 coefficients. The local mass matrix is derived in Appendix~\ref{app:local-algebra}.
+
+\section{Projection versus interpolation}
+Interpolation matches selected point values. $L^2$ projection matches weighted integrals against every basis function. If $p_0$ is an analytic Gaussian or mixture, its FE projection $u_h$ solves
+\begin{equation}\label{eq:l2projection}
+\int_Ku_hv_h\dd x=\int_Kp_0v_h\dd x\quad\text{for all }v_h|_K\in Q_k.
+\end{equation}
+Taking $v_h=1$ preserves the quadrature-defined cell mass, but does not imply positivity. Gaussian integrands are nonpolynomial, so increasing integration order matters. The project separately measures raw initialization correction; it should not be counted as a dynamical positivity failure.
+
+\evidence{\code{FokkerPlanckSolver.gaussian_projected}, \code{project_expression} and the MFEM order-14 \code{DomainLFIntegrator} implement projected initialization. Earlier nodal paths remain controlled comparators.}
+
+\chapter{Finite volumes, exponential fitting and the reference boundary}\label{ch:fv}
+\section{Deriving cell-average evolution}
+For a cell $K_i$ of volume $V_i$, integration of~\eqref{eq:balance} gives $V_i\dot p_i=-\sum_{F\subset\partial K_i}|F|\widehat J_F\cdot n_i$. In one dimension a shared flux $J_{i+1/2}$ produces
+\begin{equation}
+\dot p_i=-\frac{J_{i+1/2}-J_{i-1/2}}{h_i}.
+\end{equation}
+Internal fluxes telescope in the volume-weighted sum. This conservation mechanism is independent of whether the chosen flux is accurate or positive. A single mistaken sign can conserve a wrong model, which is why consistency and comparative tests accompany mass tests.
+
+The repository reference uses upwind drift and centred diagonal diffusion. For speed $a_{i+1/2}$ and scalar $d\ge0$,
+\begin{equation}\label{eq:fv-flux}
+J_{i+1/2}=a_{i+1/2}^+p_i+a_{i+1/2}^-p_{i+1}-d\frac{p_{i+1}-p_i}{h},
+\end{equation}
+where $a^+=\max(a,0)$ and $a^-=\min(a,0)$. Boundary face flux arrays are zero. The three-dimensional update adds directional flux differences; the reference rejects general off-diagonal $D$. It therefore supplies an independent diagonal-noise comparator but does not validate the final mixed-diffusion operator by itself.
+
+\section{Positivity under a CFL restriction}
+An explicit Euler update for~\eqref{eq:fv-flux} can be written as a nonnegative combination of nearby averages when $\Delta t$ times the total outgoing transport/diffusion rate is at most one. The off-diagonal transfer rates are nonnegative; the diagonal coefficient is $1-\Delta t\,r_i$. This gives a direct positivity proof. SSPRK(3,3) composes convex combinations of Euler steps, retaining the property under its admissible step bound.
+
+The reference computes an allowed timestep and subdivides the interval accordingly. It checks mass and minimum density after propagation. Its diagonal covariance diagnostic adds $h_i^2/12$ to account for uniform mass within each piecewise-constant cell. Other common-grid comparators use voxel-centre moments without that addition; one must compare the same convention or account for the difference.
+
+\section{Why exponential fitting was considered}
+For $J=ap-dp'$ with constant $a,d$ on a cell interval, solving the steady local ODE gives an exponential profile. With $w=ah/d$, the exact endpoint flux can be written
+\begin{equation}\label{eq:sg}
+J_{i+1/2}=\frac d h\big(\mathcal B(-w)p_i-\mathcal B(w)p_{i+1}\big),\qquad
+\mathcal B(w)=\frac{w}{e^w-1}.
+\end{equation}
+The continuous limit $\mathcal B(0)=1$ follows by Taylor expansion. This fitted flux balances advection and diffusion and approaches upwind behaviour at large positive or negative $w$. Chang--Cooper and Scharfetter--Gummel families exploit related ideas~\cite{chang}. They are relevant alternatives when equilibrium structure and directional diffusion can be used.
+
+The Lorenz full-SPD problem contains mixed derivative terms and a rotational, compressible nonlinear drift. A directional fit applied independently to the diagonal entries would leave those mixed terms untreated. A multidimensional monotone tensor construction requires additional geometry and analysis. The method-selection report considered such alternatives, but the currently tracked finite-volume source is the simpler flux~\eqref{eq:fv-flux}. No evidence supports presenting an implemented Chang--Cooper solver as an ancestor of the final MFEM method.
+
+\section{Context is not development history}
+The distinction is worth stating because a monograph may legitimately teach a technique the project did not run. Here exponential fitting is explanatory context and a researched candidate. The actual reference contributes diagonal-law comparisons and tests. The final high-order branch emerged from same-mesh Q2 evidence and positivity diagnosis, rather than from a confirmed implementation of a directional exponential-fit branch.
+
+\chapter{Weak balance and conservative DG advection}\label{ch:weak}
+\section{Integration by parts with local traces}
+Multiply $p_t+\divg(fp-D\grad p)=0$ by a test polynomial $v$ on a cell $K$. Integrating the total flux once gives
+\begin{equation}\label{eq:cell-weak}
+(p_t,v)_K-(fp,\grad v)_K+(D\grad p,\grad v)_K
++\langle J\cdot n,v\rangle_{\partial K}=0.
+\end{equation}
+The volume signs follow directly from the divergence theorem. On an interior face $F=\partial K^+\cap\partial K^-$ choose $n=n^+=-n^-$. Define scalar jump $\jump v=v^+-v^-$, vector normal jump $\jump{vn}=v^+n^++v^-n^-=\jump v\,n$, and arithmetic average $\avg q=(q^++q^-)/2$.
+
+For continuous drift, $a_F=f\cdot n$ has a unique physical value on the face. A single advective numerical flux $\widehat f_p\cdot n$ contributes $\int_F(\widehat f_p\cdot n)\jump v$. With $v=1$ globally the jump vanishes; with $v$ equal to one on one cell and zero elsewhere, the shared flux appears as that cell's boundary exchange.
+
+\section{Deriving upwind from characteristics}
+For the one-dimensional advection equation $p_t+ap_x=0$, the characteristic arriving at a face comes from the left when $a>0$ and the right when $a<0$. The interface Riemann solution therefore supplies $p^{\rm up}=p^+$ for $a_F\ge0$ under the orientation chosen above, and $p^-$ otherwise. The project form is
+\begin{equation}\label{eq:adv-form}
+a_{\rm adv}(u,v)=-\sum_K\int_Kfu\cdot\grad v\dd x
++\sum_{F\in\mathcal F_h^i}\int_Fa_Fu^{\rm up}\jump v\dd s.
+\end{equation}
+This is precisely the Python \code{adv_volume} plus \code{adv_face}. The exterior contribution is zero total flux, so there is no independently imposed exterior upwind term in the combined formulation.
+
+The equivalent identity
+\begin{equation}
+a_Fu^{\rm up}=a_F\avg u+\tfrac12|a_F|\jump u
+\end{equation}
+separates a central flux from dissipative jump control. Switching the normal changes $a_F$ and the scalar jump signs together, leaving the physical bilinear form invariant. A face-orientation bug often breaks this invariance while still giving apparently plausible fields.
+
+\section{Energy and the compressible drift}
+Take $u=v$ and integrate the volume term:
+\begin{equation}
+-\int_Kfu\cdot\grad u=-\tfrac12\int_{\partial K}(f\cdot n)u^2+\tfrac12\int_K(\divg f)u^2.
+\end{equation}
+Internal central-flux terms cancel the corresponding trace terms. The remainder includes $\frac12\int_F|a_F|\jump u^2$ and the compressibility contribution. For Lorenz $\divg f<0$, density $L^2$ can grow even while mass is conserved. One must not claim an unconditional $L^2$ contraction from upwinding alone. Boundary and diffusion terms determine the full energy estimate.
+
+This distinction connects directly to probability concentration: contraction of state-space volume can raise density peaks. An increasing $L^2$ norm is not automatically a numerical instability. Instability assessment requires comparison to the correct continuous and discrete estimates, along with mass, residuals and distributional evidence.
+
+\section{A conservation proof for the spatial form}
+\begin{proposition}\label{prop:spatial-mass}
+Assume the mesh integration and face assembly use shared conservative fluxes, constants belong to $V_h$, and exterior total flux is zero. Then the DG spatial form used in this project satisfies $a_h(u,1)=0$ for every $u\in V_h$ in exact arithmetic.
+\end{proposition}
+\begin{proof}
+In~\eqref{eq:adv-form}, $\grad1=0$ and $\jump1=0$. In the diffusion form derived next, every volume or face term contains $\grad1$ or $\jump{1n}$, so it also vanishes. There is no exterior total-flux contribution. Summing therefore gives zero independently of the polynomial coefficients.
+\end{proof}
+This statement is about the left mass functional of the evolution matrix. It does not say a constant density is stationary under Lorenz drift. Indeed $-\divg(f\cdot1)=41/3$ in the interior. Testing mass preservation and testing operator action on a constant are different operations.
+
+\chapter{Tensor diffusion and the SIPG construction}\label{ch:sipg}
+\section{Why volume diffusion alone is incomplete}
+For discontinuous $u_h$, a cellwise gradient omits jumps across faces. Summing only $\int_K\grad u^TD\grad v$ would not recover the correct weak flux coupling. Consistency requires a numerical normal diffusive flux. Symmetry and control of jumps supply the remaining SIPG terms.
+
+The project diffusion form is
+\begin{align}\label{eq:sipg}
+a_D(u,v)={}&\sum_K\int_K(D\grad u)\cdot\grad v\dd x\\
+&-\sum_F\int_F\avg{D\grad u}\cdot\jump{vn}\dd s\nonumber\\
+&-\sum_F\int_F\avg{D\grad v}\cdot\jump{un}\dd s\nonumber\\
+&+\sum_F\int_F\eta_F\jump{un}\cdot\jump{vn}\dd s.\nonumber
+\end{align}
+The first face term is obtained from the integration-by-parts diffusion trace. The second is its adjoint counterpart, restoring symmetry. The final penalty controls interelement jumps. For a globally smooth $u$, $\jump{un}=0$ and the last two terms involving that jump vanish; the remaining form reproduces integration by parts with its physical diffusive flux.
+
+The code uses
+\begin{equation}\label{eq:penalty}
+\eta_F=\gamma k^2\frac{\avg{n^TDn}}{\avg{h_K}},\qquad\gamma=16,
+\end{equation}
+with cell diameter $h_K$ and tensor degree $k=2$, giving the factor 64. This is the actual penalty convention; replacing diameter by normal cell width would change the method. MFEM's default face scaling needed a custom integrator to match it physically.
+
+\section{Coercivity under a sufficiently large penalty}
+For symmetric $D\succ0$, define a broken energy seminorm
+\begin{equation}
+\|v\|_{DG,D}^2=\sum_K\|D^{1/2}\grad v\|_{L^2(K)}^2+\sum_F\|\eta_F^{1/2}\jump v\|_{L^2(F)}^2.
+\end{equation}
+An inverse trace estimate bounds normal-gradient traces by a mesh- and degree-dependent multiple of cell gradient energy. Apply Cauchy--Schwarz and Young's inequality $2ab\le\epsilon a^2+\epsilon^{-1}b^2$ to the two consistency terms in $a_D(v,v)$. If the penalty dominates the resulting trace constant, then
+\begin{equation}
+a_D(v,v)\ge c\|v\|_{DG,D}^2
+\end{equation}
+modulo the constant nullspace for no-flux diffusion. Shape regularity, tensor ellipticity and correctly scaled penalty are required. Arnold and colleagues provide a unifying framework for DG elliptic analysis~\cite{arnold}. That framework explains the construction; it does not prove that the fixed numerical factor 16 is sufficient on every hypothetical distorted or extremely graded mesh.
+
+For affine rectangular meshes, the code's scaling is controlled empirically through equivalence, mass and diffusion probes. A rigorous global coercivity certificate for the complete NC hierarchy has not been recorded. The text must distinguish that open proof from successful numerical propagation.
+
+\section{What anisotropy changes}
+The energy uses $\grad v^TD\grad v$, so the diffusion directions are the eigenvectors of $D$, not necessarily the coordinate axes. The face quantity $n^TDn$ captures normal diffusion strength. The cross terms affect both volume gradients and numerical face fluxes. The matrix-valued MFEM integrator accepts this tensor, but compatibility of API types is weaker evidence than matched operator actions.
+
+Very small $\lambda_{\min}(D)$ can create directionally weak smoothing and high directional P\'eclet numbers. Semidefinite $D$ requires a different coercivity and regularity analysis. The chosen test tensor is moderately anisotropic and uniformly SPD; general SPD parameterization for a pilot must not silently inherit its numerical guarantees for nearly singular matrices.
+
+\section{Exterior reflecting treatment}
+Equation~\eqref{eq:cell-weak} has a \emph{combined} boundary term. After replacing interior traces by upwind and SIPG fluxes, the exterior combined flux is prescribed zero. The formulation thus has no independent Dirichlet penalty, prescribed diffusion Neumann datum or exterior advective inflow law. A separate pure-diffusion operator diagnostic has natural homogeneous Neumann behaviour, but that isolated diagnostic is not the full reflecting convection--diffusion boundary model.
+
+\evidence{Python lines defining \code{sipg} in \code{lorenz_fpe/core.py}; MFEM \code{DolfinxPenaltyDGDiffusionIntegrator}; manufactured boundary convergence in \code{boundary_flux_report.json}.}
+
+\chapter{From weak forms to matrices and Crank--Nicolson}\label{ch:cn}
+\section{The sign convention that must survive a port}
+Let $p_h=\sum_ju_j\phi_j$. With $M_{ij}=(\phi_j,\phi_i)$ and $S_{ij}=a_h(\phi_j,\phi_i)$, the semidiscrete equation is
+\begin{equation}\label{eq:semi}
+M\dot u+Su=0,\qquad M\dot u=K_hu,\quad K_h=-S.
+\end{equation}
+$M$ is symmetric positive definite for an independent basis and positive cell measures. It is block diagonal by cell for DG, though implementations may assemble distributed sparse matrices. $S$ is nonsymmetric because of upwind drift. Its diffusion part is symmetric under matched SIPG conventions.
+
+Python assembles $M+\theta\Delta tS$; the MFEM evolution matrix is $K_h$ and its CN left matrix is $M-\frac12\Delta tK_h$. Both describe the same equation. Comparing source-level signs without identifying which matrix represents spatial balance can produce a false mismatch or mask a true one. The early MFEM probe did discover a real sign defect, caught before enabling AMR.
+
+\section{Derivation of the theta update}
+Integrating~\eqref{eq:semi} over $[t_n,t_{n+1}]$ and approximating the right side with endpoint weights gives
+\begin{equation}\label{eq:theta}
+(M-\theta\Delta tK_h)u^{n+1}=(M+(1-\theta)\Delta tK_h)u^n.
+\end{equation}
+$\theta=1$ is backward Euler. $\theta=1/2$ is Crank--Nicolson. Taylor expansion for sufficiently smooth $u$ gives local defects of order $\Delta t^2$ for backward Euler and $\Delta t^3$ for CN, corresponding to first and second global order on a fixed finite-dimensional system when stability and consistent solves hold.
+
+This is a formal time-integrator statement. The executed method replaces the raw result $u^{n+1,*}$ by a corrected density $\mathcal P(u^{n+1,*})$. Its convergence depends on the size, consistency and accumulation of that correction. The CN derivation cannot by itself prove second order for the corrected trajectory.
+
+\section{Stability and a counterexample to positivity}
+For $\dot y=\lambda y$, CN has amplification $R(z)=(1+z/2)/(1-z/2)$ with $z=\lambda\Delta t$. If $\operatorname{Re}z\le0$, then $|R(z)|\le1$, showing scalar A-stability. As $z\to-\infty$, $R(z)\to-1$, so stiff modes are not strongly damped. Backward Euler has $R(z)=1/(1-z)$ and tends to zero in that limit.
+
+The distinction matters for positivity. Even $\dot y=-ay$ with $a>0$ and $y_0>0$ produces a negative CN result if $a\Delta t>2$. A stable high-order raw update can consequently contain negative polynomial structure. Implicitness controls one restriction, while admissibility remains a separate algebraic requirement.
+
+\section{Mass with exact and inexact linear solves}
+Let $e$ represent the constant test function. Then the discrete integral is $m^Tu$ with $m^T=e^TM$, while $e^TK_h=0$ by Proposition~\ref{prop:spatial-mass}. Multiplying~\eqref{eq:theta} by $e^T$ proves
+\begin{equation}\label{eq:cn-mass}
+m^Tu^{n+1}=m^Tu^n.
+\end{equation}
+If the solve residual is $r=b-A_{CN}u^{n+1}$, the mass defect satisfies
+\begin{equation}
+m^T(u^{n+1}-u^n)=-e^Tr
+\end{equation}
+under that residual sign convention. Thus tolerances and cancellation affect measured conservation. An absolute accumulated action such as $-5.6\times10^{-10}$ is uninterpretable without scale; a normalized action residual of $1.93\times10^{-17}$ supports machine-precision structural conservation in the production probe.
+
+\section{Nonsymmetric solves and reused operators}
+GMRES builds a Krylov subspace and minimizes a residual norm for nonsymmetric systems. A preconditioner changes the conditioning of the iteration, not the intended solution. The Python solver uses ILU in serial and block Jacobi under MPI, with independent true residual evaluation. MFEM uses Hypre GMRES with ILU(1), restart dimension 100, up to 1000 iterations, relative tolerance $10^{-14}$ and absolute tolerance $10^{-17}$ in the mature branch.
+
+The mature MFEM loop does not write a full per-step true-residual history in its summary. Tight requested tolerances and equivalence are strong practical evidence, but they do not substitute for a separately recorded residual gate on every trajectory. This reporting limitation is stated in the final specification.
+
+Constant coefficients, a fixed mesh and fixed timestep allow reuse of CN matrices and preconditioners. Changing mesh mid-forecast would require rebuilding or transferring operators and states. The project first chooses a static AMR mesh, removing this additional source of error and cost from its equivalence study.
+
+\chapter{Whole-cell positivity and Bernstein certificates}\label{ch:bernstein}
+\section{Several notions that must not be conflated}
+Nonnegative integral mass, nonnegative cell averages, nonnegative nodal values, nonnegative sampled values and a nonnegative polynomial everywhere are distinct properties. Positive averages constrain one linear functional per cell. Q2 has 26 additional mean-free directions that can produce internal oscillations. A certificate must control those directions on the entire cell or declare its coverage incomplete.
+
+The Bernstein basis on $[0,1]$ is $b_i^k(\xi)=\binom ki\xi^i(1-\xi)^{k-i}$. Each basis function is nonnegative and $\sum_ib_i^k=1$. Tensor products retain both properties. For coefficients $\beta_{ijk}$,
+\begin{equation}\label{eq:bernstein-enclosure}
+\min\beta_{ijk}\le p(\xi,\eta,\zeta)\le\max\beta_{ijk}\quad\text{on }[0,1]^3.
+\end{equation}
+This enclosure follows because the polynomial value is a convex combination of coefficients. Therefore coefficient nonnegativity is a sufficient whole-cell certificate.
+
+\section{A sufficient condition with an incomplete converse}
+A nonnegative polynomial can have negative Bernstein coefficients. For $p(x)=(x-c)^2$ on an interval $[a,b]$ containing $c$, the middle quadratic Bernstein coefficient is $(a-c)(b-c)<0$. The endpoint coefficients are squares. If $c$ is irrational, no finite dyadic subdivision puts its zero exactly on a subdivision boundary. The interval containing $c$ retains a negative middle coefficient at every finite depth.
+
+This gives a precise counterexample to completeness of recursive positivity certification. Failure to certify may mean genuine negativity or an enclosure that straddles zero. The implementation separates three outcomes: certified nonnegative, witnessed negative by point evaluation beyond scale-aware tolerance, and unresolved at the depth limit. Both latter outcomes require a conservative correction in the propagated method.
+
+\section{Subdivision and the actual constraint set}
+de Casteljau subdivision expresses the same polynomial in Bernstein form on smaller cells. New coefficients are convex combinations of old ones, so enclosure bounds tighten. The project's fixed Q2 constraint matrix uses two subintervals per axis, giving eight control subcells with 27 coefficients each, or 216 rows before duplicate removal. The optimizer keeps a deduplicated matrix, while acceptance is checked against the full original rows.
+
+Adaptive depth-four subdivision is used to skip a polynomial that is already certifiably nonnegative. It does not alter the convex feasible set while the QP is being solved. The mature diagnostic compares depth four and eight on the same saved raw polynomials. This prevents changes in dynamics from being mistaken for changes in certification.
+
+\section{Floating-point qualification}
+Exact-arithmetic Bernstein coefficients give an exact sufficient condition. Computed transformations, mapping and optimizer output contain roundoff. The code uses scale-aware witness tolerances and a normalized positivity margin $10^{-12}$ for QP constraints, then rechecks rows and averages. This is practical numerical certification, not outward-rounded interval arithmetic. The book therefore reports ``whole-cell Bernstein-certified at the implementation tolerance'' rather than asserting a computer-assisted exact positivity proof.
+
+Cells with nonpositive repaired average are set to the zero polynomial. For a nonnegative continuous polynomial, zero integral implies the polynomial is zero everywhere: if it were positive at one point, continuity would give a neighbourhood of positive integral. That algebraic fact explains the zero-average branch. Tiny negative average values admitted by numerical tolerances must still be controlled by global mass checks.
+
+\section{Why deeper certificates were rejected}
+The mature experiment found that depth eight rescued at most 0.0788 percent of depth-four noncertified cells and reduced correction by at most 2.89 percent. Direct negative witnesses dominated. A tighter enclosure can reveal positivity hidden by a sufficient condition; it cannot change a genuinely negative polynomial. The diagnostic therefore narrowed the relevant hypothesis from certificate conservatism towards actual approximation or update error.
+
+\evidence{\code{mature_positivity_certificate_diagnostic_report.json}, \code{mature_positivity_diagnostic.py}, \code{PositivityLimiter._classification_summary} and MFEM \code{AdaptiveCertificate}.}
+
+\chapter{Global average repair and local minimum-change QP}\label{ch:qp}
+Optimisation-based Fokker--Planck limiters provide a neighbouring two-stage architecture~\cite{liuhu}. The published semi-implicit temporal/flux construction differs from this fully CN/upwind/SIPG implementation. Its theorem is therefore not invoked as a certificate for the present three-dimensional forecast.
+\section{The nonnegative equal-mass projection}
+For raw cell averages $w_K$ and volumes $V_K>0$, Stage 1 solves
+\begin{equation}\label{eq:stage1}
+\min_{x_K\ge0}\frac12\sum_KV_K(x_K-w_K)^2,
+\quad\sum_KV_Kx_K=\sum_KV_Kw_K=M_0.
+\end{equation}
+It is feasible if and only if $M_0\ge0$. When feasible, strict convexity gives a unique minimizer. A Lagrange multiplier $\lambda$ for mass and multipliers $\nu_K\ge0$ for the lower bounds yield $V_K(x_K-w_K+\lambda)-\nu_K=0$ and $\nu_Kx_K=0$. Thus
+\begin{equation}\label{eq:waterfill}
+x_K=\max(0,w_K-\lambda).
+\end{equation}
+The scalar function $F(\lambda)=\sum_KV_K\max(0,w_K-\lambda)$ is continuous and nonincreasing. For $M_0>0$ it is strictly decreasing near the required positive active set, yielding a unique multiplier there. Bisection or a sorted active-set calculation can recover it. $M_0=0$ yields the unique vector zero, while the multiplier need not be unique.
+
+Weighted mass is essential on NC meshes. If one treats a small refined cell and a large background cell as equal-volume entries, conserving their unweighted sum conserves the wrong quantity. The MFEM average repair uses actual transformation volumes and MPI reductions; the Python baseline gathers averages/volumes to rank zero and scatters the projected result.
+
+The cell polynomial is shifted by the constant $x_K-w_K$. Since the basis represents one exactly, this changes its average without altering its mean-free shape. It makes the subsequent local positivity problem feasible.
+
+\section{Scalar contraction as a feasible comparator}
+If a cell has corrected average $\bar p\ge0$ and sufficient lower enclosure $m_K$, contraction gives
+\begin{equation}\label{eq:scaling}
+p^{\rm scale}=\bar p+\theta(p-\bar p),\quad
+\theta=\min\left(1,\frac{\bar p}{\bar p-m_K}\right)
+\end{equation}
+when $m_K<0$, with the zero-average case treated separately. Its average is unchanged because the mean-free component integrates to zero. If all corrected Bernstein coefficients are nonnegative, it certifies the polynomial. The operation scales every higher mode by the same factor, which can erase accurate shape information away from the offending direction.
+
+The project uses scalar scaling as a safe feasible candidate, diagnostic comparator and objective bound for the local QP. A minimum-change convex projection cannot have larger mass-matrix objective than that feasible candidate when solved exactly. This is an objective-norm statement; it does not automatically imply a smaller $L^1$ correction or better covariance. Those comparisons require measurements.
+
+\section{The local constrained problem}
+Let $c_0\in\R^{27}$ be the raw Q2 nodal vector after Stage 1. Let $H$ be the SPD reference mass matrix, $a^Tc$ its cell average and $Cc$ its fixed-subcell Bernstein coefficients. The local problem is
+\begin{equation}\label{eq:local-qp}
+\min_c\tfrac12(c-c_0)^TH(c-c_0),\qquad Cc\ge0,\quad a^Tc=a^Tc_0.
+\end{equation}
+$H$ makes the objective the squared $L^2$ change on the reference cell. On affine cells the physical mass matrix is $V_KH$, and multiplying the objective by a positive $V_K$ does not change its minimizer. This is the mathematical reason the same reference QP can be reused throughout a static locally refined mesh.
+
+\begin{proposition}[Feasibility and uniqueness]\label{prop:qp}
+If the prescribed average $\bar p$ is nonnegative, constants are represented by $\bm1$, $a^T\bm1=1$ and $C\bm1=\bm1$, then~\eqref{eq:local-qp} has a unique solution. If $\bar p<0$, no nonnegative polynomial can meet that mass constraint.
+\end{proposition}
+\begin{proof}
+For $\bar p\ge0$, $c=\bar p\bm1$ is feasible. The feasible set is closed and convex, and the SPD quadratic objective is coercive and strictly convex. Existence follows by restricting a minimizing sequence to a bounded sublevel set and compactness in finite dimension; strict convexity gives uniqueness. Negative average contradicts nonnegativity of the polynomial integral. For $\bar p=0$, the only nonnegative polynomial is zero by continuity and the integral argument.
+\end{proof}
+
+\section{Normalization and equality elimination}
+For $\bar p>0$, set $z_0=c_0/\bar p$ so $a^Tz_0=1$. The positive margin is applied in this normalized space, avoiding ill-conditioned absolute constraints in low-density tails. Let $N\in\R^{27\times26}$ have orthonormal columns spanning $\ker a^T$. Write $z=z_0+Ny$. Then mass is automatic and the QP reduces to
+\begin{equation}\label{eq:reduced-qp}
+\min_y\tfrac12y^T(N^THN)y,\qquad CNy\ge\varepsilon\bm1-Cz_0,
+\end{equation}
+where $\varepsilon=10^{-12}$. The reduced Hessian and constraint matrix are fixed; only the lower bound changes from cell to cell. Factorization caching and warm starts make OSQP a suitable implementation mechanism~\cite{osqp}. That external solver does not itself prove polynomial positivity; the project checks the original constraints afterwards.
+
+Python computes a nullspace with SciPy. MFEM constructs a Householder basis. The reduced coordinates may differ while representing the same constrained physical polynomial. This is another reason raw coefficient or internal-QP variable comparison across frameworks is weaker than a physical-field comparison.
+
+\section{Acceptance and numerical guards}
+Python retains SLSQP as an oracle. MFEM accepts OSQP solved or solved-inaccurate status, then reconstructs the candidate, removes average drift by a constant shift, and if needed performs a tiny contraction toward the unit-average constant. It checks all 216 rows and marks certification only when the final minimum is finite and nonnegative. Those guard operations mean the floating-point returned state may differ slightly from the exact QP minimizer.
+
+The reported zero optimizer failures and zero fallbacks on completed MFEM runs should be read with the source. Optimizer errors use aborting verification checks; successful summaries write zero failure counts. A run that aborts before its summary cannot be counted as a certified zero-failure forecast. Aborting failed solves is a safeguard, while richer attempted-solve histories would improve forensic reporting.
+
+\section{What repeated correction can reveal}
+Define $C_n=\|p_h^{n+1}-p_h^{n+1,*}\|_{L^1}/|M(p_h^{n+1,*})|$. Small $C_n$ supports a low-intervention interpretation. Large values can come from inaccurate initialization, temporal oscillations, an overly restrictive feasible set, poor spatial resolution or genuine physical concentration represented in an inadequate space. Correction by itself does not identify the cause.
+
+The project separates these possibilities by frozen-polynomial certificate tests, same-positive-initial-state AFC comparisons, one-step DOF experiments and refinement. The convergence of a norm-constrained projection on one state cannot replace convergence of the full propagated density. Repeated local changes may accumulate or cancel; both per-step and full-density evidence are required.
+
+\chapter{Alternative positivity architectures and what they tested}\label{ch:afc}
+\section{A positive low-order update}
+An invariant-domain architecture starts from a low-order state that is already admissible, then adds limited high-order corrections. For cell averages on a graph, a positive update has nonnegative transfer rates and a timestep bound on outgoing probability. The mature AFC comparator decomposes the chosen full tensor into axis and pair-diagonal graph directions. It requires nonnegative remaining diagonal rates after accounting for mixed entries; arbitrary SPD matrices need not admit that particular sparse decomposition on a chosen mesh.
+
+The high-order target remains the frozen Q2 CN result. The graph step provides admissible averages; conservative antidiffusive changes move those averages towards the target. This changes the update architecture at the average level while retaining the polynomial QP afterwards. It is a targeted diagnostic of whether average negativity is the dominant mature bottleneck.
+
+\section{The implemented complete-graph correction}
+Let $l_i$ be low-order averages and $h_i$ a high-order target rescaled to the same sum. Put $\delta_i=h_i-l_i$. Negative corrections are limited by $\delta_i\ge-l_i$, and positive corrections are multiplied by a common factor so that accepted gain equals accepted loss. On the uniform comparator mesh, equal cell volumes make sum conservation equivalent to mass conservation. This is an experiment-specific complete-graph decomposition, not the same edge-local scheme as every published AFC method.
+
+The distinction limits what a negative result says. The general literature provides conservative limiter constructions for scalar transport~\cite{kuzmin}; it does not supply a ready-made theorem that this full three-dimensional Lorenz/Q2/SIPG/CN variant will reduce correction. Carrillo--Liu--Yu explicitly separate average positivity from subsequent polynomial limiting for their Fokker--Planck class~\cite{carrillo}. The project uses that distinction as a diagnostic architecture and does not import their different energy-dissipation theorem.
+
+\section{Why almost complete antidiffusion acceptance matters}
+The mature experiment accepted more than 99.9998 percent of the high-order average correction while still requiring a local-QP change of order $10^{-3}$. This supports the conclusion that cell averages were already essentially admissible. Within-cell high-order modes remained negative. Improving average-level positivity could therefore leave the principal correction nearly unchanged.
+
+The result is specific to that comparator and law. It does not prove every AFC or subcell method ineffective. It does show that the tested average-level intervention addressed a component with little remaining error, while the expensive polynomial repair persisted. That is enough to stop spending substantial compute on another identical average-level hierarchy.
+
+\section{The Bernstein-DOF diagnostic}
+The next prototype converts each whole-cell Q2 polynomial to 27 Bernstein coefficients. All Bernstein basis functions have integral $1/27$ on the cube, so coefficient-sum conservation enforces its cell average. A Euclidean simplex projection seeks $\beta_i\ge\epsilon$ with $\sum_i\beta_i=27\bar p$. It then transforms back to nodal coordinates.
+
+This minimizes a coefficient-space Euclidean norm, whereas the retained QP minimizes a physical mass-matrix norm and uses more permissive subcell constraints. The objectives and feasible sets differ. Whole-cell Bernstein positivity can be stricter than positivity after subdivision. The prototype is thus a diagnostic convex coefficient repair, not an implemented sparse subcell flux-limited DG propagation operator.
+
+The recorded comparison failed the proposed factor-of-two reduction against the local QP. A uniform-$60$ one-step check reduced QP correction substantially compared with $45$, supporting under-resolution as the stronger hypothesis. The failure catalogue must describe the prototype precisely: it does not license a general conclusion that every DOF-level invariant-domain method is inferior.
+
+\section{Retaining the least disruptive known admissibility method}
+By this point the local QP had remained the best tested repair while mesh refinement reduced both raw negativity and intervention. The next change therefore targeted resolution, with positivity mathematics frozen. This preserved a clear comparator and avoided introducing polynomial order, different fluxes and different boundary treatment simultaneously.
+
+\chapter{Convergence, export and the meaning of a density comparison}\label{ch:convergence}
+\section{Consistency, stability and convergence}
+Consistency compares the discrete equation with the continuous equation when an exact sufficiently smooth solution is inserted. Stability controls amplification of perturbations and errors in the chosen norm. Convergence compares a sequence of discrete solutions with the continuum solution as resolution is refined. These ideas are linked under theorem-specific hypotheses; a bare invocation of consistency plus stability is insufficient for the nonlinear corrected scheme without identifying spaces, norms and uniform constants.
+
+If a smooth solution has approximation error bounded by $Ch^{k+1}$ in $L^2$, the constant depends on derivatives that can become large for narrow mature structures. A nominal Q2 approximation estimate therefore does not say a particular practical mesh is accurate. The measured initialization corrections $0.380\to0.158\to0.0313$ show how far that law initially lay from the positive representable set on early meshes.
+
+\section{Observed order from adjacent differences}
+For constant ratio $r>1$, suppose $p_h=p+ch^s+o(h^s)$ in a suitable norm with a common nonzero leading error direction. Then adjacent differences approximately satisfy $D_{h,h/r}/D_{h/r,h/r^2}\approx r^s$, giving
+\begin{equation}\label{eq:observed-order}
+s_{\rm obs}=\frac{\log(D_1/D_2)}{\log r}.
+\end{equation}
+The asymptotic expansion and matched law/time/domain assumptions are necessary to interpret this as an order estimate. Without them the same formula is simply a ratio diagnostic. Different nonuniform support/depth designs lack a single scalar refinement ratio; a rate assigned to them is heuristic.
+
+The startup four-level temporal differences $5.238\times10^{-4}$, $5.418\times10^{-4}$ and $1.620\times10^{-4}$ give orders approximately $-0.049$ and $1.741$. The plateau precedes a fine-level decrease. The final value supports entry into a better-resolved temporal regime, but does not prove uniformly second-order corrected CN convergence.
+
+Identity-noise spatial differences $0.141394$ and $0.0355845$ at ratio $1.5$ give observed common-grid rate $3.4026$. Full-SPD differences $0.139500$ and $0.0348401$ give $3.4215$. Those rates exceed three but are measured on finite grids and projected initial states; they remain observed common-grid rates rather than formal-order proofs.
+
+\begin{figure}[ht]\centering\includegraphics[width=\textwidth]{convergence_evidence.pdf}
+\caption{Recorded startup temporal differences (left) and mature uniform-mesh mean corrections (right). The temporal horizontal coordinate labels the coarser member of each pair relative to the first timestep. Mature correction values are rounded from reports; the dashed line is the original $10^{-3}$ gate. The two panels refer to different initial laws and are not a shared convergence hierarchy.}\label{fig:convergence}
+\end{figure}
+
+\section{Conservative voxel averaging}
+For export voxel $V$, define $\bar p_V=|V|^{-1}\int_Vp_h$. Splitting each voxel into intersections with FE cells permits exact integration of a Q2 polynomial by sufficient tensor Gauss quadrature on affine subboxes. The MFEM exporter uses three-point Gauss nodes and weights per coordinate, exact through degree five, hence exact for tensor Q2 on each intersection.
+
+The global exported integral is $\sum_V|V|\bar p_V=\int p_h$ in exact arithmetic if intersections partition the cells and no region is lost or duplicated. The common $180\times216\times216$ grid lets different meshes be compared without point interpolation. Its voxel volume is $384000/8398080$.
+
+\begin{proposition}[Averaging is an $L^1$ contraction]\label{prop:export}
+Let $P_V$ map integrable functions to piecewise-constant voxel averages on a fixed partition. Then $\|P_Vp-P_Vq\|_{L^1}\le\|p-q\|_{L^1}$.
+\end{proposition}
+\begin{proof}
+For each voxel, $|V|\,|\bar p_V-\bar q_V|=|\int_V(p-q)|\le\int_V|p-q|$. Sum over the disjoint partition.
+\end{proof}
+Thus the reported voxel difference is a lower bound on the true FE-polynomial $L^1$ difference, not an upper bound. Within-voxel errors can cancel. This is the precise reason subvoxel accuracy remains separate even after a small exported difference.
+
+\section{Norms and statistical quantities}
+For normalized densities, total variation is $\frac12\int|p-q|$ and equals the maximum probability discrepancy over measurable events. For bounded $g$, $|\E_pg-\E_qg|\le\|g\|_\infty\|p-q\|_1$. Moment errors are therefore controlled by full-density errors on a bounded box, while the converse fails.
+
+Relative covariance error is a Frobenius discrepancy divided by the reference Frobenius norm. Off-diagonal correlations divide by standard deviations and can be sensitive near zero variance. Lobe probability is an event integral, here often $x>0$ versus $x<0$. Joint-TV comparisons against Monte Carlo use fixed histogram resolution and declared smoothing; they are comparisons of those processed representations rather than exact total variation of the continuum laws.
+
+\section{Initial differences and reference limitations}
+For two meshes, decompose a terminal difference conceptually into initialization, propagation and export effects. Independently projecting the same mixture does not make initial FE polynomials identical. Reporting initial voxel $L^1$ separately helps interpret the final result. Across frameworks, transfer of one projected state avoids that confound entirely.
+
+Increasing reference particle count strengthens moments but not automatically fine density estimates. Histogram and kernel bandwidth choices introduce bias. Similarly, reproducing a uniform-$60$ reference to $0.001688$ establishes agreement with that reference, not its accuracy. The later fine graded change of $0.108680$ demonstrated why the reference question matters.

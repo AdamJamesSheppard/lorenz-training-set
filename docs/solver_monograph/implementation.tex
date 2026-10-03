@@ -1,0 +1,272 @@
+\part{The final tested algorithm and its reproducibility}
+\chapter{An executable mathematical specification}
+\section{What is frozen in the tested comparator}
+The current working comparator is the broader-support static MFEM NC-hex trajectory. Its mathematical ingredients are a constant full-SPD tensor, conservative Lorenz drift, reflecting total flux, Q2 DG on affine axis-aligned hexahedra, matched SIPG penalty, CN and the two-stage local-QP positivity treatment. Mesh support changed through controlled studies; the positivity mathematics remained the frozen comparator.
+
+\begin{table}[htbp]\centering\caption{Specification of the broader mature working comparator. Counts describe the constructed mesh, including forced refinement.}\label{tab:finalspec}
+\begin{tabular}{p{.32\textwidth}p{.58\textwidth}}\toprule Component & Recorded setting\\\midrule
+Drift & Lorenz--63, $(\sigma,\rho,\beta)=(10,28,8/3)$\\
+Diffusion & $D_{11}=D_{22}=D_{33}=1$, $D_{12}=.4$, $D_{13}=.2$, $D_{23}=.3$\\
+Original box & $[-30,30]\times[-40,40]\times[-10,70]$\\
+Boundary condition & $(fp-D\grad p)\cdot n=0$\\
+Space & 27 local Q2 DOFs per affine hex\\
+Background & $45\times54\times54$ cells\\
+Static refinement & Isotropic local octree refinement, two depth levels in retained broader support\\
+Actual cells / DOFs & 208,787 / 5,637,249\\
+Time & $\Delta t=1.5625\times10^{-4}$, $\tau=.05$, 320 CN steps\\
+Projection & Nonnegative conservative averages; fixed-average mass-metric QP\\
+QP solve & OSQP, reduced 26-dimensional variables, cached workspace\\
+CN linear solve & Hypre GMRES with ILU; relative tolerance $10^{-14}$, absolute $10^{-17}$, maximum 1,000 iterations, Krylov dimension 100\\
+Common export & $180\times216\times216$ conservative voxel averages, float64, C ordering $(x,y,z)$\\\bottomrule\end{tabular}\end{table}
+
+The declared settings must be read from the archived config and source revision when reproducing a specific run. A command pointing at the current source can change results if that source has changed. The table identifies the tested mathematical configuration, not a guarantee that arbitrary builds are bitwise identical.
+
+\section{Algorithm before the first timestep}
+The setup begins with a continuous normalized Gaussian-mixture law. The domain is built, selected base cells are refined, and balancing adds any required neighbours. Refinement is complete before propagation. A parallel DG space is created; the mass, transport and diffusion forms are assembled with matched geometry and quadrature.
+
+The initial law is projected by solving
+\begin{equation}
+ M u^0_{\rm raw}=b^0,\qquad b_i^0=\int_\Omega p_0\phi_i\,dx.
+\end{equation}
+The quadrature approximates the nonpolynomial Gaussian mixture; it is not an exact symbolic Gaussian integral. Global normalization, average repair and local QP produce the accepted $u^0$. The representation correction is recorded separately from the dynamical intervention.
+
+Construct $L=M-\Delta tK_h/2$ and $R=M+\Delta tK_h/2$ once. When these independent matrices have been assembled, the mature/AMR branch can release the original spatial matrix and redundant assembly storage. This changes storage lifetime, not the CN equation. The preconditioner is built for $L$.
+
+\section{One complete accepted step}
+\begin{lstlisting}[caption={Mathematical pseudocode for the tested two-stage update. Implementation details and abort conditions are part of the specification.}]
+Given accepted positive Q2 field u and fixed matrices M, K, L, R:
+  rhs := R u
+  solve L raw = rhs at declared GMRES tolerances
+  reject/abort if the linear solver does not converge
+  compute raw cell averages, total mass and negative-average mass
+  solve global weighted nonnegative-average projection
+  shift each local polynomial to its repaired average
+  set exactly zero-average cells to the zero polynomial
+  for each local cell:
+    transform into the canonical physical Q2 basis
+    certify the polynomial by Bernstein subdivision
+    if admissible: retain it unchanged
+    otherwise solve the fixed-average mass-metric QP
+    validate average, inequalities and accepted polynomial
+    abort on a failed guarded projection
+  reduce global mass and correction diagnostics across ranks
+  accept corrected state only after its declared gates pass
+  record step/time/correction; export configured snapshots
+\end{lstlisting}
+
+The algorithm's rejection behaviour distinguishes it from an optimisation call wrapped in a silent scalar fallback. The successful MFEM branch aborts when guarded local projection cannot establish acceptance. Its summary writes zero failure/fallback values on successful completion. These values are supported by the guard architecture and accepted-state checks, but they are not separately accumulated counts of recoverable failed internal attempts. A future production audit should retain explicit counters and true residual histories, even for successful runs.
+
+\section{Conservation through all stages}
+There are three mass contracts. The spatial operator satisfies $\ell^TK_h=0$, where $\ell$ represents the constant test function in the residual basis. Consequently exact CN preserves $\ell^TMu$. Stage~1 preserves its target total mass. Stage~2 preserves each repaired cell average. Therefore the composite algorithm conserves mass in exact arithmetic, provided Stage~1 is feasible and every local equality is satisfied.
+
+The floating-point errors arise separately from assembly, inexact linear solve, scalar root finding, QP tolerances, basis transforms, reduction order and export. A final mass within $10^{-10}$ does not prove every contribution is small; cancellation is possible. The tests isolate components where practical. The MFEM summary's \code{maximum_absolute_mass_error} is maximum drift from its accepted initial mass, rather than directly from one. The two are related by $|M_n-1|\le|M_n-M_0|+|M_0-1|$. Initial masses are also reported, allowing that distinction to be checked; individual step masses are held during propagation but not all persisted in the compact summary.
+
+No correction can repair a negative total target mass while preserving it and producing a nonnegative field. This impossible case must be rejected. Nearly zero cells also require a stable convention: dividing coefficients by a tiny average can amplify roundoff. The current projector normalizes positive-average problems and uses dedicated zero/near-vacuum handling rather than assuming every cell can be safely scaled without checks.
+
+\chapter{Basis transformations, geometry and quadrature}
+\section{Physical polynomials are the common object}
+A coefficient vector has meaning only relative to basis functions, reference coordinates and cell orientation. For a canonical Q2 nodal basis on $[0,1]^3$, write
+\begin{equation}
+ p_K(F_K(\xi))=\sum_{i,j,k=0}^{2}c_{ijk}l_i(\xi_1)l_j(\xi_2)l_k(\xi_3),
+\end{equation}
+where $l_i$ are the one-dimensional Lagrange polynomials at $0,1/2,1$. The affine map is $F_K(\xi)=x_K+H_K\xi$, with diagonal $H_K$ for the tested meshes. Gradients transform by $H_K^{-T}$; volume integrals acquire $\det H_K$. Face gradients, normals and measures must follow the same map.
+
+The physical nodal map is obtained by evaluating the framework basis at canonical points. Its inverse represents a corrected canonical polynomial back in framework coefficients. For an affine axis-aligned cell the reference mass metric is a common positive scalar multiple of the physical metric. Therefore removing the volume factor from a local QP does not change its minimizer. On curved or nonaffine cells this simplification would require revision.
+
+\section{Quadrature has several roles}
+The initialization integral is nonpolynomial because of the Gaussian mixture. The declared order 14 is numerically tested for that projection. The assembled operator uses its own integration rules: in the port, volume advection uses a specified cube rule of order 6; the combined face rule is order 14, and the isolated advection equivalence probe uses order 12. Diffusion integrators choose rules through their library conventions. It would be inaccurate to claim that every integral in both frameworks uses the same order-14 rule.
+
+For constant diffusion, products of Q2 gradients are polynomial on affine hexes. The Lorenz drift is quadratic, so transport products have a known finite degree in each coordinate. Adequate Gaussian quadrature can integrate these polynomial forms exactly up to arithmetic error. The observed cross-framework action agreement verifies the adopted combination more directly than comparing a single nominal quadrature-order field.
+
+\section{Penalty scaling is geometry, not a free label}
+The incumbent penalty is based on $16k^2$ times a normal diffusivity over an averaged cell diameter. At $k=2$ this supplies a factor 64. MFEM's generic SIPG integrator conventions require a custom matched scaling to reproduce that geometric choice. On nonuniform cells, diameter and normal width are different. A numerical penalty constant copied from another framework need not preserve the actual physical face term.
+
+On a hanging interface, integration is over each fine face segment. The coarse polynomial is evaluated on that same physical segment. Contributions enter the two neighbouring DG residuals with opposite transport flux signs. DG does not require the independent coarse/fine cell polynomials to agree; it requires consistent conservative face integration. Hanging-node constraints for continuous elements describe a different algebraic situation.
+
+\chapter{Conservative export and statistical diagnostics}
+\section{Why a sample image is insufficient}
+A pointwise sample $p(x_V)$ can miss a narrow oscillation or bias the mass of a voxel. The common-grid field stores
+\begin{equation}
+ \bar p_V=|V|^{-1}\int_Vp_h(x)\,dx.
+\end{equation}
+For the adopted affine Q2 cells, tensor three-point Gauss integration is exact for each polynomial intersection integral. The domain and mesh are aligned so intersections have simple Cartesian geometry.
+
+The exporter handles two current relationships. A coarse cell can contain an integer number of common voxels along every axis; it integrates separately over each voxel. A finest depth-three cell can occupy one eighth of a common voxel, with half the voxel width in every axis; its cell average contributes one eighth to the voxel average. An independent coverage array requires exactly eight eighth-coverage units for every voxel. An uncovered or multiply covered voxel triggers an error.
+
+This implementation supports the tested aligned sizes; it does not implement arbitrary polyhedral intersections or all possible anisotropic refinements. The guard against misalignment is a valuable limitation. Silently approximating unsupported geometry would invalidate conservation and density comparisons.
+
+\section{File semantics}
+The native binary files contain only float64 values. Their dimensions, bounds, coordinate ordering, timestep and units come from companion metadata. On the baseline grid,
+\begin{equation}
+ h_V=(60/180,80/216,80/216),\quad
+ |V|=384000/(180\cdot216\cdot216).
+\end{equation}
+Index $((iN_y)+j)N_z+k$ uses $z$ as the fastest varying coordinate. A consumer must check the byte count before reshaping. Endianness and float representation should be made explicit when moving files between platforms; the local evidence uses the host-written double format.
+
+The second domain grid is $196\times232\times232$ and the first is $188\times224\times224$. Removing four outer voxels from each face of the second aligns its interior with the first. This is the alignment used in the independent recomputation. A zero-filled outer shell is a measured value at the stored resolution, not an analytic proof of compact support.
+
+\section{Moments from FE fields and voxel fields}
+Mass from voxel averages is exactly the exported integral up to arithmetic. Moments require more care. Replacing a coordinate by its voxel centre approximates $\int_Vxp_h\,dx$; it is not equal in general, even when $\bar p_V$ is exact. The DOLFINx diagnostics include native FE quadrature moments. The current MFEM mature/AMR comparison scripts compute voxel-centre moments from the conservative export, without a within-voxel variance addition. Those reported covariance numbers therefore describe that matched-grid observable, with an averaging error relative to native polynomial moments. Native FE moment export would strengthen a future audit, rather than being a capability falsely attributed to the saved MFEM summaries.
+
+For a covariance comparison, specify whether the normalization is by $\|\Sigma_{\rm ref}\|_F$, by an entrywise denominator or by another scale. Off-diagonal entries can be small, so an entrywise relative error becomes unstable near zero. Correlation coefficients
+\begin{equation}
+ R_{ij}=\Sigma_{ij}/\sqrt{\Sigma_{ii}\Sigma_{jj}}
+\end{equation}
+are meaningful only when both variances are positive. Accurate diagonal variances alone do not validate mixed diffusion; off-diagonal covariance and correlations must also be checked.
+
+\section{Low-dimensional statistics can miss density error}
+For any bounded observable $g$,
+\begin{equation}
+ |\E_pg-\E_qg|\le\|g\|_\infty\|p-q\|_1.
+\end{equation}
+The implication runs from full-density control to bounded-observable control. A finite list of moments cannot be inverted into a general density-distance bound. There exist distinct densities with identical first and second moments. For example, symmetric mixtures with different component shapes can be adjusted to share mean zero and variance one.
+
+Marginalization is also a contraction, so a large joint-density difference can coexist with small one-dimensional TVs. The mature experiments instantiate this issue numerically: excellent covariance and lobe probabilities appeared while adjacent full-density differences remained large.
+
+The reported joint-TV values use a fixed coarse/smoothed Monte Carlo representation. They address agreement with that reference observable. They do not measure the exact TV between the FE field and the continuous unknown solution. The common-grid deterministic $L^1$ comparison has its own voxel-averaging scope, discussed in the convergence chapter.
+
+\section{Final broader-support numerical statistics}
+The authoritative \code{broader_support_comparison.json} reports normalized covariance discrepancy $0.00124557$ and smoothed joint TV $0.00147144$. The one-dimensional marginal TVs are approximately
+\begin{equation}
+ (\mathrm{TV}_x,\mathrm{TV}_y,\mathrm{TV}_z)=(0.00370487,0.00337592,0.00266795).
+\end{equation}
+Negative/positive-$x$ lobe probabilities are approximately $0.500000355$ and $0.499999645$; maximum lobe discrepancy against the common MC sample is approximately $0.000421645$.
+
+The initial-projection $L^1$ change is not a dynamic statistic: the recorded total initialization correction is about $6.38820\times10^{-5}$. Dynamic mean and maximum relative corrections are $7.98372\times10^{-6}$ and $1.52993\times10^{-5}$. Maximum reported mass drift is $8.76410\times10^{-13}$. The accepted trajectory has zero recorded uncertified cells and zero successful-run failure/fallback flags. These quantities passed the configured broader-support gates, with \code{mature_density_convergence_certified=false} and \code{production_dataset_authorized=false} retained in the same report.
+
+\chapter{Software architecture and code-to-mathematics mapping}
+\section{The two implementation layers}
+The Python DOLFINx layer provides model configuration, FE forecasting, analysis, local projection, validation, experiment orchestration and an existing dataset interface. The MFEM C++ branch provides the matched Q2 operator, projection, static NC-hex evolution and conservative export. Python preparation/comparison wrappers construct marking inputs and audit outputs. The separation permits cross-framework tests without claiming that every DOLFINx feature has been ported.
+
+\begin{longtable}{p{.44\textwidth}p{.48\textwidth}}
+\caption{Source map at the audited solver revision. Paths are repository-relative and indexed with hashes in the companion ledger.}\\
+\toprule File or module & Mathematical/software responsibility\\\midrule\endhead
+\code{lorenz_fpe/core.py} & Lorenz/noise model, DOLFINx DG assembly, forecast and Bayesian analysis, native export.\\
+\code{lorenz_fpe/local_projection.py} & Average repair, Q2 mass-metric constraints, OSQP/SLSQP validation and correction diagnostics.\\
+\code{lorenz_fpe/afc.py} & Controlled average-level AFC and coefficient-level diagnostic constructions.\\
+\code{lorenz_fpe/finite_volume.py} & Independent diagonal-diffusion upwind finite-volume reference and SSPRK stepping.\\
+\code{lorenz_fpe/validation.py} & Monte Carlo/reference quantities, mathematical and numerical diagnostics.\\
+\code{lorenz_fpe/dataset.py} & Existing serial dataset writing and split/schema operations; this presence does not imply mature AMR data were generated.\\
+\code{mfem/mfem_physical_equivalence.cpp} & Matched basis/operator/CN/QP implementation, static NC meshes, aligned exporter and trajectory summaries.\\
+\code{mfem/dolfinx_physical_equivalence.py} & Reference physical-state and operator-action export.\\
+\code{mfem/compare_physical_equivalence.py} & Mapping/action/raw-step/corrected-step gate evaluation.\\
+\code{mfem/compare_mature_equivalence.py} & Full uniform cross-framework trajectory comparison.\\
+\code{mfem/prepare_static_amr.py} & Indicator-to-static-base-mark construction and mixture serialization.\\
+\code{mfem/prepare_support_test.py} & Density-discrepancy support expansion.\\
+\code{mfem/prepare_support_depth.py} & Bounded additional depth on frozen support.\\
+\code{mfem/run_broader_support.py} & Broader-support pipeline, provenance and comparison orchestration.\\
+\code{mfem/run_domain_sensitivity.py} & Aligned padded domains with fixed interior physical resolution.\\
+\code{mfem/memory_backpressure.py} & Process-group pause/resume under available-memory thresholds.\\
+\code{scripts/check} & Static checks, compilation, tests and whitespace checks.\\
+\code{scripts/verify-math} & Executable invariants and mathematical evidence consistency.\\
+\code{scripts/build_solver_monograph_evidence.py} & This book's hashed evidence index, direct array checks and actual-data figures.\\\bottomrule
+\end{longtable}
+
+\section{Provenance accompanies the numerical payload}
+An immutable run should retain config, source revision, dirty state, command, seeds, environment, status, comparison diagnostics and input hashes. The run wrappers record many of these pieces. Completeness varies among older runs; a missing field must be labelled missing rather than reconstructed as though it were measured.
+
+The compact tracked root reports are convenient summaries. Immutable run decisions are the primary source for a particular experiment. Inherited comparison files must be interpreted according to their named question. A \code{status.json} can describe process state; a \code{scientific_decision.json} or named comparison classifies the scientific gates. Keeping both prevents process completion from becoming accidental method certification.
+
+\section{The verifier's scope}
+The verifier checks algebraic invariants, diffusion assumptions, limiter consistency and agreement between compact claims and evidence. It is an executable audit of declared contracts. Passing it does not make an open research gate disappear. In particular a field such as \code{method_certified: false} can coexist with \code{VERIFY-MATH: PASS}: the latter means that the records consistently disclose the former.
+
+Regression tests protect bugs already discovered. They cannot exhaust every posterior, tensor, nonconforming topology or machine-memory condition. A production dataset needs sample-level diagnostics and explicit rejection rules in addition to repository tests.
+
+\chapter{Runtime, memory and recoverable local execution}
+\section{Cost must be measured at the right boundary}
+Let $T_{\rm total}$ contain preparation, assembly, initialization, propagation, export and comparison. A timer started at the first timestep measures only a subset. The MFEM trajectory's recorded propagation wall clock includes time spent stopped by the memory-pressure guard. Peak per-rank RSS also differs from aggregate machine use: ranks can share mapped pages, while Python wrappers and the desktop consume additional memory.
+
+\begin{table}[htbp]\centering\caption{Rounded mature-trajectory cost evidence. Timers and RSS coverage differ; entries are descriptive rather than standardized benchmarks.}\label{tab:cost}
+\begin{tabular}{lrrr}\toprule Trajectory & Q2 DOFs & Propagation & Peak GiB/rank\\\midrule
+Uniform $60^*$ & 8,398,080 & 69.4 min & 6.05\\
+First graded & 2,841,696 & 32.6 min & 2.32\\
+Fine graded & 5,963,328 & 76.4 min & about 4.45\\
+AMR1 & 3,791,286 & 2.72 h & unrecorded\\
+AMR2 & 4,420,656 & about 2.58 h & 6.33\\
+AMR3 & variable refined topology & 5.23 h & 7.16\\
+Broader support & 5,637,249 & 2.93 h & 6.98\\
+Half timestep & 5,637,249 & 4.47 h & 6.80\\
+Second domain & 6,544,881 & 6.61 h incl. pauses & 6.36\\\bottomrule\end{tabular}\end{table}
+
+The fine-graded memory estimate here is rounded from its reported reduction relative to uniform 60; it is not an independently sampled peak. The later AMR values come from saved wrapper/resource records. Fewer DOFs can still mean more expensive faces, poorer conditioning, more QPs or a less favourable parallel partition. Static adaptation should be evaluated on accuracy per minute and memory as well as cell count.
+
+\section{Pause/resume preserves a live process}
+The guard reads Linux \code{MemAvailable}, a kernel estimate of memory available for starting applications without swapping \cite{linuxproc}. It sends a stop signal to the child process group when free headroom crosses the floor, then resumes that group when headroom exceeds a higher threshold. The completed run used a 2 GiB pause / 4 GiB resume hysteresis. The source defaults later moved to 2/2 GiB; already-running wrappers retain values loaded when launched.
+
+Stopping a process retains its address space. This mechanism is neither checkpoint/restart nor disk-backed out-of-core computation. If the paused solver itself holds most of the memory, external recovery may be needed before it can resume. A polling guard can miss a rapid allocation spike and cannot guarantee prevention of the kernel OOM killer. Zero in a recorded minimum-available-memory field is not sufficient evidence of a physically accurate minimum; the audit treats that monitor datum cautiously.
+
+Low CPU with high resident memory can be consistent with a paused process. Progress checks should examine fresh step logs, pause state and service status rather than process existence alone. A saved final array and completed comparison are much stronger evidence of completion than an idle process.
+
+\section{Persistent jobs and estimates}
+The project uses persistent local job services to survive an interactive chat closing. An ETA extrapolates completed steps only after representative progress exists:
+\begin{equation}
+ \widehat T_{\rm remaining}=(N-n)\frac{T_n-T_{n_0}}{n-n_0}+T_{\rm export/comparison}.
+\end{equation}
+QP activity and pauses can make this inaccurate. A useful estimate reports a range and identifies whether paused time is included. This monograph records completed measured durations; it launches no new PDE trajectory.
+
+\chapter{Reproducing the evidence and planning a bounded pilot}
+\section{A source repository is only one part of reproduction}
+The public Git repository contains code and compact evidence reports. Large ignored arrays, archived particles, mature-mixture parameters, replay indicators and local compiled libraries are separate inputs. The AMR wrappers currently refer to local absolute environment prefixes and timestamped run paths. Cloning the repository alone cannot recreate every archived experiment until these external inputs are supplied or regenerated with their recorded seeds and settings.
+
+The following sequence describes a controlled reproduction rather than an assurance of one-command portability:
+\begin{enumerate}
+\item Check the source revision and local working tree; preserve any unrelated edits.
+\item Read \code{environment.yml} and the lock file; create the declared DOLFINx/PETSc/OSQP environment and an MFEM/Hypre MPI build compatible with the C++ branch.
+\item Run \code{./scripts/check} and \code{./scripts/verify-math}; retain their full outputs.
+\item Locate or regenerate the mature mixture, MC particles, replay indicator and comparator arrays. Verify dimensions, seeds and hashes against the run records.
+\item Run physical-basis equivalence before interpreting a changed compiler/framework build as the same method.
+\item Prepare a new timestamped mesh design and immutable run directory; retain original data unchanged.
+\item Launch the selected wrapper persistently with explicit ranks and memory thresholds. Record the actual command and package/build versions.
+\item Check accepted-state diagnostics and the named scientific comparison. Do not substitute wrapper return code for scientific classification.
+\end{enumerate}
+
+The earlier shell wrappers compile using the local MFEM MPI compiler, include/link paths for MFEM, Hypre and OSQP, and an rpath for those local libraries. These are machine-specific build contracts. A portable release should replace absolute prefixes by configured dependencies, archive reference inputs with checksums and specify binary format metadata.
+
+\section{Dependency versions and MPI separation}
+The pinned Python project environment and the MFEM environment are distinct. The Python declaration records Python 3.12.13, DOLFINx/Basix 0.11.0, UFL 2026.1.0, PETSc/petsc4py 3.25.4, NumPy 2.5.2, SciPy 1.18.0, OSQP 1.1.3 and Open MPI 5.0.10. The local MFEM environment inspected during this audit contains MFEM 4.8, Hypre 2.32.0, Open MPI 5.0.7 and GCC/G++ 15.3.0. The archived broader/domain environment output independently confirms its MPI launcher version 5.0.7. A current package inventory cannot retroactively establish every older build's complete dependency set.
+
+Do not substitute the Python environment's MPI launcher for the MFEM environment's launcher without verifying binary compatibility. The wrappers explicitly select their launcher and linked libraries. They set \code{OMP_NUM_THREADS=1} and \code{OPENBLAS_NUM_THREADS=1} to avoid uncontrolled thread multiplication inside eight MPI ranks. These settings describe the tested execution design rather than an established optimal rank count.
+
+\section{Important experiment entry points}
+The following commands create new runs and may consume substantial local resources. They are documented for reproduction and were not executed during preparation of this book. Each requires the referenced inputs and environment. Historical configurations retain their predeclared gates.
+\begin{lstlisting}
+# DOLFINx startup temporal, spatial and mixed-diffusion studies
+./scripts/run-experiment experiments/local-q2-cn-tight-ksp-refinement.yaml
+./scripts/run-experiment experiments/local-q2-cn-spatial-refinement.yaml
+./scripts/run-experiment experiments/local-q2-cn-full-spd-spatial-refinement.yaml
+# Cross-framework gates before interpreting a changed MFEM build
+bash mfem/run_physical_equivalence_gate.sh
+bash mfem/run_mature_uniform_equivalence.sh
+# Static AMR preparation/evolution uses archived replay and mixture inputs
+bash mfem/run_static_amr_reproduction.sh
+./scripts/run-in-env python mfem/run_broader_support.py
+./scripts/run-in-env python mfem/run_broader_support.py --half-timestep
+./scripts/run-in-env python mfem/run_domain_sensitivity.py --help
+\end{lstlisting}
+The broader-support wrapper expects an already compiled selected executable; the static-AMR wrapper contains its build command. Domain restart options validate and reuse a completed first expansion instead of repeating it. A new reproduction should retain the exact selected executable hash, not merely the C++ source name.
+
+\section{Reproducing this book}
+The editable source is \code{docs/solver_monograph/book.tex} with included chapter files. The evidence generator writes the JSON ledger, appendices and figure PDFs under \code{output/pdf/solver_monograph}. The PDF is built from the source directory with a standard LaTeX installation:
+\begin{lstlisting}
+./scripts/run-in-env python scripts/build_solver_monograph_evidence.py
+cd docs/solver_monograph
+pdflatex -interaction=nonstopmode -halt-on-error \
+  -jobname=lorenz_solver_monograph -output-directory=../../output/pdf book.tex
+pdflatex -interaction=nonstopmode -halt-on-error \
+  -jobname=lorenz_solver_monograph -output-directory=../../output/pdf book.tex
+\end{lstlisting}
+The generated source ledger describes the state at generation. Rebuilding after a code change creates a new evidence snapshot and must not be misrepresented as identical provenance. The accompanying manifest records the delivered PDF hash and validation.
+
+\section{What a pilot candidate could contain}
+The discussed pilot is a small research dataset, with tens to low hundreds of trajectories, not a completed archive. An illustrative planning size was 48 trajectories with conservative coarsening to a $60\times72\times72$ learning grid and a three-dimensional Fourier-neural-operator candidate. No trained neural operator, achieved generalization result or successful pilot is evidenced by that proposal.
+
+For each sample, the input contract should include initial density, diffusion tensor or noise factor with its convention, forecast horizon, domain/grid metadata and any observation-conditioning information. The target is the conservatively exported forecast density. Conditioned posteriors should be separate from unconditioned laws in both labels and held-out partitions. A split by trajectory family, initial law and diffusion matrix avoids near-duplicate train/test leakage.
+
+A sample should be rejected for failed accepted-state positivity, mass, linear residual, optimizer, export coverage or boundary diagnostics. Record both intervention norms and affected probability. Testing whether these predict downstream neural-operator error is scientifically useful, but correlation would not establish that the limiter causes that error; under-resolution can cause both quantities.
+
+\section{Remaining mathematical and scientific uncertainty}
+The recorded evidence supports the selected mature configuration strongly at low-dimensional statistics, positivity, conservation, bounded support/depth/timestep sensitivity and two domain expansions. It does not prove the full-density continuum error is below a specified tolerance. The gate sequence includes failed contraction tests, and voxel averaging can hide subvoxel differences.
+
+The untested extensions include other mature posteriors, longer horizons, highly anisotropic or ill-conditioned SPD tensors, rank-deficient noise, moving mesh adaptation and robust production-scale storage/restart. A pilot may investigate these limits with controlled rejection. Large-scale authorization requires a separate explicit project decision based on pilot quality and held-out numerical evidence.
+
+The method's mathematical strength is an understandable conservative structure plus a local admissibility optimisation whose hypotheses can be checked. Its scientific strength is a history of falsifiable diagnostics. The limitations remain visible so that future changes can improve the solver without inheriting unsupported claims.

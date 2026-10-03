@@ -1,0 +1,101 @@
+\documentclass[11pt,oneside]{book}
+\usepackage[a4paper,margin=27mm,headheight=15pt]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,microtype}
+\usepackage{amsmath,amssymb,amsthm,mathtools,bm}
+\usepackage{graphicx,booktabs,longtable,array,tabularx}
+\usepackage{enumitem,fancyhdr,xcolor,listings}
+\usepackage{xurl}
+\usepackage[unicode,colorlinks=true,linkcolor=blue!45!black,citecolor=blue!45!black,urlcolor=blue!45!black]{hyperref}
+\usepackage{tikz}
+\hypersetup{pdftitle={Conserving Probability in a Chaotic State Space},pdfsubject={Lorenz-63 Fokker-Planck solver: mathematical foundations and evidence-based development},pdfauthor={Prepared for Adam James Sheppard},pdfkeywords={Lorenz, Fokker-Planck, DG, SIPG, Crank-Nicolson, positivity, QP, MFEM, AMR}}
+\usetikzlibrary{arrows.meta,positioning}
+\graphicspath{{../../output/pdf/solver_monograph/}}
+\setlength{\parskip}{5pt}
+\setlength{\parindent}{1em}
+\setlength{\emergencystretch}{3em}
+\setlist{itemsep=3pt,topsep=4pt}
+\pagestyle{fancy}\fancyhf{}\fancyhead[L]{\small Lorenz probability-density solver}\fancyhead[R]{\small Mathematical and computational record}\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{.3pt}
+\newtheorem{theorem}{Theorem}[chapter]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}\newtheorem{definition}[theorem]{Definition}\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}\newtheorem{remark}[theorem]{Remark}
+\newcommand{\R}{\mathbb R}\newcommand{\E}{\mathbb E}\newcommand{\Prob}{\mathbb P}
+\newcommand{\dd}{\,\mathrm d}\newcommand{\grad}{\nabla}\newcommand{\divg}{\nabla\!\cdot}
+\newcommand{\jump}[1]{[\![#1]\!]}\newcommand{\avg}[1]{\{#1\}}
+\newcommand{\code}[1]{\nolinkurl{#1}}
+\newcommand{\evidence}[1]{\par\smallskip\noindent\textbf{Project evidence.} #1\par}
+\newcommand{\scope}[1]{\par\smallskip\noindent\textbf{Scope of the claim.} #1\par}
+\lstset{basicstyle=\ttfamily\small,breaklines=true,columns=fullflexible,frame=single,framerule=.2pt,showstringspaces=false}
+\begin{document}
+\frontmatter
+\begin{titlepage}
+\hypersetup{pageanchor=false}
+\centering\vspace*{25mm}
+{\Huge\bfseries Conserving Probability\\[5mm] in a Chaotic State Space\par}
+\vspace{12mm}{\Large A mathematical and computational monograph\\on the Lorenz--63 Fokker--Planck solver\par}
+\vspace{18mm}{\large Foundations, discretisation, positivity, adaptive resolution,\\verification and the complete recorded development history\par}
+\vfill
+{\large Adam James Sheppard's research project\par}
+\vspace{6mm}{\large Evidence snapshot: 3 October 2026\par}
+\vspace{6mm}{\normalsize Solver revision \code{1781b40ad156f01702aeeb16eaf7e0240ede7378}\par}
+\vspace{6mm}{\small Source repository: \url{https://github.com/AdamJamesSheppard/lorenz-training-set}\par}
+\vspace{12mm}{\small Prepared from repository source, immutable local experiments, numerical arrays,\\version history and verified primary literature. No solver equations were changed.\par}
+\end{titlepage}
+\hypersetup{pageanchor=true}
+\chapter*{Abstract}\addcontentsline{toc}{chapter}{Abstract}
+This monograph develops the mathematics and implementation of a conservative three-dimensional probability-density solver for stochastic Lorenz--63 dynamics. It starts with probability measures and stochastic state evolution, derives the Kolmogorov forward equation, and follows its flux structure into discontinuous Galerkin discretisation. Conservative upwind transport and full-tensor symmetric interior-penalty diffusion lead to a nonsymmetric semidiscrete system. Crank--Nicolson provides an accurate high-order target, while a global nonnegative-average repair and a cell-local mass-matrix quadratic programme restore an admissible probability density.
+
+The development record supplies the causal structure of the book. A confounded equal-DOF comparison was replaced by same-mesh tests. A roundoff repair violated a limiter invariant and was corrected. Global scaling degraded an accurate Q2 trajectory; local QP correction performed better. Startup temporal and full-SPD spatial gates passed, but mature bimodal densities exposed genuine within-cell negativity and under-resolution. Certificate-depth, average-level AFC and Bernstein-DOF diagnostics narrowed the mechanism. Uniform and graded refinements showed that resolution controls the intervention. A basis-transformed MFEM port reproduced DOLFINx before static nonconforming hexahedral refinement was enabled. Subsequent support, depth, timestep and domain comparisons established bounded sensitivity for one mature posterior and a short forecast.
+
+The final tested implementation is a static NC-hex Q2--CN/full-SPD/local-QP solver. Both aligned domain expansions pass; the second-domain common-interior voxel difference independently recomputes to $1.9549638427469373\times10^{-12}$. This is evidence of boundary insensitivity for the tested law and horizon, not a continuum error bound. The book distinguishes exact-arithmetic algebra, sufficient polynomial certificates, floating-point acceptance criteria, reference uncertainty and empirical convergence. It includes a complete specification, pseudocode, code-to-mathematics mapping, reproducibility instructions, a failed-method catalogue and a hashed source ledger. Large-scale dataset certification remains withheld; the recent discussion supports a bounded provisional neural-operator pilot without converting that judgement into a convergence theorem.
+
+\chapter*{How to read this book}\addcontentsline{toc}{chapter}{How to read this book}
+The reader is assumed to know calculus, linear algebra and elementary probability. Specialist concepts are developed when the solver first needs them. A result labelled \emph{Theorem} or \emph{Proposition} is proved here under stated assumptions. A numerical result is identified as project evidence. A heuristic diagnosis is kept separate from the quantity actually measured.
+
+The record begins with the initial Git baseline on 9 September 2026. Files present in that baseline may predate it; their existence alone cannot establish an earlier sequence of experiments. The available conversation supplies context and recent user decisions, but repository files and immutable numerical records take precedence for numerical values. The book does not invent a pre-Git development log. No confirmed Chang--Cooper production branch appears in the current source tree: that family is explained as a literature comparator, while the implemented finite-volume reference uses upwind drift, diagonal diffusion and SSPRK time stepping.
+
+Each part returns to the same question: what does this particular piece of mathematics require from the algorithm? The answer becomes a code contract, then an experimental test. A passing test only establishes what the test actually measures. Conversely, a failed aggregate gate may contain valuable successful components. This distinction is essential for interpreting the mature-state and mesh-grading episodes.
+
+The evidence ledger indexes 883 compact source/experiment records and 86 distinct local run directories at the audited snapshot, with 69 recorded commits. Those counts refer to the evidence snapshot before monograph creation. Large arrays were selectively audited; the inventory is comprehensive for tracked paths and available compact records, not an assertion that every byte of every binary archive was interpreted. The figures drawn from saved density arrays are conservative voxel marginals, not invented attractor densities. Conceptual diagrams are explicitly labelled as such.
+
+\tableofcontents\listoffigures\listoftables
+\chapter*{Notation and evidence conventions}\addcontentsline{toc}{chapter}{Notation and evidence conventions}
+\begin{longtable}{p{.20\textwidth}p{.73\textwidth}}
+\toprule Symbol & Meaning\\\midrule\endhead
+$X_t\in\R^3$ & Random Lorenz state at time $t$.\\
+$x=(x_1,x_2,x_3)$ & A deterministic point in state space; also written $(x,y,z)$ where convenient.\\
+$p(x,t)$ & Density with respect to Lebesgue volume, not probability per voxel.\\
+$f(x)$ & Lorenz drift; $\sigma=10$, $\rho=28$, $\beta=8/3$.\\
+$B,D$ & Noise factor and diffusion tensor, $D=BB^T/2$.\\
+$\Omega$ & Finite state-space box; default $[-30,30]\times[-40,40]\times[-10,70]$.\\
+$J$ & Total probability flux $fp-D\grad p$.\\
+$K,F,n$ & A mesh cell, interior face and an outward unit normal.\\
+$Q_k$ & Tensor polynomials of degree at most $k$ in each coordinate.\\
+$V_h$ & Broken DG finite-element space.\\
+$M,S,K_h$ & Mass matrix, positive-sign spatial form matrix, and evolution matrix $K_h=-S$.\\
+$c,u$ & Local polynomial and global coefficient vectors.\\
+$H,a,C$ & Reference local mass metric, average functional and Bernstein constraint matrix.\\
+$w_K,x_K$ & Raw and repaired cell averages.\\
+$\Delta t,\tau$ & Numerical timestep and forecast horizon.\\
+$P_Vp$ & Piecewise-constant field of conservative voxel averages.\\
+$\mathrm{TV}(p,q)$ & $\frac12\|p-q\|_{L^1}$ for normalized densities on the same space.\\
+$C_n$ & Stepwise relative raw-to-corrected $L^1$ change.\\
+\bottomrule\end{longtable}
+\noindent\textbf{Evidence labels.} \emph{Established} identifies a derivation or an imported theorem with hypotheses. \emph{Formal} identifies a discretisation property in exact arithmetic. \emph{Numerical} identifies measurements at declared tolerances. \emph{Heuristic} identifies an explanation supported but not implied by the data. \emph{Open} identifies a missing proof, reference, test or scope extension. Repository assumption identifiers are discussed in Appendix~\ref{app:assumptions}; they are not a substitute for locally stating the relevant hypothesis.
+\mainmatter
+\input{foundations}
+\input{discretisation}
+\input{development}
+\input{implementation}
+\appendix
+\input{technical_appendices}
+\input{history_appendix}
+\input{ledger_appendix}
+\backmatter
+\input{bibliography}
+\end{document}
