@@ -1,5 +1,24 @@
 # Decision log
 
+## 2026-10-03 - Release redundant assembly storage before domain restart
+
+The domain run `runs/mfem-domain-sensitivity/20261003T105837Z` stopped
+when available RAM fell below the 2 GiB safety floor. It exported only the
+initial density; no domain gate was evaluated. Preserve that failed run.
+Code inspection identifies retained replicated serial mesh and local sparse
+mass/spatial matrices after independent parallel operators were assembled.
+Release those redundant objects, preserving the operators and mathematical
+scheme. Build separate `_lowmem` binaries; retain original executables.
+Keep all domain gates, mesh marks, eight ranks and memory safety floor
+unchanged. Log available memory in the immutable restarted run. Numerical
+equivalence is checked on small exported physical fields before restart.
+The before/after regression in ignored
+`runs/mfem-domain-memory-regression/20261003-{before,after}` compares 32
+physical-field exports with zero measured coefficient difference; 10 solver
+invariants and the evidence-consistency verifier pass. After CN construction,
+the mature path also releases the unused spatial operator; CN matrices remain
+unchanged. Actual production memory improvement remains to be measured.
+
 ## 2026-10-03 - Test two aligned domain expansions
 
 Mature half-timestep sensitivity passes at voxel L1=1.97036e-5, identical

@@ -1400,6 +1400,9 @@ int main(int argc, char *argv[])
       ? RefineMarkedChildren(serial, nx, ny, nz, 2, third_mark_path) : 0;
    ParMesh mesh(MPI_COMM_WORLD, serial);
    int local_cells = mesh.GetNE(), global_cells = 0;
+   // ParMesh owns its partitioned mesh; the replicated construction mesh
+   // is no longer needed during assembly or propagation.
+   serial.Clear();
    MPI_Allreduce(&local_cells, &global_cells, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
    if (adaptive_mode && rank == 0)
    {
@@ -1428,6 +1431,8 @@ int main(int argc, char *argv[])
    mass.Assemble();
    mass.Finalize();
    HypreParMatrix *M = mass.ParallelAssemble();
+   // ParallelAssemble returns an independent true-DOF operator.
+   delete mass.LoseMat();
 
    constexpr double sigma = -1.0;
    constexpr double penalty_times_degree_squared = 64.0;
@@ -1445,6 +1450,7 @@ int main(int argc, char *argv[])
    spatial.Assemble();
    spatial.Finalize();
    HypreParMatrix *A = spatial.ParallelAssemble();
+   delete spatial.LoseMat();
 
    const bool extended_diagnostics = nx * ny * nz <= 1000;
    HypreParMatrix *A_advection = nullptr;
@@ -1493,6 +1499,12 @@ int main(int argc, char *argv[])
 
    HypreParMatrix *cn_left = Add(1.0, *M, -0.5 * dt, *A);
    HypreParMatrix *cn_right = Add(1.0, *M, 0.5 * dt, *A);
+   if (mature_mode || adaptive_mode)
+   {
+      // Propagation uses only the independent CN matrices and mass operator.
+      delete A;
+      A = nullptr;
+   }
    HypreDiagScale mass_preconditioner(*M);
    HyprePCG mass_solver(*M);
    ConfigureMassSolver(*M, mass_solver, mass_preconditioner);

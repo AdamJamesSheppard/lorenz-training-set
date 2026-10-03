@@ -33,6 +33,10 @@ NEXT_REQUIRED_GATE = LOCALLY_REFINED_MATURE_DENSITY_CONVERGENCE
 - Method-selection classification: `MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED`.
 - Next required gate: `LOCALLY_REFINED_MATURE_DENSITY_CONVERGENCE`.
 - Large neural-operator dataset generation: `NO`.
+- Domain test `20261003T105837Z` stopped at the RAM safeguard before a
+  completed forecast. Restart releases redundant mesh/assembly storage and
+  the spatial matrix after independent CN matrices are built. Scientific
+  gates and the 2 GiB floor are unchanged; domain certification remains open.
 - Mature temporal sensitivity passes: `L1=1.97036e-5`, identical initial
   voxel fields, zero positivity/optimizer failures. Retain original dt on
   the broader working mesh. Evidence:

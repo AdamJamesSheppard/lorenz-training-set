@@ -58,15 +58,18 @@ try:
         for name,shape,factor in [('base_cell_marks.bin',(45,54,54),1),('child_cell_marks.bin',(90,108,108),2)]:
             marks=np.fromfile(baseline/'design'/name,dtype=np.uint8).reshape(shape)
             np.pad(marks,pad*factor).tofile(run/'design'/name)
-        binary=repo/f'build/mfem-physical-equivalence/mfem_domain_padding{pad}'
+        binary=repo/f'build/mfem-physical-equivalence/mfem_domain_padding{pad}_lowmem'
         command=[str(envroot/'bin/mpiexec'),'-n','8',str(binary),'amr2',str(45+2*pad),str(54+2*pad),str(54+2*pad),str(run/'design/base_cell_marks.bin'),str(run/'design/child_cell_marks.bin'),str(first/'design/mixture_parameters.bin'),str(run/'mfem')]
         inputs=[binary,repo/'mfem/mfem_physical_equivalence.cpp',Path(__file__),first/'design/mixture_parameters.bin',baseline/'design/base_cell_marks.bin',baseline/'design/child_cell_marks.bin',run/'design/base_cell_marks.bin',run/'design/child_cell_marks.bin',previous/'mfem/final_q2_subcell_averages.bin',previous/'mfem/initial_q2_subcell_averages.bin']
         (run/'input_sha256.json').write_text(json.dumps({str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in inputs},indent=2))
         (run/'command.json').write_text(json.dumps(command,indent=2))
         status('RUNNING_DOMAIN_SENSITIVITY', padding=pad,steps=320)
         process=subprocess.Popen(command,env=environment,start_new_session=True)
+        minimum_available=None
         while process.poll() is None:
             available=int(next(line.split()[1] for line in Path('/proc/meminfo').read_text().splitlines() if line.startswith('MemAvailable:')))
+            minimum_available=available if minimum_available is None else min(minimum_available,available)
+            (run/'memory_guard.json').write_text(json.dumps(dict(available_kib=available,minimum_available_kib=minimum_available,threshold_kib=2*1024*1024),indent=2))
             if available < 2*1024*1024:
                 os.killpg(process.pid,signal.SIGTERM)
                 process.wait()

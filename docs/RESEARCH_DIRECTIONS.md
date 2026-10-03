@@ -2,6 +2,10 @@
 
 Updated: 2026-10-03
 
+The first domain launch was resource-limited, with only an initial export.
+Restart uses reduced retained assembly storage, without changing the scheme
+or acceptance criteria; memory headroom must be observed during propagation.
+
 Half-timestep sensitivity passed for the tested mature law. Active experiment:
 two aligned domain expansions preserving interior resolution and marks.
 Longer horizons, operational posteriors and full-density spatial certification
