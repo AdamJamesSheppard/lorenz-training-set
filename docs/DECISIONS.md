@@ -1,5 +1,12 @@
 # Decision log
 
+## 2026-10-03 - User-selected 2 GiB resume threshold
+
+Set automatic resume to at least 2 GiB available RAM; pause remains below
+2 GiB. Equal thresholds can cause repeated pause/resume near the boundary.
+This changes resource scheduling only. Already-running Python supervisors
+retain loaded thresholds; do not claim a file edit updates their live state.
+
 ## 2026-10-03 - Include separately grouped MPI workers in RAM backpressure
 
 Launch inspection found MPI workers each create separate process groups.

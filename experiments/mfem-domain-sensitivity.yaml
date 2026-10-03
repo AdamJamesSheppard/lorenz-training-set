@@ -22,7 +22,7 @@ maximum_mean_correction: 0.0008
 optimizer_failures_and_fallbacks: zero
 minimum_available_RAM_GiB: 2
 low_memory_action: pause_MPI_process_group_without_termination
-resume_available_RAM_GiB: 4
+resume_available_RAM_GiB: 2
 paused_timeout: none_wait_for_external_memory_recovery
 scope: two_modest_aligned_expansions_for_one_mature_law_and_short_horizon
 production_dataset_authorized: false

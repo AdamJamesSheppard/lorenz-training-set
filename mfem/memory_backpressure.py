@@ -32,15 +32,16 @@ def signal_process_tree(pid, sig):
 
 def wait_with_backpressure(process, update, read_memory=available_kib,
                            send_signal=signal_process_tree, sleep=time.sleep,
-                           pause_kib=2*1024*1024, resume_kib=4*1024*1024):
+                           pause_kib=2*1024*1024, resume_kib=2*1024*1024):
     """Keep allocations alive; wait indefinitely for external RAM recovery.
 
-    Requires Popen(start_new_session=True). Hysteresis prevents rapid cycling.
+    Requires Popen(start_new_session=True). Equal thresholds permit cycling
+    when available RAM fluctuates near the threshold.
     This is scheduling backpressure, not out-of-core matrix storage. It does
     not protect against the kernel OOM killer or allocations between polls.
     """
-    if resume_kib <= pause_kib:
-        raise ValueError('Resume threshold must exceed pause threshold')
+    if resume_kib < pause_kib:
+        raise ValueError('Resume threshold must not be below pause threshold')
     paused = False
     minimum = None
     while process.poll() is None:
