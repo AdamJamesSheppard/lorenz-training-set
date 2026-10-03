@@ -1,5 +1,25 @@
 # Decision log
 
+## 2026-10-03 - Test two aligned domain expansions
+
+Mature half-timestep sensitivity passes at voxel L1=1.97036e-5, identical
+initial voxel fields, zero optimizer/positivity failures and mass error
+2.76e-13. Evidence: `runs/mfem-mature-half-timestep/20261002T171744Z`.
+Retain dt=0.00015625 for the tested law and horizon; no temporal-order claim.
+
+Expand each boundary by one, then two original base cells. Pad baseline mesh
+marks rather than stretching the mesh; all interior cell widths and marks
+are preserved. Pad export counts by eight voxels per axis per level to keep
+voxel widths fixed. New exterior shells remain unrefined. Use separate
+domain binaries, preserving historical executables. Compare each expansion
+to its predecessor. Predeclare density L1<=0.0025, covariance and marginal
+changes<=0.005, means<=0.005, principal-direction angles<=1 degree, outer
+base-cell-layer mass<=1e-6, initial interior difference<=1e-6 and inherited
+positivity/mass/QP gates. Two modest expansions for t=0.05 do not certify
+all posterior families or longer horizons. Stop the local solver if available
+RAM drops below 2 GiB. Entry point: `mfem/run_domain_sensitivity.py`; ignored
+evidence under `runs/mfem-domain-sensitivity/<timestamp>/`.
+
 ## 2026-10-02 - Freeze broader mesh for mature half-timestep sensitivity
 
 Broader support passes all declared gates: final voxel L1 change 0.00177608,

@@ -1,0 +1,25 @@
+id: mfem-domain-sensitivity
+status: predeclared
+baseline: runs/mfem-broader-support/20261002T080644Z
+padding_base_cells_per_side: [1, 2]
+base_cell_widths: [1.3333333333333333, 1.4814814814814814, 1.4814814814814814]
+interior_marks: exact_padded_baseline_marks
+outer_shell: unrefined_background_cells
+method: frozen_Q2_CN_full_SPD_local_QP_reflecting_total_flux
+timestep: 0.00015625
+steps: 320
+maximum_interior_density_l1_change: 0.0025
+maximum_relative_covariance_change: 0.005
+maximum_marginal_tv_change: 0.005
+maximum_absolute_mean_change: 0.005
+maximum_principal_direction_angle_degrees: 1.0
+maximum_boundary_layer_probability: 1.0e-6
+boundary_layer_width: one_original_base_cell
+maximum_initial_interior_l1_change: 1.0e-6
+maximum_mass_and_export_error: 1.0e-10
+maximum_negative_mass: 1.0e-13
+maximum_mean_correction: 0.0008
+optimizer_failures_and_fallbacks: zero
+minimum_available_RAM_GiB: 2
+scope: two_modest_aligned_expansions_for_one_mature_law_and_short_horizon
+production_dataset_authorized: false

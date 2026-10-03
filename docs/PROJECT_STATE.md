@@ -1,6 +1,6 @@
 # Project state
 
-Updated: 2026-10-02
+Updated: 2026-10-03
 
 ## Objective
 
@@ -33,6 +33,12 @@ NEXT_REQUIRED_GATE = LOCALLY_REFINED_MATURE_DENSITY_CONVERGENCE
 - Method-selection classification: `MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED`.
 - Next required gate: `LOCALLY_REFINED_MATURE_DENSITY_CONVERGENCE`.
 - Large neural-operator dataset generation: `NO`.
+- Mature temporal sensitivity passes: `L1=1.97036e-5`, identical initial
+  voxel fields, zero positivity/optimizer failures. Retain original dt on
+  the broader working mesh. Evidence:
+  `runs/mfem-mature-half-timestep/20261002T171744Z`. Next: two aligned
+  domain expansions with unchanged physical interior resolution, via
+  `mfem/run_domain_sensitivity.py`. Production authorization remains false.
 - Broader support completed all gates: final change `0.00177608`, correction
   `7.98372e-6`, runtime 2.93 hours. Evidence:
   `runs/mfem-broader-support/20261002T080644Z`. Working comparator is now

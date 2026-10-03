@@ -19,9 +19,17 @@ using namespace mfem;
 
 namespace
 {
-constexpr double x_min = -30.0, x_max = 30.0;
-constexpr double y_min = -40.0, y_max = 40.0;
-constexpr double z_min = -10.0, z_max = 70.0;
+#ifndef LORENZ_DOMAIN_PADDING
+#define LORENZ_DOMAIN_PADDING 0
+#endif
+constexpr int domain_padding = LORENZ_DOMAIN_PADDING;
+static_assert(domain_padding >= 0, "negative domain padding");
+constexpr double x_min = -30.0 - domain_padding * (60.0 / 45.0);
+constexpr double x_max = 30.0 + domain_padding * (60.0 / 45.0);
+constexpr double y_min = -40.0 - domain_padding * (80.0 / 54.0);
+constexpr double y_max = 40.0 + domain_padding * (80.0 / 54.0);
+constexpr double z_min = -10.0 - domain_padding * (80.0 / 54.0);
+constexpr double z_max = 70.0 + domain_padding * (80.0 / 54.0);
 #ifndef LORENZ_TIMESTEP
 #define LORENZ_TIMESTEP 0.00015625
 #endif
@@ -303,7 +311,9 @@ void ExportSubcellAverages(const ParGridFunction &field,
 void ExportAlignedCommonAverages(const ParGridFunction &field,
                                  const std::filesystem::path &path)
 {
-   constexpr int counts[3] = {180, 216, 216};
+   constexpr int counts[3] = {180 + 8 * domain_padding,
+                             216 + 8 * domain_padding,
+                             216 + 8 * domain_padding};
    constexpr double origins[3] = {x_min, y_min, z_min};
    constexpr double lengths[3] = {x_max - x_min, y_max - y_min, z_max - z_min};
    const std::size_t total = static_cast<std::size_t>(counts[0]) * counts[1] * counts[2];

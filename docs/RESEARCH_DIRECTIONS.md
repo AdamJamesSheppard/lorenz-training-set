@@ -1,6 +1,11 @@
 # Research directions
 
-Updated: 2026-10-02
+Updated: 2026-10-03
+
+Half-timestep sensitivity passed for the tested mature law. Active experiment:
+two aligned domain expansions preserving interior resolution and marks.
+Longer horizons, operational posteriors and full-density spatial certification
+remain unresolved; no production dataset generation is authorized.
 
 Broader-support sensitivity passed at L1=0.00177608. The next controlled
 branch freezes that mesh and halves the timestep to test the mature law;
