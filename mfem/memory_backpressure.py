@@ -10,8 +10,28 @@ def available_kib():
                     if line.startswith('MemAvailable:')))
 
 
+def signal_process_tree(pid, sig):
+    """MPI workers may create separate process groups; include descendants."""
+    children = {}
+    for path in Path('/proc').glob('[0-9]*/stat'):
+        try:
+            fields = path.read_text().rsplit(')', 1)[1].split()
+            children.setdefault(int(fields[1]), []).append(int(path.parent.name))
+        except (OSError, ValueError, IndexError):
+            continue
+    targets = [pid]
+    for parent in targets:
+        targets.extend(children.get(parent, []))
+    # Stop workers before their launcher; resume the launcher before workers.
+    for target in (reversed(targets) if sig == signal.SIGSTOP else targets):
+        try:
+            os.kill(target, sig)
+        except ProcessLookupError:
+            continue
+
+
 def wait_with_backpressure(process, update, read_memory=available_kib,
-                           send_signal=os.killpg, sleep=time.sleep,
+                           send_signal=signal_process_tree, sleep=time.sleep,
                            pause_kib=2*1024*1024, resume_kib=4*1024*1024):
     """Keep allocations alive; wait indefinitely for external RAM recovery.
 

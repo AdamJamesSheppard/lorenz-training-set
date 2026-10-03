@@ -1,5 +1,13 @@
 # Decision log
 
+## 2026-10-03 - Include separately grouped MPI workers in RAM backpressure
+
+Launch inspection found MPI workers each create separate process groups.
+Signal the full descendant process tree, stopping workers before the launcher
+and resuming the launcher first. Launcher-only group signalling was inadequate.
+The short restart `20261003T143701Z` is superseded by a fresh launch with
+this correction; its setup artifacts remain preserved.
+
 ## 2026-10-03 - Relaunch only the unfinished second domain expansion
 
 Use `--completed-first-domain` with the immutable successful padding1 result
