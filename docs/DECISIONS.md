@@ -1,5 +1,14 @@
 # Decision log
 
+## 2026-10-03 - Relaunch only the unfinished second domain expansion
+
+Use `--completed-first-domain` with the immutable successful padding1 result
+in `runs/mfem-domain-sensitivity/20261003T113423Z`. Validate all recorded
+gates and hash its report before reuse. New run references that result and
+propagates only padding2, retaining scientific criteria and padded marks.
+Automatic pause/resume at 2/4 GiB is enabled; wall time includes any memory
+wait and cannot be guaranteed. The original failed runs remain unchanged.
+
 ## 2026-10-03 - Preserve live jobs under temporary RAM pressure
 
 Replace wrapper SIGTERM at 2 GiB available RAM with scheduling backpressure:

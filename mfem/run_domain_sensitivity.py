@@ -12,6 +12,11 @@ import time
 from datetime import datetime, timezone
 import numpy as np
 from memory_backpressure import wait_with_backpressure
+import argparse
+
+parser=argparse.ArgumentParser()
+parser.add_argument('--completed-first-domain',type=Path)
+options=parser.parse_args()
 
 repo = Path(__file__).resolve().parents[1]
 root = repo / 'runs/mfem-domain-sensitivity' / datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')
@@ -52,7 +57,20 @@ try:
     reports=[]
     previous = baseline
     previous_pad=0
-    for pad in (1,2):
+    levels=(1,2)
+    if options.completed_first_domain:
+        previous=options.completed_first_domain.resolve()
+        report=json.loads((previous/'domain_comparison.json').read_text())
+        if report['padding'] != 1 or not all(report['gates'].values()):
+            raise ValueError('First-domain reference must have passed every gate')
+        if not (previous/'mfem/final_q2_subcell_averages.bin').is_file():
+            raise ValueError('Missing completed first-domain density')
+        reports.append(report)
+        previous_pad=1
+        levels=(2,)
+        (root/'completed_first_domain_reference.json').write_text(json.dumps(dict(path=str(previous),
+            sha256=hashlib.sha256((previous/'domain_comparison.json').read_bytes()).hexdigest()),indent=2))
+    for pad in levels:
         run=root/f'padding{pad}'
         (run/'design').mkdir(parents=True)
         (run/'mfem').mkdir()
