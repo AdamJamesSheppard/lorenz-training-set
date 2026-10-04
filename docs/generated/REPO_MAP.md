@@ -1,6 +1,6 @@
 # Repository map
 
-Generated: 2026-10-04T14:13:01+01:00
+Generated: 2026-10-04T14:19:55+01:00
 
 ```text
 docs/ACTIVE_TASK.md
@@ -11,6 +11,7 @@ docs/DENSITY_VISUALIZATION.md
 docs/MATHEMATICAL_SPEC.md
 docs/MATH_PROTOCOL.md
 docs/NEURAL_PILOT.md
+docs/NEURAL_PILOT_WORKFLOW.md
 docs/PROJECT_STATE.md
 docs/REFERENCES.md
 docs/RESEARCH_DIRECTIONS.md
@@ -211,31 +212,25 @@ tests/test_validation.py
 ./build_experiment_manifest.py:76:def extract_configuration(path: Path) -> dict[str, object]:
 ./build_experiment_manifest.py:85:def command_output(command: list[str]) -> str | None:
 ./build_experiment_manifest.py:92:def main() -> None:
-./local_projection_study.py:21:def _sha256(path: Path) -> str:
-./local_projection_study.py:29:def _marginal_tv(
-./local_projection_study.py:44:def _difference_report(
-./local_projection_study.py:66:def run(args: argparse.Namespace) -> None:
-./local_projection_study.py:204:def parser() -> argparse.ArgumentParser:
-./mature_da_study.py:11:def tensor_stats(a,domain):
-./mature_da_study.py:28:def main():
-./mature_forecast_validation.py:11:def sample_q1(solver,state,n,rng):
-./mature_forecast_validation.py:23:def main():
-./mature_dof_convex_diagnostic.py:20:def _simplex_projection(values: np.ndarray, target: float, lower: float) -> np.ndarray:
-./mature_dof_convex_diagnostic.py:40:def _repair_cell_averages(solver, raw: DensityState) -> tuple[DensityState,np.ndarray]:
-./mature_dof_convex_diagnostic.py:67:def _dof_convex_limit(solver, raw: DensityState) -> tuple[DensityState,dict[str,object]]:
-./mature_dof_convex_diagnostic.py:113:def _evaluate(solver,raw: DensityState,label: str) -> dict[str,object] | None:
-./mature_dof_convex_diagnostic.py:144:def main() -> int:
 ./local_projection_optimizer_study.py:18:def _sha256(path: Path) -> str:
 ./local_projection_optimizer_study.py:26:def _terminal_problems(
 ./local_projection_optimizer_study.py:48:def _random_problems(
 ./local_projection_optimizer_study.py:61:def run(args: argparse.Namespace) -> None:
 ./local_projection_optimizer_study.py:200:def parser() -> argparse.ArgumentParser:
-scripts/verify_solver_monograph.py:18:def main():
-tests/test_validation.py:4:class TestAnalyticBenchmarks(unittest.TestCase):
-tests/test_validation.py:6:    def setUpClass(cls):
-tests/test_validation.py:8:    def test_pure_diffusion(self):
-tests/test_validation.py:12:    def test_constant_advection_diffusion(self):
-tests/test_validation.py:16:    def test_non_gaussian(self):
+./mature_da_study.py:11:def tensor_stats(a,domain):
+./mature_da_study.py:28:def main():
+./mature_dof_convex_diagnostic.py:20:def _simplex_projection(values: np.ndarray, target: float, lower: float) -> np.ndarray:
+./mature_dof_convex_diagnostic.py:40:def _repair_cell_averages(solver, raw: DensityState) -> tuple[DensityState,np.ndarray]:
+./mature_dof_convex_diagnostic.py:67:def _dof_convex_limit(solver, raw: DensityState) -> tuple[DensityState,dict[str,object]]:
+./mature_dof_convex_diagnostic.py:113:def _evaluate(solver,raw: DensityState,label: str) -> dict[str,object] | None:
+./mature_dof_convex_diagnostic.py:144:def main() -> int:
+./local_projection_study.py:21:def _sha256(path: Path) -> str:
+./local_projection_study.py:29:def _marginal_tv(
+./local_projection_study.py:44:def _difference_report(
+./local_projection_study.py:66:def run(args: argparse.Namespace) -> None:
+./local_projection_study.py:204:def parser() -> argparse.ArgumentParser:
+./mature_forecast_validation.py:11:def sample_q1(solver,state,n,rng):
+./mature_forecast_validation.py:23:def main():
 lorenz_fpe/validation.py:19:def _correlation(cov: np.ndarray) -> np.ndarray:
 lorenz_fpe/validation.py:24:def covariance_accuracy(pde_covariance: np.ndarray, samples: np.ndarray, seed: int,
 lorenz_fpe/validation.py:58:class ConstantModel:
@@ -262,14 +257,12 @@ lorenz_fpe/validation.py:588:def voxel_projection_validation(cells=(12,16,16),dt
 lorenz_fpe/validation.py:637:def weighted_particle_da(cells=(20,24,24),dt=.00125,t_final=.05,n_particles=50000,seed=4401)->dict[str,object]:
 lorenz_fpe/validation.py:676:def domain_sensitivity()->dict[str,object]:
 lorenz_fpe/validation.py:691:def run_validation(output:Path)->dict[str,object]:
-scripts/verify_math.py:16:def main() -> int:
-tests/test_spatial_experiment.py:19:def test_common_continuous_gaussian_sampler_is_bounded_and_reproducible():
-tests/test_spatial_experiment.py:35:def test_spatial_predeclaration_has_constant_ratio_and_one_common_grid():
-tests/test_spatial_experiment.py:58:def test_full_spd_predeclarations_reconstruct_diffusion_and_fix_reference_seed():
-tests/test_spatial_experiment.py:77:def test_mature_bimodal_predeclaration_is_full_spd_and_common_grid():
-tests/test_spatial_experiment.py:95:def test_fine_graded_predeclaration_aligns_both_comparators_to_common_grid():
-tests/test_spatial_experiment.py:119:def test_time_aggregated_design_is_aligned_and_respects_uniform_cell_ceiling():
-tests/test_spatial_experiment.py:135:def test_z_conditioning_and_truncated_mixture_sampling_preserve_lobe_symmetry():
+scripts/verify_solver_monograph.py:18:def main():
+tests/test_validation.py:4:class TestAnalyticBenchmarks(unittest.TestCase):
+tests/test_validation.py:6:    def setUpClass(cls):
+tests/test_validation.py:8:    def test_pure_diffusion(self):
+tests/test_validation.py:12:    def test_constant_advection_diffusion(self):
+tests/test_validation.py:16:    def test_non_gaussian(self):
 lorenz_fpe/local_projection.py:34:class CellProjectionResult:
 lorenz_fpe/local_projection.py:46:class LocalPolynomialProjector:
 lorenz_fpe/local_projection.py:55:    def __init__(
@@ -282,14 +275,14 @@ lorenz_fpe/local_projection.py:476:class LocalProjectionFokkerPlanckSolver(Fokke
 lorenz_fpe/local_projection.py:479:    def __init__(self, *args, **kwargs) -> None:
 lorenz_fpe/local_projection.py:498:    def step(self, state: DensityState) -> DensityState:
 lorenz_fpe/local_projection.py:519:    def local_projection_history_summary(self) -> dict[str, object]:
-tests/test_solver_smoke.py:7:class TestSolverSmoke(unittest.TestCase):
-tests/test_solver_smoke.py:9:    def setUpClass(cls):
-tests/test_solver_smoke.py:11:    def test_forecast_probability_invariants(self):
-tests/test_solver_smoke.py:22:    def test_structured_roundtrip_conserves_mass(self):
-tests/test_solver_smoke.py:26:    def test_forecast_ksp_tolerances_are_configurable(self):
-tests/test_solver_smoke.py:34:    def test_graded_hex_common_grid_export_is_conservative(self):
-tests/test_solver_smoke.py:51:    def test_refined_structured_roundtrip_preserves_q1_shape(self):
-tests/test_solver_smoke.py:59:    def test_checkpoint_and_da_continuity_without_gaussianisation(self):
+scripts/verify_math.py:16:def main() -> int:
+tests/test_spatial_experiment.py:19:def test_common_continuous_gaussian_sampler_is_bounded_and_reproducible():
+tests/test_spatial_experiment.py:35:def test_spatial_predeclaration_has_constant_ratio_and_one_common_grid():
+tests/test_spatial_experiment.py:58:def test_full_spd_predeclarations_reconstruct_diffusion_and_fix_reference_seed():
+tests/test_spatial_experiment.py:77:def test_mature_bimodal_predeclaration_is_full_spd_and_common_grid():
+tests/test_spatial_experiment.py:95:def test_fine_graded_predeclaration_aligns_both_comparators_to_common_grid():
+tests/test_spatial_experiment.py:119:def test_time_aggregated_design_is_aligned_and_respects_uniform_cell_ceiling():
+tests/test_spatial_experiment.py:135:def test_z_conditioning_and_truncated_mixture_sampling_preserve_lobe_symmetry():
 lorenz_fpe/finite_volume.py:21:class FiniteVolumeResult:
 lorenz_fpe/finite_volume.py:30:class ConservativeFiniteVolume:
 lorenz_fpe/finite_volume.py:38:    def __init__(self, model: Lorenz63Model, domain: Domain, cfl: float = 0.72):
@@ -298,6 +291,14 @@ lorenz_fpe/finite_volume.py:70:        def component(a, b, c, index):
 lorenz_fpe/finite_volume.py:78:    def rhs(self, density: np.ndarray) -> np.ndarray:
 lorenz_fpe/finite_volume.py:100:    def propagate(self, density: np.ndarray, t0: float, t1: float) -> FiniteVolumeResult:
 lorenz_fpe/finite_volume.py:126:    def diagnostics(self, density: np.ndarray) -> dict[str, object]:
+tests/test_solver_smoke.py:7:class TestSolverSmoke(unittest.TestCase):
+tests/test_solver_smoke.py:9:    def setUpClass(cls):
+tests/test_solver_smoke.py:11:    def test_forecast_probability_invariants(self):
+tests/test_solver_smoke.py:22:    def test_structured_roundtrip_conserves_mass(self):
+tests/test_solver_smoke.py:26:    def test_forecast_ksp_tolerances_are_configurable(self):
+tests/test_solver_smoke.py:34:    def test_graded_hex_common_grid_export_is_conservative(self):
+tests/test_solver_smoke.py:51:    def test_refined_structured_roundtrip_preserves_q1_shape(self):
+tests/test_solver_smoke.py:59:    def test_checkpoint_and_da_continuity_without_gaussianisation(self):
 scripts/train_neural_pilot.py:13:class Spectral(nn.Module):
 scripts/train_neural_pilot.py:14:    def __init__(self, width=8, modes=4):
 scripts/train_neural_pilot.py:19:    def forward(self, x):
@@ -307,8 +308,6 @@ scripts/train_neural_pilot.py:38:    def forward(self, density):
 scripts/train_neural_pilot.py:52:def metrics(prediction, target):
 scripts/train_neural_pilot.py:55:    def statistics(field):
 scripts/train_neural_pilot.py:67:def main(root):
-tests/test_neural_pilot_export.py:9:def test_aligned_coarsening_preserves_mass():
-tests/test_neural_pilot_export.py:26:def test_sampled_prior_is_positive_normalized_and_reproducible():
 lorenz_fpe/dataset.py:16:class DatasetConfig:
 lorenz_fpe/dataset.py:30:class DatasetSplitter:
 lorenz_fpe/dataset.py:32:    def split(trajectory_ids: list[str], seed: int = 1729) -> dict[str,list[str]]:
@@ -317,14 +316,15 @@ lorenz_fpe/dataset.py:41:    def __init__(self, solver: FokkerPlanckSolver, conf
 lorenz_fpe/dataset.py:44:    def generate(self, root: Path) -> dict[str,object]:
 lorenz_fpe/dataset.py:131:    def _mode_count(a: np.ndarray, relative_threshold: float = 0.05) -> int:
 lorenz_fpe/dataset.py:148:    def _distribution_report(rows: list[dict[str,object]]) -> dict[str,object]:
-tests/test_mpi_consistency.py:4:class TestMPIConsistency(unittest.TestCase):
-tests/test_mpi_consistency.py:5:    def _run(self,ranks):
-tests/test_mpi_consistency.py:13:    def test_two_rank_limiter_agrees_with_serial(self):
+tests/test_neural_pilot_export.py:9:def test_aligned_coarsening_preserves_mass():
+tests/test_neural_pilot_export.py:26:def test_sampled_prior_is_positive_normalized_and_reproducible():
 scripts/run_experiment.py:22:def matched_marginal_tvs(
 scripts/run_experiment.py:45:def package_version(name: str) -> str | None:
 scripts/run_experiment.py:52:def git_text(*args: str) -> str:
 scripts/run_experiment.py:58:def main(config_path: Path, resume_run_dir: Path | None = None) -> int:
-tests/test_mfem_mature_compare.py:8:def test_uniform_voxel_statistics() -> None:
+tests/test_mpi_consistency.py:4:class TestMPIConsistency(unittest.TestCase):
+tests/test_mpi_consistency.py:5:    def _run(self,ranks):
+tests/test_mpi_consistency.py:13:    def test_two_rank_limiter_agrees_with_serial(self):
 lorenz_fpe/core.py:34:def _global_sum(comm: MPI.Comm, value: float) -> float:
 lorenz_fpe/core.py:38:def _global_min(comm: MPI.Comm, value: float) -> float:
 lorenz_fpe/core.py:42:def _global_max(comm: MPI.Comm, value: float) -> float:
@@ -390,12 +390,7 @@ lorenz_fpe/core.py:1279:    def __init__(self, model: Lorenz63Model, dt: float =
 lorenz_fpe/core.py:1282:    def simulate(self, initial: Iterable[float], times: Iterable[float], seed: int) -> np.ndarray:
 lorenz_fpe/core.py:1293:def solver_metadata(solver: FokkerPlanckSolver) -> dict[str, object]:
 lorenz_fpe/core.py:1328:def write_json(path: Path, obj: object) -> None:
-tests/test_memory_backpressure.py:12:def test_pause_resume_hysteresis_without_termination():
-tests/test_memory_backpressure.py:13:    class Process:
-tests/test_memory_backpressure.py:17:        def poll(self):
-tests/test_memory_backpressure.py:31:def test_resume_at_exact_two_gib_preserves_process():
-tests/test_memory_backpressure.py:32:    class Process:
-tests/test_memory_backpressure.py:36:        def poll(self):
+tests/test_mfem_mature_compare.py:8:def test_uniform_voxel_statistics() -> None:
 lorenz_fpe/afc.py:26:class AFCProjectionFokkerPlanckSolver(FokkerPlanckSolver):
 lorenz_fpe/afc.py:29:    def __init__(self, *args, **kwargs) -> None:
 lorenz_fpe/afc.py:51:    def _prepare_structured_layout(self) -> None:
@@ -407,13 +402,19 @@ lorenz_fpe/afc.py:183:    def _positive_low_order_step(self, old: np.ndarray) ->
 lorenz_fpe/afc.py:197:    def _limited_antidiffusion(low: np.ndarray, high: np.ndarray) -> tuple[np.ndarray, dict[str, float]]:
 lorenz_fpe/afc.py:227:    def step(self, state: DensityState) -> DensityState:
 lorenz_fpe/afc.py:300:    def local_projection_history_summary(self) -> dict[str, object]:
+tests/test_memory_backpressure.py:12:def test_pause_resume_hysteresis_without_termination():
+tests/test_memory_backpressure.py:13:    class Process:
+tests/test_memory_backpressure.py:17:        def poll(self):
+tests/test_memory_backpressure.py:31:def test_resume_at_exact_two_gib_preserves_process():
+tests/test_memory_backpressure.py:32:    class Process:
+tests/test_memory_backpressure.py:36:        def poll(self):
+scripts/plot_saved_density.py:21:def render(p, edges, title, time):
+scripts/plot_saved_density.py:51:def main():
 tests/test_limiter.py:6:class TestProjection(unittest.TestCase):
 tests/test_limiter.py:7:    def test_positive_and_conservative(self):
 tests/test_limiter.py:12:    def test_identity(self):
 tests/test_limiter.py:14:    def test_roundoff_repair_cannot_create_negative_active_entries(self):
 tests/test_limiter.py:22:    def test_trajectory_split_is_disjoint(self):
-scripts/plot_saved_density.py:21:def render(p, edges, title, time):
-scripts/plot_saved_density.py:51:def main():
 tests/test_accuracy_repairs.py:23:class TestProjectionAndSamplingAccuracy(unittest.TestCase):
 tests/test_accuracy_repairs.py:24:    def test_l2_projection_preserves_mass_and_improves_gaussian_covariance(self):
 tests/test_accuracy_repairs.py:46:    def test_limited_projection_is_positive_and_mass_conservative(self):
@@ -439,9 +440,9 @@ tests/test_accuracy_repairs.py:373:    def test_local_q2_projection_honours_pres
 tests/test_accuracy_repairs.py:387:    def test_local_projection_solver_feeds_certified_state_forward(self):
 tests/test_accuracy_repairs.py:413:class TestIndependentFiniteVolume(unittest.TestCase):
 tests/test_accuracy_repairs.py:414:    def test_total_flux_update_preserves_mass_and_positivity(self):
+scripts/package_solver_monograph.py:15:def digest(path):
+scripts/package_solver_monograph.py:19:def main():
 scripts/build_solver_monograph_evidence.py:17:def tex(s):
 scripts/build_solver_monograph_evidence.py:21:def flatten(obj, prefix=''):
 scripts/build_solver_monograph_evidence.py:34:def main():
 scripts/build_solver_monograph_evidence.py:134:def render_appendices(ledger):
-scripts/package_solver_monograph.py:15:def digest(path):
-scripts/package_solver_monograph.py:19:def main():

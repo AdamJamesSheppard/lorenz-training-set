@@ -6,6 +6,11 @@ Updated: 2026-10-03
 learning versus persistence before broader parameter families; do not interpret
 constrained mass/positivity output as full-density accuracy. See NEURAL_PILOT.md.
 
+First launch `20261004T131332Z` failed before forecast/training: negative
+smoothing-roundoff vertices reached the strict empirical importer. Correct the
+data preparation with a regression reproducing that sampled cloud, then create
+a fresh immutable run. See `docs/NEURAL_PILOT_WORKFLOW.md` for workflow and hashes.
+
 The monograph audit confirms both aligned domain expansions completed all
 configured gates for the tested broader-support mature law at `t=0.05`.
 Second interior voxel L1 independently recomputes to `1.95496e-12`;

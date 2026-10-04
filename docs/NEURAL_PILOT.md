@@ -3,6 +3,11 @@
 Authorized by the user on 2026-10-04; production authorization remains false.
 This is discrete-solver learning, not whole-space/continuum certification.
 
+Plain-language workflow and actual first-launch failure:
+`docs/NEURAL_PILOT_WORKFLOW.md`. Run `20261004T131332Z` stopped at empirical
+initialization due to negative smoothing-roundoff vertices; no forecast or
+training completed. Preparation correction and a new immutable run are needed.
+
 Implementation checks cover conservative coarsening, reproducible sampled
 priors, the Python suite and executable solver invariants. The FNO passes a
 forward/backward finite-gradient and probability-constraint test. A two-rank
@@ -54,6 +59,10 @@ Training uses isolated `.venv/neural-pilot` with CPU torch 2.8.0 and numpy
 2.2.6; existing solver environments are preserved. Upstream architecture and
 workflow reference: https://neuraloperator.github.io/dev/user_guide/index.html
 The compact implementation here is independently written in PyTorch.
+
+User preference: GPU for neural training, CPU/MPI for PDE target generation.
+The RTX 4070 has nominal 12 GiB VRAM (checked 2026-10-04). CUDA runtime/device
+handling must be enabled before training; current code/environment remains CPU-only.
 
 Pause below 2 GiB MemAvailable; resume the same process at >=2 GiB. Equal
 thresholds may cycle. There is no kill/relaunch, checkpoint or swap-to-disk

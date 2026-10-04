@@ -735,3 +735,20 @@ experiments/neural-pilot.json; immutable runs/neural-pilot/<UTC> contains hashes
 source revision, command, diagnostics, densities and training evidence.
 The pre-existing 2/2 GiB memory defaults are explicitly enforced and regression
 tested at the exact threshold. Resume means SIGCONT, not destructive restart.
+
+## 2026-10-04: Document actual pilot workflow and initialization failure
+
+On the user's documentation request, live status/log inspection found first
+pilot `20261004T131332Z` had failed before forecast/training. Empirical prior
+contains 12,939 negative vertices, minimum -4.90038e-20, caused by compact
+uniform-filter roundoff. Direct nonnegative-kernel convolution independently
+produces nonnegative output with floating-point-scale differences. Strict
+import rejection was correct. No scientific threshold is changed and no raw
+evidence is overwritten. Document workflow, limitations and evidence hashes in
+`docs/NEURAL_PILOT_WORKFLOW.md`; restart requires a separately validated
+preparation correction. This change is documentation only.
+
+User clarified GPU preference for neural training, distinct from CPU/MPI PDE
+generation. RTX 4070 hardware confirmed locally, nominal 12 GiB VRAM. Record
+the preference and required CUDA runtime/device enablement in the workflow;
+the current CPU-only trainer is unchanged in this documentation task.
