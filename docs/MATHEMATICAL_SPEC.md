@@ -2,6 +2,13 @@
 
 ## Model
 
+The opt-in neural pilot uses initial state-space densities obtained from sampled
+deterministic Lorenz trajectories, compact histogram smoothing and positive
+trilinear interpolation (`A12`). There is no Gaussian fit. The subsequent
+full-SPD FPE forecast is unchanged; this pilot learns its discrete forecast map,
+without observation channels or sequential assimilation. Its configuration is
+`experiments/neural-pilot.json`; it does not change production authorization.
+
 For the stochastic Lorenz-63 state
 
 `dX_t = f(X_t) dt + B dW_t`,

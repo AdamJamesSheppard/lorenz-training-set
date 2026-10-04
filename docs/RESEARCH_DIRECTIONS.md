@@ -2,6 +2,10 @@
 
 Updated: 2026-10-03
 
+2026-10-04: bounded six-attractor-density fixed-D/T pilot authorized. Evaluate discrete-solver
+learning versus persistence before broader parameter families; do not interpret
+constrained mass/positivity output as full-density accuracy. See NEURAL_PILOT.md.
+
 The monograph audit confirms both aligned domain expansions completed all
 configured gates for the tested broader-support mature law at `t=0.05`.
 Second interior voxel L1 independently recomputes to `1.95496e-12`;

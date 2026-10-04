@@ -1,10 +1,13 @@
 #include "mfem.hpp"
 #include <osqp.h>
+#include "empirical_prior.hpp"
 
 #include <algorithm>
 #include <array>
 #include <chrono>
 #include <cmath>
+#include <cstdlib>
+#include <memory>
 #include <cstdint>
 #include <filesystem>
 #include <fstream>
@@ -1518,9 +1521,17 @@ int main(int argc, char *argv[])
       double initial_projection_correction = 0.0;
       if (adaptive_mode)
       {
-         MatureGaussianMixture mixture(mixture_path);
+         // Opt-in empirical input; archived reference runs keep their old law.
+         std::unique_ptr<Coefficient> initial_law;
+         const char *empirical_path=std::getenv("LORENZ_EMPIRICAL_PRIOR");
+         if (empirical_path)
+         {
+            MFEM_VERIFY(domain_padding==0,"empirical prior requires the original box");
+            initial_law=std::make_unique<EmpiricalPrior>(empirical_path);
+         }
+         else { initial_law=std::make_unique<MatureGaussianMixture>(mixture_path); }
          ParLinearForm load(&space);
-         auto *integrator = new DomainLFIntegrator(mixture);
+         auto *integrator = new DomainLFIntegrator(*initial_law);
          integrator->SetIntRule(&IntRules.Get(Geometry::CUBE, 14));
          load.AddDomainIntegrator(integrator);
          load.Assemble();

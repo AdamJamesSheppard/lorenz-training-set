@@ -1,0 +1,15 @@
+{
+  "scope": "Attractor-sampled state-space density -> FPE evolved density; fixed D/T; no assimilation cycles or production certification",
+  "trajectories": 6,
+  "initial_law": "RK4 Lorenz attractor trajectory samples, compact-smoothed histogram, positive trilinear density; no Gaussian fit",
+  "splits": ["train", "train", "train", "train", "validation", "test"],
+  "D": [[1, 0.4, 0.2], [0.4, 1, 0.3], [0.2, 0.3, 1]],
+  "horizon": 0.05,
+  "steps": 320,
+  "export_grid": [60, 72, 72],
+  "epochs": 100,
+  "seed": 71023,
+  "pause_available_GiB": 2,
+  "resume_available_GiB": 2,
+  "evaluation": "Held-out complete sampled trajectories; evolved-density L1/L2, mass, covariance and marginals against persistence. No broad generalization claim."
+}

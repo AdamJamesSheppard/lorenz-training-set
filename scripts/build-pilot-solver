@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+pilot_mfem=/home/adam/.local/share/mamba/envs/mfem-lorenz
+pilot_pde=/home/adam/.local/share/mamba/envs/pde
+export PATH="$pilot_mfem/bin:$PATH"
+mkdir -p build/mfem-physical-equivalence
+"$pilot_mfem/bin/mpic++" -O2 -std=c++17 \
+  -I"$pilot_mfem/include" -I"$pilot_pde/include/osqp" \
+  mfem/mfem_physical_equivalence.cpp \
+  -L"$pilot_mfem/lib" -L"$pilot_pde/lib" \
+  -Wl,-rpath,"$pilot_mfem/lib" -Wl,-rpath,"$pilot_pde/lib" \
+  -lmfem -lHYPRE -losqp \
+  -o build/mfem-physical-equivalence/mfem_pilot_lowmem

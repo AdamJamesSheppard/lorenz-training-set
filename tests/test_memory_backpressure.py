@@ -26,3 +26,22 @@ def test_pause_resume_hysteresis_without_termination():
         sleep=lambda seconds: None,pause_kib=2,resume_kib=4) == 0
     assert signals == [signal.SIGSTOP,signal.SIGCONT]
     assert [item['paused'] for item in updates] == [False,True,True,False]
+
+
+def test_resume_at_exact_two_gib_preserves_process():
+    class Process:
+        pid = 123
+        returncode = None
+        count = 0
+        def poll(self):
+            self.count += 1
+            if self.count > 3:
+                self.returncode = 0
+            return self.returncode
+    threshold = 2*1024*1024
+    memory = iter([threshold-1, threshold, threshold+1])
+    signals = []
+    assert module.wait_with_backpressure(Process(), lambda update: None,
+        read_memory=lambda: next(memory), send_signal=lambda pid,sig: signals.append(sig),
+        sleep=lambda seconds: None) == 0
+    assert signals == [signal.SIGSTOP, signal.SIGCONT]

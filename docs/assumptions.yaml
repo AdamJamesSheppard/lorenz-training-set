@@ -52,3 +52,9 @@ A11:
   statement: A numerical method must be implemented in DOLFINx to be considered.
   status: false
   limitation: Challengers must still solve the intended equation or clearly state and justify any surrogate.
+
+A12:
+  statement: Sampled Lorenz attractor trajectories define an exact smooth state-space volume density.
+  status: false_in_general
+  limitation: The pilot uses compact-smoothed histogram and positive trilinear interpolation as explicit regularization. Finite trajectory windows and transient removal do not prove stationarity or independence of samples.
+  evidence: docs/NEURAL_PILOT.md

@@ -16,6 +16,13 @@ next experiment.
 
 ## Current decision
 
+2026-10-04: user authorized a bounded six-attractor-density neural-operator pilot
+(`docs/NEURAL_PILOT.md`, `experiments/neural-pilot.json`). Fixed diffusion/horizon;
+discrete solver targets only. Production authorization and continuum convergence
+status below remain unchanged. Inputs are distributions sampled from Lorenz
+trajectories, without Gaussian fits or observation channels. New laws must
+pass sample-level invariant gates.
+
 ```ini
 METHOD_STATUS = MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED
 MATURE_DENSITY_CONVERGENCE = OPEN

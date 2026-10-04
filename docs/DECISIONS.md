@@ -718,3 +718,20 @@ provided by the conda-forge `pde` environment. `environment.yml` pins the direct
 runtime and verification tools, while `environment-linux-64.lock` records exact
 artifacts for this platform. This adapts the guides' deterministic-environment
 requirement to the compiled FEniCSx stack.
+
+## 2026-10-04: Attractor-sampled density neural-operator feasibility pilot
+
+User authorized implementation/run with 2 GiB available-RAM automatic resume.
+The user's final clarification selects density-only forecasting: sampled Lorenz
+attractor state-space distribution -> evolved FPE density. Unlaunched Gaussian
+mixture and observation-conditioned drafts were superseded before launch.
+Six RK4 trajectories, compact-smoothed histograms, positive trilinear initial
+fields, fixed tested diffusion and horizon, four/one/one whole-trajectory split.
+Sample-level invariant rejection precedes training. This narrows the
+initial parameterized-operator proposal to an executable small fixed-D/T test;
+diffusion generalization, rollouts and continuum accuracy remain untested.
+No production waiver. Details/config: docs/NEURAL_PILOT.md and
+experiments/neural-pilot.json; immutable runs/neural-pilot/<UTC> contains hashes,
+source revision, command, diagnostics, densities and training evidence.
+The pre-existing 2/2 GiB memory defaults are explicitly enforced and regression
+tested at the exact threshold. Resume means SIGCONT, not destructive restart.

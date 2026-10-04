@@ -42,6 +42,11 @@ differences.
 
 ## Entry points
 
+- `mfem/run_neural_pilot.py`: six sequential accepted law forecasts with 2 GiB
+  in-place memory resume, conservative coarsening and immutable provenance.
+- `scripts/train_neural_pilot.py`: isolated CPU spectral-operator feasibility
+  training, trajectory-level split and persistence comparator; fixed D/T only.
+
 - `solver.py`: one forecast.
 - `generate_dataset.py`: gated sequential DA dataset generation.
 - `validate.py` and focused `*_study.py` files: validation studies.
