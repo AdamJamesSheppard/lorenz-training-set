@@ -8,6 +8,7 @@
   "steps": 320,
   "export_grid": [60, 72, 72],
   "epochs": 100,
+  "device": "auto",
   "seed": 71023,
   "pause_available_GiB": 2,
   "resume_available_GiB": 2,

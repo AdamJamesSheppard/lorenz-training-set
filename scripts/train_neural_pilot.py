@@ -1,4 +1,4 @@
-"""Small CPU 3D spectral operator for accepted, conservative density pairs."""
+"""GPU-preferred 3D spectral operator for accepted conservative density pairs."""
 import json
 from pathlib import Path
 import sys
@@ -50,7 +50,7 @@ class Operator(nn.Module):
 
 
 def metrics(prediction, target):
-    p, q = prediction.double().numpy().ravel(), target.double().numpy().ravel()
+    p, q = prediction.detach().double().cpu().numpy().ravel(), target.detach().double().cpu().numpy().ravel()
     shape = prediction.shape[-3:]
     def statistics(field):
         probability = field.reshape(shape)/field.sum()
@@ -68,14 +68,29 @@ def main(root):
     config = json.loads((root/'config.json').read_text())
     torch.manual_seed(config['seed'])
     torch.set_num_threads(4)
+    requested = config.get('device', 'auto')
+    device = torch.device('cuda' if requested == 'auto' and torch.cuda.is_available() else 'cpu' if requested == 'auto' else requested)
+    if device.type == 'cuda' and not torch.cuda.is_available():
+        raise RuntimeError('CUDA explicitly requested but unavailable')
+    # Record actual execution; preserve CPU fallback when auto finds no CUDA.
+    hardware = dict(device=str(device), torch_version=torch.__version__, cuda_runtime=torch.version.cuda,
+                    gpu_name=torch.cuda.get_device_name(device) if device.type == 'cuda' else None)
+    if device.type == 'cuda':
+        hardware['compute_capability'] = torch.cuda.get_device_capability(device)
+        hardware['total_device_memory_bytes'] = torch.cuda.get_device_properties(device).total_memory
+    (root/'training_device.json').write_text(json.dumps(hardware, indent=2))
+    print(hardware, flush=True)
     pairs = []
     for entry in json.loads((root/'manifest.json').read_text()):
         data = np.load(root/entry['path'])
         # Mean-one scaling: density = network field / physical box volume.
-        pairs.append((entry['split'],*[torch.from_numpy(data[k]*384000)[None,None] for k in ('initial','final')]))
-    model = Operator()
+        pairs.append((entry['split'],*[torch.from_numpy(data[k]*384000)[None,None].to(device) for k in ('initial','final')]))
+    model = Operator().to(device)
     optimizer = torch.optim.Adam(model.parameters(),lr=.002)
     best = float('inf')
+    if device.type == 'cuda':
+        torch.cuda.synchronize(device)
+        torch.cuda.reset_peak_memory_stats(device)
     start = time.monotonic()
     history = []
     for epoch in range(config['epochs']):
@@ -99,13 +114,17 @@ def main(root):
         history.append(dict(epoch=epoch,training=float(np.mean(losses)),validation=validation))
         (root/'training_history.json').write_text(json.dumps(history))
         print(history[-1],flush=True)
-    model.load_state_dict(torch.load(root/'best_model.pt',weights_only=True)['model'])
+    model.load_state_dict(torch.load(root/'best_model.pt',weights_only=True,map_location=device)['model'])
     results = []
     with torch.no_grad():
         for split,x,y in pairs:
             predicted = model(x)
             results.append(dict(split=split,operator=metrics(predicted,y),persistence=metrics(x,y)))
-    (root/'evaluation.json').write_text(json.dumps(dict(scope=config['scope'],results=results,runtime_seconds=time.monotonic()-start,production_authorized=False),indent=2))
+    if device.type == 'cuda':
+        torch.cuda.synchronize(device)
+        hardware['peak_allocated_bytes'] = torch.cuda.max_memory_allocated(device)
+        hardware['peak_reserved_bytes'] = torch.cuda.max_memory_reserved(device)
+    (root/'evaluation.json').write_text(json.dumps(dict(scope=config['scope'],results=results,runtime_seconds=time.monotonic()-start,hardware=hardware,production_authorized=False),indent=2))
 
 
 if __name__ == '__main__':

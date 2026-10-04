@@ -1,6 +1,6 @@
 # Repository map
 
-Generated: 2026-10-04T14:19:55+01:00
+Generated: 2026-10-04T14:34:32+01:00
 
 ```text
 docs/ACTIVE_TASK.md
@@ -79,6 +79,7 @@ scripts/bootstrap
 scripts/build-pilot-solver
 scripts/build_solver_monograph_evidence.py
 scripts/check
+scripts/check_neural_pilot_gpu.py
 scripts/context
 scripts/package_solver_monograph.py
 scripts/plot_saved_density.py
@@ -86,6 +87,7 @@ scripts/repo-map
 scripts/run-experiment
 scripts/run-in-env
 scripts/run_experiment.py
+scripts/setup-neural-pilot-gpu
 scripts/train_neural_pilot.py
 scripts/verify-math
 scripts/verify_math.py
@@ -219,18 +221,19 @@ tests/test_validation.py
 ./local_projection_optimizer_study.py:200:def parser() -> argparse.ArgumentParser:
 ./mature_da_study.py:11:def tensor_stats(a,domain):
 ./mature_da_study.py:28:def main():
-./mature_dof_convex_diagnostic.py:20:def _simplex_projection(values: np.ndarray, target: float, lower: float) -> np.ndarray:
-./mature_dof_convex_diagnostic.py:40:def _repair_cell_averages(solver, raw: DensityState) -> tuple[DensityState,np.ndarray]:
-./mature_dof_convex_diagnostic.py:67:def _dof_convex_limit(solver, raw: DensityState) -> tuple[DensityState,dict[str,object]]:
-./mature_dof_convex_diagnostic.py:113:def _evaluate(solver,raw: DensityState,label: str) -> dict[str,object] | None:
-./mature_dof_convex_diagnostic.py:144:def main() -> int:
 ./local_projection_study.py:21:def _sha256(path: Path) -> str:
 ./local_projection_study.py:29:def _marginal_tv(
 ./local_projection_study.py:44:def _difference_report(
 ./local_projection_study.py:66:def run(args: argparse.Namespace) -> None:
 ./local_projection_study.py:204:def parser() -> argparse.ArgumentParser:
+./mature_dof_convex_diagnostic.py:20:def _simplex_projection(values: np.ndarray, target: float, lower: float) -> np.ndarray:
+./mature_dof_convex_diagnostic.py:40:def _repair_cell_averages(solver, raw: DensityState) -> tuple[DensityState,np.ndarray]:
+./mature_dof_convex_diagnostic.py:67:def _dof_convex_limit(solver, raw: DensityState) -> tuple[DensityState,dict[str,object]]:
+./mature_dof_convex_diagnostic.py:113:def _evaluate(solver,raw: DensityState,label: str) -> dict[str,object] | None:
+./mature_dof_convex_diagnostic.py:144:def main() -> int:
 ./mature_forecast_validation.py:11:def sample_q1(solver,state,n,rng):
 ./mature_forecast_validation.py:23:def main():
+scripts/verify_solver_monograph.py:18:def main():
 lorenz_fpe/validation.py:19:def _correlation(cov: np.ndarray) -> np.ndarray:
 lorenz_fpe/validation.py:24:def covariance_accuracy(pde_covariance: np.ndarray, samples: np.ndarray, seed: int,
 lorenz_fpe/validation.py:58:class ConstantModel:
@@ -257,7 +260,7 @@ lorenz_fpe/validation.py:588:def voxel_projection_validation(cells=(12,16,16),dt
 lorenz_fpe/validation.py:637:def weighted_particle_da(cells=(20,24,24),dt=.00125,t_final=.05,n_particles=50000,seed=4401)->dict[str,object]:
 lorenz_fpe/validation.py:676:def domain_sensitivity()->dict[str,object]:
 lorenz_fpe/validation.py:691:def run_validation(output:Path)->dict[str,object]:
-scripts/verify_solver_monograph.py:18:def main():
+scripts/verify_math.py:16:def main() -> int:
 tests/test_validation.py:4:class TestAnalyticBenchmarks(unittest.TestCase):
 tests/test_validation.py:6:    def setUpClass(cls):
 tests/test_validation.py:8:    def test_pure_diffusion(self):
@@ -275,7 +278,6 @@ lorenz_fpe/local_projection.py:476:class LocalProjectionFokkerPlanckSolver(Fokke
 lorenz_fpe/local_projection.py:479:    def __init__(self, *args, **kwargs) -> None:
 lorenz_fpe/local_projection.py:498:    def step(self, state: DensityState) -> DensityState:
 lorenz_fpe/local_projection.py:519:    def local_projection_history_summary(self) -> dict[str, object]:
-scripts/verify_math.py:16:def main() -> int:
 tests/test_spatial_experiment.py:19:def test_common_continuous_gaussian_sampler_is_bounded_and_reproducible():
 tests/test_spatial_experiment.py:35:def test_spatial_predeclaration_has_constant_ratio_and_one_common_grid():
 tests/test_spatial_experiment.py:58:def test_full_spd_predeclarations_reconstruct_diffusion_and_fix_reference_seed():
@@ -283,6 +285,15 @@ tests/test_spatial_experiment.py:77:def test_mature_bimodal_predeclaration_is_fu
 tests/test_spatial_experiment.py:95:def test_fine_graded_predeclaration_aligns_both_comparators_to_common_grid():
 tests/test_spatial_experiment.py:119:def test_time_aggregated_design_is_aligned_and_respects_uniform_cell_ceiling():
 tests/test_spatial_experiment.py:135:def test_z_conditioning_and_truncated_mixture_sampling_preserve_lobe_symmetry():
+scripts/train_neural_pilot.py:13:class Spectral(nn.Module):
+scripts/train_neural_pilot.py:14:    def __init__(self, width=8, modes=4):
+scripts/train_neural_pilot.py:19:    def forward(self, x):
+scripts/train_neural_pilot.py:28:class Operator(nn.Module):
+scripts/train_neural_pilot.py:29:    def __init__(self):
+scripts/train_neural_pilot.py:38:    def forward(self, density):
+scripts/train_neural_pilot.py:52:def metrics(prediction, target):
+scripts/train_neural_pilot.py:55:    def statistics(field):
+scripts/train_neural_pilot.py:67:def main(root):
 lorenz_fpe/finite_volume.py:21:class FiniteVolumeResult:
 lorenz_fpe/finite_volume.py:30:class ConservativeFiniteVolume:
 lorenz_fpe/finite_volume.py:38:    def __init__(self, model: Lorenz63Model, domain: Domain, cfl: float = 0.72):
@@ -299,15 +310,6 @@ tests/test_solver_smoke.py:26:    def test_forecast_ksp_tolerances_are_configura
 tests/test_solver_smoke.py:34:    def test_graded_hex_common_grid_export_is_conservative(self):
 tests/test_solver_smoke.py:51:    def test_refined_structured_roundtrip_preserves_q1_shape(self):
 tests/test_solver_smoke.py:59:    def test_checkpoint_and_da_continuity_without_gaussianisation(self):
-scripts/train_neural_pilot.py:13:class Spectral(nn.Module):
-scripts/train_neural_pilot.py:14:    def __init__(self, width=8, modes=4):
-scripts/train_neural_pilot.py:19:    def forward(self, x):
-scripts/train_neural_pilot.py:28:class Operator(nn.Module):
-scripts/train_neural_pilot.py:29:    def __init__(self):
-scripts/train_neural_pilot.py:38:    def forward(self, density):
-scripts/train_neural_pilot.py:52:def metrics(prediction, target):
-scripts/train_neural_pilot.py:55:    def statistics(field):
-scripts/train_neural_pilot.py:67:def main(root):
 lorenz_fpe/dataset.py:16:class DatasetConfig:
 lorenz_fpe/dataset.py:30:class DatasetSplitter:
 lorenz_fpe/dataset.py:32:    def split(trajectory_ids: list[str], seed: int = 1729) -> dict[str,list[str]]:
@@ -318,6 +320,7 @@ lorenz_fpe/dataset.py:131:    def _mode_count(a: np.ndarray, relative_threshold:
 lorenz_fpe/dataset.py:148:    def _distribution_report(rows: list[dict[str,object]]) -> dict[str,object]:
 tests/test_neural_pilot_export.py:9:def test_aligned_coarsening_preserves_mass():
 tests/test_neural_pilot_export.py:26:def test_sampled_prior_is_positive_normalized_and_reproducible():
+tests/test_neural_pilot_export.py:47:def test_full_first_attractor_cloud_has_no_negative_smoothing_tails():
 scripts/run_experiment.py:22:def matched_marginal_tvs(
 scripts/run_experiment.py:45:def package_version(name: str) -> str | None:
 scripts/run_experiment.py:52:def git_text(*args: str) -> str:
@@ -446,3 +449,4 @@ scripts/build_solver_monograph_evidence.py:17:def tex(s):
 scripts/build_solver_monograph_evidence.py:21:def flatten(obj, prefix=''):
 scripts/build_solver_monograph_evidence.py:34:def main():
 scripts/build_solver_monograph_evidence.py:134:def render_appendices(ledger):
+scripts/check_neural_pilot_gpu.py:10:def main():

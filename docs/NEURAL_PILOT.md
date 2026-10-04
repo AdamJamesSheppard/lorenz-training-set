@@ -6,7 +6,8 @@ This is discrete-solver learning, not whole-space/continuum certification.
 Plain-language workflow and actual first-launch failure:
 `docs/NEURAL_PILOT_WORKFLOW.md`. Run `20261004T131332Z` stopped at empirical
 initialization due to negative smoothing-roundoff vertices; no forecast or
-training completed. Preparation correction and a new immutable run are needed.
+training completed. A same-kernel direct-convolution preparation correction and
+failed-seed regression now support a fresh immutable restart.
 
 Implementation checks cover conservative coarsening, reproducible sampled
 priors, the Python suite and executable solver invariants. The FNO passes a
@@ -48,21 +49,33 @@ persistence. Softplus and
 normalization enforce nonnegativity/unit discrete mass; these diagnostics are
 architectural constraints, not evidence that density predictions are accurate.
 No D/T input channels are used because both parameters are fixed in this pilot.
-Train 100 CPU epochs, batch one, seed 71023. Validation selects the checkpoint;
+Train 100 epochs on CUDA when available, with explicit CPU fallback, batch one,
+seed 71023. Validation selects the checkpoint;
 test is evaluated afterward. The input is only the state-space density; no
 observations or assimilation cycles are included in this user-selected test.
 Compare L1, relative L2, voxel-centre covariance,
 means, marginal TVs against persistence. No autoregressive rollout is supported
 by terminal-only pairs. Save model, training history, packages, hashes and splits.
 
-Training uses isolated `.venv/neural-pilot` with CPU torch 2.8.0 and numpy
+Training uses isolated `.venv/neural-pilot` with CUDA torch 2.8.0+cu128 and numpy
 2.2.6; existing solver environments are preserved. Upstream architecture and
 workflow reference: https://neuraloperator.github.io/dev/user_guide/index.html
 The compact implementation here is independently written in PyTorch.
 
-User preference: GPU for neural training, CPU/MPI for PDE target generation.
-The RTX 4070 has nominal 12 GiB VRAM (checked 2026-10-04). CUDA runtime/device
-handling must be enabled before training; current code/environment remains CPU-only.
+GPU training: `bash scripts/setup-neural-pilot-gpu`; hardware check:
+`.venv/neural-pilot/bin/python scripts/check_neural_pilot_gpu.py`.
+`device=auto` selects CUDA when available, otherwise CPU; explicit CUDA fails
+clearly if unavailable. Model, targets, inputs and checkpoint loading use the
+selected device; metrics explicitly transfer back to CPU. Actual hardware and
+CUDA/PyTorch versions are saved to `training_device.json`, with peak GPU tensor
+allocation included in evaluation. PDE targets remain CPU/MPI. The RTX 4070
+has nominal 12 GiB VRAM. No driver or solver-environment changes are required.
+
+Verified on 2026-10-04 with torch 2.8.0+cu128 / CUDA 12.8 on the RTX 4070:
+full 60x72x72 forward/backward and optimizer steps, finite gradients, positive
+normalized output, CPU/GPU agreement and GPU checkpoint round-trip all pass.
+Peak allocated GPU tensor memory in this software fixture was 130.9 MiB;
+this is not a numerical-density accuracy result or a complete VRAM estimate.
 
 Pause below 2 GiB MemAvailable; resume the same process at >=2 GiB. Equal
 thresholds may cycle. There is no kill/relaunch, checkpoint or swap-to-disk

@@ -8,7 +8,7 @@ import subprocess
 from datetime import datetime, timezone
 
 import numpy as np
-from scipy.ndimage import uniform_filter
+from scipy.ndimage import convolve
 from memory_backpressure import wait_with_backpressure
 
 
@@ -46,7 +46,8 @@ def vertex_density(cloud):
     histogram,_=np.histogramdd(cloud,bins=(45,54,54),range=((-30,30),(-40,40),(-10,70)))
     if histogram.sum()!=len(cloud):
         raise ValueError('Attractor samples outside the tested box')
-    smooth=uniform_filter(histogram,size=3,mode='constant')
+    # Direct nonnegative sums avoid cancellation in the running-sum filter.
+    smooth=convolve(histogram,np.ones((3,3,3),dtype=np.float64)/27,mode='constant')
     padded=np.pad(smooth,1,mode='edge')
     vertices=sum(padded[i:i+46,j:j+55,k:k+55] for i in (0,1) for j in (0,1) for k in (0,1))/8
     # Exact integral of piecewise trilinear field, by tensor trapezoidal weights.
@@ -56,7 +57,10 @@ def vertex_density(cloud):
     mass=np.einsum('ijk,i,j,k',vertices,*weights)*384000/(45*54*54)
     if mass<=0:
         raise ValueError('Empty empirical prior')
-    return vertices/mass
+    density=vertices/mass
+    if not np.isfinite(density).all() or density.min()<0:
+        raise ValueError('Empirical density must be finite and nonnegative before dispatch')
+    return density
 
 
 def main():

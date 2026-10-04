@@ -8,8 +8,10 @@ constrained mass/positivity output as full-density accuracy. See NEURAL_PILOT.md
 
 First launch `20261004T131332Z` failed before forecast/training: negative
 smoothing-roundoff vertices reached the strict empirical importer. Correct the
-data preparation with a regression reproducing that sampled cloud, then create
-a fresh immutable run. See `docs/NEURAL_PILOT_WORKFLOW.md` for workflow and hashes.
+data preparation with direct convolution and a regression reproducing that
+sampled cloud (now implemented), then create a fresh immutable run. See
+`docs/NEURAL_PILOT_WORKFLOW.md` for workflow and hashes. CUDA training is enabled
+in the isolated runtime; PDE data generation remains CPU/MPI.
 
 The monograph audit confirms both aligned domain expansions completed all
 configured gates for the tested broader-support mature law at `t=0.05`.

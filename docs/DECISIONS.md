@@ -752,3 +752,32 @@ User clarified GPU preference for neural training, distinct from CPU/MPI PDE
 generation. RTX 4070 hardware confirmed locally, nominal 12 GiB VRAM. Record
 the preference and required CUDA runtime/device enablement in the workflow;
 the current CPU-only trainer is unchanged in this documentation task.
+
+## 2026-10-04: Enable CUDA neural training
+
+User explicitly authorized enabling the GPU. Upgrade only the isolated training
+environment to PyTorch 2.8.0+cu128; preserve NVIDIA driver and PDE/MFEM runtime.
+Add auto CUDA/CPU selection, device-aware inputs/model/checkpoint loading,
+CPU-transferred diagnostics and recorded hardware/peak tensor allocation.
+Reproducible setup and full-grid hardware test scripts accompany this change.
+The failed empirical-prior run remains immutable/stopped; no scientific targets
+are regenerated or training launched. CUDA readiness does not fix its separate
+negative smoothing-roundoff defect.
+
+## 2026-10-04: Repair sampled-density roundoff and restart pilot
+
+User explicitly requested investigation and restart. Failure was initialization
+rejection before any forecast step, not neural training. Replace running-sum
+uniform_filter with direct convolution by the identical nonnegative 3x3x3 box
+kernel, validate finite nonnegative vertices before dispatch, and reproduce
+the failed full seed/window in a regression. No acceptance threshold changes
+or clipping. Preserve original run 20261004T131332Z; restart into a fresh UTC
+directory. GPU readiness and data-preparation correctness are separate checks.
+
+Validation: all six empirical seeds produce zero negative vertices; failed
+cloud differs from the original by at most 2.1684e-19. Python suite 46/46 and
+scientific invariants 10/10 pass. Full-grid RTX 4070 test passes two optimizer
+steps, finite gradients, CPU/GPU field comparison and GPU checkpoint round-trip
+under torch 2.8.0+cu128 / CUDA 12.8; peak tensor allocation 130.9 MiB. Random
+software fixtures are not scientific target evidence. Runtime changes are
+isolated to `.venv/neural-pilot`; preserve existing display/GPU workloads.

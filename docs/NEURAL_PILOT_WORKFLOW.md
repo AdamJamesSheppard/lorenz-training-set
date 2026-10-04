@@ -120,20 +120,19 @@ coordinate channels. It learns a correction starting near the unchanged-input
 baseline. Positive output transformation and normalization impose nonnegative
 values and unit discrete mass, subject to floating-point error.
 
-Train on CPU for 100 epochs with seed 71023, Adam learning rate 0.002 and batch
+Train for 100 epochs with seed 71023, Adam learning rate 0.002 and batch
 size one. Minimize squared relative L2 density error. Choose the checkpoint by
 validation loss, then evaluate it on the held-out test pair.
 
-The paragraph above describes the currently implemented trainer. The user
-subsequently requested GPU use for neural training. Live hardware inspection
-on 2026-10-04 confirms an NVIDIA RTX 4070 with nominal 12 GiB VRAM. Intended
-execution is CPU/MPI for FPE data generation and GPU for neural training when
-available. Before training, enable a compatible CUDA PyTorch runtime and move
-the model and training/evaluation tensors to the selected device, recording
-device and package versions. The current isolated PyTorch build is CPU-only;
-GPU training is not enabled by this documentation change. Retain an explicit
-CPU fallback if a usable CUDA device is unavailable. Available system RAM and
-GPU VRAM are separate resource limits.
+The user requested GPU use for neural training. Hardware inspection on
+2026-10-04 confirms an NVIDIA RTX 4070 with nominal 12 GiB VRAM. The trainer
+now selects CUDA automatically when available, moves the model and input/target
+tensors onto it, and transfers outputs to CPU for NumPy diagnostics. It records
+the actual device/runtime in `training_device.json`. The isolated environment
+uses PyTorch 2.8.0+cu128 with bundled CUDA 12.8 libraries; the NVIDIA driver and
+PDE environments are unchanged. `device=auto` retains CPU fallback; an explicit
+unavailable CUDA request fails clearly. Available system RAM and GPU VRAM are
+separate resource limits. No solver run is restarted by enabling CUDA.
 
 This follows the supervised input-function/output-function workflow described
 in the [official neuraloperator guide](https://neuraloperator.github.io/dev/user_guide/index.html).
@@ -190,10 +189,11 @@ Independent recomputation identifies tiny negative roundoff in the compact
 uniform-filter pathway: direct convolution with the same nonnegative 3x3x3
 kernel produces nonnegative values. The strict import guard exposed a data
 preparation defect; this is not evidence of PDE evolution failure.
-The preparer needs a validated nonnegative smoothing implementation before a
-fresh immutable restart. This documentation change does not restart the run
-or alter its archived inputs. The earlier 18-24-hour estimate applies only to
-a successfully restarted job; the stopped run has no current completion ETA.
+The preparer subsequently uses direct nonnegative-kernel convolution with the
+same box kernel. A regression recreates the failed seed/window and requires
+finite nonnegative vertices before dispatch. The user authorized a fresh
+immutable restart; the original inputs remain unchanged. No clipping, threshold
+relaxation, Gaussian substitution or PDE change is used.
 
 Evidence hashes:
 

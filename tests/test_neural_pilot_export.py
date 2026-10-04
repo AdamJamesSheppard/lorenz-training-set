@@ -42,3 +42,19 @@ def test_sampled_prior_is_positive_normalized_and_reproducible():
         weight[[0,-1]]=.5
     mass=np.einsum('ijk,i,j,k',vertices,*weights)*384000/(45*54*54)
     assert abs(mass-1)<1e-12
+
+
+def test_full_first_attractor_cloud_has_no_negative_smoothing_tails():
+    path=Path(__file__).resolve().parents[1]/'mfem/run_neural_pilot.py'
+    sys.path.insert(0,str(path.parent))
+    try:
+        spec=importlib.util.spec_from_file_location('pilot_roundoff_regression',path)
+        module=importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+    finally:
+        sys.path.pop(0)
+    # Exact seed/horizon from failed immutable run 20261004T131332Z.
+    _,cloud=module.attractor_samples(71023)
+    assert cloud.shape==(1000,3)
+    density=module.vertex_density(cloud)
+    assert np.isfinite(density).all() and density.min()>=0

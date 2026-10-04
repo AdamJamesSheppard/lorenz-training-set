@@ -26,8 +26,9 @@ pass sample-level invariant gates.
 First pilot launch `runs/neural-pilot/20261004T131332Z` failed at empirical
 initialization: vertex minimum `-4.90038e-20` from smoothing roundoff was rejected
 by the strict MFEM importer. No forecast or neural training completed.
-Workflow/evidence: `docs/NEURAL_PILOT_WORKFLOW.md`; new-law preparation remains
-to be corrected before restarting. Existing solver certifications are unchanged.
+Workflow/evidence: `docs/NEURAL_PILOT_WORKFLOW.md`; direct nonnegative-kernel
+convolution and a failed-seed regression fix the preparer for a new authorized
+restart. Neural training is CUDA-preferred. Existing certifications are unchanged.
 
 ```ini
 METHOD_STATUS = MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED
