@@ -30,6 +30,12 @@ Workflow/evidence: `docs/NEURAL_PILOT_WORKFLOW.md`; direct nonnegative-kernel
 convolution and a failed-seed regression fix the preparer for a new authorized
 restart. Neural training is CUDA-preferred. Existing certifications are unchanged.
 
+Fresh restart: `runs/neural-pilot/20261004T133438Z`, source `11d222f`, persistent
+service `lorenz-neural-pilot-restart-20261004`. Startup status confirms law-0
+generation with the 208,787-cell mesh, unpaused, and 2/2 GiB memory thresholds.
+This records dispatch, not completed forecasting or training. CUDA hardware
+check passes; training follows only after all six accepted forecast pairs.
+
 ```ini
 METHOD_STATUS = MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED
 MATURE_DENSITY_CONVERGENCE = OPEN
