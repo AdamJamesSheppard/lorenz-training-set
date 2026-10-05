@@ -1,5 +1,17 @@
 # Operator-learning decisions
 
+## 2026-10-05 — OL-D005: G01 v1 fails; repair arithmetic and predeclare v2
+
+v1 at predeclaration7bfe51a failed its strict bitwise reconstruction criterion
+for all six laws. Other checks passed. Independent replay with the historical
+vertex_density implementation reproduces archived vertices bitwise. The new
+helper multiplied by precomputed cell volume instead of multiplying by whole
+domain volume and then dividing by cell count; these real-arithmetic equivalents
+differ in floating-point evaluation order (maximum nodal difference1.08e-19
+for law0). Repair only the helper's evaluation order. Retain all v1 evidence,
+retain every threshold unchanged, and predeclare v2 before rerunning. G01 remains
+OPEN pending v2 technical adjudication; no model, target or population changes.
+
 ## 2026-10-05 — OL-D004: owner selects attractor-density scope and opens G01
 
 Direct owner instruction: “Work on G01 I accept, keep the densities state space

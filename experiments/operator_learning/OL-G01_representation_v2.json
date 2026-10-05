@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "id": "OL-G01_representation_v2",
+  "gate_id": "OL-G01_REPRESENTATION_CONTRACT",
+  "kind": "archived_representation_audit",
+  "status": "PREDECLARED",
+  "question": "Does the archived occupation-density pipeline implement the declared law-to-FE-to-voxel-to-tensor contract?",
+  "hypotheses": [
+    "Aligned trilinear initialization is representable in Q2",
+    "Fine export and block means conserve FE mass",
+    "Pairs equal float32 casts; tensor scaling is explicit"
+  ],
+  "metrics": [
+    "initial reconstruction/export L1",
+    "export/coarsening mass",
+    "negative mass",
+    "bitwise cast identity",
+    "float32/tensor L1"
+  ],
+  "thresholds": {
+    "mass_error_max": 1e-10,
+    "negative_mass_max": 1e-13,
+    "projection_export_l1_max": 1e-10,
+    "float32_eps_multiplier": 4,
+    "pair_cast_bitwise_equal": true,
+    "reconstruction_bitwise_equal": true,
+    "rationale": "Existing mass invariant; numerical negativity roundoff; aligned Q1/Q2 identity; machine-derived float32 budget. No continuum/resolution accuracy claim."
+  },
+  "seeds": {
+    "historical_generator_base": 71023,
+    "new_randomness": null
+  },
+  "inputs": {
+    "operator_learning/representation.py": "d195c0098e7041be1d5643102322e8b4e9406dcc3c74994890d5a34c76733f1c",
+    "operator_learning/alignment.py": "16dbec8b6f7046d90c15395a229054f0cff47218f50b438a670b8a216a664451",
+    "operator_learning/numerics.py": "397fe807db13f6b77c8d550f8cfc8c85ce48cb57fa9d88db6362b47628f9dded",
+    "scripts/run_representation_contract.py": "35b0eafd96e1fad9107e53ddc490c6654e9fb2baf7e7f9257ed399a3a95a2b6c",
+    "mfem/empirical_prior.hpp": "3653dbe1f1963f1e19ca25b9269002ae8798ea615c3e74f01e0311aaf6791629",
+    "mfem/mfem_physical_equivalence.cpp": "f0b4588cb9cce6a884678aa0c76a5c9bd825886b3d8a70e13d24507ea32d5760",
+    "mfem/run_neural_pilot.py": "2aa01348a6c976166e2b4523f512502be3df8a204dea37cb9fb2a83ec68e26af",
+    "scripts/train_neural_pilot.py": "1f223aa6f0cf0f2ef4029446875691f6209dce4754c009f4dbb2bb781febac1a",
+    "runs/neural-pilot/20261004T133438Z/law0/attractor_samples.npy": "20ec5942d9f117aac7603deed1e964fc30de939484c4926f3da9507696d2ce50",
+    "runs/neural-pilot/20261004T133438Z/law0/empirical_prior.bin": "91b21dbd0c37ee543b14d9e5bb3d09ab2b729890f49ccc1056fce1c3b9e70177",
+    "runs/neural-pilot/20261004T133438Z/law0/pair.npz": "584745a4e7a8bb6a7a84fee975268759c871319734e80b5b0df3efaaf2821d82",
+    "runs/neural-pilot/20261004T133438Z/law0/prior_design.json": "d083dd45a467d375ba089e013d042ceded388362847756b767765f4e160adf5f",
+    "runs/neural-pilot/20261004T133438Z/law0/mfem/mature_summary.json": "bec26d9aa429d00cd4ad4c7acff8aa96912eb9bb87e6678fb8973a012be6f189",
+    "runs/neural-pilot/20261004T133438Z/law0/mfem/initial_q2_subcell_averages.bin": "59f5bb3f26dcf0d1bb8f77e4be67604b33472394d294076fc334b3d0903b15b6",
+    "runs/neural-pilot/20261004T133438Z/law0/mfem/final_q2_subcell_averages.bin": "0abb62337ffd160104fd50b92625c3e8038466fa9b2d03b57f0fbb43c9052429",
+    "runs/neural-pilot/20261004T133438Z/law1/attractor_samples.npy": "509a5813f5d7177b493d7717eb1df5d9e5017f8d9b06dd1170b9b64bf7e90ea6",
+    "runs/neural-pilot/20261004T133438Z/law1/empirical_prior.bin": "da984ef7205e9de5a8a8274afbad28afb24625ee542cc2d1629dad003cf65eaf",
+    "runs/neural-pilot/20261004T133438Z/law1/pair.npz": "f874215c1cad186db47c7f11e718f5dc8b36e6116c3f6cf1486fca5546a79108",
+    "runs/neural-pilot/20261004T133438Z/law1/prior_design.json": "e641c8c7759f76344d9af197c6f5aaf2ffadf954b83390cfa0442c92a4fcd93e",
+    "runs/neural-pilot/20261004T133438Z/law1/mfem/mature_summary.json": "4e8a5ca544e35486851162c7bbae4501ff8ab781273ebf82b9f734153ebbcc59",
+    "runs/neural-pilot/20261004T133438Z/law1/mfem/initial_q2_subcell_averages.bin": "328c93bfd0b3bd1cfa4608176c07678a9f3d66970561d4fdb4155ac93d7fc2d5",
+    "runs/neural-pilot/20261004T133438Z/law1/mfem/final_q2_subcell_averages.bin": "212d472e8e70d9604bd6d036eab88651f95e6fff6cdf12c2d7ef37deaa44dcd8",
+    "runs/neural-pilot/20261004T133438Z/law2/attractor_samples.npy": "c78062be49fd0d0b14ffad5585a04846002bc7e61ba365960a172a185258df50",
+    "runs/neural-pilot/20261004T133438Z/law2/empirical_prior.bin": "47a225c0ceb005bffd782b5f3e9738903020d74d3941130fe4c9a2527c7ca30c",
+    "runs/neural-pilot/20261004T133438Z/law2/pair.npz": "40db0b0e1d970ed05f8a5f0601d9a1e576298217967d8b813ee722dd69315ffd",
+    "runs/neural-pilot/20261004T133438Z/law2/prior_design.json": "20a7aede76e031d61e4a118ccae4f62b1854a589dfa9a8cffe20bd59986fbf0c",
+    "runs/neural-pilot/20261004T133438Z/law2/mfem/mature_summary.json": "3f620830c3910e67715f3d986106338afcb1fb70b5dfc8eada4f89cd593b3886",
+    "runs/neural-pilot/20261004T133438Z/law2/mfem/initial_q2_subcell_averages.bin": "ee9f3107b112cd93fe2f1dc8f44ea114650f5711daa2f8a7b07136d98adf13bb",
+    "runs/neural-pilot/20261004T133438Z/law2/mfem/final_q2_subcell_averages.bin": "fabf1177759e13fe8e26aab5d89488edaed982c9546b55b6825491083aa7a510",
+    "runs/neural-pilot/20261004T133438Z/law3/attractor_samples.npy": "10094fc05c69c27e5e4869edb799373efca7cbe75108d0246dcb84d5cdb8d709",
+    "runs/neural-pilot/20261004T133438Z/law3/empirical_prior.bin": "ed4e0d9d8c29753e50753457f5f77014188bcd6ae91c0cd3e0a319214a01aeb3",
+    "runs/neural-pilot/20261004T133438Z/law3/pair.npz": "23cbea352511fff49e120def4b041320f10f259001d82996402032f0f42315f5",
+    "runs/neural-pilot/20261004T133438Z/law3/prior_design.json": "835593fa76052c85b60d20e44233a657f0b90057f2b02f5b6c3cfb06921a73df",
+    "runs/neural-pilot/20261004T133438Z/law3/mfem/mature_summary.json": "3861217696fdfca713098a68bd2e3b6232f4fe2a5206454b14bdfaabe7a5418b",
+    "runs/neural-pilot/20261004T133438Z/law3/mfem/initial_q2_subcell_averages.bin": "c8930c6e95c0589e5b814272db2de063fcd94469647624b5e5ffa9831192ab7e",
+    "runs/neural-pilot/20261004T133438Z/law3/mfem/final_q2_subcell_averages.bin": "6f0f934f80e47c787f472d038ddea3f64109098529ae5b1e28441c6208cc7914",
+    "runs/neural-pilot/20261004T133438Z/law4/attractor_samples.npy": "152ae61423a2619c7672db10bd762e3edfb2d75996ea448bf7eb726599c077a3",
+    "runs/neural-pilot/20261004T133438Z/law4/empirical_prior.bin": "313d79965d240c14f504f5286f3efafc5673a60f42c7537554a569e945e7bbd3",
+    "runs/neural-pilot/20261004T133438Z/law4/pair.npz": "963408d535d766b720ebe64303ae9ea7a1073abab505dc9e01f21b8f00dc5acf",
+    "runs/neural-pilot/20261004T133438Z/law4/prior_design.json": "00b4153204f738c8c25df615c68d1bde2e39ab57afd5490cb73cb7e0090daf74",
+    "runs/neural-pilot/20261004T133438Z/law4/mfem/mature_summary.json": "ec71fe7885000b254b1545597534461a5c45b209e10cbcf233b82c7d115ed202",
+    "runs/neural-pilot/20261004T133438Z/law4/mfem/initial_q2_subcell_averages.bin": "458dda3aff961af12f5ce3dc62739a834c94511a93cc28ef1ba6d0c6daa53173",
+    "runs/neural-pilot/20261004T133438Z/law4/mfem/final_q2_subcell_averages.bin": "31fef423203c552e3cb415a0ad737835fc374ea270922ed00221569394bf4d10",
+    "runs/neural-pilot/20261004T133438Z/law5/attractor_samples.npy": "4573722ef4a04ef13c83b63ee2707e62c419623ed03681d803f14967c5e0c4d4",
+    "runs/neural-pilot/20261004T133438Z/law5/empirical_prior.bin": "c1eeaae9f92e5253627233f77f34641f79406adaec96e9f0c2e3bbac51024783",
+    "runs/neural-pilot/20261004T133438Z/law5/pair.npz": "0eaa5ee00c010f9e032d18ba7298d44bea3901e33490b16bcbe76e98c3580bda",
+    "runs/neural-pilot/20261004T133438Z/law5/prior_design.json": "aa552459a047a466dcdf9e77d8050fe2c78cc6e3d69139a20250a3bb69ade075",
+    "runs/neural-pilot/20261004T133438Z/law5/mfem/mature_summary.json": "1d64e2d0a8b1bcb24284f2026ff30c81e0b932bddc09bac3e87bb398c828db8d",
+    "runs/neural-pilot/20261004T133438Z/law5/mfem/initial_q2_subcell_averages.bin": "d9088bc38c3871b158d803c3220adc4b52017508b0cdd719a293a9a33997da1a",
+    "runs/neural-pilot/20261004T133438Z/law5/mfem/final_q2_subcell_averages.bin": "e3dc412d76593e76067c689115b58a9621514bf68d23e2afb3917fc879693ed6"
+  },
+  "command": [
+    "./scripts/run-in-env",
+    "python",
+    "scripts/run_representation_contract.py",
+    "{RUN_DIRECTORY}"
+  ],
+  "runtime_versions": {
+    "python": "3.12.13",
+    "numpy": "2.5.2",
+    "scipy": "1.18.0"
+  },
+  "hardware": {
+    "device": "cpu",
+    "mpi": false,
+    "gpu": false
+  },
+  "required_evidence": [
+    "six laws and twelve archived fields",
+    "input/source hashes",
+    "source-level FE/export contract",
+    "portable report and sealed provenance",
+    "asymmetric-axis and Q2 integration fixtures"
+  ],
+  "pass_consequences": "Eligible for scoped G01 adjudication and G02 only; no new targets or training.",
+  "failure_consequences": "Preserve failed audit; retain G01; new predeclaration for repairs, no retrospective threshold relaxation.",
+  "assumptions": [
+    "OL-A01",
+    "OL-A03",
+    "OL-A08",
+    "OL-A09"
+  ],
+  "review_requirements": [
+    "Technical self-review labelled",
+    "Implementation authorization is not independent scientific review",
+    "No continuum/native replay inference"
+  ],
+  "source_run": "runs/neural-pilot/20261004T133438Z",
+  "laws": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "bounds": [
+    [
+      -30,
+      30
+    ],
+    [
+      -40,
+      40
+    ],
+    [
+      -10,
+      70
+    ]
+  ],
+  "fine_shape": [
+    180,
+    216,
+    216
+  ],
+  "learning_shape": [
+    60,
+    72,
+    72
+  ],
+  "histogram_shape": [
+    45,
+    54,
+    54
+  ],
+  "filter_width": 3,
+  "limitations": [
+    "No archived native FE coefficients: independent native re-export unavailable",
+    "G02/G04/G05 stability, reference accuracy and resolution error budget unqualified",
+    "Six archived laws are development evidence",
+    "Observed means sampled simulated states, not sensor-conditioned posteriors"
+  ],
+  "supersedes": "v1 FAILED strict reconstruction identity; arithmetic evaluation order fixed; all thresholds unchanged"
+}

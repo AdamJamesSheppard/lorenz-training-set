@@ -45,11 +45,11 @@
   {
     "id": "OL-G01_REPRESENTATION_CONTRACT",
     "question": "Is every law-to-tensor transformation explicit and correct?",
-    "scientific_motivation": "\u03bc\u2192p\u2192p_h\u2192P_Vp_h\u2192u must not silently change semantics.",
+    "scientific_motivation": "μ→p→p_h→P_Vp_h→u must not silently change semantics.",
     "prerequisites": [
       "OL-G00_PROBABILITY_DISTRIBUTION_ALIGNMENT"
     ],
-    "frozen_experiment_definition": "REPRESENTATION_CONTRACT_V1.md and committed OL-G01_representation_v1.json; archived six-law audit only",
+    "frozen_experiment_definition": "REPRESENTATION_CONTRACT_V1.md and committed OL-G01_representation_v2.json; v1 failure preserved, same thresholds",
     "evidence_required": "Conservative transfer fixtures and complete per-family representation records.",
     "metrics": "Units, axes, mass, projection/lifting/scaling and normalization.",
     "predeclared_thresholds": {
@@ -70,7 +70,7 @@
     "relevant_assumptions": [
       "OL-A01"
     ],
-    "experiment_config": "experiments/operator_learning/OL-G01_representation_v1.json",
+    "experiment_config": "experiments/operator_learning/OL-G01_representation_v2.json",
     "evidence_run": null,
     "decision_status": "OPEN",
     "adjudication": null
@@ -159,7 +159,7 @@
     ],
     "frozen_experiment_definition": "Commit a versioned, non-DRAFT config and its hash before execution; current programme catalogue is not an executable predeclaration.",
     "evidence_required": "Export/dtype error budget compared with required surrogate accuracy.",
-    "metrics": "FE\u2192180\u00d7216\u00d7216\u219260\u00d772\u00d772, grid hierarchy, dtype L1/TV/moment error.",
+    "metrics": "FE→180×216×216→60×72×72, grid hierarchy, dtype L1/TV/moment error.",
     "predeclared_thresholds": "TO_BE_PREDECLARED_BEFORE_RUN",
     "pass_condition": "All frozen scientific and provenance criteria pass; named reviewer and approver record scope and limitations.",
     "failure_condition": "Any required criterion fails or evidence is missing; missing evidence remains OPEN rather than a fabricated FAIL/PASS.",
@@ -209,7 +209,7 @@
     ],
     "frozen_experiment_definition": "Commit a versioned, non-DRAFT config and its hash before execution; current programme catalogue is not an executable predeclaration.",
     "evidence_required": "Same physical-law representation and independently propagated mixtures.",
-    "metrics": "\u0394lin=||S_h(\u03b1p+(1\u2212\u03b1)q)\u2212\u03b1S_hp\u2212(1\u2212\u03b1)S_hq||L1; correlate with corrections.",
+    "metrics": "Δlin=||S_h(αp+(1−α)q)−αS_hp−(1−α)S_hq||L1; correlate with corrections.",
     "predeclared_thresholds": "TO_BE_PREDECLARED_BEFORE_RUN",
     "pass_condition": "All frozen scientific and provenance criteria pass; named reviewer and approver record scope and limitations.",
     "failure_condition": "Any required criterion fails or evidence is missing; missing evidence remains OPEN rather than a fabricated FAIL/PASS.",
@@ -360,7 +360,7 @@
     ],
     "frozen_experiment_definition": "Commit a versioned, non-DRAFT config and its hash before execution; current programme catalogue is not an executable predeclaration.",
     "evidence_required": "Independent 2T targets and identical initial-law representation.",
-    "metrics": "||\u015cT(\u015cTp)\u2212S2Tp|| and one-shot 2T reference/approximation where available.",
+    "metrics": "||ŜT(ŜTp)−S2Tp|| and one-shot 2T reference/approximation where available.",
     "predeclared_thresholds": "TO_BE_PREDECLARED_BEFORE_RUN",
     "pass_condition": "All frozen scientific and provenance criteria pass; named reviewer and approver record scope and limitations.",
     "failure_condition": "Any required criterion fails or evidence is missing; missing evidence remains OPEN rather than a fabricated FAIL/PASS.",

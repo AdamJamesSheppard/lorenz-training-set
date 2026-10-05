@@ -44,3 +44,12 @@ def test_q2_exact_quadrature_and_hanging_child_volume_weights():
     children = [q2_box_average(f, [i/2, j/2, k/2], [(i+1)/2, (j+1)/2, (k+1)/2])
                 for i in (0, 1) for j in (0, 1) for k in (0, 1)]
     assert sum(children)/8 == pytest.approx(whole)
+
+
+def test_historical_mass_arithmetic_order_is_reproducible():
+    vertices = np.arange(46*55*55, dtype=float).reshape(46, 55, 55)/27
+    weights = [np.ones(n) for n in vertices.shape]
+    for w in weights:
+        w[[0, -1]] = .5
+    expected = np.einsum('ijk,i,j,k', vertices, *weights)*384000/(45*54*54)
+    assert vertex_mass(vertices, [(-30, 30), (-40, 40), (-10, 70)]) == expected

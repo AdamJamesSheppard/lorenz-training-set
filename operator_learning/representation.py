@@ -12,8 +12,10 @@ def vertex_mass(vertices, bounds):
     weights = [np.ones(n) for n in vertices.shape]
     for weight in weights:
         weight[[0, -1]] = .5
-    cell_volume = np.prod([(hi-lo)/(n-1) for (lo, hi), n in zip(bounds, vertices.shape)])
-    return float(np.einsum('ijk,i,j,k', vertices, *weights)*cell_volume)
+    # Preserve the historical evaluation order, not only its real-arithmetic value.
+    volume = np.prod([hi-lo for lo, hi in bounds])
+    cells = np.prod([n-1 for n in vertices.shape])
+    return float(np.einsum('ijk,i,j,k', vertices, *weights)*volume/cells)
 
 
 def reconstruct_vertices(samples, bounds, histogram_shape, filter_width):

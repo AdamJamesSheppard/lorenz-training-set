@@ -33,7 +33,7 @@ Each pass unlocks only the next gated study; DA/production need explicit approva
 - **question**: Is every law-to-tensor transformation explicit and correct?
 - **scientific_motivation**: μ→p→p_h→P_Vp_h→u must not silently change semantics.
 - **prerequisites**: ["OL-G00_PROBABILITY_DISTRIBUTION_ALIGNMENT"]
-- **frozen_experiment_definition**: REPRESENTATION_CONTRACT_V1.md and committed OL-G01_representation_v1.json; archived six-law audit only
+- **frozen_experiment_definition**: REPRESENTATION_CONTRACT_V1.md and committed OL-G01_representation_v2.json; v1 failure preserved, same thresholds
 - **evidence_required**: Conservative transfer fixtures and complete per-family representation records.
 - **metrics**: Units, axes, mass, projection/lifting/scaling and normalization.
 - **predeclared_thresholds**: {"mass_error_max": 1e-10, "negative_mass_max": 1e-13, "projection_export_l1_max": 1e-10, "float32_eps_multiplier": 4, "pair_cast_bitwise_equal": true, "reconstruction_bitwise_equal": true, "rationale": "Existing mass invariant; numerical negativity roundoff; aligned Q1/Q2 identity; machine-derived float32 budget. No continuum/resolution accuracy claim."}
@@ -44,7 +44,7 @@ Each pass unlocks only the next gated study; DA/production need explicit approva
 - **claims_permitted_after_pass**: Only scoped representation contract evidence for the frozen population/config.
 - **claims_still_forbidden_after_pass**: Unrestricted generalization, continuum accuracy without reference bounds, DA performance and production replacement.
 - **relevant_assumptions**: ["OL-A01"]
-- **experiment_config**: experiments/operator_learning/OL-G01_representation_v1.json
+- **experiment_config**: experiments/operator_learning/OL-G01_representation_v2.json
 - **evidence_run**: null
 - **decision_status**: OPEN
 - **adjudication**: null
