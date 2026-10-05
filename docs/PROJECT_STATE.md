@@ -30,7 +30,12 @@ study are authorized. No large new target campaign or operator-assisted DA.
 2026-10-05: user authorized the bounded G00 alignment comparison, predeclared
 in experiments/operator_learning/OL-G00_alignment_v2.json. This generates only
 small Monte Carlo/conditioning examples, without FEM targets or neural training.
-G00 remains OPEN pending evidence and scoped population approval.
+At dispatch, G00 remained OPEN pending evidence and scoped population approval.
+
+The v2 comparison completed: technical checks pass and 117 sealed files verify.
+Results: docs/operator_learning/evidence/G00_ALIGNMENT_V2_20261005.md.
+G00 now awaits owner approval of the recommended mixed population/roles; no
+downstream qualification or expensive target-generation permission has changed.
 
 ## FEM evidence remains separate
 

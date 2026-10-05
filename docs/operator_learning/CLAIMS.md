@@ -19,3 +19,9 @@ REJECTED. Software tests alone never prove an unrestricted scientific statement.
 
 A new decision updates evidence/classification explicitly; original historical
 results remain unchanged. No entry implies any G00–G17 pass.
+
+| ID | Claim | Class | Evidence | Falsification / limitation |
+|---|---|---|---|---|
+| OL-C011 | The current six occupation inputs do not closely reproduce the declared G00 conditioned examples | NUMERICAL | evidence/G00_ALIGNMENT_V2_20261005.json; nearest L1 .771–1.949 | Restricted generators/maps/scales, not universal application coverage |
+| OL-C012 | Sampling sensitivity may contribute materially to apparent occupation-law diversity | HEURISTIC | G00 block L1 .493–.921 versus original between-law .215–1.141 | Two replicates/one block length cannot identify law variation; G02/G03 required |
+| OL-C013 | The mixed population proposal is sufficient for all eventual posterior inputs | OPEN | G00 proposal pending owner review; G16 later | Sequential, observation-strength and parameter coverage untested |

@@ -2,15 +2,17 @@
   {
     "GENERATOR_ID": "OCCUPATION_PILOT_V1",
     "probability_interpretation": "Regularized deterministic finite-window occupation law",
-    "underlying_process_or_random_variable": "See DISTRIBUTION_CONTRACT.md; proposal details must be frozen before generation.",
-    "sampling_procedure": "Historical settings documented; proposals TO_BE_PREDECLARED_BEFORE_RUN",
-    "conditioning_procedure": "None for occupation; explicitly defined prior/likelihood required for posterior proposal.",
-    "density_reconstruction": "Explicitly record estimator or native FE law",
+    "underlying_process_or_random_variable": "Uniform-in-time finite-window sampling of one deterministic Lorenz trajectory; regularized occupation measure, not a posterior.",
+    "sampling_procedure": "Historical RK4 burn-in20/window10, dt0.001, sample interval0.01,1000 correlated samples; six source groups.",
+    "conditioning_procedure": "None.",
+    "density_reconstruction": "Histogram45x54x54, nonnegative 3-cell compact smoothing, trilinear reconstruction, FE projection and conservative export60x72x72.",
     "regularization": "Explicitly record; no forced Gaussian/GMM state fit for principal population",
     "parameters": {
-      "status": "unverified_for_population_coverage"
+      "source_run": "runs/neural-pilot/20261004T133438Z",
+      "G00_evidence": "docs/operator_learning/evidence/G00_ALIGNMENT_V2_20261005.md",
+      "representativeness": "unverified"
     },
-    "known_bias": "Sampling/conditioning/representation bias unresolved",
+    "known_bias": "Finite-window dependence, stationarity/reconstruction unverified. G00 block-replicate L1 .493-.921; six inputs do not closely reproduce declared conditioned examples.",
     "intended_scientific_role": "Historical reproduction/development only",
     "allowed_for_engineering_tests": true,
     "allowed_for_training": false,
@@ -69,6 +71,74 @@
     },
     "known_bias": "Sampling/conditioning/representation bias unresolved",
     "intended_scientific_role": "Historical FEM regression; not new training population",
+    "allowed_for_engineering_tests": true,
+    "allowed_for_training": false,
+    "allowed_for_validation": false,
+    "allowed_for_final_evaluation": false,
+    "representativeness_status": "unverified"
+  },
+  {
+    "GENERATOR_ID": "STOCHASTIC_ENSEMBLE_G00_V2",
+    "probability_interpretation": "Regularized finite-time stochastic state law",
+    "underlying_process_or_random_variable": "Whole-space Lorenz SDE with fixed full-SPD D, initialized from piecewise-constant historical voxel density",
+    "sampling_procedure": "16384 independent particles, two numerical ensembles per historical group; Euler-Maruyama dt0.00015625,320steps",
+    "conditioning_procedure": "None",
+    "density_reconstruction": "Same histogram/compact/trilinear reconstruction as G00, exact conservative voxel integration60x72x72",
+    "regularization": "Declared G00 histogram/compact kernel and voxel prior; no Gaussian/GMM state fitting",
+    "parameters": {
+      "T": 0.05,
+      "D": [
+        [
+          1,
+          0.4,
+          0.2
+        ],
+        [
+          0.4,
+          1,
+          0.3
+        ],
+        [
+          0.2,
+          0.3,
+          1
+        ]
+      ],
+      "groups": 6,
+      "replicates": 2,
+      "seeds": "OL-G00_alignment_v2.json"
+    },
+    "known_bias": "Finite particles, timestep, regularization; no reflecting simulation; no continuum or boundary qualification.",
+    "intended_scientific_role": "G00 comparison evidence and candidate qualification-family proposal; owner approval pending",
+    "allowed_for_engineering_tests": true,
+    "allowed_for_training": false,
+    "allowed_for_validation": false,
+    "allowed_for_final_evaluation": false,
+    "representativeness_status": "unverified"
+  },
+  {
+    "GENERATOR_ID": "CONDITIONED_VOXEL_G00_V2",
+    "probability_interpretation": "Bayesian conditional law for explicit regularized voxel prior",
+    "underlying_process_or_random_variable": "Single observation of independent numerically simulated Lorenz truth; ensemble prior at T0.05",
+    "sampling_procedure": "Common truth and standardized noise across each group's ensemble replicas; six related observation settings/group",
+    "conditioning_procedure": "x/xz/full coordinate likelihood, independent Gaussian noise, variance4 or16; full state density retained",
+    "density_reconstruction": "Exact cell-integrated likelihood times piecewise-constant ensemble prior; normalized voxel averages",
+    "regularization": "Declared G00 histogram/compact kernel and voxel prior; no Gaussian/GMM state fitting",
+    "parameters": {
+      "maps": [
+        "x",
+        "xz",
+        "full"
+      ],
+      "variances": [
+        4,
+        16
+      ],
+      "examples": 72,
+      "related_source_groups": 6
+    },
+    "known_bias": "Prior discretization/regularization and finite sampling; these are controlled single-observation examples, not calibrated sequential posteriors.",
+    "intended_scientific_role": "G00 comparison evidence and candidate qualification-family proposal; owner approval pending",
     "allowed_for_engineering_tests": true,
     "allowed_for_training": false,
     "allowed_for_validation": false,

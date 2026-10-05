@@ -24,6 +24,10 @@ DA are not authorized. Cheap explicitly labelled diagnostics on the original
 six pairs are allowed; they do not unlock gates. Do not tune on the original
 test law and continue claiming untouched evaluation.
 
+G00 comparison has completed: [results and population recommendation](evidence/G00_ALIGNMENT_V2_20261005.md).
+Technical evidence is complete; owner approval of the restricted population and
+generator roles remains pending. Passing numerical sanity checks did not promote G00.
+
 ## Standard commands (from repository root)
 
 - `python scripts/check_operator_learning.py`: dependency-free canonical checks.

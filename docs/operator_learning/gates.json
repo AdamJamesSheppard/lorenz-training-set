@@ -28,9 +28,19 @@
       "OL-A07"
     ],
     "experiment_config": "experiments/operator_learning/OL-G00_alignment_v2.json",
-    "evidence_run": null,
+    "evidence_run": "runs/operator-learning/OL-G00_alignment_v2/20261005T195958291168Z",
     "decision_status": "OPEN",
-    "adjudication": null
+    "adjudication": {
+      "status": "OPEN_PENDING_OWNER_POPULATION_APPROVAL",
+      "approver": null,
+      "reviewer": "Implementing agent; self-review, no independent assessor",
+      "date": "2026-10-05",
+      "config_sha256": "2302ba319cae92f5452cd3a66cf0364d4627e20c6ae5c23be227d6cd4e02e6ee",
+      "evidence_sha256": "ada2c3d1101dfea2ee4bf56fbea97a01306a24e3449aade50e06e10c34c1c9fc",
+      "predeclaration_commit": "fe5607e0b4159605ca59c1a1d173f47f2119330b",
+      "decision_record": "docs/operator_learning/DECISIONS.md OL-D003B",
+      "limitations": "Illustrative six source groups, limited reconstruction/MC, fixed noise/maps and no sequential posterior coverage; owner approval required."
+    }
   },
   {
     "id": "OL-G01_REPRESENTATION_CONTRACT",

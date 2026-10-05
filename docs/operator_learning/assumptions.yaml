@@ -5,7 +5,7 @@ OL-A01:
 OL-A02:
   statement: Deterministic finite-window occupation densities represent the eventual posterior population.
   status: unverified
-  evidence: OL-G00_PROBABILITY_DISTRIBUTION_ALIGNMENT
+  evidence: G00 evidence/G00_ALIGNMENT_V2_20261005.md shows missing conditioned-example structures in the current six inputs; universal representativeness remains unverified
 OL-A03:
   statement: The learning grid resolves application-relevant density structures.
   status: unverified

@@ -1,9 +1,12 @@
 # G00 scoped population proposal — predeclared 2026-10-05
 
-Status: proposal pending comparison evidence and owner review. This document
+Status: comparison evidence complete; proposal pending owner review. This document
 does not accept any family for scientific training or promote G00.
 Config: experiments/operator_learning/OL-G00_alignment_v2.json. Version1 draft
 is preserved. The user authorized the small alignment study on 2026-10-05.
+
+Results are now recorded in evidence/G00_ALIGNMENT_V2_20261005.md. The proposal
+remains unapproved until explicit owner review of its actual population and roles.
 
 ## Intended application backwards constraint
 

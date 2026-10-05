@@ -13,10 +13,11 @@ Historical interpretation: DECISIONS.md. FEM method status is separate.
   "current_six_law_pilot": "COMPLETED_ENGINEERING_AND_RESTRICTED_LEARNING_PILOT",
   "current_model_scientifically_qualified": false,
   "next_required_gate": "OL-G00_PROBABILITY_DISTRIBUTION_ALIGNMENT",
-  "active_blocker": "Application-relevant probability-law population is unresolved.",
+  "active_blocker": "G00 comparison evidence is complete; owner approval of restricted input population and generator roles is pending.",
   "authorized": [
     "Governance and inexpensive explicitly labelled development diagnostics on existing six pairs",
-    "Design of G00 alignment comparisons; no unpredeclared scientific pass"
+    "Design of G00 alignment comparisons; no unpredeclared scientific pass",
+    "Review completed G00 evidence and restricted mixed-population proposal; no downstream promotion without approval"
   ],
   "locked": [
     "Large expensive target campaigns",
@@ -27,7 +28,7 @@ Historical interpretation: DECISIONS.md. FEM method status is separate.
   ],
   "operator_surrogate_authorized_for_da": false,
   "operator_production_authorized": false,
-  "last_adjudicated_evidence": "OL-D002: evidence/PILOT_20261004T133438Z.json, SHA256 ed0f7de946b94c8d768846f0be2486093f3a514fefcf84f11e52d0fdf2c07340; retrospective pilot audit, no OL gate pass.",
+  "last_adjudicated_evidence": "OL-D003B: evidence/G00_ALIGNMENT_V2_20261005.json, SHA256 ada2c3d1101dfea2ee4bf56fbea97a01306a24e3449aade50e06e10c34c1c9fc; technical evidence complete, G00 OPEN pending owner review.",
   "gates": {
     "OL-G00_PROBABILITY_DISTRIBUTION_ALIGNMENT": "OPEN",
     "OL-G01_REPRESENTATION_CONTRACT": "LOCKED",

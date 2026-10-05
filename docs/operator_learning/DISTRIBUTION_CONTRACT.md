@@ -55,3 +55,13 @@ conditioning before use. G00 may inspect small examples without initiating DA.
 
 GMM_REGRESSION: retain old explicitly configured mixture laws for FEM regression
 and historical comparisons. They do not silently define the new population.
+
+## G00 comparison implementations (2026-10-05)
+
+The proposal IDs above remain proposals, not blanket accepted families.
+`STOCHASTIC_ENSEMBLE_G00_V2` and `CONDITIONED_VOXEL_G00_V2` are implemented
+small comparison versions, registered with actual sampling/conditioning metadata.
+See evidence/G00_ALIGNMENT_V2_20261005.md. They have engineering permission only;
+application alignment and scientific dataset roles await owner review.
+Their voxel arrays remain full state-space densities, including after likelihood
+conditioning. None is a Gaussian/GMM state approximation or a sequential DA result.

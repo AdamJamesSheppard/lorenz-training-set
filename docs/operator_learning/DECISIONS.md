@@ -1,5 +1,22 @@
 # Operator-learning decisions
 
+## 2026-10-05 — OL-D003B: G00 evidence complete; population approval pending
+
+The predeclared comparison at fe5607e completed in5.36 seconds. Technical checks
+pass, 117 sealed artifacts rehash without mismatch. All evidence and limitations:
+evidence/G00_ALIGNMENT_V2_20261005.md (tracked full report/provenance/seal).
+Conditioning shifts exceed ensemble-replicate differences; nearest occupation
+distances .771–1.949 and concentration/lobe changes support a mixed input
+population proposal. Block resampling variation .493–.921 warns against treating
+six occupation windows as assured independent/diverse laws.
+
+Recommendation: occupation laws remain fixtures/stress inputs; use explicitly
+defined unconditioned uncertainty and observation-conditioned full densities as
+candidate application-directed families. The owner must approve their actual
+roles and application scope after viewing evidence. Execution approval is not
+retroactively presented as approval of results. G00 remains OPEN, G01–G17 LOCKED,
+permissions unchanged. No arbitrary numerical coverage gate was added after run.
+
 ## 2026-10-05 — OL-D003A: predeclare small G00 alignment comparison
 
 The user authorizes execution of G00. Freeze alignment_v2 rather than rewrite

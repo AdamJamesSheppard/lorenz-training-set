@@ -1,5 +1,8 @@
 # Completed six-law pilot: retrospective adjudication, 2026-10-05
 
+Subsequent G00 evidence is separate: [alignment comparison and pending population decision](G00_ALIGNMENT_V2_20261005.md).
+It does not revise the historical pilot metrics below or promote a scientific gate.
+
 Decision: engineering and restricted-learning milestone. **No OL gate passed.**
 The current FNO is scientifically unqualified; statistical fidelity and
 application-population alignment remain open.
