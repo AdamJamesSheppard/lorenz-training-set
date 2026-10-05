@@ -6,11 +6,11 @@
   "current_scope": "FIXED_PHYSICS_FIXED_HORIZON_ATTRACTOR_DENSITIES",
   "current_six_law_pilot": "COMPLETED_ENGINEERING_AND_RESTRICTED_LEARNING_PILOT",
   "current_model_scientifically_qualified": false,
-  "next_required_gate": "OL-G01_REPRESENTATION_CONTRACT",
-  "active_blocker": "G01 law-to-FEM-to-voxel-to-tensor representation contract requires verification.",
+  "next_required_gate": "OL-G02_RECONSTRUCTION_STABILITY",
+  "active_blocker": "G02 sample-size, temporal-dependence, histogram and smoothing stability require predeclaration and evidence.",
   "authorized": [
-    "Bounded G01 representation study on archived attractor-density laws",
-    "Inexpensive explicitly labelled development diagnostics; no expensive new target campaign"
+    "Design and predeclare bounded G02 attractor-density reconstruction stability study",
+    "Inexpensive explicitly labelled development diagnostics; no expensive target campaign or neural retraining"
   ],
   "locked": [
     "Large expensive target campaigns",
@@ -21,11 +21,11 @@
   ],
   "operator_surrogate_authorized_for_da": false,
   "operator_production_authorized": false,
-  "last_adjudicated_evidence": "OL-D004 owner-approved scoped G00 acceptance: ACCEPTED_POPULATION_V1.md; original G00 comparison evidence unchanged.",
+  "last_adjudicated_evidence": "OL-D006; evidence/G01_REPRESENTATION_V2_20261005.md; strict v1 failure preserved.",
   "gates": {
     "OL-G00_PROBABILITY_DISTRIBUTION_ALIGNMENT": "PASSED",
-    "OL-G01_REPRESENTATION_CONTRACT": "OPEN",
-    "OL-G02_RECONSTRUCTION_STABILITY": "LOCKED",
+    "OL-G01_REPRESENTATION_CONTRACT": "PASSED",
+    "OL-G02_RECONSTRUCTION_STABILITY": "OPEN",
     "OL-G03_INPUT_DIVERSITY": "LOCKED",
     "OL-G04_REFERENCE_TARGET_APPLICABILITY": "LOCKED",
     "OL-G05_EXPORT_FIDELITY": "LOCKED",

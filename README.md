@@ -5,8 +5,8 @@
 Entry point: [docs/operator_learning/README.md](docs/operator_learning/README.md).
 The completed six-law pilot demonstrates target-generation/GPU-training feasibility
 and restricted density-learning gains, with serious statistical and boundary errors.
-No model is scientifically qualified. The owner accepted the restricted attractor-density population; representation verification is next:
-`NEXT_REQUIRED_GATE = OL-G01_REPRESENTATION_CONTRACT`.
+No model is scientifically qualified. The owner accepted the restricted attractor-density population; G01 representation checks pass; reconstruction stability is next:
+`NEXT_REQUIRED_GATE = OL-G02_RECONSTRUCTION_STABILITY`.
 Production and operator-assisted DA remain unauthorized. FEM evidence below retains
 its historical scope; the eventual posterior forecast and current density-only pilot
 are separate tasks. Run `python scripts/check_operator_learning.py` for fast controls.

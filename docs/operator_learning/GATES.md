@@ -45,9 +45,9 @@ Each pass unlocks only the next gated study; DA/production need explicit approva
 - **claims_still_forbidden_after_pass**: Unrestricted generalization, continuum accuracy without reference bounds, DA performance and production replacement.
 - **relevant_assumptions**: ["OL-A01"]
 - **experiment_config**: experiments/operator_learning/OL-G01_representation_v2.json
-- **evidence_run**: null
-- **decision_status**: OPEN
-- **adjudication**: null
+- **evidence_run**: runs/operator-learning/OL-G01_representation_v2/20261005T204321317739Z
+- **decision_status**: PASSED
+- **adjudication**: {"status": "PASSED_SCOPED_REPRESENTATION_CONTRACT", "approver": "Implementing agent delegated scoped technical adjudication by owner G01 instruction; no independent assessor or new owner outcome approval claimed", "reviewer": "Implementing agent; technical self-review", "date": "2026-10-05", "config_sha256": "ace6abdf1b847878c16c070927f57c11036f50c9d4f6b1145e72f92d3580dc86", "evidence_sha256": "699847ee4917759b21381ccf16c15dca0e88ed2097c1423224fcf75c77f6e486", "predeclaration_commit": "9198921f90defd4996a5c824069a6782ae04a472", "decision_record": "docs/operator_learning/DECISIONS.md OL-D006", "limitations": "Archived six-law representation consistency only. No native coefficient replay, continuum accuracy, reconstruction stability or learning-grid adequacy qualification."}
 
 ## OL-G02_RECONSTRUCTION_STABILITY
 
@@ -68,7 +68,7 @@ Each pass unlocks only the next gated study; DA/production need explicit approva
 - **relevant_assumptions**: ["OL-A01"]
 - **experiment_config**: TO_BE_PREDECLARED_BEFORE_RUN
 - **evidence_run**: null
-- **decision_status**: LOCKED
+- **decision_status**: OPEN
 - **adjudication**: null
 
 ## OL-G03_INPUT_DIVERSITY

@@ -15,7 +15,7 @@ CURRENT_MODEL_SCIENTIFICALLY_QUALIFIED = false
 PRODUCTION_DATASET_AUTHORIZED = false
 OPERATOR_SURROGATE_AUTHORIZED_FOR_DA = false
 OPERATOR_PRODUCTION_AUTHORIZED = false
-NEXT_REQUIRED_GATE = OL-G01_REPRESENTATION_CONTRACT
+NEXT_REQUIRED_GATE = OL-G02_RECONSTRUCTION_STABILITY
 ```
 
 The six-law pilot `runs/neural-pilot/20261004T133438Z` completed target generation
@@ -24,8 +24,8 @@ learning. Its statistical, marginal, lobe and boundary errors prevent surrogate
 qualification. The original test law has been inspected; reuse for tuning makes
 it development data. G00 passed within the owner-approved restricted attractor-density scope; posterior relevance remains unverified.
 
-Only inexpensive labelled development diagnostics and the bounded archived G01
-representation audit are authorized. No large new target campaign or operator-assisted DA.
+Only inexpensive labelled development diagnostics and G02 reconstruction
+stability design are authorized. No large new target campaign or operator-assisted DA.
 
 2026-10-05: user authorized the bounded G00 alignment comparison, predeclared
 in experiments/operator_learning/OL-G00_alignment_v2.json. This generates only
@@ -35,7 +35,8 @@ At dispatch, G00 remained OPEN pending evidence and scoped population approval.
 The v2 comparison completed: technical checks pass and 117 sealed files verify.
 Results: docs/operator_learning/evidence/G00_ALIGNMENT_V2_20261005.md.
 Owner subsequently selected the restricted attractor-density family (OL-D004),
-passing scoped G00 and opening G01. The mixed proposal is not approved.
+passing scoped G00 and opening G01. G01 v2 subsequently passed under OL-D006;
+G02 reconstruction stability is next. The mixed proposal is not approved.
 No expensive target-generation permission has changed.
 
 ## FEM evidence remains separate

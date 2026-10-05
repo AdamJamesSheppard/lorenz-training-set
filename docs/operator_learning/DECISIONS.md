@@ -1,5 +1,18 @@
 # Operator-learning decisions
 
+## 2026-10-05 — OL-D006: scoped G01 passes; G02 is next
+
+v2 predeclared at9198921 passes all frozen checks on six initial/final archived
+occupation-density pairs. See evidence/G01_REPRESENTATION_V2_20261005.md and
+sealed JSON. All sample-to-vertex reconstructions and conservative pair casts
+are bitwise identical; maximum initial physical L1 difference2.76e-14, export
+mass discrepancy2.50e-13 and measured negative mass0. Preserve v1 failure.
+Scoped technical adjudication by implementing agent under owner's G01 task
+authorization; self-review, no independent assessor. Open G02 reconstruction
+stability. Native replay, continuum accuracy, voxel resolution adequacy, actual
+posterior relevance and scientific surrogate qualification remain unverified.
+Retain owner-selected attractor population; no new target campaign/training.
+
 ## 2026-10-05 — OL-D005: G01 v1 fails; repair arithmetic and predeclare v2
 
 v1 at predeclaration7bfe51a failed its strict bitwise reconstruction criterion

@@ -1,5 +1,15 @@
 # Operator-learning claim registry
 
+## OL-C-G01 — Archived attractor representation consistency
+
+Class: NUMERICAL. Six initial/final archived laws satisfy the explicit G01
+contract, frozen v2 criteria and portable fixtures. Evidence:
+evidence/G01_REPRESENTATION_V2_20261005.md; OL-D006. Falsification: mismatched
+hash, reproduction failure, nonconservative export or inconsistent scaling.
+Limitations: native FE coefficients absent; no independent native replay,
+continuum accuracy, reconstruction stability or learning-grid adequacy claim.
+v1 strict reconstruction failure is preserved and explicitly superseded by v2.
+
 Classes: ESTABLISHED (derivation under stated assumptions), NUMERICAL (numerical
 experiments), EMPIRICAL (observed data behaviour), HEURISTIC, CONJECTURE, OPEN,
 REJECTED. Software tests alone never prove an unrestricted scientific statement.
@@ -18,10 +28,11 @@ REJECTED. Software tests alone never prove an unrestricted scientific statement.
 | OL-C010 | Separate CPU checkpoint evaluation reproduces principal pilot errors | EMPIRICAL | evidence/PILOT_20261004T133438Z.json; clean audit source 7cb41a6 | Same implementation, no independent reviewer; small device differences retained |
 
 A new decision updates evidence/classification explicitly; original historical
-results remain unchanged. No entry implies any G00–G17 pass.
+results remain unchanged. Pilot claims alone imply no qualification-gate pass;
+scoped G00/G01 decisions are separately recorded in OL-D004 and OL-D006.
 
 | ID | Claim | Class | Evidence | Falsification / limitation |
 |---|---|---|---|---|
 | OL-C011 | The current six occupation inputs do not closely reproduce the declared G00 conditioned examples | NUMERICAL | evidence/G00_ALIGNMENT_V2_20261005.json; nearest L1 .771–1.949 | Restricted generators/maps/scales, not universal application coverage |
 | OL-C012 | Sampling sensitivity may contribute materially to apparent occupation-law diversity | HEURISTIC | G00 block L1 .493–.921 versus original between-law .215–1.141 | Two replicates/one block length cannot identify law variation; G02/G03 required |
-| OL-C013 | The mixed population proposal is sufficient for all eventual posterior inputs | OPEN | G00 proposal pending owner review; G16 later | Sequential, observation-strength and parameter coverage untested |
+| OL-C013 | The mixed population proposal is sufficient for all eventual posterior inputs | OPEN | G00 comparison retained; mixed proposal not selected under OL-D004; G16 later | Sequential, observation-strength and parameter coverage untested |

@@ -108,6 +108,9 @@ def validate_programme(state, gates, generators):
         if generator.get("representativeness_status") != "accepted_scoped":
             if any(generator.get(k) for k in permissions if k != "allowed_for_engineering_tests"):
                 errors.append("unverified generator granted scientific dataset permission")
+        elif any(generator.get(k) for k in permissions if k != "allowed_for_engineering_tests"):
+            if any(state.get('gates', {}).get(gate_id) != 'PASSED' for gate_id in ids[1:7]):
+                errors.append("scientific dataset permission before G01-G06 prerequisites")
     return errors
 
 

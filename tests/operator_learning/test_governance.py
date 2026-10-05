@@ -63,6 +63,12 @@ def test_unverified_generator_has_no_training_permission():
     assert validate_programme(state, gates, generators)
 
 
+def test_accepted_population_does_not_bypass_dataset_prerequisites():
+    state, gates, generators = programme()
+    generators[0]['allowed_for_training'] = True
+    assert 'scientific dataset permission before G01-G06 prerequisites' in validate_programme(state, gates, generators)
+
+
 def test_draft_config_cannot_prepare():
     draft = json.loads((ROOT / "experiments/operator_learning/OL-G00_alignment_v1.json").read_text())
     with pytest.raises(ValueError):
