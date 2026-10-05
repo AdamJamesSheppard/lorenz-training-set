@@ -1,5 +1,17 @@
 # Operator-learning decisions
 
+## 2026-10-05 — OL-D004: owner selects attractor-density scope and opens G01
+
+Direct owner instruction: “Work on G01 I accept, keep the densities state space
+distributions of an observed Lorenz attractor”. Accept the restricted family in
+ACCEPTED_POPULATION_V1.md; do not infer acceptance of mixed/conditioned training.
+G00 scoped population-definition review PASSED; G01 representation contract OPEN.
+The G00 predeclared owner-review criterion is satisfied for this limited scope.
+Its numerical results and thresholds are unchanged; application posterior
+representativeness remains OPEN. OL-D003B's proposed mixed initial population is
+superseded as the selected direction, without deleting its evidence or warnings.
+No expensive dataset, scientific model, posterior-transfer or DA authorization.
+
 ## 2026-10-05 — OL-D003B: G00 evidence complete; population approval pending
 
 The predeclared comparison at fe5607e completed in5.36 seconds. Technical checks

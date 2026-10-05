@@ -17,16 +17,18 @@ engineering/restricted-learning milestone, not a qualification-gate pass.
 7. GOVERNANCE.md, ARCHITECTURE.md, RISKS.md — authority, checks and boundaries.
 8. FEM_GOVERNANCE_RECONSTRUCTION.md and evidence/ — history and audit pointers.
 
-**NEXT_REQUIRED_GATE = OL-G00_PROBABILITY_DISTRIBUTION_ALIGNMENT.**
-Alignment remains OPEN. G01–G17 are LOCKED. Large target campaigns, qualified
+**NEXT_REQUIRED_GATE = OL-G01_REPRESENTATION_CONTRACT.**
+G00 passed within the owner-selected attractor-density scope. G01 is OPEN; G02–G17 are LOCKED. Large target campaigns, qualified
 surrogate replacement, posterior-transfer qualification and operator-assisted
 DA are not authorized. Cheap explicitly labelled diagnostics on the original
 six pairs are allowed; they do not unlock gates. Do not tune on the original
 test law and continue claiming untouched evaluation.
 
 G00 comparison has completed: [results and population recommendation](evidence/G00_ALIGNMENT_V2_20261005.md).
-Technical evidence is complete; owner approval of the restricted population and
-generator roles remains pending. Passing numerical sanity checks did not promote G00.
+Owner accepted [the restricted attractor-density population](ACCEPTED_POPULATION_V1.md)
+under OL-D004; the mixed proposal remains historical. Read the explicit
+[representation contract](REPRESENTATION_CONTRACT_V1.md) before G01.
+Posterior-population relevance remains unverified.
 
 ## Standard commands (from repository root)
 

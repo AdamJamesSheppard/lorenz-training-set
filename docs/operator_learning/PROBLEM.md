@@ -14,7 +14,9 @@ D=BBᵀ/2. This bounded reflecting problem approximates a whole-space stochastic
 model; boundary insensitivity must be checked, not assumed.
 
 S_T: p0 ↦ pT, initially on a declared application-relevant subset of
-{p∈L¹(Ω)∩L²(Ω): p≥0, ∫Ωp=1}. The subset and sampling distribution are OPEN at G00.
+{p∈L¹(Ω)∩L²(Ω): p≥0, ∫Ωp=1}. The initial restricted family is the owner-approved
+attractor-derived population in ACCEPTED_POPULATION_V1.md. Its reconstruction
+stability/diversity and relevance to actual DA posterior inputs remain unverified.
 Well-posedness and regularity assumptions apply to any continuum claim.
 Data targets are accepted discrete FE forecasts and conservative exports.
 

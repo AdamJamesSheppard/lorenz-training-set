@@ -1,5 +1,9 @@
 # G00 scoped population proposal — predeclared 2026-10-05
 
+Historical proposal: the owner subsequently chose attractor-derived densities
+only for initial qualification (ACCEPTED_POPULATION_V1.md, OL-D004). This mixed
+population proposal was not approved. Comparison evidence below remains preserved.
+
 Status: comparison evidence complete; proposal pending owner review. This document
 does not accept any family for scientific training or promote G00.
 Config: experiments/operator_learning/OL-G00_alignment_v2.json. Version1 draft

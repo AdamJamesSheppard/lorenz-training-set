@@ -1,6 +1,6 @@
 # Repository map
 
-Generated: 2026-10-05T21:05:28+01:00
+Generated: 2026-10-05T21:41:21+01:00
 
 ```text
 docs/ACTIVE_TASK.md
@@ -18,6 +18,7 @@ docs/RESEARCH_DIRECTIONS.md
 docs/assumptions.yaml
 docs/generated/REPO_MAP.md
 docs/history/PROJECT_STATE_before_operator_learning_20261005.md
+docs/operator_learning/ACCEPTED_POPULATION_V1.md
 docs/operator_learning/ARCHITECTURE.md
 docs/operator_learning/CLAIMS.md
 docs/operator_learning/DATA_CONTRACT.md
@@ -30,6 +31,7 @@ docs/operator_learning/POPULATION_PROPOSAL_G00_V2.md
 docs/operator_learning/PROBLEM.md
 docs/operator_learning/PROJECT_STATE.md
 docs/operator_learning/README.md
+docs/operator_learning/REPRESENTATION_CONTRACT_V1.md
 docs/operator_learning/RISKS.md
 docs/operator_learning/assumptions.yaml
 docs/operator_learning/evidence/G00_ALIGNMENT_V2_20261005.json
@@ -91,6 +93,7 @@ experiments/mfem-uniform-equivalence-gate.yaml
 experiments/neural-pilot.json
 experiments/operator_learning/OL-G00_alignment_v1.json
 experiments/operator_learning/OL-G00_alignment_v2.json
+experiments/operator_learning/OL-G01_representation_v1.json
 experiments/same-mesh-q2-corrected.yaml
 experiments/same-mesh-q2-falsification.yaml
 experiments/same-mesh-q2-timestep.yaml
@@ -108,6 +111,7 @@ operator_learning/__init__.py
 operator_learning/alignment.py
 operator_learning/governance.py
 operator_learning/numerics.py
+operator_learning/representation.py
 scripts/audit_operator_pilot.py
 scripts/bootstrap
 scripts/build-pilot-solver
@@ -125,6 +129,7 @@ scripts/run-experiment
 scripts/run-in-env
 scripts/run_distribution_alignment.py
 scripts/run_experiment.py
+scripts/run_representation_contract.py
 scripts/setup-neural-pilot-gpu
 scripts/train_neural_pilot.py
 scripts/verify-math
@@ -139,6 +144,7 @@ tests/operator_learning/test_historical_evidence.py
 tests/operator_learning/test_legacy_contract.py
 tests/operator_learning/test_model_optional.py
 tests/operator_learning/test_numerics.py
+tests/operator_learning/test_representation.py
 tests/test_accuracy_repairs.py
 tests/test_limiter.py
 tests/test_memory_backpressure.py
@@ -244,11 +250,6 @@ tests/test_validation.py
 ./build_experiment_manifest.py:76:def extract_configuration(path: Path) -> dict[str, object]:
 ./build_experiment_manifest.py:85:def command_output(command: list[str]) -> str | None:
 ./build_experiment_manifest.py:92:def main() -> None:
-./local_projection_optimizer_study.py:18:def _sha256(path: Path) -> str:
-./local_projection_optimizer_study.py:26:def _terminal_problems(
-./local_projection_optimizer_study.py:48:def _random_problems(
-./local_projection_optimizer_study.py:61:def run(args: argparse.Namespace) -> None:
-./local_projection_optimizer_study.py:200:def parser() -> argparse.ArgumentParser:
 ./same_mesh_q2_study.py:31:def _sha256(path: Path) -> str:
 ./same_mesh_q2_study.py:39:def _model(noise_matrix: list[float] | tuple[float, ...] | None) -> Lorenz63Model:
 ./same_mesh_q2_study.py:46:def _marginal_tv(cell_averages: np.ndarray, particles: np.ndarray,
@@ -270,19 +271,18 @@ tests/test_validation.py
 ./local_projection_study.py:44:def _difference_report(
 ./local_projection_study.py:66:def run(args: argparse.Namespace) -> None:
 ./local_projection_study.py:204:def parser() -> argparse.ArgumentParser:
+./local_projection_optimizer_study.py:18:def _sha256(path: Path) -> str:
+./local_projection_optimizer_study.py:26:def _terminal_problems(
+./local_projection_optimizer_study.py:48:def _random_problems(
+./local_projection_optimizer_study.py:61:def run(args: argparse.Namespace) -> None:
+./local_projection_optimizer_study.py:200:def parser() -> argparse.ArgumentParser:
+./mature_da_study.py:11:def tensor_stats(a,domain):
+./mature_da_study.py:28:def main():
 ./mature_dof_convex_diagnostic.py:20:def _simplex_projection(values: np.ndarray, target: float, lower: float) -> np.ndarray:
 ./mature_dof_convex_diagnostic.py:40:def _repair_cell_averages(solver, raw: DensityState) -> tuple[DensityState,np.ndarray]:
 ./mature_dof_convex_diagnostic.py:67:def _dof_convex_limit(solver, raw: DensityState) -> tuple[DensityState,dict[str,object]]:
 ./mature_dof_convex_diagnostic.py:113:def _evaluate(solver,raw: DensityState,label: str) -> dict[str,object] | None:
 ./mature_dof_convex_diagnostic.py:144:def main() -> int:
-./mature_da_study.py:11:def tensor_stats(a,domain):
-./mature_da_study.py:28:def main():
-operator_learning/numerics.py:6:def conservative_coarsen(density, shape):
-operator_learning/numerics.py:17:def density_l1(a, b, voxel_volume):
-operator_learning/numerics.py:26:def normalized_probability(density):
-operator_learning/numerics.py:33:def boundary_mass(probability, layers):
-operator_learning/numerics.py:40:def nearest_target(training_inputs, training_targets, query, voxel_volume):
-operator_learning/numerics.py:47:def group_split(groups, seed, counts):
 lorenz_fpe/validation.py:19:def _correlation(cov: np.ndarray) -> np.ndarray:
 lorenz_fpe/validation.py:24:def covariance_accuracy(pde_covariance: np.ndarray, samples: np.ndarray, seed: int,
 lorenz_fpe/validation.py:58:class ConstantModel:
@@ -315,12 +315,12 @@ tests/test_validation.py:6:    def setUpClass(cls):
 tests/test_validation.py:8:    def test_pure_diffusion(self):
 tests/test_validation.py:12:    def test_constant_advection_diffusion(self):
 tests/test_validation.py:16:    def test_non_gaussian(self):
-operator_learning/governance.py:25:def render_state(state):
-operator_learning/governance.py:32:def render_gates(gates):
-operator_learning/governance.py:46:def validate_programme(state, gates, generators):
-operator_learning/governance.py:114:def validate_predeclaration(config):
-operator_learning/governance.py:135:def validate_provenance(record):
-operator_learning/governance.py:154:def check_repository(root):
+operator_learning/representation.py:8:def vertex_mass(vertices, bounds):
+operator_learning/representation.py:19:def reconstruct_vertices(samples, bounds, histogram_shape, filter_width):
+operator_learning/representation.py:37:def trilinear_voxel_averages(vertices, bounds, shape):
+operator_learning/representation.py:43:def encode_tensor(density, volume):
+operator_learning/representation.py:52:def decode_tensor(tensor, volume):
+operator_learning/representation.py:58:def q2_box_average(function, lower, upper):
 lorenz_fpe/local_projection.py:34:class CellProjectionResult:
 lorenz_fpe/local_projection.py:46:class LocalPolynomialProjector:
 lorenz_fpe/local_projection.py:55:    def __init__(
@@ -341,16 +341,12 @@ tests/test_spatial_experiment.py:77:def test_mature_bimodal_predeclaration_is_fu
 tests/test_spatial_experiment.py:95:def test_fine_graded_predeclaration_aligns_both_comparators_to_common_grid():
 tests/test_spatial_experiment.py:119:def test_time_aggregated_design_is_aligned_and_respects_uniform_cell_ceiling():
 tests/test_spatial_experiment.py:135:def test_z_conditioning_and_truncated_mixture_sampling_preserve_lobe_symmetry():
-operator_learning/alignment.py:7:def normalize(p, bounds):
-operator_learning/alignment.py:15:def integrated_linear_basis(source_edges, target_edges):
-operator_learning/alignment.py:33:def reconstruct(samples, bounds, histogram_shape, target_shape, filter_width):
-operator_learning/alignment.py:52:def draw_density(p, bounds, count, rng):
-operator_learning/alignment.py:59:def drift(x):
-operator_learning/alignment.py:65:def evolve_sde(initial, D, dt, steps, rng, bounds):
-operator_learning/alignment.py:80:def condition_density(prior, bounds, dimensions, observation, variance):
-operator_learning/alignment.py:104:def block_resample(samples, block_length, rng):
-operator_learning/alignment.py:112:def density_summary(p, bounds, boundary_layers, transition_width, tail_z):
-operator_learning/alignment.py:132:def distance(a, b, bounds):
+operator_learning/numerics.py:6:def conservative_coarsen(density, shape):
+operator_learning/numerics.py:17:def density_l1(a, b, voxel_volume):
+operator_learning/numerics.py:26:def normalized_probability(density):
+operator_learning/numerics.py:33:def boundary_mass(probability, layers):
+operator_learning/numerics.py:40:def nearest_target(training_inputs, training_targets, query, voxel_volume):
+operator_learning/numerics.py:47:def group_split(groups, seed, counts):
 lorenz_fpe/finite_volume.py:21:class FiniteVolumeResult:
 lorenz_fpe/finite_volume.py:30:class ConservativeFiniteVolume:
 lorenz_fpe/finite_volume.py:38:    def __init__(self, model: Lorenz63Model, domain: Domain, cfl: float = 0.72):
@@ -376,11 +372,12 @@ scripts/train_neural_pilot.py:38:    def forward(self, density):
 scripts/train_neural_pilot.py:52:def metrics(prediction, target):
 scripts/train_neural_pilot.py:55:    def statistics(field):
 scripts/train_neural_pilot.py:67:def main(root):
-tests/test_limiter.py:6:class TestProjection(unittest.TestCase):
-tests/test_limiter.py:7:    def test_positive_and_conservative(self):
-tests/test_limiter.py:12:    def test_identity(self):
-tests/test_limiter.py:14:    def test_roundoff_repair_cannot_create_negative_active_entries(self):
-tests/test_limiter.py:22:    def test_trajectory_split_is_disjoint(self):
+operator_learning/governance.py:25:def render_state(state):
+operator_learning/governance.py:32:def render_gates(gates):
+operator_learning/governance.py:46:def validate_programme(state, gates, generators):
+operator_learning/governance.py:114:def validate_predeclaration(config):
+operator_learning/governance.py:135:def validate_provenance(record):
+operator_learning/governance.py:154:def check_repository(root):
 lorenz_fpe/dataset.py:16:class DatasetConfig:
 lorenz_fpe/dataset.py:30:class DatasetSplitter:
 lorenz_fpe/dataset.py:32:    def split(trajectory_ids: list[str], seed: int = 1729) -> dict[str,list[str]]:
@@ -392,35 +389,21 @@ lorenz_fpe/dataset.py:148:    def _distribution_report(rows: list[dict[str,objec
 tests/test_neural_pilot_export.py:9:def test_aligned_coarsening_preserves_mass():
 tests/test_neural_pilot_export.py:26:def test_sampled_prior_is_positive_normalized_and_reproducible():
 tests/test_neural_pilot_export.py:47:def test_full_first_attractor_cloud_has_no_negative_smoothing_tails():
-tests/test_accuracy_repairs.py:23:class TestProjectionAndSamplingAccuracy(unittest.TestCase):
-tests/test_accuracy_repairs.py:24:    def test_l2_projection_preserves_mass_and_improves_gaussian_covariance(self):
-tests/test_accuracy_repairs.py:46:    def test_limited_projection_is_positive_and_mass_conservative(self):
-tests/test_accuracy_repairs.py:59:    def test_native_q1_sampler_recovers_linear_density_mean(self):
-tests/test_accuracy_repairs.py:73:class TestAnalysisAndBoundaryAccuracy(unittest.TestCase):
-tests/test_accuracy_repairs.py:74:    def test_projected_bayes_update_is_normalized_and_improves_covariance(self):
-tests/test_accuracy_repairs.py:88:    def test_total_flux_manufactured_solution_converges(self):
-tests/test_accuracy_repairs.py:98:class TestQ2Properties(unittest.TestCase):
-tests/test_accuracy_repairs.py:99:    def test_q2_projection_preserves_second_moments_before_limiting(self):
-tests/test_accuracy_repairs.py:116:    def test_q2_bernstein_limiter_and_voxel_roundtrip(self):
-tests/test_accuracy_repairs.py:136:    def test_adaptive_bernstein_classification_distinguishes_three_outcomes(self):
-tests/test_accuracy_repairs.py:143:        def classify(offset):
-tests/test_accuracy_repairs.py:171:    def test_q2_limiter_scaling_factors_stay_in_unit_interval(self):
-tests/test_accuracy_repairs.py:186:    def test_forecast_can_record_an_unlimited_q2_trajectory(self):
-tests/test_accuracy_repairs.py:202:    def test_structured_q1_embedding_into_q2_is_exact(self):
-tests/test_accuracy_repairs.py:212:    def test_local_q2_projection_is_conservative_positive_and_minimum_change(self):
-tests/test_accuracy_repairs.py:237:    def test_osqp_local_projection_agrees_with_slsqp_oracle(self):
-tests/test_accuracy_repairs.py:269:    def test_local_projection_reports_optimizer_fallback_and_true_iteration_mean(self):
-tests/test_accuracy_repairs.py:286:        def fail_projection(coefficients, **kwargs):
-tests/test_accuracy_repairs.py:319:    def test_local_projection_retains_actual_stage1_state(self):
-tests/test_accuracy_repairs.py:361:    def test_local_q2_projection_exposes_negative_average_infeasibility(self):
-tests/test_accuracy_repairs.py:373:    def test_local_q2_projection_honours_prescribed_zero_average(self):
-tests/test_accuracy_repairs.py:387:    def test_local_projection_solver_feeds_certified_state_forward(self):
-tests/test_accuracy_repairs.py:413:class TestIndependentFiniteVolume(unittest.TestCase):
-tests/test_accuracy_repairs.py:414:    def test_total_flux_update_preserves_mass_and_positivity(self):
-scripts/run_experiment.py:22:def matched_marginal_tvs(
-scripts/run_experiment.py:45:def package_version(name: str) -> str | None:
-scripts/run_experiment.py:52:def git_text(*args: str) -> str:
-scripts/run_experiment.py:58:def main(config_path: Path, resume_run_dir: Path | None = None) -> int:
+operator_learning/alignment.py:7:def normalize(p, bounds):
+operator_learning/alignment.py:15:def integrated_linear_basis(source_edges, target_edges):
+operator_learning/alignment.py:33:def reconstruct(samples, bounds, histogram_shape, target_shape, filter_width):
+operator_learning/alignment.py:52:def draw_density(p, bounds, count, rng):
+operator_learning/alignment.py:59:def drift(x):
+operator_learning/alignment.py:65:def evolve_sde(initial, D, dt, steps, rng, bounds):
+operator_learning/alignment.py:80:def condition_density(prior, bounds, dimensions, observation, variance):
+operator_learning/alignment.py:104:def block_resample(samples, block_length, rng):
+operator_learning/alignment.py:112:def density_summary(p, bounds, boundary_layers, transition_width, tail_z):
+operator_learning/alignment.py:132:def distance(a, b, bounds):
+tests/test_mpi_consistency.py:4:class TestMPIConsistency(unittest.TestCase):
+tests/test_mpi_consistency.py:5:    def _run(self,ranks):
+tests/test_mpi_consistency.py:13:    def test_two_rank_limiter_agrees_with_serial(self):
+scripts/run_representation_contract.py:24:def sha(path):
+scripts/run_representation_contract.py:32:def execute(run):
 lorenz_fpe/core.py:34:def _global_sum(comm: MPI.Comm, value: float) -> float:
 lorenz_fpe/core.py:38:def _global_min(comm: MPI.Comm, value: float) -> float:
 lorenz_fpe/core.py:42:def _global_max(comm: MPI.Comm, value: float) -> float:
@@ -486,12 +469,36 @@ lorenz_fpe/core.py:1279:    def __init__(self, model: Lorenz63Model, dt: float =
 lorenz_fpe/core.py:1282:    def simulate(self, initial: Iterable[float], times: Iterable[float], seed: int) -> np.ndarray:
 lorenz_fpe/core.py:1293:def solver_metadata(solver: FokkerPlanckSolver) -> dict[str, object]:
 lorenz_fpe/core.py:1328:def write_json(path: Path, obj: object) -> None:
-tests/test_mpi_consistency.py:4:class TestMPIConsistency(unittest.TestCase):
-tests/test_mpi_consistency.py:5:    def _run(self,ranks):
-tests/test_mpi_consistency.py:13:    def test_two_rank_limiter_agrees_with_serial(self):
-scripts/run_distribution_alignment.py:24:def sha(path):
-scripts/run_distribution_alignment.py:28:def execute(run):
-scripts/run_distribution_alignment.py:57:    def store(name, family, law, replicate, density, metadata):
+tests/test_mfem_mature_compare.py:8:def test_uniform_voxel_statistics() -> None:
+tests/test_accuracy_repairs.py:23:class TestProjectionAndSamplingAccuracy(unittest.TestCase):
+tests/test_accuracy_repairs.py:24:    def test_l2_projection_preserves_mass_and_improves_gaussian_covariance(self):
+tests/test_accuracy_repairs.py:46:    def test_limited_projection_is_positive_and_mass_conservative(self):
+tests/test_accuracy_repairs.py:59:    def test_native_q1_sampler_recovers_linear_density_mean(self):
+tests/test_accuracy_repairs.py:73:class TestAnalysisAndBoundaryAccuracy(unittest.TestCase):
+tests/test_accuracy_repairs.py:74:    def test_projected_bayes_update_is_normalized_and_improves_covariance(self):
+tests/test_accuracy_repairs.py:88:    def test_total_flux_manufactured_solution_converges(self):
+tests/test_accuracy_repairs.py:98:class TestQ2Properties(unittest.TestCase):
+tests/test_accuracy_repairs.py:99:    def test_q2_projection_preserves_second_moments_before_limiting(self):
+tests/test_accuracy_repairs.py:116:    def test_q2_bernstein_limiter_and_voxel_roundtrip(self):
+tests/test_accuracy_repairs.py:136:    def test_adaptive_bernstein_classification_distinguishes_three_outcomes(self):
+tests/test_accuracy_repairs.py:143:        def classify(offset):
+tests/test_accuracy_repairs.py:171:    def test_q2_limiter_scaling_factors_stay_in_unit_interval(self):
+tests/test_accuracy_repairs.py:186:    def test_forecast_can_record_an_unlimited_q2_trajectory(self):
+tests/test_accuracy_repairs.py:202:    def test_structured_q1_embedding_into_q2_is_exact(self):
+tests/test_accuracy_repairs.py:212:    def test_local_q2_projection_is_conservative_positive_and_minimum_change(self):
+tests/test_accuracy_repairs.py:237:    def test_osqp_local_projection_agrees_with_slsqp_oracle(self):
+tests/test_accuracy_repairs.py:269:    def test_local_projection_reports_optimizer_fallback_and_true_iteration_mean(self):
+tests/test_accuracy_repairs.py:286:        def fail_projection(coefficients, **kwargs):
+tests/test_accuracy_repairs.py:319:    def test_local_projection_retains_actual_stage1_state(self):
+tests/test_accuracy_repairs.py:361:    def test_local_q2_projection_exposes_negative_average_infeasibility(self):
+tests/test_accuracy_repairs.py:373:    def test_local_q2_projection_honours_prescribed_zero_average(self):
+tests/test_accuracy_repairs.py:387:    def test_local_projection_solver_feeds_certified_state_forward(self):
+tests/test_accuracy_repairs.py:413:class TestIndependentFiniteVolume(unittest.TestCase):
+tests/test_accuracy_repairs.py:414:    def test_total_flux_update_preserves_mass_and_positivity(self):
+scripts/run_experiment.py:22:def matched_marginal_tvs(
+scripts/run_experiment.py:45:def package_version(name: str) -> str | None:
+scripts/run_experiment.py:52:def git_text(*args: str) -> str:
+scripts/run_experiment.py:58:def main(config_path: Path, resume_run_dir: Path | None = None) -> int:
 lorenz_fpe/afc.py:26:class AFCProjectionFokkerPlanckSolver(FokkerPlanckSolver):
 lorenz_fpe/afc.py:29:    def __init__(self, *args, **kwargs) -> None:
 lorenz_fpe/afc.py:51:    def _prepare_structured_layout(self) -> None:
@@ -503,44 +510,29 @@ lorenz_fpe/afc.py:183:    def _positive_low_order_step(self, old: np.ndarray) ->
 lorenz_fpe/afc.py:197:    def _limited_antidiffusion(low: np.ndarray, high: np.ndarray) -> tuple[np.ndarray, dict[str, float]]:
 lorenz_fpe/afc.py:227:    def step(self, state: DensityState) -> DensityState:
 lorenz_fpe/afc.py:300:    def local_projection_history_summary(self) -> dict[str, object]:
-tests/test_mfem_mature_compare.py:8:def test_uniform_voxel_statistics() -> None:
-tests/operator_learning/test_numerics.py:10:def test_conservative_export_and_l1():
-tests/operator_learning/test_numerics.py:19:def test_probability_and_boundary():
-tests/operator_learning/test_numerics.py:29:def test_nearest_baseline_only_uses_training_targets():
-tests/operator_learning/test_numerics.py:37:def test_group_split_reproducible_no_window_leakage():
-tests/operator_learning/test_governance.py:14:def programme():
-tests/operator_learning/test_governance.py:20:def test_canonical_repository():
-tests/operator_learning/test_governance.py:24:def test_wrong_next_gate_rejected():
-tests/operator_learning/test_governance.py:30:def test_locked_gate_cannot_be_opened_before_alignment():
-tests/operator_learning/test_governance.py:40:def test_no_premature_authorization(field):
-tests/operator_learning/test_governance.py:46:def test_pass_requires_adjudication_and_thresholds():
-tests/operator_learning/test_governance.py:58:def test_unverified_generator_has_no_training_permission():
-tests/operator_learning/test_governance.py:64:def test_draft_config_cannot_prepare():
-tests/operator_learning/test_governance.py:70:def test_provenance_rejects_missing_or_invalid_hashes():
 tests/test_memory_backpressure.py:12:def test_pause_resume_hysteresis_without_termination():
 tests/test_memory_backpressure.py:13:    class Process:
 tests/test_memory_backpressure.py:17:        def poll(self):
 tests/test_memory_backpressure.py:31:def test_resume_at_exact_two_gib_preserves_process():
 tests/test_memory_backpressure.py:32:    class Process:
 tests/test_memory_backpressure.py:36:        def poll(self):
-tests/operator_learning/test_model_optional.py:8:def test_historical_model_forward_backward():
-tests/operator_learning/test_g00_evidence.py:10:def test_g00_evidence_complete_without_approval_or_qualification():
-tests/operator_learning/test_g00_evidence.py:24:def test_owner_approval_cannot_be_implicitly_fabricated():
-scripts/prepare_operator_run.py:17:def git(*args):
-scripts/prepare_operator_run.py:21:def prepare(source):
+scripts/run_distribution_alignment.py:24:def sha(path):
+scripts/run_distribution_alignment.py:28:def execute(run):
+scripts/run_distribution_alignment.py:57:    def store(name, family, law, replicate, density, metadata):
+tests/test_limiter.py:6:class TestProjection(unittest.TestCase):
+tests/test_limiter.py:7:    def test_positive_and_conservative(self):
+tests/test_limiter.py:12:    def test_identity(self):
+tests/test_limiter.py:14:    def test_roundoff_repair_cannot_create_negative_active_entries(self):
+tests/test_limiter.py:22:    def test_trajectory_split_is_disjoint(self):
 scripts/check_neural_pilot_gpu.py:10:def main():
-tests/operator_learning/test_legacy_contract.py:12:def legacy():
-tests/operator_learning/test_legacy_contract.py:27:def test_unsupported_legacy_config_rejected(field, value):
-tests/operator_learning/test_legacy_contract.py:37:def test_historical_relaunch_blocked_by_default(monkeypatch):
-tests/operator_learning/test_alignment.py:10:def test_exact_affine_voxel_averages_and_partition_of_unity():
-tests/operator_learning/test_alignment.py:18:def test_conditioning_keeps_full_non_gaussian_density_and_mass():
-tests/operator_learning/test_alignment.py:30:def test_sampling_and_sde_reproducibility_and_zero_drift_noise_covariance():
-tests/operator_learning/test_alignment.py:43:def test_compact_reconstruction_normalizes_and_rejects_box_exits():
 scripts/plot_saved_density.py:21:def render(p, edges, title, time):
 scripts/plot_saved_density.py:51:def main():
-tests/operator_learning/test_historical_evidence.py:9:def report():
-tests/operator_learning/test_historical_evidence.py:17:def test_historical_operational_acceptance_and_provenance():
-tests/operator_learning/test_historical_evidence.py:33:def test_pilot_errors_preserved_without_qualification():
+tests/operator_learning/test_representation.py:10:def test_asymmetric_axes_and_conservative_hat_integration():
+tests/operator_learning/test_representation.py:21:def test_reconstruction_positive_normalized_and_rejects_exits():
+tests/operator_learning/test_representation.py:30:def test_tensor_scaling_has_no_hidden_normalization():
+tests/operator_learning/test_representation.py:40:def test_q2_exact_quadrature_and_hanging_child_volume_weights():
+scripts/prepare_operator_run.py:17:def git(*args):
+scripts/prepare_operator_run.py:21:def prepare(source):
 scripts/build_solver_monograph_evidence.py:17:def tex(s):
 scripts/build_solver_monograph_evidence.py:21:def flatten(obj, prefix=''):
 scripts/build_solver_monograph_evidence.py:34:def main():
@@ -548,8 +540,34 @@ scripts/build_solver_monograph_evidence.py:134:def render_appendices(ledger):
 scripts/plot_operator_comparison.py:19:def sha(path):
 scripts/plot_operator_comparison.py:23:def infer(source, output):
 scripts/plot_operator_comparison.py:69:def render(output):
+tests/operator_learning/test_numerics.py:10:def test_conservative_export_and_l1():
+tests/operator_learning/test_numerics.py:19:def test_probability_and_boundary():
+tests/operator_learning/test_numerics.py:29:def test_nearest_baseline_only_uses_training_targets():
+tests/operator_learning/test_numerics.py:37:def test_group_split_reproducible_no_window_leakage():
 scripts/audit_operator_pilot.py:17:def sha(path):
 scripts/audit_operator_pilot.py:21:def audit(source, output):
 scripts/audit_operator_pilot.py:81:            def means(field):
 scripts/package_solver_monograph.py:15:def digest(path):
 scripts/package_solver_monograph.py:19:def main():
+tests/operator_learning/test_legacy_contract.py:12:def legacy():
+tests/operator_learning/test_legacy_contract.py:27:def test_unsupported_legacy_config_rejected(field, value):
+tests/operator_learning/test_legacy_contract.py:37:def test_historical_relaunch_blocked_by_default(monkeypatch):
+tests/operator_learning/test_governance.py:14:def programme():
+tests/operator_learning/test_governance.py:20:def test_canonical_repository():
+tests/operator_learning/test_governance.py:24:def test_wrong_next_gate_rejected():
+tests/operator_learning/test_governance.py:30:def test_locked_gate_cannot_be_opened_before_alignment():
+tests/operator_learning/test_governance.py:42:def test_no_premature_authorization(field):
+tests/operator_learning/test_governance.py:48:def test_pass_requires_adjudication_and_thresholds():
+tests/operator_learning/test_governance.py:60:def test_unverified_generator_has_no_training_permission():
+tests/operator_learning/test_governance.py:66:def test_draft_config_cannot_prepare():
+tests/operator_learning/test_governance.py:72:def test_provenance_rejects_missing_or_invalid_hashes():
+tests/operator_learning/test_historical_evidence.py:9:def report():
+tests/operator_learning/test_historical_evidence.py:17:def test_historical_operational_acceptance_and_provenance():
+tests/operator_learning/test_historical_evidence.py:33:def test_pilot_errors_preserved_without_qualification():
+tests/operator_learning/test_alignment.py:10:def test_exact_affine_voxel_averages_and_partition_of_unity():
+tests/operator_learning/test_alignment.py:18:def test_conditioning_keeps_full_non_gaussian_density_and_mass():
+tests/operator_learning/test_alignment.py:30:def test_sampling_and_sde_reproducibility_and_zero_drift_noise_covariance():
+tests/operator_learning/test_alignment.py:43:def test_compact_reconstruction_normalizes_and_rejects_box_exits():
+tests/operator_learning/test_model_optional.py:8:def test_historical_model_forward_backward():
+tests/operator_learning/test_g00_evidence.py:10:def test_g00_evidence_complete_without_approval_or_qualification():
+tests/operator_learning/test_g00_evidence.py:24:def test_owner_approval_cannot_be_implicitly_fabricated():

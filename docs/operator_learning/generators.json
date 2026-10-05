@@ -10,15 +10,24 @@
     "parameters": {
       "source_run": "runs/neural-pilot/20261004T133438Z",
       "G00_evidence": "docs/operator_learning/evidence/G00_ALIGNMENT_V2_20261005.md",
-      "representativeness": "unverified"
+      "representativeness": "unverified",
+      "accepted_population": "ATTRACTOR_DENSITY_V1",
+      "permission_prerequisites": [
+        "OL-G01",
+        "OL-G02",
+        "OL-G03",
+        "OL-G04",
+        "OL-G05",
+        "OL-G06"
+      ]
     },
     "known_bias": "Finite-window dependence, stationarity/reconstruction unverified. G00 block-replicate L1 .493-.921; six inputs do not closely reproduce declared conditioned examples.",
-    "intended_scientific_role": "Historical reproduction/development only",
+    "intended_scientific_role": "Owner-selected restricted attractor-density operator-qualification family; scientific dataset use awaits G01-G06; DA representativeness unverified",
     "allowed_for_engineering_tests": true,
     "allowed_for_training": false,
     "allowed_for_validation": false,
     "allowed_for_final_evaluation": false,
-    "representativeness_status": "unverified"
+    "representativeness_status": "accepted_scoped"
   },
   {
     "GENERATOR_ID": "STOCHASTIC_ENSEMBLE_PROPOSAL",

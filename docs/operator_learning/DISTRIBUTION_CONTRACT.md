@@ -1,5 +1,10 @@
 # Probability and distribution contract — version 1
 
+Owner-selected current family: [ATTRACTOR_DENSITY_V1](ACCEPTED_POPULATION_V1.md).
+Its concrete law-to-tensor transformations and numerical verification scope are
+specified in [representation contract v1](REPRESENTATION_CONTRACT_V1.md).
+Acceptance of this restricted population leaves actual posterior relevance open.
+
 ## Representation chain
 
 - μ: underlying probability measure, defined by process, time and conditioning.

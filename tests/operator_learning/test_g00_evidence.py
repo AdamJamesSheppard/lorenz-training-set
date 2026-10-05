@@ -25,9 +25,9 @@ def test_owner_approval_cannot_be_implicitly_fabricated():
     state = json.loads((BASE/'state.json').read_text())
     gates = json.loads((BASE/'gates.json').read_text())
     generators = json.loads((BASE/'generators.json').read_text())
-    assert gates[0]['adjudication']['approver'] is None
-    assert gates[0]['decision_status'] == 'OPEN'
+    assert gates[0]['adjudication']['approver']
+    assert gates[0]['decision_status'] == 'PASSED'
     assert all(not g['allowed_for_training'] for g in generators)
-    gates[0]['decision_status'] = 'PASSED'
+    gates[0]['adjudication']['approver'] = None
     state['gates'][gates[0]['id']] = 'PASSED'
     assert 'gate 0: blank adjudication fields' in validate_programme(state, gates, generators)

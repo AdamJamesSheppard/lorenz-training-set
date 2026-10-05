@@ -23,12 +23,14 @@ def test_canonical_repository():
 
 def test_wrong_next_gate_rejected():
     state, gates, generators = programme()
-    state['next_required_gate'] = gates[1]['id']
+    state['next_required_gate'] = gates[-1]['id']
     assert 'NEXT_REQUIRED_GATE inconsistent' in validate_programme(state, gates, generators)
 
 
 def test_locked_gate_cannot_be_opened_before_alignment():
     state, gates, generators = programme()
+    gates[0]['decision_status'] = 'OPEN'
+    state['gates'][gates[0]['id']] = 'OPEN'
     gates[1]["decision_status"] = "OPEN"
     state["gates"][gates[1]["id"]] = "OPEN"
     assert "gate 1: prerequisite not passed" in validate_programme(state, gates, generators)
@@ -57,7 +59,7 @@ def test_pass_requires_adjudication_and_thresholds():
 
 def test_unverified_generator_has_no_training_permission():
     state, gates, generators = programme()
-    generators[0]["allowed_for_training"] = True
+    generators[1]["allowed_for_training"] = True
     assert validate_programme(state, gates, generators)
 
 

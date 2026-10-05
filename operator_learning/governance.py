@@ -32,7 +32,7 @@ def render_state(state):
 def render_gates(gates):
     header = ("# Operator-learning scientific gates\n\n"
               "Canonical schema: gates.json. This exact readable rendering is checked.\n"
-              "All downstream qualification is blocked by G00. Cheap historical development\n"
+              "Each downstream gate is blocked until its prerequisite passes. Historical development\n"
               "studies do not pass gates. Unspecified thresholds remain non-executable.\n"
               "Each pass unlocks only the next gated study; DA/production need explicit approval.\n\n")
     sections = []

@@ -3,15 +3,14 @@
   "programme": "OPERATOR_LEARNING_QUALIFICATION",
   "scientific_problem": "FPE_FORECAST_SURROGATE",
   "eventual_application": "DENSITY_BASED_BAYESIAN_DATA_ASSIMILATION",
-  "current_scope": "FIXED_PHYSICS_FIXED_HORIZON",
+  "current_scope": "FIXED_PHYSICS_FIXED_HORIZON_ATTRACTOR_DENSITIES",
   "current_six_law_pilot": "COMPLETED_ENGINEERING_AND_RESTRICTED_LEARNING_PILOT",
   "current_model_scientifically_qualified": false,
-  "next_required_gate": "OL-G00_PROBABILITY_DISTRIBUTION_ALIGNMENT",
-  "active_blocker": "G00 comparison evidence is complete; owner approval of restricted input population and generator roles is pending.",
+  "next_required_gate": "OL-G01_REPRESENTATION_CONTRACT",
+  "active_blocker": "G01 law-to-FEM-to-voxel-to-tensor representation contract requires verification.",
   "authorized": [
-    "Governance and inexpensive explicitly labelled development diagnostics on existing six pairs",
-    "Design of G00 alignment comparisons; no unpredeclared scientific pass",
-    "Review completed G00 evidence and restricted mixed-population proposal; no downstream promotion without approval"
+    "Bounded G01 representation study on archived attractor-density laws",
+    "Inexpensive explicitly labelled development diagnostics; no expensive new target campaign"
   ],
   "locked": [
     "Large expensive target campaigns",
@@ -22,10 +21,10 @@
   ],
   "operator_surrogate_authorized_for_da": false,
   "operator_production_authorized": false,
-  "last_adjudicated_evidence": "OL-D003B: evidence/G00_ALIGNMENT_V2_20261005.json, SHA256 ada2c3d1101dfea2ee4bf56fbea97a01306a24e3449aade50e06e10c34c1c9fc; technical evidence complete, G00 OPEN pending owner review.",
+  "last_adjudicated_evidence": "OL-D004 owner-approved scoped G00 acceptance: ACCEPTED_POPULATION_V1.md; original G00 comparison evidence unchanged.",
   "gates": {
-    "OL-G00_PROBABILITY_DISTRIBUTION_ALIGNMENT": "OPEN",
-    "OL-G01_REPRESENTATION_CONTRACT": "LOCKED",
+    "OL-G00_PROBABILITY_DISTRIBUTION_ALIGNMENT": "PASSED",
+    "OL-G01_REPRESENTATION_CONTRACT": "OPEN",
     "OL-G02_RECONSTRUCTION_STABILITY": "LOCKED",
     "OL-G03_INPUT_DIVERSITY": "LOCKED",
     "OL-G04_REFERENCE_TARGET_APPLICABILITY": "LOCKED",

@@ -4,7 +4,7 @@
 
 The active operator-learning qualification programme is governed by
 [docs/operator_learning/README.md](operator_learning/README.md).
-Its sole next gate is `OL-G00_PROBABILITY_DISTRIBUTION_ALIGNMENT`; all subsequent
+Its sole next gate is `OL-G01_REPRESENTATION_CONTRACT`; G00 passed within the owner-selected attractor-density scope; later
 qualification is locked. The FEM directions below are retained historical
 method-development scope, rather than authorization for neural training or DA.
 

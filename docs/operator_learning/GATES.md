@@ -1,7 +1,7 @@
 # Operator-learning scientific gates
 
 Canonical schema: gates.json. This exact readable rendering is checked.
-All downstream qualification is blocked by G00. Cheap historical development
+Each downstream gate is blocked until its prerequisite passes. Historical development
 studies do not pass gates. Unspecified thresholds remain non-executable.
 Each pass unlocks only the next gated study; DA/production need explicit approval.
 
@@ -24,8 +24,8 @@ Each pass unlocks only the next gated study; DA/production need explicit approva
 - **relevant_assumptions**: ["OL-A02", "OL-A04", "OL-A07"]
 - **experiment_config**: experiments/operator_learning/OL-G00_alignment_v2.json
 - **evidence_run**: runs/operator-learning/OL-G00_alignment_v2/20261005T195958291168Z
-- **decision_status**: OPEN
-- **adjudication**: {"status": "OPEN_PENDING_OWNER_POPULATION_APPROVAL", "approver": null, "reviewer": "Implementing agent; self-review, no independent assessor", "date": "2026-10-05", "config_sha256": "2302ba319cae92f5452cd3a66cf0364d4627e20c6ae5c23be227d6cd4e02e6ee", "evidence_sha256": "ada2c3d1101dfea2ee4bf56fbea97a01306a24e3449aade50e06e10c34c1c9fc", "predeclaration_commit": "fe5607e0b4159605ca59c1a1d173f47f2119330b", "decision_record": "docs/operator_learning/DECISIONS.md OL-D003B", "limitations": "Illustrative six source groups, limited reconstruction/MC, fixed noise/maps and no sequential posterior coverage; owner approval required."}
+- **decision_status**: PASSED
+- **adjudication**: {"status": "PASSED_SCOPED_ATTRACTOR_POPULATION", "approver": "Adam James Sheppard; explicit instruction to accept attractor-derived densities and work on G01, 2026-10-05", "reviewer": "Implementing agent; self-review, no independent assessor", "date": "2026-10-05", "config_sha256": "2302ba319cae92f5452cd3a66cf0364d4627e20c6ae5c23be227d6cd4e02e6ee", "evidence_sha256": "ada2c3d1101dfea2ee4bf56fbea97a01306a24e3449aade50e06e10c34c1c9fc", "predeclaration_commit": "fe5607e0b4159605ca59c1a1d173f47f2119330b", "decision_record": "docs/operator_learning/DECISIONS.md OL-D004; docs/operator_learning/ACCEPTED_POPULATION_V1.md", "limitations": "Restricted regularized deterministic occupation-density forecast study. Mixed population not accepted; actual DA/posterior representativeness remains open. No production or dataset authorization."}
 
 ## OL-G01_REPRESENTATION_CONTRACT
 
@@ -33,10 +33,10 @@ Each pass unlocks only the next gated study; DA/production need explicit approva
 - **question**: Is every law-to-tensor transformation explicit and correct?
 - **scientific_motivation**: μ→p→p_h→P_Vp_h→u must not silently change semantics.
 - **prerequisites**: ["OL-G00_PROBABILITY_DISTRIBUTION_ALIGNMENT"]
-- **frozen_experiment_definition**: Commit a versioned, non-DRAFT config and its hash before execution; current programme catalogue is not an executable predeclaration.
+- **frozen_experiment_definition**: REPRESENTATION_CONTRACT_V1.md and committed OL-G01_representation_v1.json; archived six-law audit only
 - **evidence_required**: Conservative transfer fixtures and complete per-family representation records.
 - **metrics**: Units, axes, mass, projection/lifting/scaling and normalization.
-- **predeclared_thresholds**: TO_BE_PREDECLARED_BEFORE_RUN
+- **predeclared_thresholds**: {"mass_error_max": 1e-10, "negative_mass_max": 1e-13, "projection_export_l1_max": 1e-10, "float32_eps_multiplier": 4, "pair_cast_bitwise_equal": true, "reconstruction_bitwise_equal": true, "rationale": "Existing mass invariant; numerical negativity roundoff; aligned Q1/Q2 identity; machine-derived float32 budget. No continuum/resolution accuracy claim."}
 - **pass_condition**: All frozen scientific and provenance criteria pass; named reviewer and approver record scope and limitations.
 - **failure_condition**: Any required criterion fails or evidence is missing; missing evidence remains OPEN rather than a fabricated FAIL/PASS.
 - **what_passing_unlocks**: OL-G02_RECONSTRUCTION_STABILITY design/qualification only; no automatic production or DA authorization.
@@ -44,9 +44,9 @@ Each pass unlocks only the next gated study; DA/production need explicit approva
 - **claims_permitted_after_pass**: Only scoped representation contract evidence for the frozen population/config.
 - **claims_still_forbidden_after_pass**: Unrestricted generalization, continuum accuracy without reference bounds, DA performance and production replacement.
 - **relevant_assumptions**: ["OL-A01"]
-- **experiment_config**: TO_BE_PREDECLARED_BEFORE_RUN
+- **experiment_config**: experiments/operator_learning/OL-G01_representation_v1.json
 - **evidence_run**: null
-- **decision_status**: LOCKED
+- **decision_status**: OPEN
 - **adjudication**: null
 
 ## OL-G02_RECONSTRUCTION_STABILITY
