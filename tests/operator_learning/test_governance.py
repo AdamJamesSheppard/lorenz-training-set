@@ -45,6 +45,8 @@ def test_no_premature_authorization(field):
 
 def test_pass_requires_adjudication_and_thresholds():
     state, gates, generators = programme()
+    # Explicit invalid fixture, independent of whether current G00 is predeclared.
+    gates[0]['predeclared_thresholds'] = 'TO_BE_PREDECLARED_BEFORE_RUN'
     gates[0]["decision_status"] = "PASSED"
     state["gates"][gates[0]["id"]] = "PASSED"
     errors = validate_programme(state, gates, generators)

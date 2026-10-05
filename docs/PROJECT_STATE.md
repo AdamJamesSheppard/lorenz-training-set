@@ -27,6 +27,11 @@ it development data. Distribution alignment remains unresolved.
 Only inexpensive labelled development diagnostics and design of the alignment
 study are authorized. No large new target campaign or operator-assisted DA.
 
+2026-10-05: user authorized the bounded G00 alignment comparison, predeclared
+in experiments/operator_learning/OL-G00_alignment_v2.json. This generates only
+small Monte Carlo/conditioning examples, without FEM targets or neural training.
+G00 remains OPEN pending evidence and scoped population approval.
+
 ## FEM evidence remains separate
 
 `METHOD_SELECTION_REPORT.md` remains the FEM method-selection authority.

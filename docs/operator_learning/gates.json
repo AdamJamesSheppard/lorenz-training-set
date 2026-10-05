@@ -4,10 +4,18 @@
     "question": "Are these the right probability distributions for the intended forecast problem?",
     "scientific_motivation": "Define eventual posterior-input population; classify occupation laws as proxy/fixture/representative only with evidence.",
     "prerequisites": [],
-    "frozen_experiment_definition": "Commit a versioned, non-DRAFT config and its hash before execution; current programme catalogue is not an executable predeclaration.",
+    "frozen_experiment_definition": "OL-G00_alignment_v2: small occupation/ensemble/single-observation comparison, committed before execution; original v1 draft preserved.",
     "evidence_required": "Population contract and coverage/gap report; owner-reviewed law-family roles; no large FPE dataset needed.",
     "metrics": "Generator semantics, conditioning, lobe imbalance, concentration, multimodality, transitions, tails; compare small occupation/stochastic ensemble/posterior-shaped collections.",
-    "predeclared_thresholds": "TO_BE_PREDECLARED_BEFORE_RUN",
+    "predeclared_thresholds": {
+      "mass_error_max": 1e-10,
+      "mass_rationale": "Reuse existing pilot numerical mass tolerance for representation sanity only; no population-coverage inference",
+      "negative_mass_max": 0,
+      "box_exit_count_max": 0,
+      "technical_completion": "All required families and all frozen comparisons recorded with finite nonnegative normalized densities and complete metadata",
+      "scientific_pass": "Owner approves a named intended population, explicit generator roles and exclusions after reviewing the frozen evidence. No numerical coverage threshold inferred from results.",
+      "separation_diagnostic": "Report whether within-law replicate L1 is smaller than law-conditioning L1. This comparison is heuristic, not an acceptance threshold or confidence interval."
+    },
     "pass_condition": "Owner-approved population contract, generator roles, explicit application-coverage limitations and reviewed evidence; any numerical comparison thresholds frozen before collecting its results.",
     "failure_condition": "Any required criterion fails or evidence is missing; missing evidence remains OPEN rather than a fabricated FAIL/PASS.",
     "what_passing_unlocks": "OL-G01_REPRESENTATION_CONTRACT design/qualification only; no automatic production or DA authorization.",
@@ -19,7 +27,7 @@
       "OL-A04",
       "OL-A07"
     ],
-    "experiment_config": "experiments/operator_learning/OL-G00_alignment_v1.json",
+    "experiment_config": "experiments/operator_learning/OL-G00_alignment_v2.json",
     "evidence_run": null,
     "decision_status": "OPEN",
     "adjudication": null

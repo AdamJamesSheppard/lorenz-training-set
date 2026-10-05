@@ -1,0 +1,202 @@
+{
+  "schema_version": 1,
+  "id": "OL-G00_alignment_v2",
+  "gate_id": "OL-G00_PROBABILITY_DISTRIBUTION_ALIGNMENT",
+  "kind": "distribution_alignment",
+  "status": "PREDECLARED",
+  "question": "Do occupation-law fixtures cover the probability structures relevant to full-density Lorenz posterior forecasting?",
+  "hypotheses": [
+    "Occupation laws are legitimate engineering fixtures but their application representativeness is unverified",
+    "Conditioning can create concentration/lobe-weight structures not adequately represented by six occupation laws",
+    "Reconstruction variation can obscure law-family differences; measure it without claiming G02/G03 certification"
+  ],
+  "metrics": [
+    "precise probability interpretation",
+    "initial reconstruction versus accepted FE voxels",
+    "within-family replicate and between-family L1",
+    "marginal TVs",
+    "means and covariance",
+    "positive-x lobe probability",
+    "transition/tail/boundary probability",
+    "effective support volume"
+  ],
+  "thresholds": {
+    "mass_error_max": 1e-10,
+    "mass_rationale": "Reuse existing pilot numerical mass tolerance for representation sanity only; no population-coverage inference",
+    "negative_mass_max": 0,
+    "box_exit_count_max": 0,
+    "technical_completion": "All required families and all frozen comparisons recorded with finite nonnegative normalized densities and complete metadata",
+    "scientific_pass": "Owner approves a named intended population, explicit generator roles and exclusions after reviewing the frozen evidence. No numerical coverage threshold inferred from results.",
+    "separation_diagnostic": "Report whether within-law replicate L1 is smaller than law-conditioning L1. This comparison is heuristic, not an acceptance threshold or confidence interval."
+  },
+  "seeds": {
+    "block_base": 2026100501,
+    "truth_base": 2026101501,
+    "observation_base": 2026102501,
+    "ensemble_base": 2026103501
+  },
+  "inputs": {
+    "operator_learning/alignment.py": "16dbec8b6f7046d90c15395a229054f0cff47218f50b438a670b8a216a664451",
+    "scripts/run_distribution_alignment.py": "9862e1d2c2015be12502daceb32c5341575405983392406c4e5c809aa0a886d6",
+    "lorenz_fpe/core.py": "3f63b0d26a9e99a1c35e0d2d78d2c9fe519468aeb71a0cf77c941c023007bc01",
+    "runs/neural-pilot/20261004T133438Z/manifest.json": "7a37269d45c7a8eb86410d4aa4072fde2d95707cd28990a727f83ce804d1e456",
+    "runs/neural-pilot/20261004T133438Z/law0/pair.npz": "584745a4e7a8bb6a7a84fee975268759c871319734e80b5b0df3efaaf2821d82",
+    "runs/neural-pilot/20261004T133438Z/law1/pair.npz": "f874215c1cad186db47c7f11e718f5dc8b36e6116c3f6cf1486fca5546a79108",
+    "runs/neural-pilot/20261004T133438Z/law2/pair.npz": "40db0b0e1d970ed05f8a5f0601d9a1e576298217967d8b813ee722dd69315ffd",
+    "runs/neural-pilot/20261004T133438Z/law3/pair.npz": "23cbea352511fff49e120def4b041320f10f259001d82996402032f0f42315f5",
+    "runs/neural-pilot/20261004T133438Z/law4/pair.npz": "963408d535d766b720ebe64303ae9ea7a1073abab505dc9e01f21b8f00dc5acf",
+    "runs/neural-pilot/20261004T133438Z/law5/pair.npz": "0eaa5ee00c010f9e032d18ba7298d44bea3901e33490b16bcbe76e98c3580bda",
+    "runs/neural-pilot/20261004T133438Z/law0/attractor_samples.npy": "20ec5942d9f117aac7603deed1e964fc30de939484c4926f3da9507696d2ce50",
+    "runs/neural-pilot/20261004T133438Z/law1/attractor_samples.npy": "509a5813f5d7177b493d7717eb1df5d9e5017f8d9b06dd1170b9b64bf7e90ea6",
+    "runs/neural-pilot/20261004T133438Z/law2/attractor_samples.npy": "c78062be49fd0d0b14ffad5585a04846002bc7e61ba365960a172a185258df50",
+    "runs/neural-pilot/20261004T133438Z/law3/attractor_samples.npy": "10094fc05c69c27e5e4869edb799373efca7cbe75108d0246dcb84d5cdb8d709",
+    "runs/neural-pilot/20261004T133438Z/law4/attractor_samples.npy": "152ae61423a2619c7672db10bd762e3edfb2d75996ea448bf7eb726599c077a3",
+    "runs/neural-pilot/20261004T133438Z/law5/attractor_samples.npy": "4573722ef4a04ef13c83b63ee2707e62c419623ed03681d803f14967c5e0c4d4"
+  },
+  "command": [
+    "./scripts/run-in-env",
+    "python",
+    "scripts/run_distribution_alignment.py",
+    "{RUN_DIRECTORY}"
+  ],
+  "runtime_versions": {
+    "python": "3.12.13",
+    "numpy": "2.5.2",
+    "scipy": "1.18.0"
+  },
+  "hardware": {
+    "device": "cpu",
+    "threads": 1,
+    "mpi": false,
+    "gpu": false
+  },
+  "required_evidence": [
+    "source/input hashes",
+    "frozen config",
+    "actual runtime and hardware",
+    "computed stochastic truth/observations",
+    "per-density metadata/statistics",
+    "replicate and family distances",
+    "sealed density and particle artifacts",
+    "scoped population recommendation and owner approval record"
+  ],
+  "pass_consequences": "Only OL-G01 representation study becomes eligible; no training, target campaign, posterior-transfer certification or DA authorization.",
+  "failure_consequences": "Preserve evidence and G00 OPEN/FAILED as appropriate. Revise population or predeclare a new comparison; no gate relaxation.",
+  "assumptions": [
+    "OL-A01",
+    "OL-A02",
+    "OL-A04",
+    "OL-A07",
+    "OL-A08",
+    "OL-A09"
+  ],
+  "review_requirements": [
+    "Self-reviewed implementation/evidence clearly labelled",
+    "Owner approval of actual population recommendation is required; execution approval is not invented outcome approval"
+  ],
+  "source_run": "runs/neural-pilot/20261004T133438Z",
+  "laws": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "replicates": 2,
+  "particle_count": 16384,
+  "bounds": [
+    [
+      -30,
+      30
+    ],
+    [
+      -40,
+      40
+    ],
+    [
+      -10,
+      70
+    ]
+  ],
+  "learning_shape": [
+    60,
+    72,
+    72
+  ],
+  "histogram_shape": [
+    45,
+    54,
+    54
+  ],
+  "filter_width": 3,
+  "block_length": 50,
+  "D": [
+    [
+      1,
+      0.4,
+      0.2
+    ],
+    [
+      0.4,
+      1,
+      0.3
+    ],
+    [
+      0.2,
+      0.3,
+      1
+    ]
+  ],
+  "horizon": 0.05,
+  "dt": 0.00015625,
+  "steps": 320,
+  "observation_maps": {
+    "x": [
+      0
+    ],
+    "xz": [
+      0,
+      2
+    ],
+    "full": [
+      0,
+      1,
+      2
+    ]
+  },
+  "observation_variances": [
+    4,
+    16
+  ],
+  "observation_basis": "Existing ObservationModel.named maps x/xz/full and default variance 4; variance16 is a declared weaker-observation stress choice seen in mature experiments, not an application requirement.",
+  "regions": {
+    "boundary_layers": 4,
+    "transition_width": 2,
+    "tail_z": [
+      5,
+      50
+    ]
+  },
+  "required_families": [
+    "OCCUPATION_PILOT_V1",
+    "STOCHASTIC_ENSEMBLE_G00_V2",
+    "CONDITIONED_VOXEL_G00_V2"
+  ],
+  "limitations": [
+    "Six historical source groups and two replicates are illustrative, not population coverage or uncertainty certification",
+    "Circular block length50 is a diagnostic design choice, not proven decorrelation time; G02 remains open",
+    "SDE Euler-Maruyama discretization and finite particle/reconstruction bias are unqualified; no continuum reference claim",
+    "Whole-space SDE particles have no reflection; zero observed exits does not prove domain equivalence",
+    "Conditioned density is a posterior for the explicitly regularized, piecewise-constant voxel prior; not a certified continuum or sequential filtering posterior",
+    "No FE projection or FPE targets generated for new families; G01/G04 required later",
+    "All generated examples and original pilot test are development evidence, never untouched final evaluation"
+  ],
+  "forbidden_claims": [
+    "All application posteriors covered",
+    "Current FNO qualified",
+    "Reference targets qualified for new families",
+    "Full DA demonstrated",
+    "New large training campaign authorized"
+  ]
+}

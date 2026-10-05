@@ -1,5 +1,15 @@
 # Operator-learning decisions
 
+## 2026-10-05 — OL-D003A: predeclare small G00 alignment comparison
+
+The user authorizes execution of G00. Freeze alignment_v2 rather than rewrite
+the original v1 draft. Six archived occupation groups, block-resample diagnostics,
+two small stochastic ensembles/group and truth-derived single-observation
+conditioning investigate full-density population alignment. No FEM target or
+neural training is dispatched. POPULATION_PROPOSAL_G00_V2.md records proposed
+roles/exclusions; owner approval of the results remains required for promotion.
+All comparisons are development evidence; no new held-out evaluation claim.
+
 ## 2026-10-05 — OL-D001: establish qualification before optimization
 
 User explicitly authorizes a durable governance programme and new release.
