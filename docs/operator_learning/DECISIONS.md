@@ -25,3 +25,22 @@ non-gate evidence, with new hashes rather than edited old artifacts.
 
 Review/approval basis: explicit user instruction in this task. Implementer is
 the Git commit author; no independent scientific gate review is claimed.
+
+## 2026-10-05 — OL-D002: adjudicate completed pilot as historical evidence
+
+Read-only-source CPU audit at clean commit 7cb41a6 verifies six pair hashes and
+reproduces principal statistical/boundary failures. Complete compact evidence,
+original evaluation, hashes and limitations are in evidence/README.md and
+evidence/PILOT_20261004T133438Z.json. New audit sealed SHA-256:
+ed0f7de946b94c8d768846f0be2486093f3a514fefcf84f11e52d0fdf2c07340.
+No historical payload was changed, no target generated and no retraining done.
+Self-reviewed technical audit by the implementing agent; no independent assessor
+or owner-approved scientific gate promotion is claimed.
+
+Verdict: operational target-generation/CUDA-training feasibility and restricted
+density-learning improvement demonstrated. Statistical fidelity and surrogate
+qualification remain OPEN. Boundary and lobe failures, nearest-target performance,
+inspected test access and unresolved final-epoch optimization prevent broader claims.
+OL-C010 moves OPEN→EMPIRICAL under its limited reproducibility scope.
+OL-G00 remains OPEN; G01–G17 LOCKED; next gate unchanged. v0.2.0 is a research
+pre-release documenting this situation, with ignored payload limitations explicit.

@@ -1,5 +1,6 @@
 """Dependency-free canonical-state, predeclaration and provenance validation."""
 import json
+import hashlib
 import re
 from pathlib import Path
 
@@ -177,4 +178,10 @@ def check_repository(root):
         for match in re.findall(r"OL-G\d{2}_[A-Z_]+", path.read_text()):
             if match not in state["gates"]:
                 errors.append(f"unknown gate reference {match}: {path.name}")
+    seals = base / 'evidence/seals.json'
+    if seals.exists():
+        for relative, expected in json.loads(seals.read_text()).items():
+            path = base / 'evidence' / relative
+            if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != expected:
+                errors.append(f'sealed historical evidence changed or missing: {relative}')
     return errors

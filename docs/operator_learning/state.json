@@ -21,7 +21,7 @@
   ],
   "operator_surrogate_authorized_for_da": false,
   "operator_production_authorized": false,
-  "last_adjudicated_evidence": "Historical six-law pilot completed; no OL scientific gate adjudicated.",
+  "last_adjudicated_evidence": "OL-D002: evidence/PILOT_20261004T133438Z.json, SHA256 ed0f7de946b94c8d768846f0be2486093f3a514fefcf84f11e52d0fdf2c07340; retrospective pilot audit, no OL gate pass.",
   "gates": {
     "OL-G00_PROBABILITY_DISTRIBUTION_ALIGNMENT": "OPEN",
     "OL-G01_REPRESENTATION_CONTRACT": "LOCKED",
