@@ -4,6 +4,7 @@ cd "$(git rev-parse --show-toplevel)"
 
 echo '=== PROJECT STATE ==='
 sed -n '1,100p' docs/PROJECT_STATE.md
+python3 scripts/check_operator_learning.py
 
 echo
 echo '=== GIT ==='
@@ -46,4 +47,3 @@ if [ -f results/math_checks.json ]; then
 else
   echo 'none; run ./scripts/verify-math'
 fi
-

@@ -1,5 +1,13 @@
 # Architecture
 
+## Operator-learning separation (2026-10-05)
+
+[Namespace architecture](operator_learning/ARCHITECTURE.md) governs the active
+qualification stage. `operator_learning/` does not import or compile FEM code.
+The historical pilot wrapper requires explicit relaunch opt-in and validates
+hard-coded physics/representation settings before dispatch. No new expensive
+campaign is authorized.
+
 This is a living description of the current repository, not a prohibition on
 new layouts or method families. Agents are welcome to refactor it and add
 parallel implementations when that makes controlled comparisons clearer. Keep

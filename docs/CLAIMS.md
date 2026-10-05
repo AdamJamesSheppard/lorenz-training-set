@@ -1,5 +1,9 @@
 # Claim registry
 
+Scope: historical FEM/FPE claims. The active surrogate programme has a separate
+[claim registry](operator_learning/CLAIMS.md). FEM claims do not establish
+probability-law alignment or neural qualification.
+
 Evidence classes: `ESTABLISHED` (supported by derivation and targeted tests),
 `NUMERICAL`, `EMPIRICAL`, `HEURISTIC`, `CONJECTURE`, `OPEN`, `REJECTED`.
 

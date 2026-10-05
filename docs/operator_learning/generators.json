@@ -1,0 +1,78 @@
+[
+  {
+    "GENERATOR_ID": "OCCUPATION_PILOT_V1",
+    "probability_interpretation": "Regularized deterministic finite-window occupation law",
+    "underlying_process_or_random_variable": "See DISTRIBUTION_CONTRACT.md; proposal details must be frozen before generation.",
+    "sampling_procedure": "Historical settings documented; proposals TO_BE_PREDECLARED_BEFORE_RUN",
+    "conditioning_procedure": "None for occupation; explicitly defined prior/likelihood required for posterior proposal.",
+    "density_reconstruction": "Explicitly record estimator or native FE law",
+    "regularization": "Explicitly record; no forced Gaussian/GMM state fit for principal population",
+    "parameters": {
+      "status": "unverified_for_population_coverage"
+    },
+    "known_bias": "Sampling/conditioning/representation bias unresolved",
+    "intended_scientific_role": "Historical reproduction/development only",
+    "allowed_for_engineering_tests": true,
+    "allowed_for_training": false,
+    "allowed_for_validation": false,
+    "allowed_for_final_evaluation": false,
+    "representativeness_status": "unverified"
+  },
+  {
+    "GENERATOR_ID": "STOCHASTIC_ENSEMBLE_PROPOSAL",
+    "probability_interpretation": "Specified finite-time SDE ensemble law",
+    "underlying_process_or_random_variable": "See DISTRIBUTION_CONTRACT.md; proposal details must be frozen before generation.",
+    "sampling_procedure": "Historical settings documented; proposals TO_BE_PREDECLARED_BEFORE_RUN",
+    "conditioning_procedure": "None for occupation; explicitly defined prior/likelihood required for posterior proposal.",
+    "density_reconstruction": "Explicitly record estimator or native FE law",
+    "regularization": "Explicitly record; no forced Gaussian/GMM state fit for principal population",
+    "parameters": {
+      "status": "unverified_for_population_coverage"
+    },
+    "known_bias": "Sampling/conditioning/representation bias unresolved",
+    "intended_scientific_role": "G00 proposed comparator, not implemented",
+    "allowed_for_engineering_tests": true,
+    "allowed_for_training": false,
+    "allowed_for_validation": false,
+    "allowed_for_final_evaluation": false,
+    "representativeness_status": "unverified"
+  },
+  {
+    "GENERATOR_ID": "POSTERIOR_PROPOSAL",
+    "probability_interpretation": "Full prior conditioned on explicit likelihood",
+    "underlying_process_or_random_variable": "See DISTRIBUTION_CONTRACT.md; proposal details must be frozen before generation.",
+    "sampling_procedure": "Historical settings documented; proposals TO_BE_PREDECLARED_BEFORE_RUN",
+    "conditioning_procedure": "None for occupation; explicitly defined prior/likelihood required for posterior proposal.",
+    "density_reconstruction": "Explicitly record estimator or native FE law",
+    "regularization": "Explicitly record; no forced Gaussian/GMM state fit for principal population",
+    "parameters": {
+      "status": "unverified_for_population_coverage"
+    },
+    "known_bias": "Sampling/conditioning/representation bias unresolved",
+    "intended_scientific_role": "G00 proposed comparator; no full DA",
+    "allowed_for_engineering_tests": true,
+    "allowed_for_training": false,
+    "allowed_for_validation": false,
+    "allowed_for_final_evaluation": false,
+    "representativeness_status": "unverified"
+  },
+  {
+    "GENERATOR_ID": "GMM_REGRESSION",
+    "probability_interpretation": "Explicit mixture density",
+    "underlying_process_or_random_variable": "See DISTRIBUTION_CONTRACT.md; proposal details must be frozen before generation.",
+    "sampling_procedure": "Historical settings documented; proposals TO_BE_PREDECLARED_BEFORE_RUN",
+    "conditioning_procedure": "None for occupation; explicitly defined prior/likelihood required for posterior proposal.",
+    "density_reconstruction": "Explicitly record estimator or native FE law",
+    "regularization": "Explicitly record; no forced Gaussian/GMM state fit for principal population",
+    "parameters": {
+      "status": "unverified_for_population_coverage"
+    },
+    "known_bias": "Sampling/conditioning/representation bias unresolved",
+    "intended_scientific_role": "Historical FEM regression; not new training population",
+    "allowed_for_engineering_tests": true,
+    "allowed_for_training": false,
+    "allowed_for_validation": false,
+    "allowed_for_final_evaluation": false,
+    "representativeness_status": "unverified"
+  }
+]

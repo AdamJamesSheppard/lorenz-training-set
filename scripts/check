@@ -4,9 +4,10 @@ cd "$(git rev-parse --show-toplevel)"
 
 echo '[1/4] Critical static checks'
 ./scripts/run-in-env ruff check .
+./scripts/run-in-env python scripts/check_operator_learning.py
 
 echo '[2/4] Python compilation'
-./scripts/run-in-env python -m compileall -q lorenz_fpe tests scripts *.py
+./scripts/run-in-env python -m compileall -q lorenz_fpe operator_learning tests scripts *.py
 
 echo '[3/4] Test suite'
 ./scripts/run-in-env python -m pytest -q

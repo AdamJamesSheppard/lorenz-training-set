@@ -1,5 +1,9 @@
 # Numerical-method selection for stochastic Lorenz-63 forecasts
 
+Scope: FEM/FPE numerical method selection. The active surrogate programme is
+[separately governed](docs/operator_learning/README.md). FEM passes do not grant
+surrogate qualification or application-law representativeness.
+
 ## Decision
 
 **Classification: `MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED`.**

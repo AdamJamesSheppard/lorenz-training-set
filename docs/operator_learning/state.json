@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "programme": "OPERATOR_LEARNING_QUALIFICATION",
+  "scientific_problem": "FPE_FORECAST_SURROGATE",
+  "eventual_application": "DENSITY_BASED_BAYESIAN_DATA_ASSIMILATION",
+  "current_scope": "FIXED_PHYSICS_FIXED_HORIZON",
+  "current_six_law_pilot": "COMPLETED_ENGINEERING_AND_RESTRICTED_LEARNING_PILOT",
+  "current_model_scientifically_qualified": false,
+  "next_required_gate": "OL-G00_PROBABILITY_DISTRIBUTION_ALIGNMENT",
+  "active_blocker": "Application-relevant probability-law population is unresolved.",
+  "authorized": [
+    "Governance and inexpensive explicitly labelled development diagnostics on existing six pairs",
+    "Design of G00 alignment comparisons; no unpredeclared scientific pass"
+  ],
+  "locked": [
+    "Large expensive target campaigns",
+    "Qualified surrogate use",
+    "Posterior-transfer qualification",
+    "Operator-assisted DA",
+    "Operator production"
+  ],
+  "operator_surrogate_authorized_for_da": false,
+  "operator_production_authorized": false,
+  "last_adjudicated_evidence": "Historical six-law pilot completed; no OL scientific gate adjudicated.",
+  "gates": {
+    "OL-G00_PROBABILITY_DISTRIBUTION_ALIGNMENT": "OPEN",
+    "OL-G01_REPRESENTATION_CONTRACT": "LOCKED",
+    "OL-G02_RECONSTRUCTION_STABILITY": "LOCKED",
+    "OL-G03_INPUT_DIVERSITY": "LOCKED",
+    "OL-G04_REFERENCE_TARGET_APPLICABILITY": "LOCKED",
+    "OL-G05_EXPORT_FIDELITY": "LOCKED",
+    "OL-G06_DATA_PROVENANCE": "LOCKED",
+    "OL-G07_OPERATOR_STRUCTURE": "LOCKED",
+    "OL-G08_BASELINE_QUALIFICATION": "LOCKED",
+    "OL-G09_FIT_FEASIBILITY": "LOCKED",
+    "OL-G10_GENERALIZATION": "LOCKED",
+    "OL-G11_STRUCTURAL_GENERALIZATION": "LOCKED",
+    "OL-G12_PROBABILITY_STRUCTURE": "LOCKED",
+    "OL-G13_SEMIGROUP": "LOCKED",
+    "OL-G14_ROLLOUT": "LOCKED",
+    "OL-G15_ACCURACY_COST": "LOCKED",
+    "OL-G16_POSTERIOR_TRANSFER": "LOCKED",
+    "OL-G17_SEQUENTIAL_INTERFACE": "LOCKED"
+  }
+}

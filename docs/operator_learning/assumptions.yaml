@@ -1,0 +1,40 @@
+OL-A01:
+  statement: Physics, reflecting box and T are fixed initially; well-posed linear FPE evolution is the target.
+  status: declared_scope
+  evidence: PROBLEM.md
+OL-A02:
+  statement: Deterministic finite-window occupation densities represent the eventual posterior population.
+  status: unverified
+  evidence: OL-G00_PROBABILITY_DISTRIBUTION_ALIGNMENT
+OL-A03:
+  statement: The learning grid resolves application-relevant density structures.
+  status: unverified
+  evidence: OL-G05_EXPORT_FIDELITY
+OL-A04:
+  statement: The six laws cover a meaningful range of underlying application laws.
+  status: unverified
+  evidence: OL-G03_INPUT_DIVERSITY
+OL-A05:
+  statement: FNO is preferable to learned linear and reduced-order alternatives.
+  status: unverified
+  evidence: OL-G08_BASELINE_QUALIFICATION
+OL-A06:
+  statement: Softplus and global normalization preserve adequate statistics and boundaries.
+  status: contradicted_in_current_pilot
+  evidence: historical evaluation and retrospective boundary audit
+OL-A07:
+  statement: Proxy-law performance transfers to posterior densities.
+  status: unverified
+  evidence: OL-G16_POSTERIOR_TRANSFER
+OL-A08:
+  statement: Temporal samples at interval .01 are independent.
+  status: unverified
+  evidence: OL-G02_RECONSTRUCTION_STABILITY
+OL-A09:
+  statement: Old GMM/mature-mesh accuracy applies to arbitrary new empirical inputs.
+  status: unverified
+  evidence: OL-G04_REFERENCE_TARGET_APPLICABILITY
+OL-A10:
+  statement: Original law5 remains untouched evaluation after diagnostics/tuning.
+  status: false
+  evidence: DECISIONS.md OL-D001

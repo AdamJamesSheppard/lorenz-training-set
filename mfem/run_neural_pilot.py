@@ -63,8 +63,27 @@ def vertex_density(cloud):
     return density
 
 
+def validate_historical_config(config):
+    """Reject configurable-looking values unsupported by this frozen wrapper."""
+    fixed = dict(trajectories=6, splits=['train']*4+['validation','test'],
+                 D=[[1,.4,.2],[.4,1,.3],[.2,.3,1]], horizon=.05, steps=320,
+                 export_grid=[60,72,72], pause_available_GiB=2, resume_available_GiB=2)
+    for name, value in fixed.items():
+        if config.get(name) != value:
+            raise ValueError(f'Historical pilot hard-codes {name}={value}; changed config refused')
+    if type(config.get('seed')) is not int or type(config.get('epochs')) is not int or config['epochs'] < 1:
+        raise ValueError('Integer seed and positive integer epochs required')
+    if config.get('device') not in ('auto', 'cpu', 'cuda'):
+        raise ValueError('Unsupported training device')
+
+
 def main():
     repo=Path(__file__).resolve().parents[1]
+    config=json.loads((repo/'experiments/neural-pilot.json').read_text())
+    validate_historical_config(config)
+    if os.environ.get('LORENZ_ALLOW_HISTORICAL_PILOT') != '1':
+        raise RuntimeError('Historical pilot relaunch is opt-in. OL-G00 is open; '
+                           'no new scientific campaign is authorized. See docs/operator_learning/README.md')
     root=repo/'runs/neural-pilot'/datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')
     root.mkdir(parents=True)
     print(root,flush=True)

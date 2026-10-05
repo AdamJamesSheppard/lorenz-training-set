@@ -1,5 +1,15 @@
 # Mathematical specification
 
+## Scope correction, 2026-10-05
+
+This historical FEM specification includes Q1 baseline and experimental branches.
+The tested MFEM reference uses Q2 CN with conservative local-QP repair and full-SPD
+diffusion; see METHOD_SELECTION_REPORT.md. The active [operator-learning problem](operator_learning/PROBLEM.md)
+separates fixed-horizon density mapping from eventual Bayesian posterior forecasting.
+Mature/GMM certification does not transfer automatically to occupation-law inputs.
+Tested domain expansions passed within their frozen scope; continuum mature density
+convergence remains open.
+
 ## Model
 
 The opt-in neural pilot uses initial state-space densities obtained from sampled

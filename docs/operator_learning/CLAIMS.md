@@ -1,0 +1,21 @@
+# Operator-learning claim registry
+
+Classes: ESTABLISHED (derivation under stated assumptions), NUMERICAL (numerical
+experiments), EMPIRICAL (observed data behaviour), HEURISTIC, CONJECTURE, OPEN,
+REJECTED. Software tests alone never prove an unrestricted scientific statement.
+
+| ID | Claim | Class | Evidence | Falsification / limitation |
+|---|---|---|---|---|
+| OL-C001 | Fixed-physics continuum FPE evolution is linear in p | ESTABLISHED | PROBLEM.md linear PDE/BC; OL-A01 | Requires well-posed linear evolution; numerical limiter may break identity |
+| OL-C002 | Deterministic empirical-attractor generator produces application-representative learning laws | OPEN | G00; DISTRIBUTION_CONTRACT | Attractor geometry alone is insufficient; posterior concentration/conditioning may differ |
+| OL-C003 | Six pilot laws generated accepted numerical targets and CUDA training completed | EMPIRICAL | Historical 20261004T133438Z artifacts; forthcoming tracked audit | Operational acceptance, not continuum accuracy or coverage |
+| OL-C004 | Pilot model reduces density L1/L2 versus persistence on its six cases | EMPIRICAL | Historical evaluation.json | Four training cases, one validation, one inspected test; no population guarantee |
+| OL-C005 | Current model is scientifically qualified for forecast replacement or DA | REJECTED | Historical statistical errors; pilot audit | Moments/marginals degrade; boundary/lobe errors; no qualification gates passed |
+| OL-C006 | Current learning representation is sufficiently accurate | OPEN | G05 | Conservative mass does not bound full-density export loss |
+| OL-C007 | FNO is superior to strong structured alternatives | OPEN | G08 | Nearest-target diagnostic weakens claim; linear/POD/CNN not fairly tested |
+| OL-C008 | More epochs will solve the statistical failure | CONJECTURE | Best pilot loss at final epoch | Longer fitting may worsen scientific metrics; ablation needed |
+| OL-C009 | Current proxies transfer to full posterior forecast inputs | OPEN | G16 | Requires accepted population and actual posterior tests |
+| OL-C010 | Independent CPU checkpoint evaluation reproduces principal pilot errors | OPEN | Retrospective audit required | Device differences must be distinguished from scientific mismatch |
+
+A new decision updates evidence/classification explicitly; original historical
+results remain unchanged. No entry implies any G00–G17 pass.

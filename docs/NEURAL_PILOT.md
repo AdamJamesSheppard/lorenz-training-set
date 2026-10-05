@@ -1,5 +1,11 @@
 # Bounded neural-operator pilot
 
+Historical experiment, preserved as designed. As of 2026-10-05, `20261004T133438Z`
+completed. [Current interpretation](operator_learning/README.md) records engineering
+and restricted-learning evidence together with scientific failures. The original
+test law has been inspected. No qualification gate passed. Historical relaunch
+requires `LORENZ_ALLOW_HISTORICAL_PILOT=1`; opt-in does not grant scientific authorization.
+
 Authorized by the user on 2026-10-04; production authorization remains false.
 This is discrete-solver learning, not whole-space/continuum certification.
 

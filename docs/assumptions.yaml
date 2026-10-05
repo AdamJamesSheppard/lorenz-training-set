@@ -1,4 +1,6 @@
 A1:
+# FEM assumptions retain historical scope. Operator-learning assumptions are
+# separately authoritative in docs/operator_learning/assumptions.yaml.
   statement: The computational domain is an affine axis-aligned hexahedral box.
   status: active_for_current_solver
   implication: Current Q1 Bernstein/vertex positivity is a whole-cell guarantee.

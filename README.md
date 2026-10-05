@@ -1,10 +1,21 @@
 # Positivity-limited Lorenz-63 Fokker--Planck solver
 
+## Active research programme: operator-learning qualification
+
+Entry point: [docs/operator_learning/README.md](docs/operator_learning/README.md).
+The completed six-law pilot demonstrates target-generation/GPU-training feasibility
+and restricted density-learning gains, with serious statistical and boundary errors.
+No model is scientifically qualified. Distribution alignment is unresolved:
+`NEXT_REQUIRED_GATE = OL-G00_PROBABILITY_DISTRIBUTION_ALIGNMENT`.
+Production and operator-assisted DA remain unauthorized. FEM evidence below retains
+its historical scope; the eventual posterior forecast and current density-only pilot
+are separate tasks. Run `python scripts/check_operator_learning.py` for fast controls.
+
 This is a living numerical-research repository. The current DOLFINx Q1 solver
 is an evidence-preserving baseline, not a restriction on future work. New
 agents and contributors are welcome to revise any version-controlled code,
 documentation, experiment, or architecture when a better-supported direction
-emerges; see `AGENTS.md` and `docs/RESEARCH_DIRECTIONS.md` for the maintenance
+emerges; see `docs/operator_learning/GOVERNANCE.md` and `docs/RESEARCH_DIRECTIONS.md` for the maintenance
 and comparison policy.
 
 > **Current method-selection status (2026-10-03): `MATURE_STATE_STATISTICAL_AND_POSITIVITY_GATES_PASSED`.**

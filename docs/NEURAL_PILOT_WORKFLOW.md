@@ -1,5 +1,10 @@
 # How the state-space density neural-operator test works
 
+Historical workflow: the restart completed on 2026-10-05. Dispatch/failure statements
+below retain their dated context. [Operator-learning governance](operator_learning/README.md)
+is the current authority. Occupation measures are non-Gaussian proxies with unverified
+application alignment.
+
 Updated 2026-10-04. This records the user's final scope: a distribution sampled
 from Lorenz trajectories is the input; the evolved distribution is the target.
 There are no observation inputs or assimilation cycles in this particular test.

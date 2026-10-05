@@ -1,5 +1,11 @@
 # Decision log
 
+## 2026-10-05 - Establish operator-learning qualification
+
+[New decisions](operator_learning/DECISIONS.md) record a new interpretation while
+preserving all historical entries below. The six-law pilot completed; distribution
+alignment is the blocking next gate. FEM certification retains its original scope.
+
 ## 2026-10-03 - User-selected 2 GiB resume threshold
 
 Set automatic resume to at least 2 GiB available RAM; pause remains below

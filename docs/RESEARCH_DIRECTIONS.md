@@ -1,5 +1,13 @@
 # Research directions
 
+## Current programme authority (2026-10-05)
+
+The active operator-learning qualification programme is governed by
+[docs/operator_learning/README.md](operator_learning/README.md).
+Its sole next gate is `OL-G00_PROBABILITY_DISTRIBUTION_ALIGNMENT`; all subsequent
+qualification is locked. The FEM directions below are retained historical
+method-development scope, rather than authorization for neural training or DA.
+
 Updated: 2026-10-03
 
 2026-10-04: bounded six-attractor-density fixed-D/T pilot authorized. Evaluate discrete-solver
