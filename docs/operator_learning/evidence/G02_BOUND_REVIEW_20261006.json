@@ -1,0 +1,152 @@
+{
+  "kind": "POST_HOC_FINITE_CONTROL_ANALYSIS",
+  "gate_status": "OPEN",
+  "scientific_qualification": false,
+  "source_run": "runs/operator-learning/OL-G02_reconstruction_mechanism_v3/20261006T120426434502Z",
+  "source_seal_sha256": "f9cc7337d523bae3a50ac1d172be2eb49b8ce963fa7187177e62d7bd40f13cd1",
+  "verified_artifacts": 21,
+  "attempted_seeds": 6,
+  "exclusions": [],
+  "physical_widths": [
+    4,
+    4.444444444444445,
+    4.444444444444445
+  ],
+  "records": [
+    {
+      "seed": 71029,
+      "input_sha256": "4ab674635559453c44e0fdd83d823a64239f1934f637ac67755bbad54ccb4291",
+      "aligned_integration_l1_upper": 0.000001709490096584454,
+      "sampling_phase_l1_upper": {
+        "5000": [
+          0.05214187154968039,
+          0.03495457842976139,
+          0.034954574494095766,
+          0.05214208145270311
+        ],
+        "10000": [
+          0.017535448459877603,
+          0.017535448459877603
+        ]
+      }
+    },
+    {
+      "seed": 71030,
+      "input_sha256": "d982af24176a6fbd93490f4ad6f9993cf5c8c11fb8f82c1f9449e8d3f85b6bfe",
+      "aligned_integration_l1_upper": 3.12812618286773e-7,
+      "sampling_phase_l1_upper": {
+        "5000": [
+          0.04650515977270153,
+          0.031160359819339352,
+          0.031160307576862566,
+          0.04650208012407435
+        ],
+        "10000": [
+          0.01562766436063762,
+          0.01562766436063762
+        ]
+      }
+    },
+    {
+      "seed": 71031,
+      "input_sha256": "8126967739758275712650ffadbce7c93e8bf29f55d480feea1f51eb25c88c2d",
+      "aligned_integration_l1_upper": 9.568556204186507e-7,
+      "sampling_phase_l1_upper": {
+        "5000": [
+          0.04604156784061202,
+          0.030854698723405568,
+          0.030854611037409812,
+          0.04604301235883531
+        ],
+        "10000": [
+          0.015475414199724377,
+          0.015475414199724377
+        ]
+      }
+    },
+    {
+      "seed": 71032,
+      "input_sha256": "78df8c656edd0d313c8cf996dc2cbbfc23ccfd7e489bfe06de9f0a5ee769b9b9",
+      "aligned_integration_l1_upper": 0.0000017475800150469788,
+      "sampling_phase_l1_upper": {
+        "5000": [
+          0.04844119908043101,
+          0.03246507023667882,
+          0.03246507360998253,
+          0.048441470749957014
+        ],
+        "10000": [
+          0.016283943306835396,
+          0.016283943306835396
+        ]
+      }
+    },
+    {
+      "seed": 71033,
+      "input_sha256": "bd489ff506ebf4843a91caa04cb73e32a590361d0fed5dd8f46847cf7920057b",
+      "aligned_integration_l1_upper": 0.0000011401023470909877,
+      "sampling_phase_l1_upper": {
+        "5000": [
+          0.049873769259936016,
+          0.0334328782702889,
+          0.03343289387389926,
+          0.04987521782052284
+        ],
+        "10000": [
+          0.016771520085874982,
+          0.016771520085874982
+        ]
+      }
+    },
+    {
+      "seed": 71034,
+      "input_sha256": "28fd9d26386330559930c3fe005526f4ddb0c431d3c2876babd0e9ab7e403182",
+      "aligned_integration_l1_upper": 7.256880951740818e-7,
+      "sampling_phase_l1_upper": {
+        "5000": [
+          0.048348410720496234,
+          0.032404921673827775,
+          0.03240490627087782,
+          0.04834870739308369
+        ],
+        "10000": [
+          0.016254367008095606,
+          0.016254367008095606
+        ]
+      }
+    }
+  ],
+  "worst_sampling_l1_upper": {
+    "5000": 0.05214208145270311,
+    "10000": 0.017535448459877603
+  },
+  "worst_sampling_tv_upper": {
+    "5000": 0.026071040726351555,
+    "10000": 0.008767724229938802
+  },
+  "worst_aligned_integration_l1_upper": 0.0000017475800150469788,
+  "git_commit": "640c2180213fce224a9b29d265f7e532cde09fb5",
+  "git_status": " M docs/operator_learning/DECISIONS.md\n M docs/operator_learning/README.md\n?? docs/operator_learning/evidence/G02_BOUND_REVIEW_20261006.md\n?? scripts/audit_reconstruction_bounds.py\n?? scripts/plot_reconstruction_comparison.py\n",
+  "analysis_source_hashes": {
+    "scripts/audit_reconstruction_bounds.py": "87f13d6d70f357d98cdb8b56e12a81d67357ea3d2d7c8701802128697e684b00",
+    "operator_learning/reconstruction_controls.py": "ef319bf6ddb90c94dcf4d89d28b36545e0d7763901a04d2b4dc9e081867aa3a6"
+  },
+  "runtime": {
+    "python": "3.12.13",
+    "numpy": "2.5.2",
+    "platform": "Linux-7.1.5-76070105-generic-x86_64-with-glibc2.39",
+    "device": "cpu"
+  },
+  "command": [
+    "scripts/audit_reconstruction_bounds.py",
+    "runs/operator-learning/OL-G02_reconstruction_mechanism_v3/20261006T120426434502Z"
+  ],
+  "limitations": [
+    "Bounds evaluated in floating point without interval error enclosure",
+    "Same six development windows; no fresh qualification population",
+    "Finite paired controls; no exact-trajectory or continuum bound",
+    "Sampling coupling bound can be loose; no independence assumed",
+    "Whole-space box-mixture bounds; truncation and FE transfer separate",
+    "No predeclared scientific budget; no retrospective gate pass"
+  ]
+}

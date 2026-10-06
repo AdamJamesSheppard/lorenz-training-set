@@ -1,5 +1,19 @@
 # Operator-learning decisions
 
+## 2026-10-06 — OL-D019: quantify grid-independent finite-control bounds
+
+Owner requests G02 continuation. Read-only post-hoc audit verifies all21 sealed
+mechanism_v3 artifacts and retains six windows/every sampling phase. See
+evidence/G02_BOUND_REVIEW_20261006.md and compact JSON. Paired-box method/source
+derivation: RECONSTRUCTION_QUALIFICATION_PROPOSAL_V3.md; external dependence
+research attribution and unverified hypotheses are explicit in the review.
+Worst sampling TV upper bounds: .02607104 (5000), .00876772 (10000).
+Aligned finite dt L1 bound: 1.74758e-6; no continuum or independence claim.
+No retrospective thresholds, changed bandwidth, exclusions or gate promotion.
+Scientific budget approval remains required before fresh qualification dispatch.
+Self-reviewed implementing agent; no independent assessor. G02 OPEN, later
+gates LOCKED; no expensive computation, targets, training or DA launched.
+
 ## 2026-10-06 — OL-D018: build searchable provenance graph including successes
 
 Owner requests implementation and explicitly includes successful results, not

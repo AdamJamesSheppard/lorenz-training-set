@@ -4,10 +4,10 @@
     "docs/research_audit/methods.json": "8167012c99375c28b91458671a998fab876ed2c02f9d35387feb62b876e5c791",
     "docs/research_audit/snapshot_20261006.json": "43da62abd04704f92606e2f75bdf919e46fc0908c477ad84da4cad853c1e0fa8",
     "docs/operator_learning/gates.json": "1ed071b6fa9c8c880b2150d32ac99dd3b3f3cfed197ba0634f8070473765fb82",
-    "docs/operator_learning/state.json": "3bc321bf46f25aef4e2dd187b444e8d02204069b2fd4c5d53cb3ebcf60d7613d",
+    "docs/operator_learning/state.json": "b5989cdf7c21ea9aab88598587428aa0ae8cf5f821fc6e928810453ac865f602",
     "docs/operator_learning/CLAIMS.md": "3642804a17bc8d2038472458b8e52d46d8fd4bfbfcadc6bd4c9fad260650eff7",
     "docs/CLAIMS.md": "474a415c96ac74dd48eb3901af68660544549b7b966f549d09d712873ef7977c",
-    "docs/operator_learning/DECISIONS.md": "16a5981ee20cb70442c7e181dcd7d842d199b558482685331e66484a008c64ea",
+    "docs/operator_learning/DECISIONS.md": "76e8101cea38b01a032365afa8309235cd88e73fa2f87acc5778a747511ec228",
     "docs/DECISIONS.md": "e815b7dd8cd7f274fa88fed0fffc367b34ac32e35a2fffa93c4e694e0189c814",
     "docs/operator_learning/assumptions.yaml": "71e16568f5cc6cb8b3f5856eba3fe3a4a8d090da9616a17750686c06309ea5cf",
     "docs/assumptions.yaml": "51092eeafd2176eadee11442bd8fc9238217a7d772bd797f60ea4c6c5ce844ce",
@@ -5201,6 +5201,14 @@
       "label": "2026-10-06 — OL-D018: build searchable provenance graph including successes",
       "status": "RECORDED_DECISION",
       "text": "Owner requests implementation and explicitly includes successful results, not\nonly failures. Add typed graph projection/query tools under REQ-RT-001, linked\nto method/source registers, all 18 gates, experiments/runs, original decision\nsections, historical component outcomes, claims, assumptions and authorizations.\nSuccess/failure/open/process-completion statuses remain distinct; positive\ncomponent results do not invent aggregate passes. Contextual citations never\nautomatically become support/proof edges. W3C PROV is conceptual guidance,\nrecorded in ../research_audit/graph_sources.json; custom schema, no conformance\nclaim. BFS/search, deterministic rebuild/freshness and structural tests are\nengineering checks. Dated audit snapshots and all original evidence preserved.\nNo scientific gate/model/solver/authorization changes or expensive run.\nImplementing-agent self-review under direct owner instruction.",
+      "path": "docs/operator_learning/DECISIONS.md"
+    },
+    {
+      "id": "decision:OL-D019",
+      "kind": "decision",
+      "label": "2026-10-06 — OL-D019: quantify grid-independent finite-control bounds",
+      "status": "RECORDED_DECISION",
+      "text": "Owner requests G02 continuation. Read-only post-hoc audit verifies all21 sealed\nmechanism_v3 artifacts and retains six windows/every sampling phase. See\nevidence/G02_BOUND_REVIEW_20261006.md and compact JSON. Paired-box method/source\nderivation: RECONSTRUCTION_QUALIFICATION_PROPOSAL_V3.md; external dependence\nresearch attribution and unverified hypotheses are explicit in the review.\nWorst sampling TV upper bounds: .02607104 (5000), .00876772 (10000).\nAligned finite dt L1 bound: 1.74758e-6; no continuum or independence claim.\nNo retrospective thresholds, changed bandwidth, exclusions or gate promotion.\nScientific budget approval remains required before fresh qualification dispatch.\nSelf-reviewed implementing agent; no independent assessor. G02 OPEN, later\ngates LOCKED; no expensive computation, targets, training or DA launched.",
       "path": "docs/operator_learning/DECISIONS.md"
     },
     {
@@ -13000,6 +13008,13 @@
       "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
     },
     {
+      "id": "edge:05af55b52e927dc23bd33827",
+      "source": "decision:OL-D019",
+      "relation": "recorded_in",
+      "target": "artifact:docs/operator_learning/DECISIONS.md",
+      "attribution": "ORIGINAL_DECISION_SECTION"
+    },
+    {
       "id": "edge:05c9075c5cf695db525297d2",
       "source": "decision:92fa3f0bf1baf49b1a5adba5",
       "relation": "recorded_in",
@@ -13985,6 +14000,13 @@
       "relation": "documents",
       "target": "artifact:runs/mfem-physical-equivalence/20260915T183709Z/physical_equivalence_report.json",
       "attribution": "HISTORICAL_METADATA_NOT_NEW_ADJUDICATION"
+    },
+    {
+      "id": "edge:1764ae93168139234473cb0f",
+      "source": "decision:OL-D019",
+      "relation": "references",
+      "target": "artifact:docs/operator_learning/DECISIONS.md",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
     },
     {
       "id": "edge:17958fb148542c170ae67da8",
@@ -16773,6 +16795,13 @@
       "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
     },
     {
+      "id": "edge:4a2f23224224c9966f60e997",
+      "source": "decision:OL-D019",
+      "relation": "references",
+      "target": "decision:OL-D019",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
+    },
+    {
       "id": "edge:4a387fab0b729b02fad76857",
       "source": "record:fem:2dca79ee15db1298a7fb28e5",
       "relation": "recorded_in",
@@ -18094,6 +18123,13 @@
       "relation": "recorded_in",
       "target": "artifact:docs/research_audit/snapshot_20261006.json",
       "attribution": "AUDIT_SNAPSHOT"
+    },
+    {
+      "id": "edge:618f3f0120faf40dd9cb3aa3",
+      "source": "decision:OL-D019",
+      "relation": "references",
+      "target": "artifact:docs/operator_learning/RECONSTRUCTION_QUALIFICATION_PROPOSAL_V3.md",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
     },
     {
       "id": "edge:619ea451366e0d0d66fdca73",

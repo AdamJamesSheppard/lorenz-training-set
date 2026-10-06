@@ -53,6 +53,10 @@ G02 remains OPEN. Review the [current v3 qualification proposal](RECONSTRUCTION_
 and approve a scientific error budget before executable predeclaration or dispatch.
 No expensive target campaign or model training is included.
 
+Latest continuation: [grid-independent finite-control bound review](evidence/G02_BOUND_REVIEW_20261006.md).
+Sampling phase bounds and aligned finite integration controls are now measured;
+scientific error-budget approval remains the blocking decision.
+
 OL-D010 authorizes the separate bounded CPU-only refinement characterization:
 experiments/operator_learning/OL-G02_reconstruction_refinement_v2.json.
 It completed with unresolved histogram/burn-in sensitivity. OL-D012 authorizes
