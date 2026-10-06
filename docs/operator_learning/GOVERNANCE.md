@@ -39,6 +39,11 @@ update claims/decisions/assumptions/state and NEXT_REQUIRED_GATE together.
 A GitHub review should compare the Phase A config with the run copy and Phase B
 decision. No force-push or moved released tag is part of this protocol.
 
+OL-D020/v5 explicitly permitted one unrelated untracked plotting script:
+tracked inputs remained clean and matched their hashes; full dirty status was
+recorded rather than hidden. This narrow exception grants no general dirty-source
+dispatch permission and is disclosed in OL-D021.
+
 ## Roles and authority
 
 Research owner: Adam James Sheppard (approval of scientific scope and promotion).

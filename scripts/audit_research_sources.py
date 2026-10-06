@@ -204,11 +204,25 @@ def validate(root=ROOT):
             if not (root / path).is_file():
                 errors.append(f'missing method evidence: {path}')
     canonical = json.loads((root / 'docs/operator_learning/gates.json').read_text())
+    # Preserve the dated audit; later adjudications are explicit versioned overlays.
+    updates = json.loads((base / 'gate_updates.json').read_text())['updates']
+    by_id = {entry['gate_id']: entry for entry in updates}
+    if len(by_id) != len(updates):
+        errors.append('duplicate gate research update')
+    if set(by_id) - {g['id'] for g in canonical}:
+        errors.append('unknown gate research update')
     if [g['id'] for g in audit['gates']] != [g['id'] for g in canonical]:
         errors.append('research audit gate coverage stale')
     for actual, frozen in zip(canonical, audit['gates']):
-        if actual['decision_status'] != frozen['status'] or actual['adjudication'] != frozen['adjudication']:
+        latest = by_id.get(actual['id'], frozen)
+        if actual['decision_status'] != latest['status'] or actual['adjudication'] != latest['adjudication']:
             errors.append(f"research audit gate decision stale: {actual['id']}")
+        if actual['id'] in by_id:
+            for key in ('evidence', 'method_record'):
+                if not (root / latest[key]).is_file():
+                    errors.append(f'missing updated gate traceability: {actual["id"]}/{key}')
+            if latest['decision_id'] not in (root / 'docs/operator_learning/DECISIONS.md').read_text():
+                errors.append('updated research decision missing')
         if actual['decision_status'] in ('PASSED', 'FAILED') and not frozen['historical_events']:
             errors.append(f"adjudicated gate missing outcome/research history: {actual['id']}")
         if set(frozen['method_ids']) - method_ids or set(frozen['research_source_ids']) - source_ids:

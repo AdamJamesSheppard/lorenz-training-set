@@ -59,7 +59,8 @@ Occupation densities and conditional state uncertainty remain distinct objects.
 
 ## Authority
 
-Current stage remains operator-learning qualification. G02 is OPEN; posterior
+Current stage remains operator-learning qualification. G02 passed only scoped
+finite-control occupation reconstruction (OL-D021); posterior
 transfer (G16), sequential interface (G17), and a separately approved Bayesian
 assimilation programme remain prerequisites. No DA run, new target campaign,
 model retraining or historical evidence rewrite is authorized here.

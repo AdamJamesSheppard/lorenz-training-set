@@ -20,6 +20,7 @@ INPUTS = [
     'docs/operator_learning/CLAIMS.md', 'docs/CLAIMS.md',
     'docs/operator_learning/DECISIONS.md', 'docs/DECISIONS.md',
     'docs/operator_learning/assumptions.yaml', 'docs/assumptions.yaml',
+    'docs/research_audit/gate_updates.json',
 ]
 
 
@@ -246,6 +247,18 @@ def build_graph(root=ROOT):
          'OL-D006_PRESERVES_V1_FAILURE_AND_ADJUDICATES_V2_UNCHANGED_THRESHOLDS')
     edge('decision:OL-D006', 'supports', 'claim:OL-C-G01', 'SCOPED_G01_CLAIM_REGISTRY')
     edge('decision:OL-D002', 'contradicts', 'claim:OL-C005', 'PILOT_SCIENTIFIC_QUALIFICATION_REJECTED')
+    updates = json.loads((root/'docs/research_audit/gate_updates.json').read_text())['updates']
+    for update in updates:
+        decision = 'decision:'+update['decision_id']
+        edge(decision, 'adjudicates', 'gate:'+update['gate_id'], 'VERSIONED_GATE_RESEARCH_UPDATE')
+        for key in ('evidence', 'method_record'):
+            edge(decision, 'references', artifact(update[key]), 'EXPLICIT_GATE_METHOD_EVIDENCE')
+        for index, component in enumerate(update['component_outcomes']):
+            identifier = node(f'outcome:{update["decision_id"]}:component{index}', 'outcome',
+                              component['label'], status=component['status'], cases=component['cases'],
+                              evidence=update['evidence'], limitation='Recorded sufficient certification outcome; failed bound does not prove actual error exceeds tolerance')
+            edge(decision, 'has_outcome', identifier, 'EXPLICIT_COMPONENT_ADJUDICATION')
+    edge('decision:OL-D021', 'supports', 'claim:OL-C016', 'SCOPED_FINITE_CONTROL_NUMERICAL_CLAIM')
     return dict(schema_version=1, generated_from=hashes,
                 relation_vocabulary=sorted(RELATIONS),
                 limitation='Searchable documentary projection; not independent proof, raw-array revalidation or automatic scientific promotion.',

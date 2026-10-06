@@ -1,5 +1,15 @@
 # Operator-learning claim registry
 
+## OL-C016 — Bin-free20k finite-control reconstruction stability
+
+Class: NUMERICAL. Six fresh v5 windows meet unchanged1% TV upper-bound criteria
+including every sampling phase and aligned integration; maximum.006441564.
+Evidence: OL-D021; evidence/G02_QUALIFICATION_V5_20261006.md. Falsification:
+source/seal mismatch, replay failure, incorrect coupling or failed criterion.
+Limits: finite control, fixed width/window, float64 without interval proof;
+no exact trajectory, invariant law, universal initial-state, posterior, changed
+FE transfer or law-diversity guarantee.5k/10k insufficient certification retained.
+
 ## OL-C014 — Full-density Bayesian analysis is the owner-required application
 
 Class: ESTABLISHED as a scope decision, not numerical qualification. Evidence:
@@ -9,8 +19,9 @@ DA remains unauthorized; likelihood, prior and numerical assumptions persist.
 
 ## OL-C015 — Reserved approval qualifies the bin-free reconstruction
 
-Class: REJECTED. Owner approval selects a candidate for qualification, while
-G02 remains OPEN. Evidence: RECONSTRUCTION_CANDIDATE_APPROVAL_V2.md; OL-D014.
+Class: REJECTED. Reserved approval alone selected a candidate and did not pass
+G02. Later OL-D021 passes scoped v5 using new evidence, not approval alone.
+Evidence: RECONSTRUCTION_CANDIDATE_APPROVAL_V2.md; OL-D014; OL-D021.
 Reassessment requires new frozen criteria, evidence and explicit adjudication.
 
 ## OL-C-G02 — Conditional temporal-sampling contraction

@@ -31,8 +31,10 @@ G01 failure, G02 open characterizations and prospective-only later-gate sources.
 Use the [searchable provenance graph](../research_audit/GRAPH.md) to trace both
 successful and unsuccessful outcomes through their research and evidence.
 
-**NEXT_REQUIRED_GATE = OL-G02_RECONSTRUCTION_STABILITY.**
-G00 passed within the owner-selected attractor-density scope. G01 passed scoped representation checks. G02 is OPEN; G03–G17 are LOCKED. Large target campaigns, qualified
+**NEXT_REQUIRED_GATE = OL-G03_INPUT_DIVERSITY.**
+G00 passed within the owner-selected attractor-density scope. G01 passed archived
+representation checks; G02 passed scoped finite-control reconstruction under
+OL-D021. G03 is OPEN; G04–G17 are LOCKED. Large target campaigns, qualified
 surrogate replacement, posterior-transfer qualification and operator-assisted
 DA are not authorized. Cheap explicitly labelled diagnostics on the original
 six pairs are allowed; they do not unlock gates. Do not tune on the original
@@ -43,21 +45,24 @@ Owner accepted [the restricted attractor-density population](ACCEPTED_POPULATION
 under OL-D004; the mixed proposal remains historical. Read the explicit
 [representation contract](REPRESENTATION_CONTRACT_V1.md) for G01 details.
 [G01 audit and limitations](evidence/G01_REPRESENTATION_V2_20261005.md) record the pass.
-The next study concerns G02 reconstruction stability, retaining attractor densities.
+The next study concerns G03 diversity, retaining attractor densities without
+assuming that different seeds supply different laws.
 Posterior-population relevance remains unverified.
 
 G02 implementation and controlled study design:
 [reconstruction stability v1](RECONSTRUCTION_STABILITY_G02_V1.md).
 Characterization has completed: [adjudication and limits](evidence/G02_CHARACTERIZATION_20261006.md).
-G02 remains OPEN. Owner approved TV≤.01 against the declared finite control;
-[qualification v5](RECONSTRUCTION_QUALIFICATION_V5.md) now freezes the fresh study.
+Owner approved TV≤.01 against the declared finite control;
+[qualification v5](RECONSTRUCTION_QUALIFICATION_V5.md) passed the frozen20k recipe
+on all six fresh windows. [Adjudication and limits](evidence/G02_QUALIFICATION_V5_20261006.md).
 Earlier v3 proposals and pending-budget decisions remain preserved history.
 No expensive target campaign or model training is included.
 
 Latest continuation: [grid-independent finite-control bound review](evidence/G02_BOUND_REVIEW_20261006.md).
 Sampling phase bounds and aligned finite integration controls are now measured;
-The approved budget is now frozen in v5; fresh qualification evidence and review
-are required before any gate promotion.
+The approved budget stayed unchanged in v5; OL-D021 verifies and adjudicates the
+fresh evidence. Changed FE transfer, reference applicability and grid fidelity
+remain separate unresolved checks, not implied by the G02 pass.
 
 OL-D010 authorizes the separate bounded CPU-only refinement characterization:
 experiments/operator_learning/OL-G02_reconstruction_refinement_v2.json.
@@ -70,7 +75,7 @@ technical completion. OL-D013 authorizes [empirical-box control v4](RECONSTRUCTI
 to measure histogram sensitivity against a bin-free diagnostic on identical samples.
 It completed; [verified v4 review](evidence/G02_EMPIRICAL_V4_20261006.md) records
 all attempts and limitations. OL-D015 adds an analytic paired-kernel bound and
-the v3 qualification draft; scientific budget approval remains required.
+the historical v3 draft; OL-D020 later approved the budget and OL-D021 adjudicates v5.
 
 ## Standard commands (from repository root)
 

@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "immutable_baseline": "docs/research_audit/snapshot_20261006.json",
+  "decision_record": "docs/operator_learning/DECISIONS.md#ol-d021",
+  "updates": [
+    {
+      "gate_id": "OL-G02_RECONSTRUCTION_STABILITY",
+      "status": "PASSED",
+      "adjudication": {
+        "approver": "Adam James Sheppard: explicit1% budget approval and instruction to adjudicate",
+        "reviewer": "Implementing Codex agent; self-review, no independent assessor",
+        "date": "2026-10-06",
+        "config_sha256": "fc8a1bb304e7c2d5e849053b4bb248cb9177bdcbbf71cd5ad92239c8c952deef",
+        "evidence_sha256": "1b356c08fe983ac90760b54bc526f3c34343e34170ec96756cb863728181e0fa",
+        "predeclaration_commit": "651eec5aa781148b1b2fcc966681a0e8cf34dd07",
+        "decision_record": "OL-D021; docs/operator_learning/evidence/G02_QUALIFICATION_V5_20261006.md",
+        "limitations": "Fixed-width finite-control six-window numerical evidence; no interval/continuum/universal/posterior/changed-FE-transfer certification; ignored arrays local; declared untracked plotting script in dirty provenance"
+      },
+      "decision_id": "OL-D021",
+      "evidence": "docs/operator_learning/evidence/G02_QUALIFICATION_V5_20261006.md",
+      "method_record": "docs/operator_learning/RECONSTRUCTION_QUALIFICATION_V5.md",
+      "component_outcomes": [
+        {
+          "label": "20k finite-control candidate",
+          "status": "PASSED",
+          "cases": 6
+        },
+        {
+          "label": "5k sufficient bound certification",
+          "status": "FAILED",
+          "cases": 6
+        },
+        {
+          "label": "10k sufficient bound certification",
+          "status": "FAILED",
+          "cases": 6
+        }
+      ]
+    },
+    {
+      "gate_id": "OL-G03_INPUT_DIVERSITY",
+      "status": "OPEN",
+      "adjudication": null,
+      "decision_id": "OL-D021",
+      "evidence": "docs/operator_learning/evidence/G02_QUALIFICATION_V5_20261006.md",
+      "method_record": "docs/operator_learning/RECONSTRUCTION_QUALIFICATION_V5.md",
+      "component_outcomes": []
+    }
+  ]
+}

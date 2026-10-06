@@ -55,10 +55,10 @@ Each pass unlocks only the next gated study; DA/production need explicit approva
 - **question**: Is empirical reconstruction stable?
 - **scientific_motivation**: Separate finite-sample, temporal dependence and regularization uncertainty.
 - **prerequisites**: ["OL-G01_REPRESENTATION_CONTRACT"]
-- **frozen_experiment_definition**: RECONSTRUCTION_STABILITY_G02_V1.md; bounded characterization config must be committed before execution; later scientific qualification needs a new error-budget predeclaration
-- **evidence_required**: Bitwise trajectory replay, count/phase/independent-reconstruction and histogram/bandwidth sensitivity, observable-specific ACF/ESS limitations, sealed source/output provenance; qualification requires approved error budget and fresh evidence
-- **metrics**: Sample-count/bandwidth/grid/window sensitivity, observable autocorrelation/ESS, independent replicates.
-- **predeclared_thresholds**: {"characterization_technical": {"mass_error_max": 1e-10, "negative_mass_max": 0, "historical_replay_bitwise_equal": true, "technical_completion": "Every frozen law/comparison and required metadata recorded; hashes/provenance/seal complete", "scientific_qualification": "NOT_AUTHORIZED_BY_CHARACTERIZATION: gate stays OPEN pending owner-reviewed reconstruction recipe and scientifically justified error budget, followed by a new predeclared qualification run"}, "qualification_error_budget": "TO_BE_PREDECLARED_BEFORE_RUN"}
+- **frozen_experiment_definition**: RECONSTRUCTION_QUALIFICATION_V5.md; committed651eec5 before fresh six-window run; earlier characterizations preserved
+- **evidence_required**: All phases/counts, aligned finite integrations, raw mass/positivity, grid/statistical/dependence diagnostics, source/config/seal hashes, all attempts; scoped finite-control evidence only
+- **metrics**: Whole-space coupled TV upper bounds; raw mass/negativity; voxel L1 and statistics; heuristic ACF/ESS
+- **predeclared_thresholds**: {"tv_max": 0.01, "mass_error_max": 1e-10, "negative_mass_max": 0, "safety_allowance": 1e-10, "scope": "Every20k candidate in six fresh windows; source/provenance verification; no continuum budget"}
 - **pass_condition**: All frozen scientific and provenance criteria pass; named reviewer and approver record scope and limitations.
 - **failure_condition**: Any required criterion fails or evidence is missing; missing evidence remains OPEN rather than a fabricated FAIL/PASS.
 - **what_passing_unlocks**: OL-G03_INPUT_DIVERSITY design/qualification only; no automatic production or DA authorization.
@@ -66,10 +66,10 @@ Each pass unlocks only the next gated study; DA/production need explicit approva
 - **claims_permitted_after_pass**: Only scoped reconstruction stability evidence for the frozen population/config.
 - **claims_still_forbidden_after_pass**: Unrestricted generalization, continuum accuracy without reference bounds, DA performance and production replacement.
 - **relevant_assumptions**: ["OL-A01"]
-- **experiment_config**: experiments/operator_learning/OL-G02_reconstruction_characterization_v1.json
-- **evidence_run**: null
-- **decision_status**: OPEN
-- **adjudication**: null
+- **experiment_config**: experiments/operator_learning/OL-G02_reconstruction_qualification_v5.json
+- **evidence_run**: runs/operator-learning/OL-G02_reconstruction_qualification_v5/20261006T132432282684Z
+- **decision_status**: PASSED
+- **adjudication**: {"approver": "Adam James Sheppard: explicit1% budget approval and instruction to adjudicate", "reviewer": "Implementing Codex agent; self-review, no independent assessor", "date": "2026-10-06", "config_sha256": "fc8a1bb304e7c2d5e849053b4bb248cb9177bdcbbf71cd5ad92239c8c952deef", "evidence_sha256": "1b356c08fe983ac90760b54bc526f3c34343e34170ec96756cb863728181e0fa", "predeclaration_commit": "651eec5aa781148b1b2fcc966681a0e8cf34dd07", "decision_record": "OL-D021; docs/operator_learning/evidence/G02_QUALIFICATION_V5_20261006.md", "limitations": "Fixed-width finite-control six-window numerical evidence; no interval/continuum/universal/posterior/changed-FE-transfer certification; ignored arrays local; declared untracked plotting script in dirty provenance"}
 
 ## OL-G03_INPUT_DIVERSITY
 
@@ -90,7 +90,7 @@ Each pass unlocks only the next gated study; DA/production need explicit approva
 - **relevant_assumptions**: ["OL-A01"]
 - **experiment_config**: TO_BE_PREDECLARED_BEFORE_RUN
 - **evidence_run**: null
-- **decision_status**: LOCKED
+- **decision_status**: OPEN
 - **adjudication**: null
 
 ## OL-G04_REFERENCE_TARGET_APPLICABILITY

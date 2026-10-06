@@ -19,7 +19,7 @@ CURRENT_MODEL_SCIENTIFICALLY_QUALIFIED = false
 PRODUCTION_DATASET_AUTHORIZED = false
 OPERATOR_SURROGATE_AUTHORIZED_FOR_DA = false
 OPERATOR_PRODUCTION_AUTHORIZED = false
-NEXT_REQUIRED_GATE = OL-G02_RECONSTRUCTION_STABILITY
+NEXT_REQUIRED_GATE = OL-G03_INPUT_DIVERSITY
 ```
 
 The six-law pilot `runs/neural-pilot/20261004T133438Z` completed target generation
@@ -30,9 +30,9 @@ it development data. G00 passed within the owner-approved restricted attractor-d
 
 OL-D014 records approval with reservations of a bin-free reconstruction candidate.
 Owner subsequently approved finite-control reconstruction TV≤.01 (OL-D020).
-G02 remains OPEN pending fresh qualification_v5 evidence/review and changed
-representation checks. Bounded qualification dispatch is authorized; no large
-target campaign or DA.
+G02 qualification_v5 now PASSED within the finite-control scope (OL-D021).
+G03 input diversity is OPEN; changed bin-free FE transfer and reference/export
+checks remain necessary before expensive targets. No target campaign or DA.
 Eventual analysis follows [the full-density Bayesian contract](BAYESIAN_ASSIMILATION_CONTRACT.md).
 
 2026-10-05: user authorized the bounded G00 alignment comparison, predeclared
@@ -44,15 +44,16 @@ The v2 comparison completed: technical checks pass and 117 sealed files verify.
 Results: docs/operator_learning/evidence/G00_ALIGNMENT_V2_20261005.md.
 Owner subsequently selected the restricted attractor-density family (OL-D004),
 passing scoped G00 and opening G01. G01 v2 subsequently passed under OL-D006;
-G02 reconstruction stability is next. The mixed proposal is not approved.
+G02 later passed scoped v5; G03 input diversity is next. The mixed proposal is not approved.
 No expensive target-generation permission has changed.
 
 G02 implementation: docs/operator_learning/RECONSTRUCTION_STABILITY_G02_V1.md;
 OL-D007 records the characterization design; OL-D008 restored dispatch.
 Characterization completed and was reviewed under OL-D009; portable evidence:
 docs/operator_learning/evidence/G02_CHARACTERIZATION_20261006.md.
-G02 remains OPEN: scientific reconstruction-error budget and executable recipe
-qualification are pending. Candidate approval under OL-D014 retains reservations.
+Earlier characterizations left G02 OPEN pending budget and qualification. Those
+historical decisions remain preserved; OL-D021 adjudicates the fresh v5 pass.
+Candidate approval under OL-D014 retains its original reservations.
 The historical v3 proposal remains a draft; qualification_v5 is now frozen under
 OL-D020. OL-D015 verifies empirical_v4 and adds an analytic paired-box
 bound; see operator_learning/evidence/G02_EMPIRICAL_V4_20261006.md.

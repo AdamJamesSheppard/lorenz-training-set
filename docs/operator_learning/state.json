@@ -6,11 +6,11 @@
   "current_scope": "FIXED_PHYSICS_FIXED_HORIZON_ATTRACTOR_DENSITIES",
   "current_six_law_pilot": "COMPLETED_ENGINEERING_AND_RESTRICTED_LEARNING_PILOT",
   "current_model_scientifically_qualified": false,
-  "next_required_gate": "OL-G02_RECONSTRUCTION_STABILITY",
-  "active_blocker": "OL-D020 approves finite-control TV<=0.01 and freezes qualification_v5. Fresh evidence/adjudication and changed representation qualification remain pending.",
+  "next_required_gate": "OL-G03_INPUT_DIVERSITY",
+  "active_blocker": "G03 must separate between-law diversity from within-law reconstruction variation; changed bin-free FE transfer and reference/export qualification remain unverified.",
   "authorized": [
-    "Dispatch committed qualification_v5 with approved TV budget, fixed widths and every fresh window retained; review before gate promotion",
-    "Inexpensive labelled development diagnostics; no expensive target generation, neural retraining or DA"
+    "Design and predeclare G03 diversity assessment using the scoped20k finite-control reconstruction; no automatic expensive dispatch",
+    "Inexpensive labelled diagnostics; no expensive targets, neural retraining or DA"
   ],
   "locked": [
     "Large expensive target campaigns",
@@ -21,12 +21,12 @@
   ],
   "operator_surrogate_authorized_for_da": false,
   "operator_production_authorized": false,
-  "last_adjudicated_evidence": "OL-D019; evidence/G02_BOUND_REVIEW_20261006.md: all21 source seals verified, grid-independent sampling and aligned finite integration bounds; G02 OPEN pending scientific budget. OL-D009, OL-D013 and OL-D015 earlier characterizations preserved.",
+  "last_adjudicated_evidence": "OL-D021; evidence/G02_QUALIFICATION_V5_20261006.md: six20k candidates pass unchanged1% TV finite-control criteria; lower-count failures retained. Historical OL-D009/OL-D013/OL-D015 preserved.",
   "gates": {
     "OL-G00_PROBABILITY_DISTRIBUTION_ALIGNMENT": "PASSED",
     "OL-G01_REPRESENTATION_CONTRACT": "PASSED",
-    "OL-G02_RECONSTRUCTION_STABILITY": "OPEN",
-    "OL-G03_INPUT_DIVERSITY": "LOCKED",
+    "OL-G02_RECONSTRUCTION_STABILITY": "PASSED",
+    "OL-G03_INPUT_DIVERSITY": "OPEN",
     "OL-G04_REFERENCE_TARGET_APPLICABILITY": "LOCKED",
     "OL-G05_EXPORT_FIDELITY": "LOCKED",
     "OL-G06_DATA_PROVENANCE": "LOCKED",

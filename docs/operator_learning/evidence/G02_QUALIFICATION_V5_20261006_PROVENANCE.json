@@ -1,0 +1,87 @@
+{
+  "experiment_id": "OL-G02_reconstruction_qualification_v5",
+  "gate_id": "OL-G02_RECONSTRUCTION_STABILITY",
+  "kind": "finite_control_reconstruction_qualification",
+  "config_sha256": "fc8a1bb304e7c2d5e849053b4bb248cb9177bdcbbf71cd5ad92239c8c952deef",
+  "git_commit": "651eec5aa781148b1b2fcc966681a0e8cf34dd07",
+  "git_dirty": true,
+  "git_status": "?? scripts/plot_reconstruction_comparison.py",
+  "command": [
+    "env",
+    "OPENBLAS_NUM_THREADS=1",
+    "OMP_NUM_THREADS=1",
+    "./scripts/run-in-env",
+    "python",
+    "scripts/run_reconstruction_qualification.py",
+    "{RUN_DIRECTORY}"
+  ],
+  "runtime_versions": {
+    "python": "3.12.13",
+    "numpy": "2.5.2",
+    "scipy": "1.18.0"
+  },
+  "hardware": {
+    "device": "cpu",
+    "blas_threads": 1,
+    "openmp_threads": 1,
+    "gpu": false,
+    "mpi": false
+  },
+  "seeds": {
+    "trajectory": [
+      82029,
+      82030,
+      82031,
+      82032,
+      82033,
+      82034
+    ]
+  },
+  "input_hashes": {
+    "scripts/run_reconstruction_qualification.py": "894080538814441f43bd62f070f247e890848c758c0090b38fad4b5338c4ef21",
+    "operator_learning/reconstruction_controls.py": "ef319bf6ddb90c94dcf4d89d28b36545e0d7763901a04d2b4dc9e081867aa3a6",
+    "operator_learning/reconstruction.py": "9687ec1de3d7d766c74a17f7d79ef5a97aaa299b90a23543960dfc48620c3b5c",
+    "operator_learning/alignment.py": "16dbec8b6f7046d90c15395a229054f0cff47218f50b438a670b8a216a664451",
+    "operator_learning/governance.py": "49912ae3dcf57f37421a9200331821830d2ad3822154f899bad4215213a3a8b5",
+    "docs/operator_learning/RECONSTRUCTION_QUALIFICATION_V5.md": "094e829049b9bd2663132016646fe28ee94d083eb38b0e756a7ba3b7276f755d",
+    "SCIENTIFIC_INTEGRITY.md": "f0208b97e2466c14ec10851da5d07ff39be0af3952491f6890eb43c054c7a97e"
+  },
+  "output_hashes": {
+    "seed82029_paths.npz": "000448e9a6720f62fecdbf1499308c25291c94a630d36278eecc066b8a37c38d",
+    "seed82029_grid60x72x72.npz": "e44c1cfaba6d47bcfd65c3c2181bf2276c367c5b3011ed86299f8b1d3d05cf39",
+    "seed82029_grid120x144x144.npz": "96133f769250faedbe459e844a04ea0390aace331c55e63f3e37d4eae3694c07",
+    "seed82030_paths.npz": "72103a0287b782d16416ac5a10c397824f272b23bb5416f2b42ff421e270a601",
+    "seed82030_grid60x72x72.npz": "20b3ca9f603edeee38fadd8bfd28902b84b02696914251c9bb6fe62ee6494bfd",
+    "seed82030_grid120x144x144.npz": "1545e4a204a11a39407a67048d6a2f97e2294e6e365643681518b7780513e286",
+    "seed82031_paths.npz": "add0f852f3b751c3ff6f1a2e1ce711ac7703c9424060e931b5c777063b9e64a3",
+    "seed82031_grid60x72x72.npz": "46038550745cd526d0aae05123b8ccc825126ccd09c69b7de613c99edb4bc7b9",
+    "seed82031_grid120x144x144.npz": "f4c3a55a264be609a766c9b541b24c82392953d45e7a82c76fe27eec7094c244",
+    "seed82032_paths.npz": "1516ce0f8fe1597673b00c8d42e4c7c01bc854108ca49ea8485789bed1635064",
+    "seed82032_grid60x72x72.npz": "515f7109dae8bff1c63fb9ebc4bf105a80bc4941ceb1654e27a1c0107e5d1cbd",
+    "seed82032_grid120x144x144.npz": "44c926c7ef8b7f4e9505d563c706e4f7c056e7a6952ce33db6779c044c7833e5",
+    "seed82033_paths.npz": "9461e788565b3b7aae0550705f1c571fa89010cfdf5bf88a68b894a7a3f9c32b",
+    "seed82033_grid60x72x72.npz": "08bbe1cfef05b660cd8f39d431d3c6df615e9784d7f0480cdf4b24b36f52ab4f",
+    "seed82033_grid120x144x144.npz": "b3b2fd90f3a72913ee52f7706ffea4b2d5cba705d799567a67c01e0292ff90bb",
+    "seed82034_paths.npz": "2dae89c585ab66081607c306e3e0f6d4bb9478fe61cfebb40a4875b0bdaa43b5",
+    "seed82034_grid60x72x72.npz": "2de8f276249d88263012e749b373d8b2a256018a8fc13f94c27be30538883427",
+    "seed82034_grid120x144x144.npz": "27da000cc7f044ea498e115b5989ebb3e7a28cfe01a0fc46d7b7bf1851d613c1",
+    "report.json": "1b356c08fe983ac90760b54bc526f3c34343e34170ec96756cb863728181e0fa",
+    "partial_report.json": "e2efbcdd90c2e1f250c33fdb30e86f767b3ca0036659d3f941c8a5ab6f10d51d"
+  },
+  "checkpoint_hashes": {},
+  "diagnostics": {
+    "candidate_criteria_passed": true,
+    "gate_passed": false
+  },
+  "status": "COMPLETED",
+  "actual_command": [
+    "scripts/run_reconstruction_qualification.py",
+    "/mnt/large storage/Important/Derby Masters/Original Dissertation Royal Holloway/FENICS Code/NewTest/runs/operator-learning/OL-G02_reconstruction_qualification_v5/20261006T132432282684Z"
+  ],
+  "observed_runtime_versions": {
+    "python": "3.12.13",
+    "numpy": "2.5.2",
+    "scipy": "1.18.0"
+  },
+  "platform": "Linux-7.1.5-76070105-generic-x86_64-with-glibc2.39"
+}

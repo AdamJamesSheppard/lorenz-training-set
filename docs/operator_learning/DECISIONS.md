@@ -1,5 +1,21 @@
 # Operator-learning decisions
 
+## 2026-10-06 — OL-D021: PASSED_SCOPED_FINITE_CONTROL_V5; open G03
+
+Owner requests adjudication. Sealed qualification_v5 at predeclaration651eec5:
+all22 hashes, config/source correspondence and all paired bounds verify; both
+paths/initial states replay bitwise. Six20k cases meet unchanged TV≤.01,
+maximum.006441564; mass error≤1.51e-14, negativity0. Six5k and six10k bound
+certification failures preserved, without claims of true error>.01.
+Full method/source/outcome/authority/limits: evidence/G02_QUALIFICATION_V5_20261006.md
+and portable CONFIG/PROVENANCE/SEAL/REPORT. Implementer self-review, no independent
+assessor. Dirty provenance discloses unrelated untracked plot script; tracked
+sources clean. G02 PASSED only for finite-control deterministic box reconstruction;
+G03 OPEN for diversity design, G04–G17 LOCKED. No continuum/posterior/universal
+qualification, changed FE transfer pass, new targets, training or DA. Historical
+characterizations and all raw runs unchanged. Supersedes pending review status,
+not earlier failures or scientific limitations.
+
 ## 2026-10-06 — OL-D020: approve1% budget and freeze fresh G02 qualification
 
 Owner explicitly approves reconstruction TV≤.01 versus the declared finite

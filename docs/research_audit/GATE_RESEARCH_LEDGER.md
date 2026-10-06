@@ -11,8 +11,8 @@ in the structured snapshot. No gate is promoted by this audit.
 |---|---|---|---|
 |G00 probability alignment|PASSED scoped|OCCUPATION/BAYES/GOVERNANCE; MONO-lorenz, OL-BAYES, reporting guidance|OL-D003A/B→D004; alignment_v2 comparison and owner-selected ACCEPTED_POPULATION_V1. Actual posterior representativeness remains open.|
 |G01 representation|PASSED scoped; v1 FAILED preserved|REPRESENTATION; OL-NUMPY and project conservative-integration identities|OL-D005 v1 bitwise failure; OL-D006 v2 unchanged thresholds pass. Archived six pairs only; new box FE transfer unqualified.|
-|G02 reconstruction|OPEN; four technical characterizations completed|OCCUPATION/DEPENDENCE/BOX/BOUND; OL-SCIPY, OL-TIME, OL-RESAMPLE, OL-KDE, OL-FILTER; original overlap derivation|OL-D009/12/13/15 reviews; D014 reserved candidate approval. No scientific budget or qualification pass.|
-|G03 diversity|LOCKED|DEPENDENCE; temporal-resampling context|No scientific run/adjudication; distinct laws versus estimator noise unresolved.|
+|G02 reconstruction|PASSED scoped finite-control v5; historical characterizations retained|OCCUPATION/DEPENDENCE/BOX/BOUND; original overlap derivation; v5 Canonne TV semantics, no i.i.d. theorem transfer|OL-D021; frozen651eec5, six20k cases within1% TV bound.20k max.006441564;5k/10k insufficient certification preserved. No continuum/posterior/changed-FE-transfer guarantee. gate_updates.json preserves later adjudication without editing original snapshot.|
+|G03 diversity|OPEN|DEPENDENCE; temporal-resampling context|No scientific run/adjudication; distinct laws versus reconstruction variation unresolved.|
 |G04 reference applicability|LOCKED|DG/QP/REFERENCE/AMR; FEM-R01/03/04/21/25 and MFEM sources|Old GMM/mature certification cannot transfer automatically to new laws.|
 |G05 export fidelity|LOCKED|REPRESENTATION; conservative integration and OL-NUMPY|Mass conservation alone does not qualify resolution/full-density fidelity.|
 |G06 provenance/leakage|LOCKED|GOVERNANCE; FAIR4RS, Datasheets, Model Cards, REFORMS/leakage|Existing hashes are engineering evidence; no dataset qualification pass.|
@@ -32,6 +32,12 @@ LOCKED rows are planned research mappings, not evidence of research already used
 to pass/fail those gates. Each complete gate schema is copied in the snapshot.
 
 ## G01 and G02 preserved events
+
+- G02 qualification_v5: OL-D021 scoped PASS with unchanged owner-approved.01 TV
+  budget, all six windows,22 verified seals and bitwise trajectory/bound replay.
+  Six5k and six10k sufficient-bound certification failures remain recorded; actual
+  TV is not proved above tolerance. Full method/source and portable evidence:
+  ../operator_learning/evidence/G02_QUALIFICATION_V5_20261006.md.
 
 - G01 v1: FAILED strict bitwise replay, predeclaration7bfe51a; arithmetic ordering
   diagnosis is project numerical evidence, not a published theorem. The original

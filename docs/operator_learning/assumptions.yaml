@@ -50,3 +50,7 @@ OL-A13:
   statement: Neural forecasting eliminates all model and inference assumptions.
   status: false
   evidence: ../BAYESIAN_ASSIMILATION_CONTRACT.md
+OL-A14:
+  statement: Fixed-width20k box reconstruction meets1% TV against80k finite controls on six v5 windows.
+  status: numerically_supported_scoped
+  evidence: OL-D021; evidence/G02_QUALIFICATION_V5_20261006.md; no continuum or population-uniform extension

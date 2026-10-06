@@ -12,6 +12,10 @@ anchor1781b40ad156f01702aeeb16eaf7e0240ede7378 and subsequent OL decisions.
 [Searchable provenance graph](GRAPH.md): stable typed node/edge register and local
 search/traversal CLI, covering successful outcomes as well as failures/open records.
 
+Later adjudications are recorded in [versioned gate updates](gate_updates.json).
+The original dated audit remains unchanged; checks compare current status against
+the explicit latest decision overlay, retaining historical outcomes and sources.
+
 - [Method register](methods.json): implemented methods, failed alternatives,
   historical fixtures, approved-but-unqualified candidates and future methods;
   implementation/evidence pointers, research-source IDs and applicability limits.
