@@ -27,6 +27,10 @@ surrogate forecast qualification/posterior transfer → operator-assisted DA.
 Current stage is operator-learning qualification, with later stages LOCKED.
 The eventual input is the COMPLETE posterior p(k|k), forecast to p(k+1|k).
 A Gaussian likelihood does not require Gaussian or mixture state closure.
+The [full-density Bayesian contract](../BAYESIAN_ASSIMILATION_CONTRACT.md)
+requires explicit likelihood-times-prior updating; Kalman/variational and
+Gaussian/GMM state-closure substitutions are excluded. Neural forecasting
+retains explicit model and numerical assumptions; no assumption-free claim.
 
 Lorenz-like state-space geometry alone is not evidence that a proposed input
 law belongs to the application-relevant probability population.

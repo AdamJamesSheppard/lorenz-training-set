@@ -7,6 +7,9 @@ apparent success by silently changing populations, outputs or evaluation cases.
 
 Scientific objective: qualify a computational forecast surrogate for full Lorenz
 probability densities relevant to eventual Bayesian assimilation.
+Eventual analysis must follow the [full-density Bayesian contract](../BAYESIAN_ASSIMILATION_CONTRACT.md).
+Owner's [candidate approval with reservations](RECONSTRUCTION_CANDIDATE_APPROVAL_V2.md)
+does not pass G02 or authorize posterior smoothing, training or assimilation.
 Current stage: **OPERATOR_LEARNING_QUALIFICATION**; eventual application:
 density-based Bayesian data assimilation. The original six-law pilot is an
 engineering/restricted-learning milestone, not a qualification-gate pass.

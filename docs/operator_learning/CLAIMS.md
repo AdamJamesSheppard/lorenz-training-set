@@ -1,5 +1,18 @@
 # Operator-learning claim registry
 
+## OL-C014 — Full-density Bayesian analysis is the owner-required application
+
+Class: ESTABLISHED as a scope decision, not numerical qualification. Evidence:
+OL-D014 and ../BAYESIAN_ASSIMILATION_CONTRACT.md. Kalman/variational and Gaussian
+or Gaussian-mixture state closure are excluded as method substitutions. Limits:
+DA remains unauthorized; likelihood, prior and numerical assumptions persist.
+
+## OL-C015 — Reserved approval qualifies the bin-free reconstruction
+
+Class: REJECTED. Owner approval selects a candidate for qualification, while
+G02 remains OPEN. Evidence: RECONSTRUCTION_CANDIDATE_APPROVAL_V2.md; OL-D014.
+Reassessment requires new frozen criteria, evidence and explicit adjudication.
+
 ## OL-C-G02 — Conditional temporal-sampling contraction
 
 Class: NUMERICAL. On six frozen windows at the historical histogram/bandwidth,

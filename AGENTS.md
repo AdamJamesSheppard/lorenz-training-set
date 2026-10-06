@@ -4,6 +4,7 @@ Before scientific implementation, analysis, plotting or adjudication, read
 SCIENTIFIC_INTEGRITY.md, docs/PROJECT_STATE.md, docs/MATH_PROTOCOL.md and the
 current programme's canonical state, claims and decisions. For operator learning
 start with docs/operator_learning/README.md and its linked documents.
+For assimilation-related work read docs/BAYESIAN_ASSIMILATION_CONTRACT.md.
 
 Never manufacture apparent success, silently substitute Gaussian/GMM state
 approximations, exclude difficult legitimate cases based on model outcomes,

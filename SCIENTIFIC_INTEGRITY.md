@@ -6,6 +6,11 @@ assimilation. Scientific success is an outcome to investigate, never an output
 the implementation must manufacture. This policy supplements mathematical and
 gate protocols; it grants no run, population-change or production authority.
 
+Eventual assimilation follows docs/BAYESIAN_ASSIMILATION_CONTRACT.md: explicit
+full-density Bayesian updating, without Kalman/variational or Gaussian/GMM
+state-closure substitution. Neural operators do not eliminate declared model,
+prior, likelihood or numerical assumptions. Posterior smoothing is not automatic.
+
 ## Preserve the scientific object
 
 Current accepted operator-learning inputs are regularized finite-window

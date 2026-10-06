@@ -38,3 +38,15 @@ OL-A10:
   statement: Original law5 remains untouched evaluation after diagnostics/tuning.
   status: false
   evidence: DECISIONS.md OL-D001
+OL-A11:
+  statement: Eventual assimilation uses explicit full-density Bayesian likelihood-times-prior updating without Kalman, variational or Gaussian/GMM state closure.
+  status: owner_required_scope
+  evidence: ../BAYESIAN_ASSIMILATION_CONTRACT.md; OL-D014
+OL-A12:
+  statement: Bin-free occupation-density regularization is appropriate for actual Bayesian posterior reconstruction.
+  status: unverified
+  evidence: RECONSTRUCTION_CANDIDATE_APPROVAL_V2.md; OL-G16_POSTERIOR_TRANSFER
+OL-A13:
+  statement: Neural forecasting eliminates all model and inference assumptions.
+  status: false
+  evidence: ../BAYESIAN_ASSIMILATION_CONTRACT.md

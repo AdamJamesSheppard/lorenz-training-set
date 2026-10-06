@@ -24,8 +24,10 @@ learning. Its statistical, marginal, lobe and boundary errors prevent surrogate
 qualification. The original test law has been inspected; reuse for tuning makes
 it development data. G00 passed within the owner-approved restricted attractor-density scope; posterior relevance remains unverified.
 
-Only inexpensive labelled development diagnostics, review of completed G02 and
-committed empirical-box characterization v4 under OL-D013 are authorized. No large new target campaign or operator-assisted DA.
+OL-D014 records approval with reservations of a bin-free reconstruction candidate.
+G02 remains OPEN pending a frozen error budget and changed representation checks.
+Only bounded development/planning is authorized; no large target campaign or DA.
+Eventual analysis follows [the full-density Bayesian contract](BAYESIAN_ASSIMILATION_CONTRACT.md).
 
 2026-10-05: user authorized the bounded G00 alignment comparison, predeclared
 in experiments/operator_learning/OL-G00_alignment_v2.json. This generates only
@@ -43,11 +45,13 @@ G02 implementation: docs/operator_learning/RECONSTRUCTION_STABILITY_G02_V1.md;
 OL-D007 records the characterization design; OL-D008 restored dispatch.
 Characterization completed and was reviewed under OL-D009; portable evidence:
 docs/operator_learning/evidence/G02_CHARACTERIZATION_20261006.md.
-G02 remains OPEN: scientific reconstruction-error budget and v2 recipe approval
-are pending. The v2 qualification proposal is a draft, without qualification
+G02 remains OPEN: scientific reconstruction-error budget and executable recipe
+qualification are pending. Candidate approval under OL-D014 retains reservations.
+The v2 qualification proposal is a draft, without qualification
 dispatch authority. Mechanism_v3 completed; its reviewed evidence is in
 operator_learning/evidence/G02_MECHANISM_V3_20261006.md. Empirical_v4 is authorized
-under OL-D013 as a diagnostic only; accepted inputs remain unchanged.
+under OL-D013 as a diagnostic only; OL-D014 subsequently approves the candidate
+with reservations for qualification, preserving historical accepted inputs.
 
 ## FEM evidence remains separate
 

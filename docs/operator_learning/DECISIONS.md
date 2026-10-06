@@ -1,5 +1,21 @@
 # Operator-learning decisions
 
+## 2026-10-06 — OL-D014: reserved reconstruction approval and full-density Bayes
+
+Owner approves the bin-free candidate with reservations and explicitly requires
+Bayesian full-density assimilation, excluding Kalman/variational substitutions.
+RECONSTRUCTION_CANDIDATE_APPROVAL_V2.md records the bounded approval; the
+cross-stage authority is ../BAYESIAN_ASSIMILATION_CONTRACT.md. Preserve historical
+recipes and evidence. Approval selects a candidate, never retrospectively passes
+G02 or validates occupation-to-posterior transfer. Scientific error budget and
+new representation checks remain pending. G02 OPEN; downstream gates LOCKED.
+No new computation, target campaign, training or DA is dispatched.
+
+The aim avoids imposed state closure; neural forecasts cannot remove dynamics,
+prior, likelihood or numerical assumptions. Posterior smoothing requires a
+separate declared justification. Implementing agent self-review under direct
+owner instruction; no independent assessor or scientific qualification claimed.
+
 ## 2026-10-06 — OL-D013: review mechanism v3 and predeclare direct empirical control
 
 Owner asks to continue. evidence/G02_MECHANISM_V3_20261006.md records technical
