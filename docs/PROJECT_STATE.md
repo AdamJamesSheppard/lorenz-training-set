@@ -24,8 +24,8 @@ learning. Its statistical, marginal, lobe and boundary errors prevent surrogate
 qualification. The original test law has been inspected; reuse for tuning makes
 it development data. G00 passed within the owner-approved restricted attractor-density scope; posterior relevance remains unverified.
 
-Only inexpensive labelled development diagnostics and review of the completed
-G02 characterization are authorized. No large new target campaign or operator-assisted DA.
+Only inexpensive labelled development diagnostics, review of completed G02 and
+committed refinement characterization v2 under OL-D010 are authorized. No large new target campaign or operator-assisted DA.
 
 2026-10-05: user authorized the bounded G00 alignment comparison, predeclared
 in experiments/operator_learning/OL-G00_alignment_v2.json. This generates only
@@ -44,7 +44,8 @@ OL-D007 records the characterization design; OL-D008 restored dispatch.
 Characterization completed and was reviewed under OL-D009; portable evidence:
 docs/operator_learning/evidence/G02_CHARACTERIZATION_20261006.md.
 G02 remains OPEN: scientific reconstruction-error budget and v2 recipe approval
-are pending. The v2 proposal is a draft, without qualification dispatch authority.
+are pending. The v2 qualification proposal is a draft, without qualification
+dispatch authority; separate characterization refinement_v2 is authorized under OL-D010.
 
 ## FEM evidence remains separate
 

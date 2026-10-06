@@ -13,9 +13,9 @@ Historical interpretation: DECISIONS.md. FEM method status is separate.
   "current_six_law_pilot": "COMPLETED_ENGINEERING_AND_RESTRICTED_LEARNING_PILOT",
   "current_model_scientifically_qualified": false,
   "next_required_gate": "OL-G02_RECONSTRUCTION_STABILITY",
-  "active_blocker": "G02 characterization completed; histogram sensitivity and an unapproved scientific reconstruction-error budget prevent qualification. Review v2 proposal before any qualification run.",
+  "active_blocker": "G02 scientific error budget unapproved. OL-D010 authorizes committed CPU-only refinement characterization v2, without scientific gate promotion.",
   "authorized": [
-    "Review completed G02 characterization and draft qualification recipe/error budget; no automatic scientific pass or v2 dispatch",
+    "Commit then dispatch bounded CPU-only OL-G02_reconstruction_refinement_v2 characterization; qualification draft remains unauthorized",
     "Inexpensive labelled development diagnostics; no expensive target generation, neural retraining or DA"
   ],
   "locked": [

@@ -1,5 +1,18 @@
 # Operator-learning decisions
 
+## 2026-10-06 — OL-D010: authorize second bounded characterization
+
+Owner approved inexpensive finer-reference characterization and requests immediate
+handoff once running. Freeze OL-G02_reconstruction_refinement_v2.json before
+execution. Six fresh development seeds71029–71034, two RK4 steps, sampling
+5000/10000/20000 and three histograms at fixed physical bandwidth, compared on
+two conservative grids, produce96 diagnostics. Full spinup integration sensitivity
+includes chaotic amplification. No bootstrap independence claims are made;
+see https://stat.cmu.edu/~cshalizi/uADA/16/lectures/26.pdf.
+Technical mass/positivity invariants remain; no scientific error budget or
+qualification is invented. G02 OPEN, G03–G17 LOCKED. Draft qualification recipe
+remains separate. No target generation, model training or historical overwrite.
+
 ## 2026-10-06 — OL-D009: archive G02 characterization; qualification remains OPEN
 
 User requested analysis and continuation. Archive reviewed characterization
