@@ -1,0 +1,327 @@
+{
+  "schema_version": 1,
+  "audit_date": "2026-10-06",
+  "source_revision": "5262c48",
+  "methods": [
+    {
+      "id": "FPE",
+      "method": "Fixed-physics Lorenz FPE and reflecting flux",
+      "stage_status": "implemented_reference",
+      "implementation_and_evidence": [
+        "docs/MATHEMATICAL_SPEC.md",
+        "NUMERICAL_METHOD.md"
+      ],
+      "source_ids": [
+        "MONO-lorenz",
+        "MONO-sarkka",
+        "FEM-R21"
+      ],
+      "limitations": "Continuum linearity is a mathematical derivation under well-posedness; numerical correction may break it."
+    },
+    {
+      "id": "DG",
+      "method": "Q1/Q2 upwind advection and full-SPD SIPG diffusion",
+      "stage_status": "implemented_reference",
+      "implementation_and_evidence": [
+        "NUMERICAL_METHOD.md",
+        "METHOD_SELECTION_REPORT.md"
+      ],
+      "source_ids": [
+        "MONO-arnold",
+        "FEM-R01",
+        "FEM-R03",
+        "FEM-R04"
+      ],
+      "limitations": "Published neighbouring DG constructions do not prove the complete project CN/QP scheme."
+    },
+    {
+      "id": "QP",
+      "method": "Stage-1 cell-average repair and constrained local-QP polynomial correction",
+      "stage_status": "implemented_reference",
+      "implementation_and_evidence": [
+        "POSITIVITY_AUDIT.md",
+        "METHOD_SELECTION_REPORT.md"
+      ],
+      "source_ids": [
+        "FEM-R01",
+        "FEM-R25"
+      ],
+      "limitations": "Project local polynomial QP differs from the cited paper's average optimisation plus scaling."
+    },
+    {
+      "id": "BERNSTEIN",
+      "method": "Whole-cell Bernstein constraints, subdivision and negative witnesses",
+      "stage_status": "implemented_diagnostic",
+      "implementation_and_evidence": [
+        "POSITIVITY_AUDIT.md",
+        "mature_positivity_certificate_diagnostic_report.json"
+      ],
+      "source_ids": [
+        "FEM-R19",
+        "FEM-R20"
+      ],
+      "limitations": "Nonnegative Bernstein coefficients suffice; negative coefficients alone do not prove polynomial negativity; retain actual witnesses."
+    },
+    {
+      "id": "TIME",
+      "method": "Backward Euler, Crank–Nicolson and timestep refinements",
+      "stage_status": "implemented_comparisons",
+      "implementation_and_evidence": [
+        "METHOD_SELECTION_REPORT.md",
+        "local_q2_tight_refinement_report.json"
+      ],
+      "source_ids": [],
+      "limitations": "Project equations, residual tests and frozen temporal runs supply evidence; no separate historical time-integrator paper citation recovered."
+    },
+    {
+      "id": "AFC",
+      "method": "Cell-average AFC/FCT and DOF/subcell convex-limiting alternatives",
+      "stage_status": "tested_failed_or_diagnostic",
+      "implementation_and_evidence": [
+        "METHOD_SELECTION_REPORT.md",
+        "docs/solver_monograph/source_ledger.json"
+      ],
+      "source_ids": [
+        "FEM-R07",
+        "FEM-R08",
+        "FEM-R23",
+        "FEM-R24",
+        "MONO-kuzmin"
+      ],
+      "limitations": "AFC runs can complete while scientific gates fail and fallbacks occur; hyperbolic convex-limiting theory is not automatically applicable to full-SPD FPE."
+    },
+    {
+      "id": "AMR",
+      "method": "Static tensor grading and nonconforming local hex refinement",
+      "stage_status": "implemented_comparisons",
+      "implementation_and_evidence": [
+        "METHOD_SELECTION_REPORT.md",
+        "mfem/prepare_static_amr.py",
+        "docs/DECISIONS.md"
+      ],
+      "source_ids": [
+        "FEM-R22",
+        "MONO-mfemnc",
+        "MONO-mfemdiff"
+      ],
+      "limitations": "Infrastructure support differs from project flux correctness; graded aggregate failures and voxel-only convergence limits remain."
+    },
+    {
+      "id": "PORT",
+      "method": "Physical-basis DOLFINx/MFEM operator, raw CN, corrected step and trajectory equivalence",
+      "stage_status": "implemented_passed_scoped",
+      "implementation_and_evidence": [
+        "mfem/compare_physical_equivalence.py",
+        "mfem/compare_mature_equivalence.py"
+      ],
+      "source_ids": [
+        "MONO-mfemdiff",
+        "MONO-mfemnc"
+      ],
+      "limitations": "Agreement is scoped numerical evidence, not continuum accuracy or full timestep-history proof."
+    },
+    {
+      "id": "REFERENCE",
+      "method": "Monte Carlo covariance/bootstrap, marginal and independent reference diagnostics",
+      "stage_status": "implemented_comparisons",
+      "implementation_and_evidence": [
+        "high_resolution_monte_carlo_report.json",
+        "independent_reference_report.json"
+      ],
+      "source_ids": [
+        "MONO-sarkka",
+        "FEM-R21"
+      ],
+      "limitations": "Sampling uncertainty and limited statistics cannot establish full-density truth; historical bootstrap methodology lacks an individually recorded external citation."
+    },
+    {
+      "id": "DOMAIN",
+      "method": "Aligned domain, support/depth and mature timestep sensitivity",
+      "stage_status": "implemented_passed_or_failed_scoped",
+      "implementation_and_evidence": [
+        "docs/DECISIONS.md",
+        "docs/solver_monograph/source_ledger.json"
+      ],
+      "source_ids": [
+        "AMR_LOCAL"
+      ],
+      "limitations": "AMR_LOCAL denotes project design evidence rather than an external publication; small voxel sensitivity is not continuum certification."
+    },
+    {
+      "id": "ALTERNATIVES",
+      "method": "Chang–Cooper, structure-preserving FD, anisotropic FV, Hermite and semi-Lagrangian challengers",
+      "stage_status": "literature_candidates",
+      "implementation_and_evidence": [
+        "METHOD_SELECTION_REPORT.md"
+      ],
+      "source_ids": [
+        "FEM-R05",
+        "FEM-R06",
+        "FEM-R09",
+        "FEM-R10",
+        "FEM-R11",
+        "FEM-R12",
+        "FEM-R13",
+        "FEM-R14",
+        "FEM-R15",
+        "FEM-R16",
+        "FEM-R17",
+        "FEM-R18"
+      ],
+      "limitations": "Cited challenger families do not establish that every candidate was implemented or qualified; recent preprints retain dimension and mixed-diffusion restrictions."
+    },
+    {
+      "id": "GMM",
+      "method": "Historical Gaussian/Gaussian-mixture mature initial laws and Bayesian regression tests",
+      "stage_status": "historical_fixture",
+      "implementation_and_evidence": [
+        "mature_da_report.json",
+        "mature_da_projected_report.json",
+        "docs/MATHEMATICAL_SPEC.md"
+      ],
+      "source_ids": [],
+      "limitations": "Preserved regression inputs; no authority to substitute them for accepted attractor inputs."
+    },
+    {
+      "id": "OCCUPATION",
+      "method": "RK4 Lorenz finite-window empirical occupation law and histogram reconstruction",
+      "stage_status": "implemented_pilot",
+      "implementation_and_evidence": [
+        "mfem/run_neural_pilot.py",
+        "operator_learning/reconstruction.py"
+      ],
+      "source_ids": [
+        "MONO-lorenz",
+        "OL-SCIPY"
+      ],
+      "limitations": "Correlated temporal samples, declared reconstruction and regularization; no iid or posterior-coverage inference."
+    },
+    {
+      "id": "BOX",
+      "method": "Bin-free empirical top-hat convolution and exact overlap integration",
+      "stage_status": "approved_candidate_unqualified",
+      "implementation_and_evidence": [
+        "operator_learning/reconstruction_controls.py",
+        "docs/operator_learning/RECONSTRUCTION_EMPIRICAL_G02_V4.md"
+      ],
+      "source_ids": [
+        "OL-KDE",
+        "OL-FILTER"
+      ],
+      "limitations": "KDE context; particle-filter convergence hypotheses not verified for fixed-bandwidth deterministic occupations."
+    },
+    {
+      "id": "BOUND",
+      "method": "Paired-box mixture L1 upper bound and conservative-grid contraction",
+      "stage_status": "derived_and_unit_tested",
+      "implementation_and_evidence": [
+        "operator_learning/reconstruction_controls.py",
+        "docs/operator_learning/RECONSTRUCTION_QUALIFICATION_PROPOSAL_V3.md"
+      ],
+      "source_ids": [],
+      "limitations": "Original project derivation from overlap and triangle inequality; no external theorem attribution invented; pairing bound can be loose."
+    },
+    {
+      "id": "REPRESENTATION",
+      "method": "Empirical law to volume density, FE projection, conservative voxel averages, float32 and training scaling",
+      "stage_status": "passed_scoped_v1_pipeline",
+      "implementation_and_evidence": [
+        "docs/operator_learning/REPRESENTATION_CONTRACT_V1.md",
+        "scripts/run_representation_contract.py"
+      ],
+      "source_ids": [
+        "OL-NUMPY"
+      ],
+      "limitations": "G01 v1 failed arithmetic/bitwise replay; v2 passed unchanged thresholds. New box candidate FE transfer is unqualified."
+    },
+    {
+      "id": "DEPENDENCE",
+      "method": "Block resampling, ACF/effective sample size and reconstruction-phase diagnostics",
+      "stage_status": "characterization_only",
+      "implementation_and_evidence": [
+        "scripts/run_reconstruction_stability.py",
+        "docs/operator_learning/RECONSTRUCTION_STABILITY_G02_V1.md"
+      ],
+      "source_ids": [
+        "OL-TIME",
+        "OL-RESAMPLE"
+      ],
+      "limitations": "Conditional reconstruction replicates are not independent paths; ESS is observable-specific heuristic evidence."
+    },
+    {
+      "id": "BAYES",
+      "method": "Full-density likelihood-times-prior Bayes update",
+      "stage_status": "owner_required_future_application",
+      "implementation_and_evidence": [
+        "docs/BAYESIAN_ASSIMILATION_CONTRACT.md",
+        "scripts/run_distribution_alignment.py"
+      ],
+      "source_ids": [
+        "OL-BAYES"
+      ],
+      "limitations": "G00 has small conditioned diagnostics, not a complete DA cycle. Kalman/variational/state-closure substitutions excluded."
+    },
+    {
+      "id": "FNO",
+      "method": "Density-only 3D FNO, positivity/normalization, CUDA training",
+      "stage_status": "completed_unqualified_pilot",
+      "implementation_and_evidence": [
+        "scripts/train_neural_pilot.py",
+        "scripts/audit_operator_pilot.py",
+        "docs/NEURAL_PILOT_WORKFLOW.md"
+      ],
+      "source_ids": [
+        "OL-FNO-GUIDE",
+        "OL-FNO-PAPER"
+      ],
+      "limitations": "Original guide is recorded; original paper added retrospectively in this audit, not claimed as historical design provenance. Scientific moment/boundary failures remain."
+    },
+    {
+      "id": "BASELINES",
+      "method": "Persistence and nearest-target diagnostics; learned linear/POD/CNN candidates",
+      "stage_status": "partial_diagnostics_remaining_proposed",
+      "implementation_and_evidence": [
+        "scripts/audit_operator_pilot.py",
+        "docs/operator_learning/GATES.md"
+      ],
+      "source_ids": [],
+      "limitations": "Linear baseline required by fixed FPE linearity; no historical POD/CNN research source recovered, qualification remains locked."
+    },
+    {
+      "id": "GOVERNANCE",
+      "method": "Predeclaration, immutable evidence, leakage controls and gate adjudication",
+      "stage_status": "implemented_controls",
+      "implementation_and_evidence": [
+        "SCIENTIFIC_INTEGRITY.md",
+        "docs/operator_learning/GOVERNANCE.md"
+      ],
+      "source_ids": [
+        "OL-REFORMS",
+        "OL-LEAKAGE",
+        "OL-FAIR",
+        "OL-DATASHEETS",
+        "OL-MODELCARDS"
+      ],
+      "limitations": "Reporting guidance supports discipline; neither source nor fast CI proves honest scientific qualification."
+    },
+    {
+      "id": "MEMORY",
+      "method": "Local RAM backpressure and resumability safeguards",
+      "stage_status": "implemented_operational",
+      "implementation_and_evidence": [
+        "mfem/memory_backpressure.py",
+        "docs/DECISIONS.md"
+      ],
+      "source_ids": [
+        "MONO-linuxproc"
+      ],
+      "limitations": "MemAvailable and process pause/resume are operational; no automatic scientific checkpoint guarantee."
+    }
+  ],
+  "local_sources": [
+    {
+      "id": "AMR_LOCAL",
+      "description": "Frozen project refinement/support/depth designs and outcomes; docs/DECISIONS.md and solver monograph ledger."
+    }
+  ]
+}

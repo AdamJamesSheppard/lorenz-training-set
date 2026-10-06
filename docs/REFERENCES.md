@@ -1,5 +1,14 @@
 # References
 
+## Cross-stage method and gate traceability
+
+The [2026-10-06 research audit](research_audit/README.md) records methods,
+research-source IDs, preserved passes/failures/open decisions, all18 OL gates,
+historical FEM decision fields and current/reachable-Git citation occurrences.
+The [gap register](research_audit/GAPS.md) distinguishes missing attribution,
+retrospective additions and unverified theorem applicability. Existing references
+below remain historical records; they do not override current plotting policy.
+
 ## Numerical method
 
 - Liu, Hu, Taitano, and Zhang (2025), "An optimization-based

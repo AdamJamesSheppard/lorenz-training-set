@@ -1,5 +1,13 @@
 # Research-control protocol
 
+Method/source and outcome traceability: ../research_audit/README.md.
+Each new scientific predeclaration/adjudication must record method IDs, precise
+research source/version, mathematical use and hypothesis applicability, or an
+explicit project-derivation/engineering-design/citation-gap attribution. Link
+the frozen config/commit, immutable evidence, thresholds, outcome, reviewer and
+authority. Retrospective references must be labelled; they cannot replace
+research recorded before the run. Preserve failure-specific records.
+
 Mandatory cross-stage authority: ../../SCIENTIFIC_INTEGRITY.md.
 Gate-specific acceptance boundaries: INTEGRITY_GATE_AUDIT_20261006.md.
 These supplement the catalogue without changing historical thresholds/decisions.

@@ -25,6 +25,10 @@ engineering/restricted-learning milestone, not a qualification-gate pass.
 7. GOVERNANCE.md, ARCHITECTURE.md, RISKS.md — authority, checks and boundaries.
 8. FEM_GOVERNANCE_RECONSTRUCTION.md and evidence/ — history and audit pointers.
 
+Research used for gate decisions is indexed in the
+[cross-stage research audit](../research_audit/README.md), including preserved
+G01 failure, G02 open characterizations and prospective-only later-gate sources.
+
 **NEXT_REQUIRED_GATE = OL-G02_RECONSTRUCTION_STABILITY.**
 G00 passed within the owner-selected attractor-density scope. G01 passed scoped representation checks. G02 is OPEN; G03–G17 are LOCKED. Large target campaigns, qualified
 surrogate replacement, posterior-transfer qualification and operator-assisted

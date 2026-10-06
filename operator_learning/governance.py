@@ -190,6 +190,8 @@ def check_repository(root):
     generators = json.loads((base / "generators.json").read_text())
     errors = validate_programme(state, gates, generators)
     errors.extend(validate_integrity_documents(root, gates))
+    from scripts.audit_research_sources import validate as validate_research_sources
+    errors.extend(validate_research_sources(root))
     for path, expected in [("PROJECT_STATE.md", render_state(state)),
                            ("GATES.md", render_gates(gates))]:
         if (base / path).read_text() != expected:

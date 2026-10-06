@@ -1,5 +1,19 @@
 # Operator-learning decisions
 
+## 2026-10-06 — OL-D016: audit method, citation and gate-outcome traceability
+
+Owner requests every recorded method/citation and research behind each gate's
+pass/failure. Establish ../research_audit/ with method/source IDs, current and
+reachable-Git URL provenance, complete decision sections, all18 OL gate mappings,
+preserved G01 failure/pass and G02 characterization history, original FEM ledger
+decision fields and tracked report classifications. Preserve snapshot/thresholds
+and distinguish recorded attribution from retrospective mapping. Original FNO
+paper added as explicitly retrospective context; incomplete source/theorem
+reviews retained as gaps. Bibliographic/API checks are not full proof audits.
+No gate, model, generator, solver, historical evidence or authorization changes.
+Fast checks enforce method/source resolution and gate status/adjudication coverage.
+Implementing-agent self-review; no independent assessor or new scientific pass.
+
 ## 2026-10-06 — OL-D015: verify empirical v4 and prepare grid-independent control
 
 Owner requests continuation of G02. Rehash15 artifacts, review all120 comparisons
