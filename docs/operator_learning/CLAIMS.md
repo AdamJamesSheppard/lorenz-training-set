@@ -1,5 +1,17 @@
 # Operator-learning claim registry
 
+## OL-C017 — Six retained finite laws have resolved pairwise variation
+
+Class: NUMERICAL. All15 pairs on each of two conservative grids have positive
+lower TV margins after the declared reconstruction bounds; finest-grid minimum
+.1118646982. Evidence: OL-D024; evidence/G03_CHARACTERIZATION_V1_20261006.md;
+method/derivation/sources INPUT_DIVERSITY_G03_V1.md. Falsification: incorrect
+bounds, exporter, source correspondence, failed seals or replay. Limits: six
+development windows; phase controls are not independent laws; no continuum,
+population coverage, optimum dataset, universal initial-condition, posterior
+or learned forecast claim. G03 remains OPEN.
+
+
 ## OL-C016 — Bin-free20k finite-control reconstruction stability
 
 Class: NUMERICAL. Six fresh v5 windows meet unchanged1% TV upper-bound criteria

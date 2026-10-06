@@ -41,10 +41,26 @@
       "gate_id": "OL-G03_INPUT_DIVERSITY",
       "status": "OPEN",
       "adjudication": null,
-      "decision_id": "OL-D021",
-      "evidence": "docs/operator_learning/evidence/G02_QUALIFICATION_V5_20261006.md",
-      "method_record": "docs/operator_learning/RECONSTRUCTION_QUALIFICATION_V5.md",
-      "component_outcomes": []
+      "decision_id": "OL-D024",
+      "evidence": "docs/operator_learning/evidence/G03_CHARACTERIZATION_V1_20261006.md",
+      "method_record": "docs/operator_learning/INPUT_DIVERSITY_G03_V1.md",
+      "component_outcomes": [
+        {
+          "label": "12 law/grid attempts and 102 TV replay comparisons",
+          "status": "TECHNICAL_COMPLETED",
+          "cases": 12
+        },
+        {
+          "label": "Finite-control positive separation margins, both grids",
+          "status": "NUMERICAL_RESOLVED",
+          "cases": 30
+        },
+        {
+          "label": "Population coverage qualification",
+          "status": "OPEN",
+          "cases": 0
+        }
+      ]
     }
   ]
 }

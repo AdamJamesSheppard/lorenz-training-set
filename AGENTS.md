@@ -25,3 +25,17 @@ methods, research and positive/negative outcomes; rebuild the graph after review
 source changes. Graph connectivity is not proof or new scientific authorization.
 For a persistent job, confirm launch and hand back with a measured/provisional ETA;
 do not keep a conversation waiting for a scientific run to finish.
+
+## Mandatory ETA and cumulative-job handoff
+
+Before launching computation, calculate and state a measured or provisional
+ETA, including the basis and uncertainty. If any job is expected to exceed
+one minute, launch persistently when authorized, verify launch, then hand the
+chat back immediately with the ETA and when to return. Do not wait for completion.
+Apply the same rule to the CUMULATIVE expected runtime of related jobs/checks
+in one task: splitting work into many sub-minute jobs does not avoid handoff.
+For example, thirty59-second jobs require handoff, not thirty inline waits.
+If measured runtime grows beyond the estimate, hand back rather than extend
+polling. Do not claim a launch or completion without evidence. When launch is
+blocked, state the blocker and do not invent a completion ETA. Implementation
+and reading time are separate from compute-job runtime estimates.

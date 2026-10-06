@@ -1,0 +1,91 @@
+{
+  "experiment_id": "OL-G03_input_diversity_characterization_v1",
+  "gate_id": "OL-G03_INPUT_DIVERSITY",
+  "kind": "bounded_diversity_characterization",
+  "config_sha256": "b843f2ca9af19a0466ecbb6d5cf4f0c1e56c0b6d9a303669ada6a4e07557a095",
+  "git_commit": "abd8d14cef4f1f5a3a1ce737980150c3400be1f4",
+  "git_dirty": true,
+  "git_status": "?? scripts/plot_reconstruction_comparison.py",
+  "command": [
+    "env",
+    "OPENBLAS_NUM_THREADS=1",
+    "OMP_NUM_THREADS=1",
+    "/home/adam/.local/share/mamba/envs/pde/bin/python",
+    "scripts/run_input_diversity.py",
+    "{RUN_DIRECTORY}"
+  ],
+  "runtime_versions": {
+    "python": "3.12.13",
+    "numpy": "2.5.2",
+    "scipy": "1.18.0"
+  },
+  "hardware": {
+    "device": "cpu",
+    "gpu": false,
+    "mpi": false,
+    "blas_threads": 1,
+    "openmp_threads": 1
+  },
+  "seeds": {
+    "trajectory": [
+      82029,
+      82030,
+      82031,
+      82032,
+      82033,
+      82034
+    ]
+  },
+  "input_hashes": {
+    "scripts/run_input_diversity.py": "d271cabf3f58296dfb8f1eacad28bd7046cf0b371317017f47b726af1ef36d04",
+    "scripts/run_reconstruction_qualification.py": "894080538814441f43bd62f070f247e890848c758c0090b38fad4b5338c4ef21",
+    "operator_learning/reconstruction_controls.py": "ef319bf6ddb90c94dcf4d89d28b36545e0d7763901a04d2b4dc9e081867aa3a6",
+    "operator_learning/reconstruction.py": "9687ec1de3d7d766c74a17f7d79ef5a97aaa299b90a23543960dfc48620c3b5c",
+    "operator_learning/alignment.py": "16dbec8b6f7046d90c15395a229054f0cff47218f50b438a670b8a216a664451",
+    "operator_learning/governance.py": "49912ae3dcf57f37421a9200331821830d2ad3822154f899bad4215213a3a8b5",
+    "docs/operator_learning/INPUT_DIVERSITY_G03_V1.md": "611916c52162788e6b744c4a0620876e7391b670ccefda58d80328820c6b7354",
+    "SCIENTIFIC_INTEGRITY.md": "f0208b97e2466c14ec10851da5d07ff39be0af3952491f6890eb43c054c7a97e",
+    "runs/operator-learning/OL-G02_reconstruction_qualification_v5/20261006T132432282684Z/config.json": "fc8a1bb304e7c2d5e849053b4bb248cb9177bdcbbf71cd5ad92239c8c952deef",
+    "runs/operator-learning/OL-G02_reconstruction_qualification_v5/20261006T132432282684Z/provenance.json": "d76ddcb74992310f320f7a22049390d8548141cd82424cde0bd068aaea0f6744",
+    "runs/operator-learning/OL-G02_reconstruction_qualification_v5/20261006T132432282684Z/report.json": "1b356c08fe983ac90760b54bc526f3c34343e34170ec96756cb863728181e0fa",
+    "runs/operator-learning/OL-G02_reconstruction_qualification_v5/20261006T132432282684Z/seal.json": "5f3f43ea319247534e505edf7924030445a174b462605f8524d3eef5bfaa3940",
+    "runs/operator-learning/OL-G02_reconstruction_qualification_v5/20261006T132432282684Z/seed82029_paths.npz": "000448e9a6720f62fecdbf1499308c25291c94a630d36278eecc066b8a37c38d",
+    "runs/operator-learning/OL-G02_reconstruction_qualification_v5/20261006T132432282684Z/seed82030_paths.npz": "72103a0287b782d16416ac5a10c397824f272b23bb5416f2b42ff421e270a601",
+    "runs/operator-learning/OL-G02_reconstruction_qualification_v5/20261006T132432282684Z/seed82031_paths.npz": "add0f852f3b751c3ff6f1a2e1ce711ac7703c9424060e931b5c777063b9e64a3",
+    "runs/operator-learning/OL-G02_reconstruction_qualification_v5/20261006T132432282684Z/seed82032_paths.npz": "1516ce0f8fe1597673b00c8d42e4c7c01bc854108ca49ea8485789bed1635064",
+    "runs/operator-learning/OL-G02_reconstruction_qualification_v5/20261006T132432282684Z/seed82033_paths.npz": "9461e788565b3b7aae0550705f1c571fa89010cfdf5bf88a68b894a7a3f9c32b",
+    "runs/operator-learning/OL-G02_reconstruction_qualification_v5/20261006T132432282684Z/seed82034_paths.npz": "2dae89c585ab66081607c306e3e0f6d4bb9478fe61cfebb40a4875b0bdaa43b5"
+  },
+  "output_hashes": {
+    "seed82029_grid60x72x72.npz": "a76cf36eab74118c548dcc3ee43d7b75c7da0c5d8bc0ac2b2112b0c90592f4eb",
+    "seed82030_grid60x72x72.npz": "df12d81a56d9093060949697dbb89b64413bdc7aa6d91f9662bd1cd66084b85b",
+    "seed82031_grid60x72x72.npz": "610aa593777196b0cbb55d95c6f23d31fa4c1fc38906f1aa414f67efa53e11e7",
+    "seed82032_grid60x72x72.npz": "d4018b34d1ab1769c6c666700db91f80f19b1e1b5cd69f6309f772f10e7570d5",
+    "seed82033_grid60x72x72.npz": "2941d00e33eaee96e8efc5ade5cebdc69321310c1d67fa8eb57ae7fd2a6bbf1e",
+    "seed82034_grid60x72x72.npz": "a89f0f75426156b2f5e52c1eb95b85b88a99815f2f32fee79da057cb0239b5ce",
+    "seed82029_grid120x144x144.npz": "7dbc7ad948583b461bd31cd19e587ac392866e119584a8f5e0272ea5366afb77",
+    "seed82030_grid120x144x144.npz": "2173ea82424cdbe7b7ffd3ecb6eb8ccf10a5c985a87ec5f02dc1acd6376ee207",
+    "seed82031_grid120x144x144.npz": "b2952f17c311801ba811f734b3b5b5b08c7cc91c6ce3dd1662bfa1345c050c9b",
+    "seed82032_grid120x144x144.npz": "c97790b9c5caa5db102d5fe352d5291b0cafee466e5216070a6ee8e6b2c5427b",
+    "seed82033_grid120x144x144.npz": "5af2452ebe828606b140fe529988d85b7922e3bd33b62445f4323654d393a54e",
+    "seed82034_grid120x144x144.npz": "b8353a2971cd76aaadefbf9888809da5d9ccbb930a9d5c55926854386134a251",
+    "report.json": "0ec6daac66a6e51d8f2e7b30011a2e0e3cdc7de29375a649cb9dd5b5b18bef2d",
+    "partial_report.json": "be7e9b2c88b4107e9850020c6eea5418c586ef28f4e2fd22a855df96242ed384"
+  },
+  "checkpoint_hashes": {},
+  "diagnostics": {
+    "technical_status": "COMPLETED",
+    "gate_passed": false
+  },
+  "status": "COMPLETED",
+  "actual_command": [
+    "scripts/run_input_diversity.py",
+    "/mnt/large storage/Important/Derby Masters/Original Dissertation Royal Holloway/FENICS Code/NewTest/runs/operator-learning/OL-G03_input_diversity_characterization_v1/20261006T135528033588Z"
+  ],
+  "observed_runtime_versions": {
+    "python": "3.12.13",
+    "numpy": "2.5.2",
+    "scipy": "1.18.0"
+  },
+  "observed_hardware": "Linux-7.1.5-76070105-generic-x86_64-with-glibc2.39"
+}

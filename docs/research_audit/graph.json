@@ -4,14 +4,14 @@
     "docs/research_audit/methods.json": "8167012c99375c28b91458671a998fab876ed2c02f9d35387feb62b876e5c791",
     "docs/research_audit/snapshot_20261006.json": "43da62abd04704f92606e2f75bdf919e46fc0908c477ad84da4cad853c1e0fa8",
     "docs/operator_learning/gates.json": "dca4e83aecf72500e53b21afe1a788e23348b48361d21dcf0f2eb99cb55d0ead",
-    "docs/operator_learning/state.json": "e4f5d7ce80b1c4c80b707bbdb573563837c78e4df1c8ab183cfa204881f95dad",
-    "docs/operator_learning/CLAIMS.md": "574658afafb0dc82f051fc66d923a928aa94fd16c2c80db5c7fb73ccfee8fa98",
+    "docs/operator_learning/state.json": "7e39815e087ef19aec9c3ef2ef6670a6e7ff68b767e9380031ddfd5b5e4bf434",
+    "docs/operator_learning/CLAIMS.md": "4a989e772c0d905bd6c95279db583ac0d7171f2c2d1a15f1699ac0a2a1c42771",
     "docs/CLAIMS.md": "474a415c96ac74dd48eb3901af68660544549b7b966f549d09d712873ef7977c",
-    "docs/operator_learning/DECISIONS.md": "f0f6f239f926f0c31f862dead4fe1920f272de44d7fe56a4395f66a26dc20db4",
+    "docs/operator_learning/DECISIONS.md": "c78283026639e931a7b6840a6b05dd8484ab98d8c912daa621d661accd409a97",
     "docs/DECISIONS.md": "e815b7dd8cd7f274fa88fed0fffc367b34ac32e35a2fffa93c4e694e0189c814",
     "docs/operator_learning/assumptions.yaml": "bb46bbdb7103d49d84c89a149073f69f3ab8d3f0afedef4a829fc958e6eb6c29",
     "docs/assumptions.yaml": "51092eeafd2176eadee11442bd8fc9238217a7d772bd797f60ea4c6c5ce844ce",
-    "docs/research_audit/gate_updates.json": "b76577d2ae623cb1a9e589870e6b5916e0cef4535db3fd4dd5432ecb532499b2",
+    "docs/research_audit/gate_updates.json": "53dd66176ea025cebf12a4fdd275511aace4bb2412b794e56a94e45bae320413",
     "docs/research_audit/graph_sources.json": "5d4b54beefa93b17c7b4eca0aac129410bed4e4619c3943cec8906fbc7d313bb",
     "operator_learning/research_graph.py": "6fd7f29062ccef1dfd6a4ae733a7595b27ef65a3a43db0a74368d3622e66703d",
     "scripts/research_graph.py": "87c0baee42228d4fa1e924c1f899b2dfe6a3933a1f5cc6cab4d3fdf12e8812f2",
@@ -24,6 +24,7 @@
     "experiments/operator_learning/OL-G02_reconstruction_mechanism_v3.json": "417c1657e0c83f9178245470dafe836824bacc511e307a8a677011be6179a7e6",
     "experiments/operator_learning/OL-G02_reconstruction_qualification_v5.json": "fc8a1bb304e7c2d5e849053b4bb248cb9177bdcbbf71cd5ad92239c8c952deef",
     "experiments/operator_learning/OL-G02_reconstruction_refinement_v2.json": "9a554146d32f1390f9d58456a092914e93498476030172f9dc02d7e0e4dae37a",
+    "experiments/operator_learning/OL-G03_input_coverage_characterization_v2.json": "f8580e76c07bff84398fe757932849e8170a437c19e30e9ef40caa86dab4083f",
     "experiments/operator_learning/OL-G03_input_diversity_characterization_v1.json": "b843f2ca9af19a0466ecbb6d5cf4f0c1e56c0b6d9a303669ada6a4e07557a095"
   },
   "relation_vocabulary": [
@@ -324,6 +325,13 @@
       "kind": "artifact",
       "label": "docs/operator_learning/evidence/G02_QUALIFICATION_V5_20261006.md",
       "path": "docs/operator_learning/evidence/G02_QUALIFICATION_V5_20261006.md",
+      "availability": "REPOSITORY_POINTER"
+    },
+    {
+      "id": "artifact:docs/operator_learning/evidence/G03_CHARACTERIZATION_V1_20261006.md",
+      "kind": "artifact",
+      "label": "docs/operator_learning/evidence/G03_CHARACTERIZATION_V1_20261006.md",
+      "path": "docs/operator_learning/evidence/G03_CHARACTERIZATION_V1_20261006.md",
       "availability": "REPOSITORY_POINTER"
     },
     {
@@ -4610,6 +4618,14 @@
       "path": "docs/operator_learning/CLAIMS.md"
     },
     {
+      "id": "claim:OL-C017",
+      "kind": "claim",
+      "label": "Six retained finite laws have resolved pairwise variation",
+      "status": "NUMERICAL",
+      "text": "Class: NUMERICAL. All15 pairs on each of two conservative grids have positive\nlower TV margins after the declared reconstruction bounds; finest-grid minimum\n.1118646982. Evidence: OL-D024; evidence/G03_CHARACTERIZATION_V1_20261006.md;\nmethod/derivation/sources INPUT_DIVERSITY_G03_V1.md. Falsification: incorrect\nbounds, exporter, source correspondence, failed seals or replay. Limits: six\ndevelopment windows; phase controls are not independent laws; no continuum,\npopulation coverage, optimum dataset, universal initial-condition, posterior\nor learned forecast claim. G03 remains OPEN.",
+      "path": "docs/operator_learning/CLAIMS.md"
+    },
+    {
       "id": "decision:024e022ec860235115756c43",
       "kind": "decision",
       "label": "2026-09-10 - Gate the next implementation on a same-mesh Q2 falsification",
@@ -5290,6 +5306,30 @@
       "path": "docs/operator_learning/DECISIONS.md"
     },
     {
+      "id": "decision:OL-D024",
+      "kind": "decision",
+      "label": "2026-10-06 — OL-D024: review G03 v1 distinctness; retain OPEN coverage",
+      "status": "RECORDED_DECISION",
+      "text": "Owner requests continuation after discussing optimal coverage. Self-review by\nimplementing agent; no independent assessor or qualification promotion.\nevidence/G03_CHARACTERIZATION_V1_20261006.md records16 seals,18 frozen input\nhashes, config/commit correspondence and all102 saved-array TV recomputations.\nAll12 attempts completed, no exclusions/failures;15/15 law pairs on each grid\nhave positive finite-control lower margins. This is scoped NUMERICAL distinctness,\nnot optimal allocation, universal coverage, independence or generalization.\nSources/derivation/assumptions: INPUT_DIVERSITY_G03_V1.md; all original evidence\nunchanged. G03 OPEN; G04–G17 LOCKED; no targets, training or DA.\nINPUT_COVERAGE_G03_V2_PROPOSAL.md records proposed hierarchical36-law development\ncharacterization and prospective research context with explicit applicability\ngaps. Counts are engineering budgets, no retroactive numerical gate threshold.\nThis is a draft awaiting implementation and committed predeclaration, not a\nrun authorization bypass. Current read-only.git blocks a new phase-A commit;\nleave dispatch blocked and preserve the unrelated untracked plotting script.",
+      "path": "docs/operator_learning/DECISIONS.md"
+    },
+    {
+      "id": "decision:OL-D025",
+      "kind": "decision",
+      "label": "2026-10-06 — OL-D025: implement hierarchical G03 and cumulative ETA handoff",
+      "status": "RECORDED_DECISION",
+      "text": "Owner requests implementation of the v2 proposal and mandatory ETA/handoff\ninstructions. AGENTS.md now requires an ETA before computation and handoff when\nany job or the cumulative related-job runtime exceeds one minute. Splitting a\ntask into sub-minute jobs is not an exemption. No job launch is claimed.\nHIERARCHICAL_OCCUPATION_COVERAGE_V2 implementation/config/tests are linked in\nINPUT_COVERAGE_G03_V2_PROPOSAL.md, with pre-run method/source/application limits.\n12 initial-state groups,36 fixed-window laws, unchanged widths, all failures\nand unresolved reconstructions retained; no training, FPE target or DA.\nG03 remains OPEN. Counts and orders are fixed engineering choices, not optimality\nor retrospectively chosen thresholds. Self-review, no independent assessor.\nWorking-tree implementation requires a Git phase-A commit before dispatch;\ncurrent read-only.git prevents that commit. Provisional full-run ETA5–15minutes\nis extrapolated from G02/G03 small-run timings and added streaming pair I/O,\nnot a measurement of this new run. Fast checks estimated under10seconds total.",
+      "path": "docs/operator_learning/DECISIONS.md"
+    },
+    {
+      "id": "decision:OL-D026",
+      "kind": "decision",
+      "label": "2026-10-06 — OL-D026: review, commit and dispatch hierarchical G03 v2",
+      "status": "RECORDED_DECISION",
+      "text": "Owner explicitly requests commit/review/run after full access is restored.\nReview retains all36 windows, fixed source groups/orders, widths and thresholds.\nCorrect inherited v1 config descriptions (six laws and grid-count boundary),\nlabel available coverage queries MEASURED rather than implying reconstruction\nqualification, and add immediate path-generation progress. No scientific\ncriteria or family changes. Source hashes refreshed before phase-A commit.\nTests/governance/hash checks precede persistent dispatch. Self-review only;\nG03 remains OPEN and G04–G17 LOCKED. No FPE targets, training or DA.\nProvisional ETA5–15minutes from prior timings; hand back immediately after\nverified persistent launch. Unrelated plotting script is excluded from commit\nand explicitly disclosed as the only allowed untracked provenance exception.\nEarlier access blockers and validation history remain preserved.",
+      "path": "docs/operator_learning/DECISIONS.md"
+    },
+    {
       "id": "decision:a13b3c67c70a14d3a5dc7f59",
       "kind": "decision",
       "label": "2026-10-03 - Monograph evidence audit and completed domain record",
@@ -5653,6 +5693,16 @@
       "status": "PREDECLARED",
       "experiment_id": "OL-G02_reconstruction_refinement_v2",
       "kind_of_run": "bounded_reconstruction_characterization"
+    },
+    {
+      "id": "experiment:experiments/operator_learning/OL-G03_input_coverage_characterization_v2.json",
+      "kind": "experiment",
+      "label": "experiments/operator_learning/OL-G03_input_coverage_characterization_v2.json",
+      "path": "experiments/operator_learning/OL-G03_input_coverage_characterization_v2.json",
+      "availability": "REPOSITORY_POINTER",
+      "status": "PREDECLARED",
+      "experiment_id": "OL-G03_input_coverage_characterization_v2",
+      "kind_of_run": "hierarchical_coverage_characterization"
     },
     {
       "id": "experiment:experiments/operator_learning/OL-G03_input_diversity_characterization_v1.json",
@@ -6103,6 +6153,33 @@
       "status": "FAILED",
       "cases": 6,
       "evidence": "docs/operator_learning/evidence/G02_QUALIFICATION_V5_20261006.md",
+      "limitation": "Recorded sufficient certification outcome; failed bound does not prove actual error exceeds tolerance"
+    },
+    {
+      "id": "outcome:OL-D024:component0",
+      "kind": "outcome",
+      "label": "12 law/grid attempts and 102 TV replay comparisons",
+      "status": "TECHNICAL_COMPLETED",
+      "cases": 12,
+      "evidence": "docs/operator_learning/evidence/G03_CHARACTERIZATION_V1_20261006.md",
+      "limitation": "Recorded sufficient certification outcome; failed bound does not prove actual error exceeds tolerance"
+    },
+    {
+      "id": "outcome:OL-D024:component1",
+      "kind": "outcome",
+      "label": "Finite-control positive separation margins, both grids",
+      "status": "NUMERICAL_RESOLVED",
+      "cases": 30,
+      "evidence": "docs/operator_learning/evidence/G03_CHARACTERIZATION_V1_20261006.md",
+      "limitation": "Recorded sufficient certification outcome; failed bound does not prove actual error exceeds tolerance"
+    },
+    {
+      "id": "outcome:OL-D024:component2",
+      "kind": "outcome",
+      "label": "Population coverage qualification",
+      "status": "OPEN",
+      "cases": 0,
+      "evidence": "docs/operator_learning/evidence/G03_CHARACTERIZATION_V1_20261006.md",
       "limitation": "Recorded sufficient certification outcome; failed bound does not prove actual error exceeds tolerance"
     },
     {
@@ -13249,6 +13326,13 @@
       "attribution": "AUDIT_SNAPSHOT"
     },
     {
+      "id": "edge:08822734fbcbb77684a1f485",
+      "source": "decision:OL-D024",
+      "relation": "adjudicates",
+      "target": "gate:OL-G03_INPUT_DIVERSITY",
+      "attribution": "VERSIONED_GATE_RESEARCH_UPDATE"
+    },
+    {
       "id": "edge:08db339a55822b55e0bbb7c9",
       "source": "record:fem:08c5baf0452977169eb5db38",
       "relation": "recorded_in",
@@ -13982,6 +14066,13 @@
       "relation": "recorded_in",
       "target": "artifact:docs/research_audit/snapshot_20261006.json",
       "attribution": "AUDIT_SNAPSHOT"
+    },
+    {
+      "id": "edge:1572a2ef0e5142dd7eb2e28f",
+      "source": "claim:OL-C017",
+      "relation": "references",
+      "target": "artifact:docs/operator_learning/INPUT_DIVERSITY_G03_V1.md",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
     },
     {
       "id": "edge:1574382837bf233470627187",
@@ -15118,6 +15209,13 @@
       "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
     },
     {
+      "id": "edge:27ca0511ec68b0e3ceb5fc6d",
+      "source": "claim:OL-C017",
+      "relation": "recorded_in",
+      "target": "artifact:docs/operator_learning/CLAIMS.md",
+      "attribution": "CLAIM_REGISTRY"
+    },
+    {
       "id": "edge:27f1133838e13ea0ebd9a01e",
       "source": "record:tracked:3cb15457089a183e288cef6f",
       "relation": "recorded_in",
@@ -15494,6 +15592,13 @@
       "relation": "proposed_for",
       "target": "gate:OL-G16_POSTERIOR_TRANSFER",
       "attribution": "Prospective method/context mapping only: gate LOCKED, no adjudication or historical research-use claim"
+    },
+    {
+      "id": "edge:2e433c74532cb18f446dc834",
+      "source": "decision:OL-D024",
+      "relation": "has_outcome",
+      "target": "outcome:OL-D024:component1",
+      "attribution": "EXPLICIT_COMPONENT_ADJUDICATION"
     },
     {
       "id": "edge:2e55a18a8054a932b8ed76ea",
@@ -16238,6 +16343,13 @@
       "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
     },
     {
+      "id": "edge:3c0b7b518df31692904d421f",
+      "source": "decision:OL-D025",
+      "relation": "recorded_in",
+      "target": "artifact:docs/operator_learning/DECISIONS.md",
+      "attribution": "ORIGINAL_DECISION_SECTION"
+    },
+    {
       "id": "edge:3c0c152bd88cb712a9dd6772",
       "source": "record:fem:4c41ad3b489e1b394ccff346",
       "relation": "documents",
@@ -16581,6 +16693,13 @@
       "attribution": "AUDIT_SNAPSHOT"
     },
     {
+      "id": "edge:4234e60f52582baaa80cba0b",
+      "source": "decision:OL-D024",
+      "relation": "references",
+      "target": "artifact:docs/operator_learning/INPUT_DIVERSITY_G03_V1.md",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
+    },
+    {
       "id": "edge:423e80edd6943303a5551679",
       "source": "assumption:OL-A03",
       "relation": "references",
@@ -16817,6 +16936,13 @@
       "relation": "recorded_in",
       "target": "artifact:docs/research_audit/snapshot_20261006.json",
       "attribution": "AUDIT_SNAPSHOT"
+    },
+    {
+      "id": "edge:46e482fe19c2d31c6c81bd3a",
+      "source": "decision:OL-D024",
+      "relation": "references",
+      "target": "decision:OL-D024",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
     },
     {
       "id": "edge:46e8c037b1d076e5761f9bab",
@@ -18548,6 +18674,13 @@
       "attribution": "AUDIT_SNAPSHOT"
     },
     {
+      "id": "edge:649d09c27041888e9e5f0b6f",
+      "source": "gate:OL-G03_INPUT_DIVERSITY",
+      "relation": "tested_by",
+      "target": "experiment:experiments/operator_learning/OL-G03_input_coverage_characterization_v2.json",
+      "attribution": "CONFIG_GATE_ID"
+    },
+    {
       "id": "edge:64a76286c2653e20a9b6d148",
       "source": "record:fem:831a161041ab3c380c3a87b6",
       "relation": "recorded_in",
@@ -18672,6 +18805,13 @@
       "relation": "documents",
       "target": "artifact:runs/corrected-q2-crank-nicolson/20260911T002101Z/q2_adaptive_cn_half_dt/final_raw_cell_classification_rank0003.json",
       "attribution": "HISTORICAL_METADATA_NOT_NEW_ADJUDICATION"
+    },
+    {
+      "id": "edge:6651d87fc1f4fc3ba9120403",
+      "source": "decision:OL-D026",
+      "relation": "references",
+      "target": "artifact:docs/operator_learning/DECISIONS.md",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
     },
     {
       "id": "edge:6654a1503d6a2fae0405c0a9",
@@ -19059,6 +19199,13 @@
       "attribution": "PRESERVED_GATE_EVENT"
     },
     {
+      "id": "edge:6d7537b57a025097a94264cf",
+      "source": "decision:OL-D025",
+      "relation": "references",
+      "target": "artifact:AGENTS.md",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
+    },
+    {
       "id": "edge:6d93f90f8153e2f08870b95d",
       "source": "record:tracked:95a9f28eab45ac365b641db5",
       "relation": "has_outcome",
@@ -19071,6 +19218,13 @@
       "relation": "has_outcome",
       "target": "outcome:fem:1e3f0df75822014f8d0504bf",
       "attribution": "VERBATIM_RECORDED_FIELD"
+    },
+    {
+      "id": "edge:6daa30442f30430657abfda6",
+      "source": "claim:OL-C017",
+      "relation": "references",
+      "target": "artifact:docs/operator_learning/evidence/G03_CHARACTERIZATION_V1_20261006.md",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
     },
     {
       "id": "edge:6df68dece5b3317604575d4d",
@@ -19134,6 +19288,13 @@
       "relation": "recorded_in",
       "target": "artifact:docs/DECISIONS.md",
       "attribution": "ORIGINAL_DECISION_SECTION"
+    },
+    {
+      "id": "edge:6e82622422dc531409345b86",
+      "source": "decision:OL-D024",
+      "relation": "has_outcome",
+      "target": "outcome:OL-D024:component2",
+      "attribution": "EXPLICIT_COMPONENT_ADJUDICATION"
     },
     {
       "id": "edge:6eb332d9877323607e328329",
@@ -19414,6 +19575,13 @@
       "relation": "has_outcome",
       "target": "outcome:OL-D013:MECHANISM_V3_COMPLETE_GATE_OPEN",
       "attribution": "PRESERVED_GATE_EVENT"
+    },
+    {
+      "id": "edge:73f1e26672477480fcbff138",
+      "source": "decision:OL-D024",
+      "relation": "references",
+      "target": "artifact:docs/operator_learning/INPUT_DIVERSITY_G03_V1.md",
+      "attribution": "EXPLICIT_GATE_METHOD_EVIDENCE"
     },
     {
       "id": "edge:73f8ba982020e799a6e5587e",
@@ -19889,6 +20057,13 @@
       "source": "decision:fe022c839bcff4968af0c146",
       "relation": "recorded_in",
       "target": "artifact:METHOD_SELECTION_REPORT.md",
+      "attribution": "ORIGINAL_DECISION_SECTION"
+    },
+    {
+      "id": "edge:7d1efc67727933e0ab0697a5",
+      "source": "decision:OL-D024",
+      "relation": "recorded_in",
+      "target": "artifact:docs/operator_learning/DECISIONS.md",
       "attribution": "ORIGINAL_DECISION_SECTION"
     },
     {
@@ -22265,6 +22440,13 @@
       "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
     },
     {
+      "id": "edge:a5a89b121edf45974fcfcf88",
+      "source": "decision:OL-D024",
+      "relation": "references",
+      "target": "artifact:docs/operator_learning/evidence/G03_CHARACTERIZATION_V1_20261006.md",
+      "attribution": "EXPLICIT_GATE_METHOD_EVIDENCE"
+    },
+    {
       "id": "edge:a5c291e3ea84b4429d876590",
       "source": "claim:C-030",
       "relation": "references",
@@ -22559,6 +22741,13 @@
       "attribution": "AUDIT_SNAPSHOT"
     },
     {
+      "id": "edge:aa8faa2a7ba6cec9b5f4fe6d",
+      "source": "decision:OL-D024",
+      "relation": "references",
+      "target": "artifact:docs/operator_learning/DECISIONS.md",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
+    },
+    {
       "id": "edge:aa929ee87d4a903d9ae41ce1",
       "source": "record:fem:3786b4978d5adee5ecc13538",
       "relation": "recorded_in",
@@ -22832,6 +23021,13 @@
       "attribution": "AUDIT_SNAPSHOT"
     },
     {
+      "id": "edge:af27b55dacd2e97624691601",
+      "source": "decision:OL-D024",
+      "relation": "has_outcome",
+      "target": "outcome:OL-D024:component0",
+      "attribution": "EXPLICIT_COMPONENT_ADJUDICATION"
+    },
+    {
       "id": "edge:af4b07cfc105f074d7b62458",
       "source": "record:fem:dd2c6fe307c27fcfb8a296e2",
       "relation": "documents",
@@ -23054,6 +23250,13 @@
       "relation": "documents",
       "target": "artifact:runs/local-q2-cn-spatial-refinement/20260912T185711Z/q2_local_qp_cn_20x24x24/report.json",
       "attribution": "HISTORICAL_METADATA_NOT_NEW_ADJUDICATION"
+    },
+    {
+      "id": "edge:b3fb0306a718617486d6cef9",
+      "source": "decision:OL-D025",
+      "relation": "references",
+      "target": "decision:OL-D025",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
     },
     {
       "id": "edge:b4137d8a1b234346667b9ef1",
@@ -24463,13 +24666,6 @@
       "attribution": "AUDIT_SNAPSHOT"
     },
     {
-      "id": "edge:cdcc63cc03ca4c534907ae96",
-      "source": "decision:OL-D021",
-      "relation": "adjudicates",
-      "target": "gate:OL-G03_INPUT_DIVERSITY",
-      "attribution": "VERSIONED_GATE_RESEARCH_UPDATE"
-    },
-    {
       "id": "edge:cde2a84e9ef5f10c4cc21836",
       "source": "decision:OL-D014",
       "relation": "adjudicates",
@@ -24904,6 +25100,13 @@
       "attribution": "CURRENT_CATALOGUE"
     },
     {
+      "id": "edge:d43c1a3fb94228a7706b4f27",
+      "source": "decision:OL-D026",
+      "relation": "references",
+      "target": "decision:OL-D026",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
+    },
+    {
       "id": "edge:d46fb494b35e650358cd9fb8",
       "source": "assumption:OL-A08",
       "relation": "references",
@@ -25314,6 +25517,13 @@
       "source": "decision:920670aa6c87e04360138460",
       "relation": "references",
       "target": "artifact:same_mesh_q2_corrected_report.json",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
+    },
+    {
+      "id": "edge:db74e62217bf5d6b1db66ea1",
+      "source": "claim:OL-C017",
+      "relation": "references",
+      "target": "artifact:docs/operator_learning/CLAIMS.md",
       "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
     },
     {
@@ -26598,6 +26808,13 @@
       "attribution": "CLAIM_REGISTRY"
     },
     {
+      "id": "edge:f5730ae1f0726dbea4385aa9",
+      "source": "decision:OL-D026",
+      "relation": "recorded_in",
+      "target": "artifact:docs/operator_learning/DECISIONS.md",
+      "attribution": "ORIGINAL_DECISION_SECTION"
+    },
+    {
       "id": "edge:f57b5864be31d211cd5c4872",
       "source": "gate:OL-G06_DATA_PROVENANCE",
       "relation": "recorded_in",
@@ -26764,6 +26981,13 @@
       "relation": "recorded_in",
       "target": "artifact:docs/research_audit/snapshot_20261006.json",
       "attribution": "AUDIT_SNAPSHOT"
+    },
+    {
+      "id": "edge:f8c0898ce270a6e39eb1ec7a",
+      "source": "claim:OL-C017",
+      "relation": "references",
+      "target": "decision:OL-D024",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
     },
     {
       "id": "edge:f8cbf9cc19eb8081fcd4cfec",
@@ -27121,6 +27345,13 @@
       "relation": "has_outcome",
       "target": "outcome:fem:647df35e6ba18193b16ac552",
       "attribution": "VERBATIM_RECORDED_FIELD"
+    },
+    {
+      "id": "edge:ff150adcf1d8640dea1e9257",
+      "source": "decision:OL-D025",
+      "relation": "references",
+      "target": "artifact:docs/operator_learning/DECISIONS.md",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
     },
     {
       "id": "edge:ff1582cf579e9e8a935afee7",

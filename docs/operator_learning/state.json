@@ -7,9 +7,9 @@
   "current_six_law_pilot": "COMPLETED_ENGINEERING_AND_RESTRICTED_LEARNING_PILOT",
   "current_model_scientifically_qualified": false,
   "next_required_gate": "OL-G03_INPUT_DIVERSITY",
-  "active_blocker": "OL-D023 restores G03 characterization dispatch. Results/review and population coverage remain pending; changed FE transfer and reference/export qualification remain unverified.",
+  "active_blocker": "OL-D026 authorizes committed hierarchical G03 v2 dispatch after review. Population coverage remains unqualified; changed FE transfer and reference/export checks remain open.",
   "authorized": [
-    "Commit and dispatch bounded G03 characterization_v1 under OL-D023; no expensive targets, training or DA",
+    "Commit and dispatch bounded hierarchical G03 v2 under OL-D026; no targets, training or DA",
     "Inexpensive labelled diagnostics; no expensive targets, neural retraining or DA"
   ],
   "locked": [
@@ -21,7 +21,7 @@
   ],
   "operator_surrogate_authorized_for_da": false,
   "operator_production_authorized": false,
-  "last_adjudicated_evidence": "OL-D021; evidence/G02_QUALIFICATION_V5_20261006.md: six20k candidates pass unchanged1% TV finite-control criteria; lower-count failures retained. Historical OL-D009/OL-D013/OL-D015 preserved.",
+  "last_adjudicated_evidence": "OL-D024; evidence/G03_CHARACTERIZATION_V1_20261006.md: v1 technical completion and finite-law distinctness verified; G03 remains OPEN, no population-coverage qualification.",
   "gates": {
     "OL-G00_PROBABILITY_DISTRIBUTION_ALIGNMENT": "PASSED",
     "OL-G01_REPRESENTATION_CONTRACT": "PASSED",

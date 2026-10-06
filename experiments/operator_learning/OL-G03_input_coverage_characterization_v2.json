@@ -1,0 +1,200 @@
+{
+  "schema_version": 1,
+  "id": "OL-G03_input_coverage_characterization_v2",
+  "gate_id": "OL-G03_INPUT_DIVERSITY",
+  "kind": "hierarchical_coverage_characterization",
+  "status": "PREDECLARED",
+  "question": "How much density variation lies across source groups versus within-source windows, and what gaps remain under frozen group allocation?",
+  "hypotheses": [
+    "Distinct resolved finite occupation laws",
+    "Sampling/export effects explain separation",
+    "Distinct laws remain insufficient for application coverage"
+  ],
+  "metrics": [
+    "within-law phase L1/TV",
+    "between-law L1/TV and finite-control separation margins",
+    "marginal TVs means covariance lobe tail boundary",
+    "median p90 p95 worst-case distances",
+    "per-law nearest neighbor",
+    "frozen grouped pool coverage and common physical boundary"
+  ],
+  "thresholds": {
+    "mass_error_max": 1e-10,
+    "negative_mass_max": 0,
+    "scientific_qualification": "CHARACTERIZATION_ONLY_G03_OPEN",
+    "resolution": "Positive signed mathematical margin is diagnostic, no arbitrary coverage quota",
+    "technical_completion": "All36 law attempts,216 within-law pairs,630 endpoint pairs or explicit failures; no coverage pass",
+    "reconstruction_tv_max": 0.01
+  },
+  "seeds": {
+    "trajectory": [
+      83001,
+      83002,
+      83003,
+      83004,
+      83005,
+      83006,
+      83007,
+      83008,
+      83009,
+      83010,
+      83011,
+      83012
+    ]
+  },
+  "inputs": {
+    "scripts/run_input_coverage.py": "9acf9e80535377ebe46c853bc41bd3a991282a6938a8850c9ab29ec182df5d6f",
+    "scripts/run_input_diversity.py": "d271cabf3f58296dfb8f1eacad28bd7046cf0b371317017f47b726af1ef36d04",
+    "scripts/run_reconstruction_qualification.py": "894080538814441f43bd62f070f247e890848c758c0090b38fad4b5338c4ef21",
+    "operator_learning/reconstruction_controls.py": "ef319bf6ddb90c94dcf4d89d28b36545e0d7763901a04d2b4dc9e081867aa3a6",
+    "operator_learning/reconstruction.py": "9687ec1de3d7d766c74a17f7d79ef5a97aaa299b90a23543960dfc48620c3b5c",
+    "operator_learning/alignment.py": "16dbec8b6f7046d90c15395a229054f0cff47218f50b438a670b8a216a664451",
+    "operator_learning/governance.py": "49912ae3dcf57f37421a9200331821830d2ad3822154f899bad4215213a3a8b5",
+    "docs/operator_learning/INPUT_COVERAGE_G03_V2_PROPOSAL.md": "21992f656b89c494f5b3496f69f4c3307a0ec971db392eab5b6a3e37d22194ce",
+    "docs/operator_learning/INPUT_DIVERSITY_G03_V1.md": "611916c52162788e6b744c4a0620876e7391b670ccefda58d80328820c6b7354",
+    "AGENTS.md": "dd8519e15fd369ff7e4604a79a69f867e0fa7db75e10bea46dfa5fae6111deeb",
+    "SCIENTIFIC_INTEGRITY.md": "f0208b97e2466c14ec10851da5d07ff39be0af3952491f6890eb43c054c7a97e"
+  },
+  "command": [
+    "env",
+    "OPENBLAS_NUM_THREADS=1",
+    "OMP_NUM_THREADS=1",
+    "/home/adam/.local/share/mamba/envs/pde/bin/python",
+    "scripts/run_input_coverage.py",
+    "{RUN_DIRECTORY}"
+  ],
+  "runtime_versions": {
+    "python": "3.12.13",
+    "numpy": "2.5.2",
+    "scipy": "1.18.0"
+  },
+  "hardware": {
+    "device": "cpu",
+    "gpu": false,
+    "mpi": false,
+    "blas_threads": 1,
+    "openmp_threads": 1
+  },
+  "required_evidence": [
+    "All36 law attempts and group identities",
+    "Fine/coarse paths, four coarse phases and fine endpoints",
+    "Raw invariants, reconstruction bounds, every pair or missing failure",
+    "Grouped coverage all-attempt and resolved-only denominators",
+    "Export diagnostics, runtime, immutable provenance and seals"
+  ],
+  "pass_consequences": "Technical characterization only; G03 remains OPEN pending frozen scientifically justified population/coverage assessment",
+  "failure_consequences": "Preserve every failure/unresolved pair; no threshold relaxation, population narrowing or gate unlock",
+  "assumptions": [
+    "OL-A14",
+    "Finite recorded laws rather than independent invariant-law samples",
+    "Phase controls are deterministic quadrature replicates, not independent laws"
+  ],
+  "review_requirements": "Implementing agent self-review under owner's start instruction; no independent assessor or qualification authority",
+  "scientific_adjudication": "CHARACTERIZATION_ONLY_G03_OPEN",
+  "sampling_count": 20000,
+  "phases": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "bounds": [
+    [
+      -30,
+      30
+    ],
+    [
+      -40,
+      40
+    ],
+    [
+      -10,
+      70
+    ]
+  ],
+  "physical_widths": [
+    4,
+    4.444444444444445,
+    4.444444444444445
+  ],
+  "comparison_shapes": [
+    [
+      60,
+      72,
+      72
+    ],
+    [
+      120,
+      144,
+      144
+    ]
+  ],
+  "regions": {
+    "boundary_layers": 4,
+    "transition_width": 2,
+    "tail_z": [
+      5,
+      50
+    ]
+  },
+  "allowed_untracked": [
+    "scripts/plot_reconstruction_comparison.py"
+  ],
+  "limitations": [
+    "36 development windows from12 source groups; no untouched evaluation/independence claim",
+    "No continuum, invariant-law or posterior-coverage guarantee",
+    "Numerical TV margin uses float64 bounds, no interval proof",
+    "Common physical boundary slabs; voxel-centre moments are representation diagnostics",
+    "No expensive FPE targets, neural training or DA",
+    "Git predeclaration commit required before dispatch",
+    "All36 laws are development; initial-state generator box is not universal scope"
+  ],
+  "windows": 3,
+  "spinup": 20,
+  "window": 10,
+  "integration_steps": [
+    0.000125,
+    0.00025
+  ],
+  "control_count": 80000,
+  "pool_sizes": [
+    2,
+    4,
+    8
+  ],
+  "group_orders": [
+    [
+      83001,
+      83002,
+      83003,
+      83004,
+      83005,
+      83006,
+      83007,
+      83008,
+      83009,
+      83010,
+      83011,
+      83012
+    ],
+    [
+      83007,
+      83001,
+      83010,
+      83004,
+      83012,
+      83006,
+      83009,
+      83003,
+      83011,
+      83005,
+      83008,
+      83002
+    ]
+  ],
+  "boundary_thickness": [
+    4,
+    4.444444444444445,
+    4.444444444444445
+  ]
+}

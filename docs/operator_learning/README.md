@@ -54,6 +54,14 @@ All six G02 windows and four sampling phases are retained. Distinct finite-law
 evidence does not establish universal initial-condition or population coverage.
 Commit predeclaration before dispatch; OL-D023 records restored Git write access.
 
+G03 v1 completed and is [reviewed without coverage promotion](evidence/G03_CHARACTERIZATION_V1_20261006.md)
+under OL-D024. A [hierarchical coverage proposal](INPUT_COVERAGE_G03_V2_PROPOSAL.md)
+is implemented and tested; OL-D026 restores access and authorizes committed
+dispatch. Runner: scripts/run_input_coverage.py; config:
+experiments/operator_learning/OL-G03_input_coverage_characterization_v2.json.
+Dispatch requires a verified persistent launch. G03 remains OPEN. OL-D025 records the
+cumulative-job ETA/handoff rule in root AGENTS.md.
+
 G02 implementation and controlled study design:
 [reconstruction stability v1](RECONSTRUCTION_STABILITY_G02_V1.md).
 Characterization has completed: [adjudication and limits](evidence/G02_CHARACTERIZATION_20261006.md).

@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "id": "OL-G03_input_diversity_characterization_v1",
+  "gate_id": "OL-G03_INPUT_DIVERSITY",
+  "kind": "bounded_diversity_characterization",
+  "status": "PREDECLARED",
+  "question": "Do finite between-law differences exceed same-law reconstruction variation on the six retained G02 windows?",
+  "hypotheses": [
+    "Distinct resolved finite occupation laws",
+    "Sampling/export effects explain separation",
+    "Distinct laws remain insufficient for application coverage"
+  ],
+  "metrics": [
+    "within-law phase L1/TV",
+    "between-law L1/TV and finite-control separation margins",
+    "marginal TVs means covariance lobe tail boundary",
+    "median p90 p95 worst-case distances",
+    "per-law nearest neighbor"
+  ],
+  "thresholds": {
+    "mass_error_max": 1e-10,
+    "negative_mass_max": 0,
+    "scientific_qualification": "CHARACTERIZATION_ONLY_G03_OPEN",
+    "resolution": "Positive signed mathematical margin is diagnostic, no arbitrary coverage quota",
+    "technical_completion": "All12 law/grid attempts,72 within comparisons,30 between comparisons, seals/metadata or preserved failures"
+  },
+  "seeds": {
+    "trajectory": [
+      82029,
+      82030,
+      82031,
+      82032,
+      82033,
+      82034
+    ]
+  },
+  "inputs": {
+    "scripts/run_input_diversity.py": "d271cabf3f58296dfb8f1eacad28bd7046cf0b371317017f47b726af1ef36d04",
+    "scripts/run_reconstruction_qualification.py": "894080538814441f43bd62f070f247e890848c758c0090b38fad4b5338c4ef21",
+    "operator_learning/reconstruction_controls.py": "ef319bf6ddb90c94dcf4d89d28b36545e0d7763901a04d2b4dc9e081867aa3a6",
+    "operator_learning/reconstruction.py": "9687ec1de3d7d766c74a17f7d79ef5a97aaa299b90a23543960dfc48620c3b5c",
+    "operator_learning/alignment.py": "16dbec8b6f7046d90c15395a229054f0cff47218f50b438a670b8a216a664451",
+    "operator_learning/governance.py": "49912ae3dcf57f37421a9200331821830d2ad3822154f899bad4215213a3a8b5",
+    "docs/operator_learning/INPUT_DIVERSITY_G03_V1.md": "611916c52162788e6b744c4a0620876e7391b670ccefda58d80328820c6b7354",
+    "SCIENTIFIC_INTEGRITY.md": "f0208b97e2466c14ec10851da5d07ff39be0af3952491f6890eb43c054c7a97e",
+    "runs/operator-learning/OL-G02_reconstruction_qualification_v5/20261006T132432282684Z/config.json": "fc8a1bb304e7c2d5e849053b4bb248cb9177bdcbbf71cd5ad92239c8c952deef",
+    "runs/operator-learning/OL-G02_reconstruction_qualification_v5/20261006T132432282684Z/provenance.json": "d76ddcb74992310f320f7a22049390d8548141cd82424cde0bd068aaea0f6744",
+    "runs/operator-learning/OL-G02_reconstruction_qualification_v5/20261006T132432282684Z/report.json": "1b356c08fe983ac90760b54bc526f3c34343e34170ec96756cb863728181e0fa",
+    "runs/operator-learning/OL-G02_reconstruction_qualification_v5/20261006T132432282684Z/seal.json": "5f3f43ea319247534e505edf7924030445a174b462605f8524d3eef5bfaa3940",
+    "runs/operator-learning/OL-G02_reconstruction_qualification_v5/20261006T132432282684Z/seed82029_paths.npz": "000448e9a6720f62fecdbf1499308c25291c94a630d36278eecc066b8a37c38d",
+    "runs/operator-learning/OL-G02_reconstruction_qualification_v5/20261006T132432282684Z/seed82030_paths.npz": "72103a0287b782d16416ac5a10c397824f272b23bb5416f2b42ff421e270a601",
+    "runs/operator-learning/OL-G02_reconstruction_qualification_v5/20261006T132432282684Z/seed82031_paths.npz": "add0f852f3b751c3ff6f1a2e1ce711ac7703c9424060e931b5c777063b9e64a3",
+    "runs/operator-learning/OL-G02_reconstruction_qualification_v5/20261006T132432282684Z/seed82032_paths.npz": "1516ce0f8fe1597673b00c8d42e4c7c01bc854108ca49ea8485789bed1635064",
+    "runs/operator-learning/OL-G02_reconstruction_qualification_v5/20261006T132432282684Z/seed82033_paths.npz": "9461e788565b3b7aae0550705f1c571fa89010cfdf5bf88a68b894a7a3f9c32b",
+    "runs/operator-learning/OL-G02_reconstruction_qualification_v5/20261006T132432282684Z/seed82034_paths.npz": "2dae89c585ab66081607c306e3e0f6d4bb9478fe61cfebb40a4875b0bdaa43b5"
+  },
+  "command": [
+    "env",
+    "OPENBLAS_NUM_THREADS=1",
+    "OMP_NUM_THREADS=1",
+    "/home/adam/.local/share/mamba/envs/pde/bin/python",
+    "scripts/run_input_diversity.py",
+    "{RUN_DIRECTORY}"
+  ],
+  "runtime_versions": {
+    "python": "3.12.13",
+    "numpy": "2.5.2",
+    "scipy": "1.18.0"
+  },
+  "hardware": {
+    "device": "cpu",
+    "gpu": false,
+    "mpi": false,
+    "blas_threads": 1,
+    "openmp_threads": 1
+  },
+  "required_evidence": [
+    "Every within and between pair",
+    "raw invariants source seal and archived endpoint replay",
+    "phase arrays summaries report/provenance/config/seal",
+    "all failures attempts exclusions and timing"
+  ],
+  "pass_consequences": "Technical characterization only; G03 remains OPEN pending frozen scientifically justified population/coverage assessment",
+  "failure_consequences": "Preserve every failure/unresolved pair; no threshold relaxation, population narrowing or gate unlock",
+  "assumptions": [
+    "OL-A14",
+    "Finite recorded laws rather than independent invariant-law samples",
+    "Phase controls are deterministic quadrature replicates, not independent laws"
+  ],
+  "review_requirements": "Implementing agent self-review under owner's start instruction; no independent assessor or qualification authority",
+  "scientific_adjudication": "CHARACTERIZATION_ONLY_G03_OPEN",
+  "sampling_count": 20000,
+  "phases": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "source_run": "runs/operator-learning/OL-G02_reconstruction_qualification_v5/20261006T132432282684Z",
+  "bounds": [
+    [
+      -30,
+      30
+    ],
+    [
+      -40,
+      40
+    ],
+    [
+      -10,
+      70
+    ]
+  ],
+  "physical_widths": [
+    4,
+    4.444444444444445,
+    4.444444444444445
+  ],
+  "comparison_shapes": [
+    [
+      60,
+      72,
+      72
+    ],
+    [
+      120,
+      144,
+      144
+    ]
+  ],
+  "regions": {
+    "boundary_layers": 4,
+    "transition_width": 2,
+    "tail_z": [
+      5,
+      50
+    ]
+  },
+  "allowed_untracked": [
+    "scripts/plot_reconstruction_comparison.py"
+  ],
+  "limitations": [
+    "Six retained development windows; no untouched evaluation/independence claim",
+    "No continuum, invariant-law or posterior-coverage guarantee",
+    "Numerical TV margin uses float64 bounds, no interval proof",
+    "Boundary region thickness differs across grids",
+    "No expensive FPE targets, neural training or DA",
+    "Git predeclaration commit required before dispatch"
+  ]
+}

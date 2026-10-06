@@ -1,5 +1,56 @@
 # Operator-learning decisions
 
+## 2026-10-06 — OL-D026: review, commit and dispatch hierarchical G03 v2
+
+Owner explicitly requests commit/review/run after full access is restored.
+Review retains all36 windows, fixed source groups/orders, widths and thresholds.
+Correct inherited v1 config descriptions (six laws and grid-count boundary),
+label available coverage queries MEASURED rather than implying reconstruction
+qualification, and add immediate path-generation progress. No scientific
+criteria or family changes. Source hashes refreshed before phase-A commit.
+Tests/governance/hash checks precede persistent dispatch. Self-review only;
+G03 remains OPEN and G04–G17 LOCKED. No FPE targets, training or DA.
+Provisional ETA5–15minutes from prior timings; hand back immediately after
+verified persistent launch. Unrelated plotting script is excluded from commit
+and explicitly disclosed as the only allowed untracked provenance exception.
+Earlier access blockers and validation history remain preserved.
+
+## 2026-10-06 — OL-D025: implement hierarchical G03 and cumulative ETA handoff
+
+Owner requests implementation of the v2 proposal and mandatory ETA/handoff
+instructions. AGENTS.md now requires an ETA before computation and handoff when
+any job or the cumulative related-job runtime exceeds one minute. Splitting a
+task into sub-minute jobs is not an exemption. No job launch is claimed.
+HIERARCHICAL_OCCUPATION_COVERAGE_V2 implementation/config/tests are linked in
+INPUT_COVERAGE_G03_V2_PROPOSAL.md, with pre-run method/source/application limits.
+12 initial-state groups,36 fixed-window laws, unchanged widths, all failures
+and unresolved reconstructions retained; no training, FPE target or DA.
+G03 remains OPEN. Counts and orders are fixed engineering choices, not optimality
+or retrospectively chosen thresholds. Self-review, no independent assessor.
+Working-tree implementation requires a Git phase-A commit before dispatch;
+current read-only.git prevents that commit. Provisional full-run ETA5–15minutes
+is extrapolated from G02/G03 small-run timings and added streaming pair I/O,
+not a measurement of this new run. Fast checks estimated under10seconds total.
+
+## 2026-10-06 — OL-D024: review G03 v1 distinctness; retain OPEN coverage
+
+Owner requests continuation after discussing optimal coverage. Self-review by
+implementing agent; no independent assessor or qualification promotion.
+evidence/G03_CHARACTERIZATION_V1_20261006.md records16 seals,18 frozen input
+hashes, config/commit correspondence and all102 saved-array TV recomputations.
+All12 attempts completed, no exclusions/failures;15/15 law pairs on each grid
+have positive finite-control lower margins. This is scoped NUMERICAL distinctness,
+not optimal allocation, universal coverage, independence or generalization.
+Sources/derivation/assumptions: INPUT_DIVERSITY_G03_V1.md; all original evidence
+unchanged. G03 OPEN; G04–G17 LOCKED; no targets, training or DA.
+INPUT_COVERAGE_G03_V2_PROPOSAL.md records proposed hierarchical36-law development
+characterization and prospective research context with explicit applicability
+gaps. Counts are engineering budgets, no retroactive numerical gate threshold.
+This is a draft awaiting implementation and committed predeclaration, not a
+run authorization bypass. Current read-only.git blocks a new phase-A commit;
+leave dispatch blocked and preserve the unrelated untracked plotting script.
+
+
 ## 2026-10-06 — OL-D023: restore G03 predeclaration and bounded dispatch
 
 Owner restores full access and requests retry. Git staging now succeeds.
