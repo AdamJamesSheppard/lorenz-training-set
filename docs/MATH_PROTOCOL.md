@@ -1,5 +1,7 @@
 # Mathematical reasoning protocol
 
+Project-wide mandatory requirement: ../RESEARCH_TRACEABILITY.md (REQ-RT-001).
+
 Read the cross-stage policy in ../SCIENTIFIC_INTEGRITY.md before scientific work.
 Preserve failed and difficult cases; record population exclusions and output
 interventions. No evidence or figure may manufacture apparent success.

@@ -1,5 +1,18 @@
 # Operator-learning decisions
 
+## 2026-10-06 — OL-D017: require project-wide research traceability
+
+Direct owner instruction makes the audit discipline mandatory across all stages.
+../../RESEARCH_TRACEABILITY.md defines REQ-RT-001: methods, sources/versions,
+mathematical use/hypotheses, implementation, frozen criteria, immutable evidence
+and reviewer/authority for all scientific outcomes. Missing records block new
+qualification/promotion; gap disclosure does not establish applicability.
+Preserve failures, historical audit snapshots and retrospective attribution.
+Fast checks require the cross-stage authority and canonical entry pointers;
+semantic review remains necessary. No old gate outcome, threshold, solver,
+training run or scientific authorization changes. Self-reviewed implementing
+agent under direct owner instruction, no independent scientific assessor.
+
 ## 2026-10-06 — OL-D016: audit method, citation and gate-outcome traceability
 
 Owner requests every recorded method/citation and research behind each gate's

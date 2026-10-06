@@ -1,5 +1,9 @@
 # Mandatory research context
 
+REQ-RT-001 in RESEARCH_TRACEABILITY.md is mandatory for all project stages.
+Read it before new method implementation, experiments or scientific decisions;
+missing method/source/outcome traceability blocks qualification and promotion.
+
 Before scientific implementation, analysis, plotting or adjudication, read
 SCIENTIFIC_INTEGRITY.md, docs/PROJECT_STATE.md, docs/MATH_PROTOCOL.md and the
 current programme's canonical state, claims and decisions. For operator learning

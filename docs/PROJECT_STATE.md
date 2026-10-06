@@ -4,6 +4,10 @@ Updated: 2026-10-06
 
 ## Current programme authority
 
+Mandatory across all stages: [REQ-RT-001 research traceability](../RESEARCH_TRACEABILITY.md).
+Method/source/outcome records are required before scientific qualification;
+historical audit gaps remain explicit and do not rewrite old evidence.
+
 The active programme is **OPERATOR_LEARNING_QUALIFICATION**. Canonical status,
 18 gates, probability semantics and authorization controls are in
 [docs/operator_learning/README.md](operator_learning/README.md) and

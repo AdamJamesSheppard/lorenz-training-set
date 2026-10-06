@@ -1,5 +1,9 @@
 # Positivity-limited Lorenz-63 Fokker--Planck solver
 
+Project-wide requirement: [REQ-RT-001 research traceability](RESEARCH_TRACEABILITY.md).
+Every method and scientific outcome must record its research, assumptions,
+implementation, frozen criteria and evidence; missing records block qualification.
+
 Mandatory across all stages: [scientific-integrity policy](SCIENTIFIC_INTEGRITY.md).
 Preserve difficult cases and failures; no silent Gaussian/GMM substitution or
 target-informed repair. [Gate integrity audit](docs/operator_learning/INTEGRITY_GATE_AUDIT_20261006.md)

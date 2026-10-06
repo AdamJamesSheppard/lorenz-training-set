@@ -1,5 +1,8 @@
 # Research-control protocol
 
+Project-wide mandatory requirement: ../../RESEARCH_TRACEABILITY.md (REQ-RT-001).
+Its blocking rule applies to every gate promotion and scientific qualification.
+
 Method/source and outcome traceability: ../research_audit/README.md.
 Each new scientific predeclaration/adjudication must record method IDs, precise
 research source/version, mathematical use and hypothesis applicability, or an

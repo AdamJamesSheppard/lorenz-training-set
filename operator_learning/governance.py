@@ -182,6 +182,22 @@ def validate_integrity_documents(root, gates):
     return errors
 
 
+def validate_traceability_requirement(root):
+    """Check durable authority/pointers, not semantic scientific compliance."""
+    root = Path(root)
+    errors = []
+    policy = root / 'RESEARCH_TRACEABILITY.md'
+    if not policy.is_file() or 'REQ-RT-001' not in policy.read_text():
+        errors.append('missing mandatory research-traceability requirement')
+    for relative in ('AGENTS.md', 'README.md', 'SCIENTIFIC_INTEGRITY.md',
+                     'docs/MATH_PROTOCOL.md', 'docs/PROJECT_STATE.md',
+                     'docs/operator_learning/GOVERNANCE.md'):
+        path = root / relative
+        if not path.is_file() or 'RESEARCH_TRACEABILITY.md' not in path.read_text():
+            errors.append(f'missing mandatory traceability authority pointer: {relative}')
+    return errors
+
+
 def check_repository(root):
     root = Path(root)
     base = root / "docs/operator_learning"
@@ -190,6 +206,7 @@ def check_repository(root):
     generators = json.loads((base / "generators.json").read_text())
     errors = validate_programme(state, gates, generators)
     errors.extend(validate_integrity_documents(root, gates))
+    errors.extend(validate_traceability_requirement(root))
     from scripts.audit_research_sources import validate as validate_research_sources
     errors.extend(validate_research_sources(root))
     for path, expected in [("PROJECT_STATE.md", render_state(state)),

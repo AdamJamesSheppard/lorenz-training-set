@@ -1,5 +1,8 @@
 # Research, method and gate audit — 2026-10-06
 
+Ongoing project-wide authority: [REQ-RT-001](../../RESEARCH_TRACEABILITY.md).
+The dated snapshot remains historical; the requirement governs new work.
+
 Authority: traceability audit requested by the owner. Scientific state and gate
 thresholds remain unchanged. Audit source revision:5262c48, following the FEM
 anchor1781b40ad156f01702aeeb16eaf7e0240ede7378 and subsequent OL decisions.

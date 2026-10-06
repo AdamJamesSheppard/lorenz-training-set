@@ -1,5 +1,9 @@
 # Scientific integrity: evidence must be allowed to contradict the project
 
+Mandatory across all stages: RESEARCH_TRACEABILITY.md (REQ-RT-001).
+Record research/method attribution and evidence for every scientific outcome,
+including failures and open decisions. Missing traceability blocks qualification.
+
 Effective 2026-10-06; owner instruction recorded as OL-D011. Applies to the
 whole repository: FEM/FPE, data generation, operator learning, plots and future
 assimilation. Scientific success is an outcome to investigate, never an output
