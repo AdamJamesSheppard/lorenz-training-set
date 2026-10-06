@@ -13,9 +13,9 @@ Historical interpretation: DECISIONS.md. FEM method status is separate.
   "current_six_law_pilot": "COMPLETED_ENGINEERING_AND_RESTRICTED_LEARNING_PILOT",
   "current_model_scientifically_qualified": false,
   "next_required_gate": "OL-G02_RECONSTRUCTION_STABILITY",
-  "active_blocker": "OL-D014 records bin-free reconstruction candidate approval with reservations. G02 scientific error budget and changed representation qualification remain pending.",
+  "active_blocker": "OL-D020 approves finite-control TV<=0.01 and freezes qualification_v5. Fresh evidence/adjudication and changed representation qualification remain pending.",
   "authorized": [
-    "Prepare versioned bin-free candidate qualification under reserved owner approval; no qualification dispatch before frozen scientific criteria",
+    "Dispatch committed qualification_v5 with approved TV budget, fixed widths and every fresh window retained; review before gate promotion",
     "Inexpensive labelled development diagnostics; no expensive target generation, neural retraining or DA"
   ],
   "locked": [

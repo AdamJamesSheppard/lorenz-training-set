@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "id": "OL-G02_reconstruction_qualification_v5",
+  "gate_id": "OL-G02_RECONSTRUCTION_STABILITY",
+  "kind": "finite_control_reconstruction_qualification",
+  "status": "PREDECLARED",
+  "question": "Does unchanged-width 20k bin-free reconstruction meet the owner-approved 1% TV budget against a declared 80k finite control on fresh windows?",
+  "hypotheses": [
+    "20k temporal sampling resolves this finite law within 1% TV",
+    "Some legitimate windows remain unresolved under this recipe"
+  ],
+  "metrics": [
+    "whole-space paired-box TV upper bounds",
+    "all sampling phases and aligned integration",
+    "raw mass/negative mass",
+    "voxel L1/L2/marginal TVs",
+    "means covariance lobe tail boundary",
+    "heuristic ACF/ESS"
+  ],
+  "thresholds": {
+    "tv_max": 0.01,
+    "mass_error_max": 1e-10,
+    "negative_mass_max": 0,
+    "safety_allowance": 1e-10,
+    "decision": "Every20k case within fixed TV budget and technical invariants; reviewed adjudication required"
+  },
+  "seeds": {
+    "trajectory": [
+      82029,
+      82030,
+      82031,
+      82032,
+      82033,
+      82034
+    ]
+  },
+  "inputs": {
+    "scripts/run_reconstruction_qualification.py": "894080538814441f43bd62f070f247e890848c758c0090b38fad4b5338c4ef21",
+    "operator_learning/reconstruction_controls.py": "ef319bf6ddb90c94dcf4d89d28b36545e0d7763901a04d2b4dc9e081867aa3a6",
+    "operator_learning/reconstruction.py": "9687ec1de3d7d766c74a17f7d79ef5a97aaa299b90a23543960dfc48620c3b5c",
+    "operator_learning/alignment.py": "16dbec8b6f7046d90c15395a229054f0cff47218f50b438a670b8a216a664451",
+    "operator_learning/governance.py": "49912ae3dcf57f37421a9200331821830d2ad3822154f899bad4215213a3a8b5",
+    "docs/operator_learning/RECONSTRUCTION_QUALIFICATION_V5.md": "094e829049b9bd2663132016646fe28ee94d083eb38b0e756a7ba3b7276f755d",
+    "SCIENTIFIC_INTEGRITY.md": "f0208b97e2466c14ec10851da5d07ff39be0af3952491f6890eb43c054c7a97e"
+  },
+  "command": [
+    "env",
+    "OPENBLAS_NUM_THREADS=1",
+    "OMP_NUM_THREADS=1",
+    "./scripts/run-in-env",
+    "python",
+    "scripts/run_reconstruction_qualification.py",
+    "{RUN_DIRECTORY}"
+  ],
+  "runtime_versions": {
+    "python": "3.12.13",
+    "numpy": "2.5.2",
+    "scipy": "1.18.0"
+  },
+  "hardware": {
+    "device": "cpu",
+    "blas_threads": 1,
+    "openmp_threads": 1,
+    "gpu": false,
+    "mpi": false
+  },
+  "required_evidence": [
+    "all six attempts and no outcome-driven exclusions",
+    "all phases/counts",
+    "source/config/provenance/report/seal",
+    "initial states and both paths",
+    "candidate/control conservative arrays",
+    "failures and cost"
+  ],
+  "pass_consequences": "Eligible only for scoped finite-control G02 review; no automatic gate promotion or transfer/DA authorization",
+  "failure_consequences": "Preserve failure; new sampling experiment needs new predeclaration with unchanged budget and widths",
+  "assumptions": [
+    "OL-A01",
+    "Fixed recorded finite occupation law, not continuum truth",
+    "Temporal dependence does not invalidate deterministic coupling bound"
+  ],
+  "review_requirements": "Owner approved1% engineering budget; implementing-agent self-review explicitly labelled, no independent assessor",
+  "bounds": [
+    [
+      -30,
+      30
+    ],
+    [
+      -40,
+      40
+    ],
+    [
+      -10,
+      70
+    ]
+  ],
+  "regions": {
+    "boundary_layers": 4,
+    "transition_width": 2,
+    "tail_z": [
+      5,
+      50
+    ]
+  },
+  "physical_widths": [
+    4,
+    4.444444444444445,
+    4.444444444444445
+  ],
+  "spinup": 20,
+  "window": 10,
+  "integration_steps": [
+    0.000125,
+    0.00025
+  ],
+  "candidate_count": 20000,
+  "control_count": 80000,
+  "sampling_counts": [
+    5000,
+    10000,
+    20000
+  ],
+  "comparison_shapes": [
+    [
+      60,
+      72,
+      72
+    ],
+    [
+      120,
+      144,
+      144
+    ]
+  ],
+  "allowed_untracked": [
+    "scripts/plot_reconstruction_comparison.py"
+  ],
+  "limitations": [
+    "Fresh development windows, no population-uniform guarantee",
+    "Finite control not exact trajectory/invariant law",
+    "No changed FE transfer or learning grid certification",
+    "Deterministic sampling, no independent time samples",
+    "Moment diagnostics have no separate invented thresholds",
+    "Float64 bounds with safety allowance, no interval proof",
+    "No expensive target generation/training/DA"
+  ]
+}

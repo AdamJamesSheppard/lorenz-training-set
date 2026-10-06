@@ -29,8 +29,10 @@ qualification. The original test law has been inspected; reuse for tuning makes
 it development data. G00 passed within the owner-approved restricted attractor-density scope; posterior relevance remains unverified.
 
 OL-D014 records approval with reservations of a bin-free reconstruction candidate.
-G02 remains OPEN pending a frozen error budget and changed representation checks.
-Only bounded development/planning is authorized; no large target campaign or DA.
+Owner subsequently approved finite-control reconstruction TV≤.01 (OL-D020).
+G02 remains OPEN pending fresh qualification_v5 evidence/review and changed
+representation checks. Bounded qualification dispatch is authorized; no large
+target campaign or DA.
 Eventual analysis follows [the full-density Bayesian contract](BAYESIAN_ASSIMILATION_CONTRACT.md).
 
 2026-10-05: user authorized the bounded G00 alignment comparison, predeclared
@@ -51,8 +53,8 @@ Characterization completed and was reviewed under OL-D009; portable evidence:
 docs/operator_learning/evidence/G02_CHARACTERIZATION_20261006.md.
 G02 remains OPEN: scientific reconstruction-error budget and executable recipe
 qualification are pending. Candidate approval under OL-D014 retains reservations.
-The current v3 qualification proposal is a draft, without qualification
-dispatch authority. OL-D015 verifies empirical_v4 and adds an analytic paired-box
+The historical v3 proposal remains a draft; qualification_v5 is now frozen under
+OL-D020. OL-D015 verifies empirical_v4 and adds an analytic paired-box
 bound; see operator_learning/evidence/G02_EMPIRICAL_V4_20261006.md.
 Mechanism_v3 completed; its reviewed evidence is in
 operator_learning/evidence/G02_MECHANISM_V3_20261006.md. Empirical_v4 is authorized

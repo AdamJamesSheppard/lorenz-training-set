@@ -1,5 +1,20 @@
 # Operator-learning decisions
 
+## 2026-10-06 — OL-D020: approve1% budget and freeze fresh G02 qualification
+
+Owner explicitly approves reconstruction TV≤.01 versus the declared finite
+control, with handoff for jobs exceeding one minute. Predeclare qualification_v5
+before dispatch: six fresh seeds, every phase,20k candidate/80k control, fixed
+box widths, conservative grids and aligned integration checks. Full design,
+method/source derivation, competing counts, scope/assumptions and limitations:
+RECONSTRUCTION_QUALIFICATION_V5.md. No old evidence is requalified or overwritten.
+Thresholds remain fixed on failure. Run evidence is immutable; gate stays OPEN
+pending reviewed adjudication, not automatic promotion by a script. Statistical
+diagnostics and finite-control scope do not certify continuum or posterior truth.
+Self-review by implementing agent under direct owner authority; no independent
+assessor. No FPE targets, training or DA. Preserve unrelated untracked plotting
+script, explicitly record it in dirty provenance; tracked sources must be clean.
+
 ## 2026-10-06 — OL-D019: quantify grid-independent finite-control bounds
 
 Owner requests G02 continuation. Read-only post-hoc audit verifies all21 sealed

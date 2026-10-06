@@ -4,10 +4,10 @@
     "docs/research_audit/methods.json": "8167012c99375c28b91458671a998fab876ed2c02f9d35387feb62b876e5c791",
     "docs/research_audit/snapshot_20261006.json": "43da62abd04704f92606e2f75bdf919e46fc0908c477ad84da4cad853c1e0fa8",
     "docs/operator_learning/gates.json": "1ed071b6fa9c8c880b2150d32ac99dd3b3f3cfed197ba0634f8070473765fb82",
-    "docs/operator_learning/state.json": "b5989cdf7c21ea9aab88598587428aa0ae8cf5f821fc6e928810453ac865f602",
+    "docs/operator_learning/state.json": "4235611a3fd31852f66e59c3fcadb6f4363f66dd8f623cd9b72f3ae6b7734e44",
     "docs/operator_learning/CLAIMS.md": "3642804a17bc8d2038472458b8e52d46d8fd4bfbfcadc6bd4c9fad260650eff7",
     "docs/CLAIMS.md": "474a415c96ac74dd48eb3901af68660544549b7b966f549d09d712873ef7977c",
-    "docs/operator_learning/DECISIONS.md": "76e8101cea38b01a032365afa8309235cd88e73fa2f87acc5778a747511ec228",
+    "docs/operator_learning/DECISIONS.md": "0acd9cf6b0d61583892d6f454b4c7347eb0fc49784785a4359381d23d353efe3",
     "docs/DECISIONS.md": "e815b7dd8cd7f274fa88fed0fffc367b34ac32e35a2fffa93c4e694e0189c814",
     "docs/operator_learning/assumptions.yaml": "71e16568f5cc6cb8b3f5856eba3fe3a4a8d090da9616a17750686c06309ea5cf",
     "docs/assumptions.yaml": "51092eeafd2176eadee11442bd8fc9238217a7d772bd797f60ea4c6c5ce844ce",
@@ -21,6 +21,7 @@
     "experiments/operator_learning/OL-G02_reconstruction_characterization_v1.json": "eed26d5a2e9ae764ac32c8399f50c0a898f5ae8cf559c218be2666ba82c17ee5",
     "experiments/operator_learning/OL-G02_reconstruction_empirical_v4.json": "59a89a81660ff804e4e134b64dffd80d7de50be4358c105f67c0d48179e4f6f8",
     "experiments/operator_learning/OL-G02_reconstruction_mechanism_v3.json": "417c1657e0c83f9178245470dafe836824bacc511e307a8a677011be6179a7e6",
+    "experiments/operator_learning/OL-G02_reconstruction_qualification_v5.json": "fc8a1bb304e7c2d5e849053b4bb248cb9177bdcbbf71cd5ad92239c8c952deef",
     "experiments/operator_learning/OL-G02_reconstruction_refinement_v2.json": "9a554146d32f1390f9d58456a092914e93498476030172f9dc02d7e0e4dae37a"
   },
   "relation_vocabulary": [
@@ -5212,6 +5213,14 @@
       "path": "docs/operator_learning/DECISIONS.md"
     },
     {
+      "id": "decision:OL-D020",
+      "kind": "decision",
+      "label": "2026-10-06 — OL-D020: approve1% budget and freeze fresh G02 qualification",
+      "status": "RECORDED_DECISION",
+      "text": "Owner explicitly approves reconstruction TV≤.01 versus the declared finite\ncontrol, with handoff for jobs exceeding one minute. Predeclare qualification_v5\nbefore dispatch: six fresh seeds, every phase,20k candidate/80k control, fixed\nbox widths, conservative grids and aligned integration checks. Full design,\nmethod/source derivation, competing counts, scope/assumptions and limitations:\nRECONSTRUCTION_QUALIFICATION_V5.md. No old evidence is requalified or overwritten.\nThresholds remain fixed on failure. Run evidence is immutable; gate stays OPEN\npending reviewed adjudication, not automatic promotion by a script. Statistical\ndiagnostics and finite-control scope do not certify continuum or posterior truth.\nSelf-review by implementing agent under direct owner authority; no independent\nassessor. No FPE targets, training or DA. Preserve unrelated untracked plotting\nscript, explicitly record it in dirty provenance; tracked sources must be clean.",
+      "path": "docs/operator_learning/DECISIONS.md"
+    },
+    {
       "id": "decision:a13b3c67c70a14d3a5dc7f59",
       "kind": "decision",
       "label": "2026-10-03 - Monograph evidence audit and completed domain record",
@@ -5555,6 +5564,16 @@
       "status": "PREDECLARED",
       "experiment_id": "OL-G02_reconstruction_mechanism_v3",
       "kind_of_run": "bounded_reconstruction_characterization"
+    },
+    {
+      "id": "experiment:experiments/operator_learning/OL-G02_reconstruction_qualification_v5.json",
+      "kind": "experiment",
+      "label": "experiments/operator_learning/OL-G02_reconstruction_qualification_v5.json",
+      "path": "experiments/operator_learning/OL-G02_reconstruction_qualification_v5.json",
+      "availability": "REPOSITORY_POINTER",
+      "status": "PREDECLARED",
+      "experiment_id": "OL-G02_reconstruction_qualification_v5",
+      "kind_of_run": "finite_control_reconstruction_qualification"
     },
     {
       "id": "experiment:experiments/operator_learning/OL-G02_reconstruction_refinement_v2.json",
@@ -15598,6 +15617,13 @@
       "attribution": "HISTORICAL_METADATA_NOT_NEW_ADJUDICATION"
     },
     {
+      "id": "edge:32b9a82420594337c9453fb0",
+      "source": "decision:OL-D020",
+      "relation": "recorded_in",
+      "target": "artifact:docs/operator_learning/DECISIONS.md",
+      "attribution": "ORIGINAL_DECISION_SECTION"
+    },
+    {
       "id": "edge:32c39aa75eaeab4a7dd2a7fa",
       "source": "record:fem:d6c9678a26ed1587529e9af0",
       "relation": "recorded_in",
@@ -17537,6 +17563,13 @@
       "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
     },
     {
+      "id": "edge:573f1fb891598fafd3112d41",
+      "source": "gate:OL-G02_RECONSTRUCTION_STABILITY",
+      "relation": "tested_by",
+      "target": "experiment:experiments/operator_learning/OL-G02_reconstruction_qualification_v5.json",
+      "attribution": "CONFIG_GATE_ID"
+    },
+    {
       "id": "edge:576b91e9cac8e18a279ad0a1",
       "source": "method:ALTERNATIVES",
       "relation": "informed_by",
@@ -17971,6 +18004,13 @@
       "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
     },
     {
+      "id": "edge:5eeb21bce41d298aa3312686",
+      "source": "decision:OL-D020",
+      "relation": "references",
+      "target": "decision:OL-D020",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
+    },
+    {
       "id": "edge:5f104c91f8524486d939cc8f",
       "source": "method:BASELINES",
       "relation": "proposed_for",
@@ -18277,6 +18317,13 @@
       "relation": "documents",
       "target": "artifact:runs/local-q2-crank-nicolson/20260911T165516Z/q2_local_qp_cn_quarter_dt/final_raw_cell_classification_rank0004.json",
       "attribution": "HISTORICAL_METADATA_NOT_NEW_ADJUDICATION"
+    },
+    {
+      "id": "edge:64877bf15d60040ae800c124",
+      "source": "decision:OL-D020",
+      "relation": "references",
+      "target": "artifact:docs/operator_learning/DECISIONS.md",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
     },
     {
       "id": "edge:648f4054e1e50bd3ddcd01c6",

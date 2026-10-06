@@ -49,13 +49,15 @@ Posterior-population relevance remains unverified.
 G02 implementation and controlled study design:
 [reconstruction stability v1](RECONSTRUCTION_STABILITY_G02_V1.md).
 Characterization has completed: [adjudication and limits](evidence/G02_CHARACTERIZATION_20261006.md).
-G02 remains OPEN. Review the [current v3 qualification proposal](RECONSTRUCTION_QUALIFICATION_PROPOSAL_V3.md)
-and approve a scientific error budget before executable predeclaration or dispatch.
+G02 remains OPEN. Owner approved TV≤.01 against the declared finite control;
+[qualification v5](RECONSTRUCTION_QUALIFICATION_V5.md) now freezes the fresh study.
+Earlier v3 proposals and pending-budget decisions remain preserved history.
 No expensive target campaign or model training is included.
 
 Latest continuation: [grid-independent finite-control bound review](evidence/G02_BOUND_REVIEW_20261006.md).
 Sampling phase bounds and aligned finite integration controls are now measured;
-scientific error-budget approval remains the blocking decision.
+The approved budget is now frozen in v5; fresh qualification evidence and review
+are required before any gate promotion.
 
 OL-D010 authorizes the separate bounded CPU-only refinement characterization:
 experiments/operator_learning/OL-G02_reconstruction_refinement_v2.json.
