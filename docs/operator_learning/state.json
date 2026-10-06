@@ -7,9 +7,9 @@
   "current_six_law_pilot": "COMPLETED_ENGINEERING_AND_RESTRICTED_LEARNING_PILOT",
   "current_model_scientifically_qualified": false,
   "next_required_gate": "OL-G02_RECONSTRUCTION_STABILITY",
-  "active_blocker": "G02 bounded characterization authorized for dispatch after phase-A commit; results and scientific reconstruction-error budget await review.",
+  "active_blocker": "G02 characterization completed; histogram sensitivity and an unapproved scientific reconstruction-error budget prevent qualification. Review v2 proposal before any qualification run.",
   "authorized": [
-    "Commit then execute bounded CPU-only G02 reconstruction characterization under frozen config; no automatic scientific pass",
+    "Review completed G02 characterization and draft qualification recipe/error budget; no automatic scientific pass or v2 dispatch",
     "Inexpensive labelled development diagnostics; no expensive target generation, neural retraining or DA"
   ],
   "locked": [
@@ -21,7 +21,7 @@
   ],
   "operator_surrogate_authorized_for_da": false,
   "operator_production_authorized": false,
-  "last_adjudicated_evidence": "OL-D006; evidence/G01_REPRESENTATION_V2_20261005.md; strict v1 failure preserved.",
+  "last_adjudicated_evidence": "OL-D009; evidence/G02_CHARACTERIZATION_20261006.md; technical characterization completed, scientific G02 OPEN; earlier G01 failure preserved.",
   "gates": {
     "OL-G00_PROBABILITY_DISTRIBUTION_ALIGNMENT": "PASSED",
     "OL-G01_REPRESENTATION_CONTRACT": "PASSED",

@@ -1,5 +1,20 @@
 # Operator-learning decisions
 
+## 2026-10-06 — OL-D009: archive G02 characterization; qualification remains OPEN
+
+User requested analysis and continuation. Archive reviewed characterization
+summaries and exact config/provenance/seal under evidence/G02_CHARACTERIZATION_20261006*.
+The sealed run completed306 comparisons and technical invariants. Temporal
+sampling contracts; histogram and regularization materially affect full density.
+Scientific thresholds were not approved, so no scientific pass/fail is invented.
+This supersedes the dispatch-pending current status under OL-D008, preserving
+its historical authority and all raw evidence. Self-reviewed agent adjudication.
+
+Draft v2 proposes fresh-seed sampling/integration/histogram controls. It has no
+execution authority until the reconstruction budget/recipe is approved and
+predeclared. G02 stays OPEN, G03–G17 LOCKED, production/DA unauthorized.
+No solver/model/data changes, new target campaign or neural training occur.
+
 ## 2026-10-06 — OL-D008: permissions restored; authorize committed G02 dispatch
 
 Owner refreshed the execution profile and requested another attempt. Git staging

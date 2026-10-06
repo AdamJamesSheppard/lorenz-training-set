@@ -34,9 +34,10 @@ Posterior-population relevance remains unverified.
 
 G02 implementation and controlled study design:
 [reconstruction stability v1](RECONSTRUCTION_STABILITY_G02_V1.md).
-Commit phase A before execution. This first characterization cannot automatically
-pass G02; a scientific reconstruction-error budget and qualification review are
-still required. No expensive target campaign or model training is included.
+Characterization has completed: [adjudication and limits](evidence/G02_CHARACTERIZATION_20261006.md).
+G02 remains OPEN. Review the [v2 qualification proposal](RECONSTRUCTION_QUALIFICATION_PROPOSAL_V2.md)
+and approve a scientific error budget before executable predeclaration or dispatch.
+No expensive target campaign or model training is included.
 
 ## Standard commands (from repository root)
 

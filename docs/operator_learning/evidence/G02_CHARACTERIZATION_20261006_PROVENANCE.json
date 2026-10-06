@@ -1,0 +1,92 @@
+{
+  "experiment_id": "OL-G02_reconstruction_characterization_v1",
+  "gate_id": "OL-G02_RECONSTRUCTION_STABILITY",
+  "kind": "bounded_reconstruction_characterization",
+  "config_sha256": "eed26d5a2e9ae764ac32c8399f50c0a898f5ae8cf559c218be2666ba82c17ee5",
+  "git_commit": "d4b99a14be12a8fc06eed2c764182a3721e70f39",
+  "git_dirty": false,
+  "git_status": "",
+  "command": [
+    "env",
+    "OPENBLAS_NUM_THREADS=1",
+    "OMP_NUM_THREADS=1",
+    "./scripts/run-in-env",
+    "python",
+    "scripts/run_reconstruction_stability.py",
+    "{RUN_DIRECTORY}"
+  ],
+  "runtime_versions": {
+    "python": "3.12.13",
+    "numpy": "2.5.2",
+    "scipy": "1.18.0"
+  },
+  "hardware": {
+    "device": "cpu",
+    "blas_threads": 1,
+    "openmp_threads": 1,
+    "mpi": false,
+    "gpu": false
+  },
+  "seeds": {
+    "independent_base": 2026100601,
+    "block_base": 2026101601,
+    "historical_seed_base": 71023
+  },
+  "input_hashes": {
+    "operator_learning/reconstruction.py": "9687ec1de3d7d766c74a17f7d79ef5a97aaa299b90a23543960dfc48620c3b5c",
+    "operator_learning/representation.py": "d195c0098e7041be1d5643102322e8b4e9406dcc3c74994890d5a34c76733f1c",
+    "operator_learning/alignment.py": "16dbec8b6f7046d90c15395a229054f0cff47218f50b438a670b8a216a664451",
+    "scripts/run_reconstruction_stability.py": "aebdf3e541f7dc7964005cf41fdbae2d7813b5b2c6cb7470cfaebcd6203dc6c2",
+    "scripts/prepare_operator_run.py": "983aa7bda5bade0efb3cb9c4f1a66d4c6a17d8e920c55186931c8858a2e8db6d",
+    "docs/operator_learning/ACCEPTED_POPULATION_V1.md": "2977a1fe0eafdad7f4ee87ade7ecdb73a9388c41ae7ab83fdd0d3768804e912d",
+    "docs/operator_learning/RECONSTRUCTION_STABILITY_G02_V1.md": "bc1eb1cdfb39fad09149a6b800ab5ffbc39fcb053ecf57aa8827c296e59bbe7d",
+    "runs/neural-pilot/20261004T133438Z/law0/attractor_samples.npy": "20ec5942d9f117aac7603deed1e964fc30de939484c4926f3da9507696d2ce50",
+    "runs/neural-pilot/20261004T133438Z/law0/prior_design.json": "d083dd45a467d375ba089e013d042ceded388362847756b767765f4e160adf5f",
+    "runs/neural-pilot/20261004T133438Z/law1/attractor_samples.npy": "509a5813f5d7177b493d7717eb1df5d9e5017f8d9b06dd1170b9b64bf7e90ea6",
+    "runs/neural-pilot/20261004T133438Z/law1/prior_design.json": "e641c8c7759f76344d9af197c6f5aaf2ffadf954b83390cfa0442c92a4fcd93e",
+    "runs/neural-pilot/20261004T133438Z/law2/attractor_samples.npy": "c78062be49fd0d0b14ffad5585a04846002bc7e61ba365960a172a185258df50",
+    "runs/neural-pilot/20261004T133438Z/law2/prior_design.json": "20a7aede76e031d61e4a118ccae4f62b1854a589dfa9a8cffe20bd59986fbf0c",
+    "runs/neural-pilot/20261004T133438Z/law3/attractor_samples.npy": "10094fc05c69c27e5e4869edb799373efca7cbe75108d0246dcb84d5cdb8d709",
+    "runs/neural-pilot/20261004T133438Z/law3/prior_design.json": "835593fa76052c85b60d20e44233a657f0b90057f2b02f5b6c3cfb06921a73df",
+    "runs/neural-pilot/20261004T133438Z/law4/attractor_samples.npy": "152ae61423a2619c7672db10bd762e3edfb2d75996ea448bf7eb726599c077a3",
+    "runs/neural-pilot/20261004T133438Z/law4/prior_design.json": "00b4153204f738c8c25df615c68d1bde2e39ab57afd5490cb73cb7e0090daf74",
+    "runs/neural-pilot/20261004T133438Z/law5/attractor_samples.npy": "4573722ef4a04ef13c83b63ee2707e62c419623ed03681d803f14967c5e0c4d4",
+    "runs/neural-pilot/20261004T133438Z/law5/prior_design.json": "aa552459a047a466dcdf9e77d8050fe2c78cc6e3d69139a20250a3bb69ade075"
+  },
+  "output_hashes": {
+    "law0_dense_samples.npy": "e5db96f4187224cccadf5b1e8dc04e35034c99102124f83b1b99ea24a4b5d443",
+    "law0_references.npz": "16e6adc9875e66bd78af6fb902189e90e3b2ec7bd918af81a15797957d2fd37b",
+    "law1_dense_samples.npy": "a2dbbcf5ef20edf768a3290d73b035c19a298c2aec46df41d3155ff193a8efbc",
+    "law1_references.npz": "87bb448ceaf7d7e33ee401d0c099e12546ce8ed4f769f6fa515d94d825ee7347",
+    "law2_dense_samples.npy": "02f607085405dd73fea10cb22ba9be8857e8cddded3578c1654cae83d0f8e21d",
+    "law2_references.npz": "0ba48f82e75bf1bb8cb37fd7c769bdbc30a9efc7c866bc3ac5e12519b4960cad",
+    "law3_dense_samples.npy": "6e651eec0031f034326e90c9bd2b8e7674c77b22cc8d9cf0f815fef0cc98ec60",
+    "law3_references.npz": "6471d82ee2b57f0cdf67c4a07a1c44048abb0cca54172ddc00b340b15b95e55b",
+    "law4_dense_samples.npy": "525d0bfa68c2df6d94a6b94cde23298c60424466ce4a379eb833427edcbfb6d6",
+    "law4_references.npz": "db12a431ee72742f5cdd5a1049fb0f3bb615c09b3696a267fb1707d2bc816cfc",
+    "law5_dense_samples.npy": "08f77e65b4f3dd9e1b88ed2b694e3831bf0613728fc0bb081af8e9e6a46f5df9",
+    "law5_references.npz": "7cd0fe9fc8b412daa7b6c75642c4d632943f9c3befe9ce15b1a6cd21e155e40b",
+    "report.json": "d7eafd692649ed6b9108fba6c4197cb6920fbd68ecc118b3ec6e2ea426173377"
+  },
+  "checkpoint_hashes": {},
+  "diagnostics": {
+    "technical_checks_passed": true,
+    "gate_passed": false
+  },
+  "status": "COMPLETED",
+  "actual_command": [
+    "scripts/run_reconstruction_stability.py",
+    "/mnt/large storage/Important/Derby Masters/Original Dissertation Royal Holloway/FENICS Code/NewTest/runs/operator-learning/OL-G02_reconstruction_characterization_v1/20261006T104156003005Z"
+  ],
+  "observed_runtime_versions": {
+    "python": "3.12.13",
+    "numpy": "2.5.2",
+    "scipy": "1.18.0"
+  },
+  "observed_hardware": {
+    "device": "cpu",
+    "platform": "Linux-7.1.5-76070105-generic-x86_64-with-glibc2.39",
+    "blas_threads": 1,
+    "openmp_threads": 1
+  }
+}

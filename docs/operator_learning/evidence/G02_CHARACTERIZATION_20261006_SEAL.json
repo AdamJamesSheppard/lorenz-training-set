@@ -1,0 +1,17 @@
+{
+  "config.json": "eed26d5a2e9ae764ac32c8399f50c0a898f5ae8cf559c218be2666ba82c17ee5",
+  "provenance.json": "654c029c60e854a5702a2ddab2265c7f633afd56e4c129c06ee7d6f8299a8cc2",
+  "law0_dense_samples.npy": "e5db96f4187224cccadf5b1e8dc04e35034c99102124f83b1b99ea24a4b5d443",
+  "law0_references.npz": "16e6adc9875e66bd78af6fb902189e90e3b2ec7bd918af81a15797957d2fd37b",
+  "law1_dense_samples.npy": "a2dbbcf5ef20edf768a3290d73b035c19a298c2aec46df41d3155ff193a8efbc",
+  "law1_references.npz": "87bb448ceaf7d7e33ee401d0c099e12546ce8ed4f769f6fa515d94d825ee7347",
+  "law2_dense_samples.npy": "02f607085405dd73fea10cb22ba9be8857e8cddded3578c1654cae83d0f8e21d",
+  "law2_references.npz": "0ba48f82e75bf1bb8cb37fd7c769bdbc30a9efc7c866bc3ac5e12519b4960cad",
+  "law3_dense_samples.npy": "6e651eec0031f034326e90c9bd2b8e7674c77b22cc8d9cf0f815fef0cc98ec60",
+  "law3_references.npz": "6471d82ee2b57f0cdf67c4a07a1c44048abb0cca54172ddc00b340b15b95e55b",
+  "law4_dense_samples.npy": "525d0bfa68c2df6d94a6b94cde23298c60424466ce4a379eb833427edcbfb6d6",
+  "law4_references.npz": "db12a431ee72742f5cdd5a1049fb0f3bb615c09b3696a267fb1707d2bc816cfc",
+  "law5_dense_samples.npy": "08f77e65b4f3dd9e1b88ed2b694e3831bf0613728fc0bb081af8e9e6a46f5df9",
+  "law5_references.npz": "7cd0fe9fc8b412daa7b6c75642c4d632943f9c3befe9ce15b1a6cd21e155e40b",
+  "report.json": "d7eafd692649ed6b9108fba6c4197cb6920fbd68ecc118b3ec6e2ea426173377"
+}

@@ -1,5 +1,15 @@
 # Operator-learning claim registry
 
+## OL-C-G02 — Conditional temporal-sampling contraction
+
+Class: NUMERICAL. On six frozen windows at the historical histogram/bandwidth,
+median density L1 against the10000-point control contracts from.144690 at250
+points to.006361 at5000. Evidence: evidence/G02_CHARACTERIZATION_20261006.md;
+OL-D009. Falsification: failed replay/hash verification or non-reproducible
+comparisons. Limits: same finite numerical path/control, no continuum order,
+population guarantee, histogram adequacy or scientific G02 pass. Histogram
+and regularization sensitivity remain unresolved.
+
 ## OL-C-G01 — Archived attractor representation consistency
 
 Class: NUMERICAL. Six initial/final archived laws satisfy the explicit G01

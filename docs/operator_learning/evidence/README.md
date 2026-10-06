@@ -103,6 +103,13 @@ data. Future generalization requires new untouched independent laws/families.
 No distribution alignment, reference applicability, generalization, rollout,
 posterior-transfer, DA or production claim follows from this pilot.
 
+## G02 reconstruction characterization
+
+[G02 characterization adjudication](G02_CHARACTERIZATION_20261006.md) records
+technical completion, full-density sensitivity and scientific gate OPEN.
+Exact config/provenance/seal are portable; the full report and dense arrays
+remain ignored local evidence identified by SHA-256. See the draft v2 proposal.
+
 Large arrays, raw exports and checkpoint remain ignored local evidence, absent
 from GitHub/release source archives. The tracked report is portable; raw
 reproduction requires separately archived payloads whose hashes are listed here.
