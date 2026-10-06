@@ -1,5 +1,10 @@
 # Positivity-limited Lorenz-63 Fokker--Planck solver
 
+Mandatory across all stages: [scientific-integrity policy](SCIENTIFIC_INTEGRITY.md).
+Preserve difficult cases and failures; no silent Gaussian/GMM substitution or
+target-informed repair. [Gate integrity audit](docs/operator_learning/INTEGRITY_GATE_AUDIT_20261006.md)
+records acceptable evidence and prohibited promotion for all18 operator gates.
+
 ## Active research programme: operator-learning qualification
 
 Entry point: [docs/operator_learning/README.md](docs/operator_learning/README.md).

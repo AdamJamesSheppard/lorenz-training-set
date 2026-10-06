@@ -154,6 +154,34 @@ def validate_provenance(record):
         raise ValueError("completed evidence must have output hashes")
 
 
+def validate_integrity_documents(root, gates):
+    """Structural controls only; cannot certify semantic honesty or runtime behaviour."""
+    root = Path(root)
+    errors = []
+    policy = root / 'SCIENTIFIC_INTEGRITY.md'
+    audit = root / 'docs/operator_learning/INTEGRITY_GATE_AUDIT_20261006.md'
+    if not policy.is_file():
+        errors.append('missing cross-stage scientific-integrity policy')
+    if not audit.is_file():
+        errors.append('missing gate integrity audit')
+    else:
+        text = audit.read_text()
+        for gate in gates:
+            heading = f"### {gate['id']}\n"
+            if heading not in text:
+                errors.append(f"gate integrity audit missing: {gate['id']}")
+                continue
+            section = text.split(heading, 1)[1].split('\n### ', 1)[0]
+            if 'Acceptable:' not in section or 'Unacceptable:' not in section:
+                errors.append(f"incomplete integrity boundaries: {gate['id']}")
+    for relative in ('AGENTS.md', 'README.md', 'docs/MATH_PROTOCOL.md',
+                     'docs/operator_learning/README.md', 'docs/operator_learning/GOVERNANCE.md'):
+        path = root / relative
+        if not path.is_file() or 'SCIENTIFIC_INTEGRITY.md' not in path.read_text():
+            errors.append(f'missing integrity authority pointer: {relative}')
+    return errors
+
+
 def check_repository(root):
     root = Path(root)
     base = root / "docs/operator_learning"
@@ -161,6 +189,7 @@ def check_repository(root):
     gates = json.loads((base / "gates.json").read_text())
     generators = json.loads((base / "generators.json").read_text())
     errors = validate_programme(state, gates, generators)
+    errors.extend(validate_integrity_documents(root, gates))
     for path, expected in [("PROJECT_STATE.md", render_state(state)),
                            ("GATES.md", render_gates(gates))]:
         if (base / path).read_text() != expected:

@@ -1,5 +1,10 @@
 # Probability and distribution contract — version 1
 
+Integrity authority: ../../SCIENTIFIC_INTEGRITY.md. G02 qualifies the declared
+reconstruction procedure within scope; it does not suppress genuine variation
+or require every input law to approach one attractor-density template. Scope,
+physical regularization and owner approval govern any population change.
+
 Owner-selected current family: [ATTRACTOR_DENSITY_V1](ACCEPTED_POPULATION_V1.md).
 Its concrete law-to-tensor transformations and numerical verification scope are
 specified in [representation contract v1](REPRESENTATION_CONTRACT_V1.md).

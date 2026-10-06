@@ -1,5 +1,23 @@
 # Operator-learning decisions
 
+## 2026-10-06 — OL-D011: prohibit manufactured success across all stages
+
+Owner explicitly requests durable controls and a gate audit following concerns
+over earlier Gaussian choices. Establish SCIENTIFIC_INTEGRITY.md as cross-stage
+authority and AGENTS.md as its task-entry pointer. Preserve accepted full
+attractor-density scope, historical Gaussian/GMM fixtures and all old failures.
+Audit all18 gates in INTEGRITY_GATE_AUDIT_20261006.md: legitimate variation,
+all-attempt accounting, reference validity versus model failure, raw/final
+interventions, target-independent evaluation and scoped generalization.
+
+No Gaussian substitution or population change is authorized. Review finds
+historical normalization/softplus and normalized shape metrics, requiring future
+raw-constraint diagnostics; no new accusation of covert target repair is inferred.
+This is a bounded policy/control audit, not exhaustive code/history certification.
+Self-reviewed implementing agent under owner's direct instruction. No gate pass,
+threshold change, historical evidence modification, solver/training change or
+new run occurs. G02 OPEN, later gates LOCKED; no DA/production authority.
+
 ## 2026-10-06 — OL-D010: authorize second bounded characterization
 
 Owner approved inexpensive finer-reference characterization and requests immediate

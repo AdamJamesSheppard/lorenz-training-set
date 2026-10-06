@@ -1,5 +1,9 @@
 # Mathematical reasoning protocol
 
+Read the cross-stage policy in ../SCIENTIFIC_INTEGRITY.md before scientific work.
+Preserve failed and difficult cases; record population exclusions and output
+interventions. No evidence or figure may manufacture apparent success.
+
 1. Normalize the target statement and define every space, domain, norm,
    boundary condition, parameter, and quantifier that affects it.
 2. List active assumptions and the dependencies of non-universal constants.

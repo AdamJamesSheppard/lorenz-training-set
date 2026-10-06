@@ -1,5 +1,9 @@
 # Research-control protocol
 
+Mandatory cross-stage authority: ../../SCIENTIFIC_INTEGRITY.md.
+Gate-specific acceptance boundaries: INTEGRITY_GATE_AUDIT_20261006.md.
+These supplement the catalogue without changing historical thresholds/decisions.
+
 All dimensions are required: problem scope, targets, assumptions, competing
 hypotheses, architecture/contracts, validation, provenance, accountability,
 change control, resources and reporting. No dimension substitutes for another.

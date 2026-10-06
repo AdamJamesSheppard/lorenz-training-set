@@ -1,5 +1,11 @@
 # Data, run and evaluation contract — version 1
 
+Cross-stage integrity supplement: ../../SCIENTIFIC_INTEGRITY.md (OL-D011).
+Future qualification must include all attempted sample IDs, acceptance/exclusion
+categories, retries/failures and raw/final intervention diagnostics. Scores
+conditioned on valid references must state their denominator and unresolved
+coverage; no target-guided prediction repair is permitted in final evaluation.
+
 ## Dataset identity
 
 An accepted sample records generator metadata, law/family ID, independent

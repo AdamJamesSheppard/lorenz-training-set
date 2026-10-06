@@ -1,5 +1,10 @@
 # Operator-learning research programme
 
+Read [the repository-wide scientific-integrity policy](../../SCIENTIFIC_INTEGRITY.md)
+and [the gate-by-gate integrity audit](INTEGRITY_GATE_AUDIT_20261006.md) before
+implementation/adjudication. Preserve legitimate variation; never manufacture
+apparent success by silently changing populations, outputs or evaluation cases.
+
 Scientific objective: qualify a computational forecast surrogate for full Lorenz
 probability densities relevant to eventual Bayesian assimilation.
 Current stage: **OPERATOR_LEARNING_QUALIFICATION**; eventual application:
