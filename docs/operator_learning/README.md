@@ -49,6 +49,11 @@ The next study concerns G03 diversity, retaining attractor densities without
 assuming that different seeds supply different laws.
 Posterior-population relevance remains unverified.
 
+G03 starts with [bounded within/between-law characterization](INPUT_DIVERSITY_G03_V1.md).
+All six G02 windows and four sampling phases are retained. Distinct finite-law
+evidence does not establish universal initial-condition or population coverage.
+Commit predeclaration before dispatch; OL-D023 records restored Git write access.
+
 G02 implementation and controlled study design:
 [reconstruction stability v1](RECONSTRUCTION_STABILITY_G02_V1.md).
 Characterization has completed: [adjudication and limits](evidence/G02_CHARACTERIZATION_20261006.md).

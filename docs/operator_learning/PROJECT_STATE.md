@@ -13,9 +13,9 @@ Historical interpretation: DECISIONS.md. FEM method status is separate.
   "current_six_law_pilot": "COMPLETED_ENGINEERING_AND_RESTRICTED_LEARNING_PILOT",
   "current_model_scientifically_qualified": false,
   "next_required_gate": "OL-G03_INPUT_DIVERSITY",
-  "active_blocker": "G03 must separate between-law diversity from within-law reconstruction variation; changed bin-free FE transfer and reference/export qualification remain unverified.",
+  "active_blocker": "OL-D023 restores G03 characterization dispatch. Results/review and population coverage remain pending; changed FE transfer and reference/export qualification remain unverified.",
   "authorized": [
-    "Design and predeclare G03 diversity assessment using the scoped20k finite-control reconstruction; no automatic expensive dispatch",
+    "Commit and dispatch bounded G03 characterization_v1 under OL-D023; no expensive targets, training or DA",
     "Inexpensive labelled diagnostics; no expensive targets, neural retraining or DA"
   ],
   "locked": [

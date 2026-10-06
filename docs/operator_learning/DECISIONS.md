@@ -1,5 +1,32 @@
 # Operator-learning decisions
 
+## 2026-10-06 — OL-D023: restore G03 predeclaration and bounded dispatch
+
+Owner restores full access and requests retry. Git staging now succeeds.
+Commit the prepared bounded G03 characterization before launch, preserve prior
+restricted-session validation/errors and unrelated plotting script. Refresh only
+the design input hash for this provenance/access note; mathematical design,
+72within/30between comparisons and characterization-only authority unchanged.
+Use persistent local CPU job; hand back after verified launch with provisional
+30–90s ETA. G03 remains OPEN; no targets, training or DA. Self-review under owner
+instruction, no independent assessor or population-coverage qualification.
+
+## 2026-10-06 — OL-D022: start bounded G03 within/between-law characterization
+
+Owner asks to start G03. Prepare INPUT_DIVERSITY_G03_V1.md and config using all
+six sealed G02 windows and four20k phase reconstructions per fixed law;72 within
+and30 between-grid comparisons. Account for each law's prior error bounds using
+TV triangle inequality and contractive export. Retain unresolved pairs/failures;
+no population changes, Gaussian fitting, bandwidth tuning or new expensive targets.
+Method/source/derivation and competing interpretations are explicit in the design.
+Technical completion cannot pass G03: population coverage remains unqualified.
+No run without Git predeclaration; current read-only.git access is a dispatch
+blocker, not authority to bypass provenance. Self-reviewed implementer under
+direct owner instruction, no independent assessor. G03 OPEN; later gates LOCKED.
+Validation and environment failure record: evidence/G03_IMPLEMENTATION_VALIDATION_20261006.md.
+Operator tests78passed/1skipped; full suite has one MPI initialization failure
+under restricted socket permissions. No scientific output or full-CI pass claimed.
+
 ## 2026-10-06 — OL-D021: PASSED_SCOPED_FINITE_CONTROL_V5; open G03
 
 Owner requests adjudication. Sealed qualification_v5 at predeclaration651eec5:
