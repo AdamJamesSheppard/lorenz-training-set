@@ -1,5 +1,35 @@
 # Operator-learning decisions
 
+## 2026-10-06 — OL-D008: permissions restored; authorize committed G02 dispatch
+
+Owner refreshed the execution profile and requested another attempt. Git staging
+succeeds and ./scripts/check reports90passed,1skipped, including MPI consistency.
+Commit the existing frozen G02 characterization before dispatch and run it as a
+persistent CPU-only local job. No threshold, input-family or historical evidence
+changes. G02 remains OPEN: execution approval does not approve scientific results.
+No FEM target campaign, neural training, posterior transfer or DA starts.
+
+## 2026-10-06 — OL-D007: implement bounded G02 characterization; do not presume stability
+
+Owner requested G02. Retain ATTRACTOR_DENSITY_V1 and implement the controlled
+study in RECONSTRUCTION_STABILITY_G02_V1.md. Dense replay holds each physical
+window fixed; random time-index reconstructions are independent conditional on
+that discrete path, while block/ACF diagnostics explicitly retain dependence
+limitations. Fixed physical smoothing separates histogram changes from bandwidth
+changes as far as the existing vertex lifting allows. Different bandwidths are
+different regularized laws, never hidden replacements of historical inputs.
+
+Technical invariants and design are frozen in the characterization config.
+No scientifically justified absolute reconstruction-error budget is currently
+approved. Characterization completion must leave G02 OPEN. Review its results,
+then predeclare a qualification recipe/budget and fresh evidence; no retrospective
+conversion of these technical thresholds into a scientific pass.
+
+At implementation this session's filesystem grants read-only .git access.
+The predeclaration commit is required before dispatch, so no scientific run is
+authorized to bypass that restriction. No FEM targets, training, DA experiments
+or historical-data changes occur. G03 and all later gates remain LOCKED.
+
 ## 2026-10-05 — OL-D006: scoped G01 passes; G02 is next
 
 v2 predeclared at9198921 passes all frozen checks on six initial/final archived

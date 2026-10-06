@@ -1,6 +1,6 @@
 # Operator-learning current state
 
-Updated: 2026-10-05. Canonical encoding: state.json; this exact mirror is checked.
+Updated: 2026-10-06. Canonical encoding: state.json; this exact mirror is checked.
 Historical interpretation: DECISIONS.md. FEM method status is separate.
 
 ```json
@@ -13,10 +13,10 @@ Historical interpretation: DECISIONS.md. FEM method status is separate.
   "current_six_law_pilot": "COMPLETED_ENGINEERING_AND_RESTRICTED_LEARNING_PILOT",
   "current_model_scientifically_qualified": false,
   "next_required_gate": "OL-G02_RECONSTRUCTION_STABILITY",
-  "active_blocker": "G02 sample-size, temporal-dependence, histogram and smoothing stability require predeclaration and evidence.",
+  "active_blocker": "G02 bounded characterization authorized for dispatch after phase-A commit; results and scientific reconstruction-error budget await review.",
   "authorized": [
-    "Design and predeclare bounded G02 attractor-density reconstruction stability study",
-    "Inexpensive explicitly labelled development diagnostics; no expensive target campaign or neural retraining"
+    "Commit then execute bounded CPU-only G02 reconstruction characterization under frozen config; no automatic scientific pass",
+    "Inexpensive labelled development diagnostics; no expensive target generation, neural retraining or DA"
   ],
   "locked": [
     "Large expensive target campaigns",
@@ -47,6 +47,7 @@ Historical interpretation: DECISIONS.md. FEM method status is separate.
     "OL-G15_ACCURACY_COST": "LOCKED",
     "OL-G16_POSTERIOR_TRANSFER": "LOCKED",
     "OL-G17_SEQUENTIAL_INTERFACE": "LOCKED"
-  }
+  },
+  "updated": "2026-10-06"
 }
 ```

@@ -1,6 +1,6 @@
 # Project current state
 
-Updated: 2026-10-05
+Updated: 2026-10-06
 
 ## Current programme authority
 
@@ -24,8 +24,8 @@ learning. Its statistical, marginal, lobe and boundary errors prevent surrogate
 qualification. The original test law has been inspected; reuse for tuning makes
 it development data. G00 passed within the owner-approved restricted attractor-density scope; posterior relevance remains unverified.
 
-Only inexpensive labelled development diagnostics and G02 reconstruction
-stability design are authorized. No large new target campaign or operator-assisted DA.
+Only inexpensive labelled development diagnostics and the bounded G02
+characterization, after its predeclaration is committed, are authorized. No large new target campaign or operator-assisted DA.
 
 2026-10-05: user authorized the bounded G00 alignment comparison, predeclared
 in experiments/operator_learning/OL-G00_alignment_v2.json. This generates only
@@ -38,6 +38,11 @@ Owner subsequently selected the restricted attractor-density family (OL-D004),
 passing scoped G00 and opening G01. G01 v2 subsequently passed under OL-D006;
 G02 reconstruction stability is next. The mixed proposal is not approved.
 No expensive target-generation permission has changed.
+
+G02 implementation: docs/operator_learning/RECONSTRUCTION_STABILITY_G02_V1.md;
+OL-D007 records the characterization design. Permissions restored under OL-D008; dispatch is authorized after the
+mandatory phase-A commit. G02 remains OPEN, with no approved scientific
+reconstruction-error budget; characterization alone cannot pass it.
 
 ## FEM evidence remains separate
 

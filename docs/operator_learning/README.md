@@ -32,6 +32,12 @@ under OL-D004; the mixed proposal remains historical. Read the explicit
 The next study concerns G02 reconstruction stability, retaining attractor densities.
 Posterior-population relevance remains unverified.
 
+G02 implementation and controlled study design:
+[reconstruction stability v1](RECONSTRUCTION_STABILITY_G02_V1.md).
+Commit phase A before execution. This first characterization cannot automatically
+pass G02; a scientific reconstruction-error budget and qualification review are
+still required. No expensive target campaign or model training is included.
+
 ## Standard commands (from repository root)
 
 - `python scripts/check_operator_learning.py`: dependency-free canonical checks.

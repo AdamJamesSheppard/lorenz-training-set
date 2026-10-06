@@ -92,10 +92,19 @@
     "prerequisites": [
       "OL-G01_REPRESENTATION_CONTRACT"
     ],
-    "frozen_experiment_definition": "Commit a versioned, non-DRAFT config and its hash before execution; current programme catalogue is not an executable predeclaration.",
-    "evidence_required": "Convergence and dependence-aware uncertainty reports; document N/A with proof of no reconstruction stage.",
+    "frozen_experiment_definition": "RECONSTRUCTION_STABILITY_G02_V1.md; bounded characterization config must be committed before execution; later scientific qualification needs a new error-budget predeclaration",
+    "evidence_required": "Bitwise trajectory replay, count/phase/independent-reconstruction and histogram/bandwidth sensitivity, observable-specific ACF/ESS limitations, sealed source/output provenance; qualification requires approved error budget and fresh evidence",
     "metrics": "Sample-count/bandwidth/grid/window sensitivity, observable autocorrelation/ESS, independent replicates.",
-    "predeclared_thresholds": "TO_BE_PREDECLARED_BEFORE_RUN",
+    "predeclared_thresholds": {
+      "characterization_technical": {
+        "mass_error_max": 1e-10,
+        "negative_mass_max": 0,
+        "historical_replay_bitwise_equal": true,
+        "technical_completion": "Every frozen law/comparison and required metadata recorded; hashes/provenance/seal complete",
+        "scientific_qualification": "NOT_AUTHORIZED_BY_CHARACTERIZATION: gate stays OPEN pending owner-reviewed reconstruction recipe and scientifically justified error budget, followed by a new predeclared qualification run"
+      },
+      "qualification_error_budget": "TO_BE_PREDECLARED_BEFORE_RUN"
+    },
     "pass_condition": "All frozen scientific and provenance criteria pass; named reviewer and approver record scope and limitations.",
     "failure_condition": "Any required criterion fails or evidence is missing; missing evidence remains OPEN rather than a fabricated FAIL/PASS.",
     "what_passing_unlocks": "OL-G03_INPUT_DIVERSITY design/qualification only; no automatic production or DA authorization.",
@@ -105,7 +114,7 @@
     "relevant_assumptions": [
       "OL-A01"
     ],
-    "experiment_config": "TO_BE_PREDECLARED_BEFORE_RUN",
+    "experiment_config": "experiments/operator_learning/OL-G02_reconstruction_characterization_v1.json",
     "evidence_run": null,
     "decision_status": "OPEN",
     "adjudication": null

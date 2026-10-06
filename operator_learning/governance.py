@@ -24,7 +24,7 @@ GENERATOR_FIELDS = {
 
 def render_state(state):
     return ("# Operator-learning current state\n\n"
-            "Updated: 2026-10-05. Canonical encoding: state.json; this exact mirror is checked.\n"
+            f"Updated: {state.get('updated', '2026-10-05')}. Canonical encoding: state.json; this exact mirror is checked.\n"
             "Historical interpretation: DECISIONS.md. FEM method status is separate.\n\n"
             "```json\n" + json.dumps(state, indent=2) + "\n```\n")
 
