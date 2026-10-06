@@ -46,7 +46,10 @@ No expensive target campaign or model training is included.
 
 OL-D010 authorizes the separate bounded CPU-only refinement characterization:
 experiments/operator_learning/OL-G02_reconstruction_refinement_v2.json.
-It tests fresh trajectories and finer controls, without qualification thresholds.
+It completed with unresolved histogram/burn-in sensitivity. OL-D012 authorizes
+[mechanism characterization v3](RECONSTRUCTION_MECHANISM_G02_V3.md), using one
+common post-burn-in start and a labelled exact-box diagnostic, without replacing
+the accepted density recipe or creating scientific qualification thresholds.
 
 ## Standard commands (from repository root)
 

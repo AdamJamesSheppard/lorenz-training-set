@@ -7,9 +7,9 @@
   "current_six_law_pilot": "COMPLETED_ENGINEERING_AND_RESTRICTED_LEARNING_PILOT",
   "current_model_scientifically_qualified": false,
   "next_required_gate": "OL-G02_RECONSTRUCTION_STABILITY",
-  "active_blocker": "G02 scientific error budget unapproved. OL-D010 authorizes committed CPU-only refinement characterization v2, without scientific gate promotion.",
+  "active_blocker": "G02 scientific error budget unapproved; v2 sensitivity unresolved. OL-D012 authorizes common-start and exact-box mechanism characterization v3 without population change or gate promotion.",
   "authorized": [
-    "Commit then dispatch bounded CPU-only OL-G02_reconstruction_refinement_v2 characterization; qualification draft remains unauthorized",
+    "Commit then dispatch bounded CPU-only OL-G02_reconstruction_mechanism_v3 characterization; qualification draft remains unauthorized",
     "Inexpensive labelled development diagnostics; no expensive target generation, neural retraining or DA"
   ],
   "locked": [
@@ -21,7 +21,7 @@
   ],
   "operator_surrogate_authorized_for_da": false,
   "operator_production_authorized": false,
-  "last_adjudicated_evidence": "OL-D009; evidence/G02_CHARACTERIZATION_20261006.md; technical characterization completed, scientific G02 OPEN; earlier G01 failure preserved.",
+  "last_adjudicated_evidence": "OL-D012; refinement_v2/20261006T105310213234Z reviewed: technical completion, scientific G02 OPEN; OL-D009 earlier characterization preserved.",
   "gates": {
     "OL-G00_PROBABILITY_DISTRIBUTION_ALIGNMENT": "PASSED",
     "OL-G01_REPRESENTATION_CONTRACT": "PASSED",

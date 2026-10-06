@@ -1,5 +1,21 @@
 # Operator-learning decisions
 
+## 2026-10-06 — OL-D012: isolate G02 reconstruction mechanisms
+
+Owner asks to continue G02 under the new integrity policy. Reviewed refinement_v2:
+96 comparisons completed in11.781s;21 sealed files verified on prior check.
+On finer comparison grid median histogram L1 .05483 (45→60), .11566 (60→90),
+and full-burn-in integration difference .42664. These establish sensitivity,
+not continuum truth or disqualification of fixed recorded occupation inputs.
+All original evidence remains immutable; fresh diagnosticmechanism_v3 uses
+common saved post-burn-in initial states and a labelled exact-box integration
+control to separate discretized smoothing/lifting from histogram effects.
+Source and config must be committed first; CPU-only132 comparisons, all attempt
+counts/raw invariants retained. No accepted recipe, targets or model changed.
+G02 OPEN, later gates LOCKED; characterization has no scientific pass authority.
+Self-reviewed implementing agent; owner approval covers this bounded diagnostic,
+not its outcomes. Stop/handoff once running with provisional ETA.
+
 ## 2026-10-06 — OL-D011: prohibit manufactured success across all stages
 
 Owner explicitly requests durable controls and a gate audit following concerns

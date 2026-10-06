@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "gate_id": "OL-G02_RECONSTRUCTION_STABILITY",
+  "status": "PREDECLARED",
+  "runtime_versions": {
+    "python": "3.12.13",
+    "numpy": "2.5.2",
+    "scipy": "1.18.0"
+  },
+  "hardware": {
+    "device": "cpu",
+    "blas_threads": 1,
+    "openmp_threads": 1,
+    "mpi": false,
+    "gpu": false
+  },
+  "bounds": [
+    [
+      -30,
+      30
+    ],
+    [
+      -40,
+      40
+    ],
+    [
+      -10,
+      70
+    ]
+  ],
+  "regions": {
+    "boundary_layers": 4,
+    "transition_width": 2,
+    "tail_z": [
+      5,
+      50
+    ]
+  },
+  "id": "OL-G02_reconstruction_mechanism_v3",
+  "kind": "bounded_reconstruction_characterization",
+  "question": "Does common-start integration and exact continuous-box reconstruction localize the G02 sensitivity?",
+  "hypotheses": [
+    "Different burn-in states confound full-path integration comparison",
+    "Vertex lifting or discrete filtering contributes to noncontracting histogram discrepancies",
+    "Exact continuous-box convolution may contract differently without changing accepted inputs"
+  ],
+  "metrics": [
+    "physical density L1/TV",
+    "marginal TVs",
+    "mean and relative covariance",
+    "lobe and boundary discrepancies",
+    "mass and negative mass"
+  ],
+  "thresholds": {
+    "mass_error_max": 1e-10,
+    "negative_mass_max": 0,
+    "technical_completion": "All 132 comparisons and sealed outputs; raw mass before normalization",
+    "scientific_qualification": "CHARACTERIZATION_ONLY: G02 stays OPEN; no approved scientific error budget"
+  },
+  "seeds": {
+    "trajectory": [
+      71029,
+      71030,
+      71031,
+      71032,
+      71033,
+      71034
+    ]
+  },
+  "command": [
+    "env",
+    "OPENBLAS_NUM_THREADS=1",
+    "OMP_NUM_THREADS=1",
+    "./scripts/run-in-env",
+    "python",
+    "scripts/run_reconstruction_mechanism.py",
+    "{RUN_DIRECTORY}"
+  ],
+  "required_evidence": [
+    "identical common post-burn-in initial states",
+    "132 comparisons on two grids",
+    "historical and diagnostic-control arrays/hashes",
+    "all attempts, exclusions and partial failures",
+    "config/provenance/report/seal"
+  ],
+  "pass_consequences": "Technical characterization only; G02 OPEN and G03 LOCKED",
+  "failure_consequences": "Preserve failure and diagnostics; no gate unlock",
+  "assumptions": [
+    "OL-A01",
+    "Finite-window occupation, not invariant-law estimate",
+    "Fixed physical top-hat, grid-dependent vertex lifting"
+  ],
+  "review_requirements": "Owner reviews sensitivity before any qualification error budget",
+  "scientific_adjudication": "CHARACTERIZATION_ONLY_G02_OPEN",
+  "spinup": 20,
+  "window": 10,
+  "integration_steps": [
+    0.001,
+    0.0005
+  ],
+  "sampling_counts": [
+    5000,
+    10000,
+    20000
+  ],
+  "comparison_shapes": [
+    [
+      60,
+      72,
+      72
+    ],
+    [
+      120,
+      144,
+      144
+    ]
+  ],
+  "histogram_shapes": [
+    [
+      45,
+      54,
+      54
+    ],
+    [
+      60,
+      72,
+      72
+    ],
+    [
+      90,
+      108,
+      108
+    ],
+    [
+      120,
+      144,
+      144
+    ]
+  ],
+  "physical_widths": [
+    4.0,
+    4.444444444444445,
+    4.444444444444445
+  ],
+  "limitations": [
+    "Exact box control is diagnostic and does not replace accepted law",
+    "Common-start paths still accumulate chaotic divergence over ten units",
+    "Finite histogram/reference controls do not bound continuum error",
+    "Normalized shape metrics accompanied by raw invariants",
+    "Roundoff floor only on analytic transfer entries in [-1e-10,0]",
+    "No target generation/training/DA or scientific pass"
+  ],
+  "inputs": {
+    "scripts/run_reconstruction_mechanism.py": "fd24a51e2a861e3489b06f075187e8f96a2e83bed71dc1713c75e81599ac47f7",
+    "operator_learning/reconstruction_controls.py": "9fb54d5221e5727e5a5e3e91e02bc04914c4d880f1abec1c47c2692f93635499",
+    "operator_learning/reconstruction.py": "9687ec1de3d7d766c74a17f7d79ef5a97aaa299b90a23543960dfc48620c3b5c",
+    "operator_learning/alignment.py": "16dbec8b6f7046d90c15395a229054f0cff47218f50b438a670b8a216a664451",
+    "operator_learning/representation.py": "d195c0098e7041be1d5643102322e8b4e9406dcc3c74994890d5a34c76733f1c",
+    "operator_learning/governance.py": "df4d5c422a39b2168a5d59dcafa273a9f5c1cfe8663f1060f41847269a779cdd",
+    "scripts/prepare_operator_run.py": "983aa7bda5bade0efb3cb9c4f1a66d4c6a17d8e920c55186931c8858a2e8db6d",
+    "docs/operator_learning/RECONSTRUCTION_MECHANISM_G02_V3.md": "fe4336e797d446194b9b05c0f35ce5cc552099d90d1b80bfef1e9052d821783a",
+    "SCIENTIFIC_INTEGRITY.md": "e5c263269393a0dff32f0c9594e3b97e5b7537aff697ebd865f650dec095c658",
+    "runs/operator-learning/OL-G02_reconstruction_refinement_v2/20261006T105310213234Z/seed71029_paths.npz": "c62e350d64da047a85eb8c961836023a9b4695174b736663e9471b2b7fbc26b1",
+    "runs/operator-learning/OL-G02_reconstruction_refinement_v2/20261006T105310213234Z/seed71030_paths.npz": "eb3ae8b25fb300859aaa812b25081af4cf8761c107f2a3c29d2f452417c2b06f",
+    "runs/operator-learning/OL-G02_reconstruction_refinement_v2/20261006T105310213234Z/seed71031_paths.npz": "64c58738ff0aa9b98b6f9ade16637fc2683fea23ee9a45145f62a3bbe37480c4",
+    "runs/operator-learning/OL-G02_reconstruction_refinement_v2/20261006T105310213234Z/seed71032_paths.npz": "9dd795c8e39d0936efbc4c46bea11ff9d40769080140b1f750074774686b3fb5",
+    "runs/operator-learning/OL-G02_reconstruction_refinement_v2/20261006T105310213234Z/seed71033_paths.npz": "97a3dc200b534bf32d1b2c59c2854736a57b09d1cc96c180ab9678a1f7cee618",
+    "runs/operator-learning/OL-G02_reconstruction_refinement_v2/20261006T105310213234Z/seed71034_paths.npz": "a9eada1a0f5f2e67a4a8e1939e6a7c2751bdaf1a08a65cb42d501fbba9ceb547",
+    "runs/operator-learning/OL-G02_reconstruction_refinement_v2/20261006T105310213234Z/seal.json": "2a9b65c74469b1b8346ec1af5f1c93356f48fc5ed9e822183a781fc01fc7dbcb"
+  },
+  "source_run": "runs/operator-learning/OL-G02_reconstruction_refinement_v2/20261006T105310213234Z"
+}
