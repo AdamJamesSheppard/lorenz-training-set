@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "method": {
+    "id": "PROVENANCE_GRAPH",
+    "version": 1,
+    "attribution": "PROJECT_ENGINEERING_DESIGN_WITH_CURRENT_PROVENANCE_RESEARCH_CONTEXT",
+    "definition": "Deterministic typed JSON node/edge projection of recorded research artifacts; token-AND text search and bounded breadth-first relationship traversal.",
+    "purpose": "Recover evidence and research behind successful, failed, open and superseded records without requiring chat history.",
+    "implementation": ["operator_learning/research_graph.py", "scripts/research_graph.py"],
+    "assumptions_and_limits": "Existing records are authoritative only within their recorded scope. Graph links do not prove scientific claims or supply missing raw evidence. No PROV serialization/conformance claim, graph database or learned inference is used.",
+    "verification": "Deterministic rebuild, unique IDs, typed attributed edges, endpoint resolution, source freshness, all18 gates, positive and negative outcomes, query/traversal and cycle/error tests. Software checks only; no scientific gate promotion."
+  },
+  "sources": [
+    {
+      "id": "W3C-PROV",
+      "title": "W3C PROV Overview (Working Group Note, 30 April 2013) and PROV Model Primer",
+      "urls": ["https://www.w3.org/TR/prov-overview/", "https://www.w3.org/TR/prov-primer/"],
+      "attribution": "CURRENT_RESEARCH_20261006",
+      "use": "Conceptual distinction between entities/artifacts, activities and provenance relationships; motivation for explicit attribution. Project relationship vocabulary is custom.",
+      "verification": "Official overview/primer descriptions checked; no PROV compliance or imported scientific theorem claim."
+    }
+  ]
+}

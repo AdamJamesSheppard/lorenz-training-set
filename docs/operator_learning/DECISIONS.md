@@ -1,5 +1,20 @@
 # Operator-learning decisions
 
+## 2026-10-06 — OL-D018: build searchable provenance graph including successes
+
+Owner requests implementation and explicitly includes successful results, not
+only failures. Add typed graph projection/query tools under REQ-RT-001, linked
+to method/source registers, all 18 gates, experiments/runs, original decision
+sections, historical component outcomes, claims, assumptions and authorizations.
+Success/failure/open/process-completion statuses remain distinct; positive
+component results do not invent aggregate passes. Contextual citations never
+automatically become support/proof edges. W3C PROV is conceptual guidance,
+recorded in ../research_audit/graph_sources.json; custom schema, no conformance
+claim. BFS/search, deterministic rebuild/freshness and structural tests are
+engineering checks. Dated audit snapshots and all original evidence preserved.
+No scientific gate/model/solver/authorization changes or expensive run.
+Implementing-agent self-review under direct owner instruction.
+
 ## 2026-10-06 — OL-D017: require project-wide research traceability
 
 Direct owner instruction makes the audit discipline mandatory across all stages.

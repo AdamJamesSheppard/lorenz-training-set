@@ -20,5 +20,8 @@ criteria and recorded adjudication; documentation changes do not promote gates.
 Run python3 scripts/check_operator_learning.py and relevant inexpensive tests.
 For scientific gate work consult docs/research_audit/README.md and record the
 method/source attribution and applicability gaps for each new outcome.
+Use docs/research_audit/GRAPH.md and scripts/research_graph.py to retrieve related
+methods, research and positive/negative outcomes; rebuild the graph after reviewed
+source changes. Graph connectivity is not proof or new scientific authorization.
 For a persistent job, confirm launch and hand back with a measured/provisional ETA;
 do not keep a conversation waiting for a scientific run to finish.

@@ -9,6 +9,9 @@ anchor1781b40ad156f01702aeeb16eaf7e0240ede7378 and subsequent OL decisions.
 
 ## What is recorded
 
+[Searchable provenance graph](GRAPH.md): stable typed node/edge register and local
+search/traversal CLI, covering successful outcomes as well as failures/open records.
+
 - [Method register](methods.json): implemented methods, failed alternatives,
   historical fixtures, approved-but-unqualified candidates and future methods;
   implementation/evidence pointers, research-source IDs and applicability limits.

@@ -28,6 +28,8 @@ engineering/restricted-learning milestone, not a qualification-gate pass.
 Research used for gate decisions is indexed in the
 [cross-stage research audit](../research_audit/README.md), including preserved
 G01 failure, G02 open characterizations and prospective-only later-gate sources.
+Use the [searchable provenance graph](../research_audit/GRAPH.md) to trace both
+successful and unsuccessful outcomes through their research and evidence.
 
 **NEXT_REQUIRED_GATE = OL-G02_RECONSTRUCTION_STABILITY.**
 G00 passed within the owner-selected attractor-density scope. G01 passed scoped representation checks. G02 is OPEN; G03–G17 are LOCKED. Large target campaigns, qualified

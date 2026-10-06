@@ -209,6 +209,8 @@ def check_repository(root):
     errors.extend(validate_traceability_requirement(root))
     from scripts.audit_research_sources import validate as validate_research_sources
     errors.extend(validate_research_sources(root))
+    from operator_learning.research_graph import check_graph
+    errors.extend(check_graph(root))
     for path, expected in [("PROJECT_STATE.md", render_state(state)),
                            ("GATES.md", render_gates(gates))]:
         if (base / path).read_text() != expected:
