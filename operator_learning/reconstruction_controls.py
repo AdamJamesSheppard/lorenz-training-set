@@ -57,3 +57,41 @@ def exact_box_histogram_density(samples, bounds, histogram_shape, widths, shape)
     density = np.einsum('ai,bj,ck,ijk->abc', *matrices, hist/len(cloud), optimize=True)
     dv = np.prod([(hi-lo)/n for (lo, hi), n in zip(bounds, shape)])
     return density, float(density.sum()*dv)
+
+
+def empirical_box_density(samples, bounds, widths, shape):
+    """Exact voxel integrals of the empirical measure convolved with a box.
+
+    Sum individual box/voxel overlap volumes. No histogram, state refit,
+    normalization or support masking. Kernel mass outside the box is reported.
+    This is a finite-sample regularized-law control, not continuum truth.
+    """
+    cloud = np.asarray(samples, dtype=float)
+    bounds, widths, shape = np.asarray(bounds), np.asarray(widths), np.asarray(shape)
+    if cloud.ndim != 2 or cloud.shape[1] != 3 or not len(cloud) or not np.isfinite(cloud).all():
+        raise ValueError('Finite nonempty xyz samples required')
+    if bounds.shape != (3, 2) or widths.shape != (3,) or shape.shape != (3,):
+        raise ValueError('Three-dimensional contract required')
+    if np.any(widths <= 0) or np.any(shape <= 0) or np.any(shape != shape.astype(int)):
+        raise ValueError('Positive kernel widths and integer grid shape required')
+    lower, upper = bounds[:, 0], bounds[:, 1]
+    if np.any(upper <= lower) or np.any(cloud < lower) or np.any(cloud > upper):
+        raise ValueError('Ordered box and in-box samples required; no clipping')
+    shape = shape.astype(int)
+    spacing = (upper-lower)/shape
+    probability = np.zeros(tuple(shape), dtype=float)
+    scale = 1/(len(cloud)*np.prod(widths))
+    for point in cloud:
+        left, right = point-widths/2, point+widths/2
+        starts = np.maximum(0, np.floor((left-lower)/spacing).astype(int))
+        stops = np.minimum(shape, np.ceil((right-lower)/spacing).astype(int))
+        overlaps = []
+        for axis in range(3):
+            indices = np.arange(starts[axis], stops[axis])
+            edges = lower[axis]+indices*spacing[axis]
+            overlaps.append(np.maximum(0, np.minimum(edges+spacing[axis], right[axis])-
+                                          np.maximum(edges, left[axis])))
+        slices = tuple(slice(a, b) for a, b in zip(starts, stops))
+        probability[slices] += (overlaps[0][:, None, None]*overlaps[1][None, :, None]*
+                               overlaps[2][None, None, :])*scale
+    return probability/np.prod(spacing), float(probability.sum())

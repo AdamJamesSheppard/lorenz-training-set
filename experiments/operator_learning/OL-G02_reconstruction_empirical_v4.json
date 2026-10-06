@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "gate_id": "OL-G02_RECONSTRUCTION_STABILITY",
+  "status": "PREDECLARED",
+  "runtime_versions": {
+    "python": "3.12.13",
+    "numpy": "2.5.2",
+    "scipy": "1.18.0"
+  },
+  "hardware": {
+    "device": "cpu",
+    "blas_threads": 1,
+    "openmp_threads": 1,
+    "mpi": false,
+    "gpu": false
+  },
+  "bounds": [
+    [
+      -30,
+      30
+    ],
+    [
+      -40,
+      40
+    ],
+    [
+      -10,
+      70
+    ]
+  ],
+  "regions": {
+    "boundary_layers": 4,
+    "transition_width": 2,
+    "tail_z": [
+      5,
+      50
+    ]
+  },
+  "id": "OL-G02_reconstruction_empirical_v4",
+  "kind": "bounded_reconstruction_characterization",
+  "question": "Does direct empirical top-hat integration localize the remaining histogram and lifting sensitivity?",
+  "hypotheses": [
+    "Histogram quantization may dominate",
+    "Discretized filter/lifting may dominate",
+    "Both may contribute while finite-time sampling remains unresolved"
+  ],
+  "metrics": [
+    "raw mass/negative mass",
+    "density L1/TV",
+    "marginal TVs",
+    "means/covariance",
+    "lobe/boundary discrepancies"
+  ],
+  "thresholds": {
+    "mass_error_max": 1e-10,
+    "negative_mass_max": 0,
+    "technical_completion": "All 120 comparisons, all attempts, and sealed outputs; scientific G02 remains OPEN",
+    "scientific_qualification": "CHARACTERIZATION_ONLY: G02 stays OPEN; no approved scientific error budget"
+  },
+  "seeds": {
+    "trajectory": [
+      71029,
+      71030,
+      71031,
+      71032,
+      71033,
+      71034
+    ]
+  },
+  "command": [
+    "env",
+    "OPENBLAS_NUM_THREADS=1",
+    "OMP_NUM_THREADS=1",
+    "./scripts/run-in-env",
+    "python",
+    "scripts/run_reconstruction_empirical.py",
+    "{RUN_DIRECTORY}"
+  ],
+  "required_evidence": [
+    "120 frozen comparisons",
+    "six source-group attempts and exclusion ledger",
+    "empirical controls and source hashes",
+    "raw invariants",
+    "config/provenance/report/seal"
+  ],
+  "pass_consequences": "Technical characterization only; G02 OPEN and G03 LOCKED",
+  "failure_consequences": "Preserve failure and diagnostics; no gate unlock",
+  "assumptions": [
+    "OL-A01",
+    "Finite-window occupation, not invariant-law estimate",
+    "Fixed physical top-hat, grid-dependent vertex lifting"
+  ],
+  "review_requirements": "Owner reviews sensitivity before any qualification error budget",
+  "scientific_adjudication": "CHARACTERIZATION_ONLY_G02_OPEN",
+  "window": 10,
+  "sampling_counts": [
+    5000,
+    10000,
+    20000
+  ],
+  "comparison_shapes": [
+    [
+      60,
+      72,
+      72
+    ],
+    [
+      120,
+      144,
+      144
+    ]
+  ],
+  "histogram_shapes": [
+    [
+      45,
+      54,
+      54
+    ],
+    [
+      60,
+      72,
+      72
+    ],
+    [
+      90,
+      108,
+      108
+    ],
+    [
+      120,
+      144,
+      144
+    ]
+  ],
+  "physical_widths": [
+    4.0,
+    4.444444444444445,
+    4.444444444444445
+  ],
+  "limitations": [
+    "Empirical kernel control differs from accepted historical recipe; not adopted",
+    "Finite sample control is not a continuum or invariant-law truth",
+    "Same windows and kernel widths; no outcome-driven population selection",
+    "Raw defects are reported before normalized shape metrics",
+    "No qualification budget, target generation, training or DA"
+  ],
+  "inputs": {
+    "scripts/run_reconstruction_empirical.py": "55ab96c678722feb0f7d934b6aefd45dd8d9f5faf0b7328941d11d2b9dd9f442",
+    "operator_learning/reconstruction_controls.py": "8771f588bf714f63ae82b6f44e2fa474fa7bb73e69c20265649f4ff89fc8a9d0",
+    "operator_learning/reconstruction.py": "9687ec1de3d7d766c74a17f7d79ef5a97aaa299b90a23543960dfc48620c3b5c",
+    "operator_learning/alignment.py": "16dbec8b6f7046d90c15395a229054f0cff47218f50b438a670b8a216a664451",
+    "operator_learning/representation.py": "d195c0098e7041be1d5643102322e8b4e9406dcc3c74994890d5a34c76733f1c",
+    "operator_learning/governance.py": "df4d5c422a39b2168a5d59dcafa273a9f5c1cfe8663f1060f41847269a779cdd",
+    "scripts/prepare_operator_run.py": "983aa7bda5bade0efb3cb9c4f1a66d4c6a17d8e920c55186931c8858a2e8db6d",
+    "docs/operator_learning/RECONSTRUCTION_EMPIRICAL_G02_V4.md": "912041894a03479d93644d94dd1c45bf0dc63ae02d30da6549e08bd5526dd46b",
+    "SCIENTIFIC_INTEGRITY.md": "e5c263269393a0dff32f0c9594e3b97e5b7537aff697ebd865f650dec095c658",
+    "runs/operator-learning/OL-G02_reconstruction_mechanism_v3/20261006T120426434502Z/seed71029_paths.npz": "4ab674635559453c44e0fdd83d823a64239f1934f637ac67755bbad54ccb4291",
+    "runs/operator-learning/OL-G02_reconstruction_mechanism_v3/20261006T120426434502Z/seed71030_paths.npz": "d982af24176a6fbd93490f4ad6f9993cf5c8c11fb8f82c1f9449e8d3f85b6bfe",
+    "runs/operator-learning/OL-G02_reconstruction_mechanism_v3/20261006T120426434502Z/seed71031_paths.npz": "8126967739758275712650ffadbce7c93e8bf29f55d480feea1f51eb25c88c2d",
+    "runs/operator-learning/OL-G02_reconstruction_mechanism_v3/20261006T120426434502Z/seed71032_paths.npz": "78df8c656edd0d313c8cf996dc2cbbfc23ccfd7e489bfe06de9f0a5ee769b9b9",
+    "runs/operator-learning/OL-G02_reconstruction_mechanism_v3/20261006T120426434502Z/seed71033_paths.npz": "bd489ff506ebf4843a91caa04cb73e32a590361d0fed5dd8f46847cf7920057b",
+    "runs/operator-learning/OL-G02_reconstruction_mechanism_v3/20261006T120426434502Z/seed71034_paths.npz": "28fd9d26386330559930c3fe005526f4ddb0c431d3c2876babd0e9ab7e403182",
+    "runs/operator-learning/OL-G02_reconstruction_mechanism_v3/20261006T120426434502Z/seal.json": "f9cc7337d523bae3a50ac1d172be2eb49b8ce963fa7187177e62d7bd40f13cd1"
+  },
+  "source_run": "runs/operator-learning/OL-G02_reconstruction_mechanism_v3/20261006T120426434502Z"
+}

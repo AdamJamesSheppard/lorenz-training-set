@@ -50,6 +50,9 @@ It completed with unresolved histogram/burn-in sensitivity. OL-D012 authorizes
 [mechanism characterization v3](RECONSTRUCTION_MECHANISM_G02_V3.md), using one
 common post-burn-in start and a labelled exact-box diagnostic, without replacing
 the accepted density recipe or creating scientific qualification thresholds.
+Mechanism_v3 [review and provenance](evidence/G02_MECHANISM_V3_20261006.md) records
+technical completion. OL-D013 authorizes [empirical-box control v4](RECONSTRUCTION_EMPIRICAL_G02_V4.md)
+to measure histogram sensitivity against a bin-free diagnostic on identical samples.
 
 ## Standard commands (from repository root)
 

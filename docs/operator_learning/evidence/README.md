@@ -105,6 +105,10 @@ posterior-transfer, DA or production claim follows from this pilot.
 
 ## G02 reconstruction characterization
 
+[Mechanism v3 reviewed](G02_MECHANISM_V3_20261006.md): common-start integration
+and reconstruction sensitivity; companion provenance/seal identify ignored local
+arrays/report. Scientific G02 remains OPEN; no accepted density was substituted.
+
 [G02 characterization adjudication](G02_CHARACTERIZATION_20261006.md) records
 technical completion, full-density sensitivity and scientific gate OPEN.
 Exact config/provenance/seal are portable; the full report and dense arrays

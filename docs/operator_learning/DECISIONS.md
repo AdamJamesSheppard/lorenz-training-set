@@ -1,5 +1,18 @@
 # Operator-learning decisions
 
+## 2026-10-06 — OL-D013: review mechanism v3 and predeclare direct empirical control
+
+Owner asks to continue. evidence/G02_MECHANISM_V3_20261006.md records technical
+completion, common-start integration resolution and remaining histogram/control
+sensitivity. Source evidence and every accepted input remain unchanged.
+Next bounded characterization: RECONSTRUCTION_EMPIRICAL_G02_V4.md with exact
+empirical top-hat voxel integration, without histogram intermediate. Alternative
+is diagnostic, not adopted population or manufactured target. Source arrays and
+code/config hashes frozen first; all120 comparisons, raw invariants and failures
+retained. No outcome-based exclusions, threshold relaxation or scientific pass.
+G02 OPEN; later gates LOCKED; no FPE targets, training or DA. Self-review and
+owner task authority, no independent assessor. Handoff immediately once running.
+
 ## 2026-10-06 — OL-D012: isolate G02 reconstruction mechanisms
 
 Owner asks to continue G02 under the new integrity policy. Reviewed refinement_v2:
