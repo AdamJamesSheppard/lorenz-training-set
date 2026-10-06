@@ -3,6 +3,7 @@ import pytest
 
 from operator_learning.reconstruction_controls import (
     box_transfer, exact_box_histogram_density, restart_path, empirical_box_density,
+    paired_box_l1_bound,
 )
 
 
@@ -51,3 +52,25 @@ def test_empirical_box_linear_mixture_and_exact_conservative_coarsening():
     assert np.allclose(p, (a+b)/2)
     coarse, _ = empirical_box_density(cloud, bounds, [1]*3, [4]*3)
     assert np.allclose(p.reshape(4, 2, 4, 2, 4, 2).mean(axis=(1, 3, 5)), coarse)
+
+
+def test_paired_box_bound_exact_single_kernel_and_coarse_grid_lower_bound():
+    a, b = [[0, 0, 0]], [[.5, 0, 0]]
+    bound = paired_box_l1_bound(a, b, [2]*3)
+    assert bound == pytest.approx(.5)
+    assert paired_box_l1_bound(a, a, [2]*3) == 0
+    assert paired_box_l1_bound(a, [[3, 0, 0]], [2]*3) == 2
+    p, _ = empirical_box_density(a, [(-4, 4)]*3, [2]*3, [16]*3)
+    q, _ = empirical_box_density(b, [(-4, 4)]*3, [2]*3, [16]*3)
+    assert np.sum(np.abs(p-q))*.5**3 == pytest.approx(bound)
+
+
+def test_paired_box_bound_is_not_claimed_exact_for_mixtures():
+    a = [[0, 0, 0], [3, 0, 0]]
+    b = a[::-1]
+    # Identical measures, deliberately poor pairing: valid but loose upper bound.
+    assert paired_box_l1_bound(a, b, [1]*3) == 2
+    with pytest.raises(ValueError):
+        paired_box_l1_bound(a, b, [1, float('nan'), 1])
+    with pytest.raises(ValueError):
+        paired_box_l1_bound(a, b[:1], [1]*3)

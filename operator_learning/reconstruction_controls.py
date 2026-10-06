@@ -4,6 +4,26 @@ import numpy as np
 from operator_learning.reconstruction import rk4_step
 
 
+def paired_box_l1_bound(samples_a, samples_b, widths):
+    """Whole-space L1 upper bound for equally weighted, paired box mixtures.
+
+    Each pair's exact kernel L1 is twice one minus its relative overlap.
+    The triangle inequality bounds the mixture difference by their mean.
+    No grid, normalization or empirical independence assumption is involved.
+    Pairing must be supplied explicitly (e.g. matching physical sample times).
+    This is an upper bound, not an estimator of the actual mixture difference.
+    """
+    a, b, w = (np.asarray(x, dtype=float) for x in (samples_a, samples_b, widths))
+    if a.ndim != 2 or a.shape[1] != 3 or not len(a) or b.shape != a.shape:
+        raise ValueError('Equal nonempty paired xyz clouds required')
+    if w.shape != (3,) or not np.isfinite(w).all() or np.any(w <= 0):
+        raise ValueError('Finite positive xyz box widths required')
+    if not np.isfinite(a).all() or not np.isfinite(b).all():
+        raise ValueError('Finite paired points required')
+    overlap = np.prod(np.maximum(0, 1-np.abs(a-b)/w), axis=1)
+    return float(np.mean(2*(1-overlap)))
+
+
 def restart_path(initial, window, dt):
     if dt <= 0 or window <= 0 or not np.isclose(round(window/dt)*dt, window, atol=1e-12, rtol=0):
         raise ValueError('Positive aligned window and timestep required')

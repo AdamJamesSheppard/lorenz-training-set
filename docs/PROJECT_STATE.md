@@ -47,8 +47,10 @@ Characterization completed and was reviewed under OL-D009; portable evidence:
 docs/operator_learning/evidence/G02_CHARACTERIZATION_20261006.md.
 G02 remains OPEN: scientific reconstruction-error budget and executable recipe
 qualification are pending. Candidate approval under OL-D014 retains reservations.
-The v2 qualification proposal is a draft, without qualification
-dispatch authority. Mechanism_v3 completed; its reviewed evidence is in
+The current v3 qualification proposal is a draft, without qualification
+dispatch authority. OL-D015 verifies empirical_v4 and adds an analytic paired-box
+bound; see operator_learning/evidence/G02_EMPIRICAL_V4_20261006.md.
+Mechanism_v3 completed; its reviewed evidence is in
 operator_learning/evidence/G02_MECHANISM_V3_20261006.md. Empirical_v4 is authorized
 under OL-D013 as a diagnostic only; OL-D014 subsequently approves the candidate
 with reservations for qualification, preserving historical accepted inputs.

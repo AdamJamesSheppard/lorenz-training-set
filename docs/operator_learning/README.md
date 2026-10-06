@@ -43,7 +43,7 @@ Posterior-population relevance remains unverified.
 G02 implementation and controlled study design:
 [reconstruction stability v1](RECONSTRUCTION_STABILITY_G02_V1.md).
 Characterization has completed: [adjudication and limits](evidence/G02_CHARACTERIZATION_20261006.md).
-G02 remains OPEN. Review the [v2 qualification proposal](RECONSTRUCTION_QUALIFICATION_PROPOSAL_V2.md)
+G02 remains OPEN. Review the [current v3 qualification proposal](RECONSTRUCTION_QUALIFICATION_PROPOSAL_V3.md)
 and approve a scientific error budget before executable predeclaration or dispatch.
 No expensive target campaign or model training is included.
 
@@ -56,6 +56,9 @@ the accepted density recipe or creating scientific qualification thresholds.
 Mechanism_v3 [review and provenance](evidence/G02_MECHANISM_V3_20261006.md) records
 technical completion. OL-D013 authorizes [empirical-box control v4](RECONSTRUCTION_EMPIRICAL_G02_V4.md)
 to measure histogram sensitivity against a bin-free diagnostic on identical samples.
+It completed; [verified v4 review](evidence/G02_EMPIRICAL_V4_20261006.md) records
+all attempts and limitations. OL-D015 adds an analytic paired-kernel bound and
+the v3 qualification draft; scientific budget approval remains required.
 
 ## Standard commands (from repository root)
 

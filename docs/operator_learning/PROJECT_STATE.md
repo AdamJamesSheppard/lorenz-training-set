@@ -27,7 +27,7 @@ Historical interpretation: DECISIONS.md. FEM method status is separate.
   ],
   "operator_surrogate_authorized_for_da": false,
   "operator_production_authorized": false,
-  "last_adjudicated_evidence": "OL-D013; evidence/G02_MECHANISM_V3_20261006.md reviewed: technical completion, scientific G02 OPEN; OL-D009 earlier characterization preserved.",
+  "last_adjudicated_evidence": "OL-D015; evidence/G02_EMPIRICAL_V4_20261006.md: all15 seals verified, technical completion, G02 OPEN; OL-D013 mechanism and OL-D009 earlier characterization preserved.",
   "gates": {
     "OL-G00_PROBABILITY_DISTRIBUTION_ALIGNMENT": "PASSED",
     "OL-G01_REPRESENTATION_CONTRACT": "PASSED",

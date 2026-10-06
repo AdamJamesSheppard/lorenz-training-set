@@ -1,5 +1,18 @@
 # Operator-learning decisions
 
+## 2026-10-06 — OL-D015: verify empirical v4 and prepare grid-independent control
+
+Owner requests continuation of G02. Rehash15 artifacts, review all120 comparisons
+and retain six attempts/no exclusions. evidence/G02_EMPIRICAL_V4_20261006.md
+records measured results and limitations. Implement analytic paired-box L1 upper
+bound with tests and derivation; no dependence on comparison-grid resolution.
+RECONSTRUCTION_QUALIFICATION_PROPOSAL_V3.md supersedes v2 as the proposed next
+design, preserving v2 and all earlier evidence. No arbitrary scientific threshold
+is inferred from favourable diagnostics. G02 OPEN pending budget approval/frozen
+configuration. No scientific run, FEM targets, training or DA launched.
+Self-reviewed implementing agent, direct owner task authority, no independent
+assessment. Reserved approval under OL-D014 and Bayesian contract remain binding.
+
 ## 2026-10-06 — OL-D014: reserved reconstruction approval and full-density Bayes
 
 Owner approves the bin-free candidate with reservations and explicitly requires
