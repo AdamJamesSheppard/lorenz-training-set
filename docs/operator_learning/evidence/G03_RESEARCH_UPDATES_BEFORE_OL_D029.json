@@ -41,22 +41,22 @@
       "gate_id": "OL-G03_INPUT_DIVERSITY",
       "status": "OPEN",
       "adjudication": null,
-      "decision_id": "OL-D029",
-      "evidence": "docs/operator_learning/evidence/G03_WINDOW_LOCAL_V3_20261008.md",
-      "method_record": "docs/operator_learning/WINDOW_LOCAL_CONTROL_G03_V3.md",
+      "decision_id": "OL-D024",
+      "evidence": "docs/operator_learning/evidence/G03_CHARACTERIZATION_V1_20261006.md",
+      "method_record": "docs/operator_learning/INPUT_DIVERSITY_G03_V1.md",
       "component_outcomes": [
         {
-          "label": "Window-local finite-control bounds, unchanged1% criterion",
-          "status": "NUMERICAL_SUPPORTED",
-          "cases": 36
-        },
-        {
-          "label": "Original accumulated-control sufficient-bound failures preserved",
-          "status": "FAILED_SUFFICIENT_BOUND",
+          "label": "12 law/grid attempts and 102 TV replay comparisons",
+          "status": "TECHNICAL_COMPLETED",
           "cases": 12
         },
         {
-          "label": "Population qualification pending prospective criteria",
+          "label": "Finite-control positive separation margins, both grids",
+          "status": "NUMERICAL_RESOLVED",
+          "cases": 30
+        },
+        {
+          "label": "Population coverage qualification",
           "status": "OPEN",
           "cases": 0
         }

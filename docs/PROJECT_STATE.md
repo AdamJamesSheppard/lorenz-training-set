@@ -37,7 +37,9 @@ OL-D024 reviews completed G03 v1: resolved finite-law variation, no coverage
 promotion. OL-D025 implements/tests hierarchical coverage v2; OL-D026 restores
 access and authorizes committed dispatch. V2 completed; OL-D027 prepares
 window-local controls with unchanged laws. OL-D028 restores committed v3
-dispatch. G03 remains OPEN. See operator-learning state.
+dispatch. V3 completed; OL-D029 records36 supported local-control bounds and
+retains G03 OPEN pending prospective qualification criteria/scope approval.
+No new run is active. See operator-learning state.
 Eventual analysis follows [the full-density Bayesian contract](BAYESIAN_ASSIMILATION_CONTRACT.md).
 
 2026-10-05: user authorized the bounded G00 alignment comparison, predeclared

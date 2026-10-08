@@ -1,0 +1,118 @@
+{
+  "experiment_id": "OL-G03_window_local_control_v3",
+  "gate_id": "OL-G03_INPUT_DIVERSITY",
+  "kind": "window_local_integration_diagnostic",
+  "config_sha256": "be3a9402f943083a438e42be6de3b47189ddadc1852fe50628d621cd9ba6fbd7",
+  "git_commit": "fd87dd8efa14186fbd157e5f1e888f213f8f6960",
+  "git_dirty": true,
+  "git_status": "?? scripts/plot_reconstruction_comparison.py",
+  "command": [
+    "env",
+    "OPENBLAS_NUM_THREADS=1",
+    "OMP_NUM_THREADS=1",
+    "/home/adam/.local/share/mamba/envs/pde/bin/python",
+    "scripts/run_window_local_control.py",
+    "{RUN_DIRECTORY}"
+  ],
+  "runtime_versions": {
+    "python": "3.12.13",
+    "numpy": "2.5.2",
+    "scipy": "1.18.0"
+  },
+  "hardware": {
+    "device": "cpu",
+    "gpu": false,
+    "mpi": false,
+    "blas_threads": 1,
+    "openmp_threads": 1
+  },
+  "seeds": {
+    "trajectory": [
+      83001,
+      83002,
+      83003,
+      83004,
+      83005,
+      83006,
+      83007,
+      83008,
+      83009,
+      83010,
+      83011,
+      83012
+    ]
+  },
+  "input_hashes": {
+    "scripts/run_window_local_control.py": "09d33b65fe23b9c9db23d8c989304dec64bdaad523977d0c1b8fe05a9df12e17",
+    "scripts/run_input_coverage.py": "9acf9e80535377ebe46c853bc41bd3a991282a6938a8850c9ab29ec182df5d6f",
+    "scripts/run_input_diversity.py": "d271cabf3f58296dfb8f1eacad28bd7046cf0b371317017f47b726af1ef36d04",
+    "scripts/run_reconstruction_qualification.py": "894080538814441f43bd62f070f247e890848c758c0090b38fad4b5338c4ef21",
+    "operator_learning/reconstruction_controls.py": "ef319bf6ddb90c94dcf4d89d28b36545e0d7763901a04d2b4dc9e081867aa3a6",
+    "operator_learning/reconstruction.py": "9687ec1de3d7d766c74a17f7d79ef5a97aaa299b90a23543960dfc48620c3b5c",
+    "operator_learning/alignment.py": "16dbec8b6f7046d90c15395a229054f0cff47218f50b438a670b8a216a664451",
+    "operator_learning/governance.py": "49912ae3dcf57f37421a9200331821830d2ad3822154f899bad4215213a3a8b5",
+    "docs/operator_learning/WINDOW_LOCAL_CONTROL_G03_V3.md": "ac8d922e6b1e2a60d26a8fab182ddf1320d110d662288a4a71438d9bb068ec25",
+    "SCIENTIFIC_INTEGRITY.md": "f0208b97e2466c14ec10851da5d07ff39be0af3952491f6890eb43c054c7a97e",
+    "AGENTS.md": "dd8519e15fd369ff7e4604a79a69f867e0fa7db75e10bea46dfa5fae6111deeb",
+    "runs/operator-learning/OL-G03_input_coverage_characterization_v2/20261006T190016632767Z/config.json": "f8580e76c07bff84398fe757932849e8170a437c19e30e9ef40caa86dab4083f",
+    "runs/operator-learning/OL-G03_input_coverage_characterization_v2/20261006T190016632767Z/report.json": "c25659cdee478f6d5b436920d4b75b287846d0ff563c60de8a412bf6b69a55bf",
+    "runs/operator-learning/OL-G03_input_coverage_characterization_v2/20261006T190016632767Z/provenance.json": "76d1ff861c02308550da51202de5aff477668f18a34155b5fead2af37dfc32c7",
+    "runs/operator-learning/OL-G03_input_coverage_characterization_v2/20261006T190016632767Z/seal.json": "3649e6536151b7b35d6f8b7558bc120a81ce318f49313888a825ae9076a90a06"
+  },
+  "output_hashes": {
+    "seed83001_window0_local_control.npz": "50cfca571f4da4702097234925d4448a2c1f88ee660cfcf670bf6f532ffc274d",
+    "seed83001_window1_local_control.npz": "c2a86e26f976dbfbdf7779894d25ec1fcacbf10ad595fc47b61a72d0feaedfce",
+    "seed83001_window2_local_control.npz": "01c7917a801ff884192234424d0092ac3f76ce6454230d9081ce87f0e1b78e63",
+    "seed83002_window0_local_control.npz": "a81f16602296bb18aebccc5f718776d2a06ef3d7ba55b71c20130ebc90e02e90",
+    "seed83002_window1_local_control.npz": "a30d687a04bd249b37ff94476666703c284795902b1b6ca6cf07bcf76b556d2e",
+    "seed83002_window2_local_control.npz": "288746e45e2475440b798f9b9198774cb3cb89cc0e457aa5ba87390974d0e3c6",
+    "seed83003_window0_local_control.npz": "2d088e419f24527ad71ae1356aeb6ea3f94b8b17538b341784e964d63ca04f0d",
+    "seed83003_window1_local_control.npz": "f4ce50cba91d3589ea57c4b26bab7e8ab0e3456c1d30e78570baa65ea88b9bdb",
+    "seed83003_window2_local_control.npz": "6a8a5f16bb7ec48d3a02fae491b14e19760c120faa4e58b4ead026df5bc0f1e0",
+    "seed83004_window0_local_control.npz": "9d7f3e1646f4bfa29fdea304580e928547e64331cc1680f753f11f9769949f33",
+    "seed83004_window1_local_control.npz": "0825076d4d906c0b4ee84a46bd8349ae459264627283ab19070cc0de46910e08",
+    "seed83004_window2_local_control.npz": "25c19b3bcb94a344fa6747fa640ea42ec6a5c547efda3d52325e261f65cccc2e",
+    "seed83005_window0_local_control.npz": "d60eb6e522638bb7fddea6e73798834beed058792436cd057b80cf69bf1d81b6",
+    "seed83005_window1_local_control.npz": "ae8feadb98f8756f70ddb4094cc0163506fbcf1ee57fcde047332cfe8bd1cbc1",
+    "seed83005_window2_local_control.npz": "81bd0ea37fc0370400b53c997b4178110a42e6098cad2931d883281c37b8cdd0",
+    "seed83006_window0_local_control.npz": "47fe4d66a2848dd5db3a5465718409ad4c7fea39228146361737ab43f1b40a8a",
+    "seed83006_window1_local_control.npz": "8af77ec46beb8e810f7eacf9844e1c8649029b8a2579f0cb85b885be1df52a33",
+    "seed83006_window2_local_control.npz": "bd5602761953f8e39e46642ad2261a31928e2699bb3ff9910a7b29ed6dcfe4a9",
+    "seed83007_window0_local_control.npz": "5874eab748aae7a6a731d8f21fc429efc45ef040a1c818450b4834cf28442a09",
+    "seed83007_window1_local_control.npz": "cdac782617025cf5cd6f4b7b708fd4e945cdb8232a73a2af4670cf59f9c2e86e",
+    "seed83007_window2_local_control.npz": "ebb03db18d250233cd8bfe586fbe0a2a00b4cc2d09d0e40179e2a216cf89cf0a",
+    "seed83008_window0_local_control.npz": "75cd28d5e0b2ce310de3fb3cc509eb8734a3c057a8c2cc7138fdbce1ff17523b",
+    "seed83008_window1_local_control.npz": "1dacdb6ec17da641ecf82ced8495e00d686944d1152cc0bfae02010bfa896a7d",
+    "seed83008_window2_local_control.npz": "2ad3b237df850ae3996bcb784021667141f479e609d8843b04bc810f21980014",
+    "seed83009_window0_local_control.npz": "2451c241318e261791b80885f5e06541e3e9e92a80b902929cd87aa97159588b",
+    "seed83009_window1_local_control.npz": "e3c0fdf8e963606a9774e80c725e933b4b1bec4961c06225497dfa8695501fec",
+    "seed83009_window2_local_control.npz": "dba6823fc022ee3a2f38dd5b4ef65a47cfbde51e1a5ae761de925656ddddba37",
+    "seed83010_window0_local_control.npz": "bb422c4ff6e6bf32b0a8e1416da981cb6402005b4ab8b39c07a16e565b1f92c0",
+    "seed83010_window1_local_control.npz": "200f4da6bea5716246a0c8e5fcf855ca3c8531fec44ddb6deae49e224201133f",
+    "seed83010_window2_local_control.npz": "8b6f772ac406d1388e43d9686b651797a3097471ed2dce39e4fd7838e6757f9b",
+    "seed83011_window0_local_control.npz": "7da0275edfb091f08381ef3f0b20d7ee4c8e0b7874aafcb4aae7dab9bebed7d4",
+    "seed83011_window1_local_control.npz": "094c99f17a24587ef49e2caf3b7c2d04e694f9623b342d52c6f2e1f898445125",
+    "seed83011_window2_local_control.npz": "1bceda8a69d78d80742e731dd981c091aecfc17af1be15c8ebeaf01c7c639edf",
+    "seed83012_window0_local_control.npz": "14e26a2d2b040e9000abec32cae03b46016ed118cd643e61457d370693fdba23",
+    "seed83012_window1_local_control.npz": "f88e51cfb2b7d8d022d28de4a38887d47b78ec7d32c1559dc37086098c9acee7",
+    "seed83012_window2_local_control.npz": "609c001f832180759b6c9af5aa64fbd9561b5d86d8a9cbecfd75c969de1de2d1",
+    "report.json": "d1812ec5239a82bdc6253016047611b8e8cf9f126ce7f5ac3510a7571cd888ad",
+    "partial_report.json": "c553468e87bfb91622aff22230b9c0ebe145d8b531345d6b89b8aa71e3814e1a"
+  },
+  "checkpoint_hashes": {},
+  "diagnostics": {
+    "technical_status": "COMPLETED",
+    "gate_passed": false
+  },
+  "status": "COMPLETED",
+  "actual_command": [
+    "scripts/run_window_local_control.py",
+    "/mnt/large storage/Important/Derby Masters/Original Dissertation Royal Holloway/FENICS Code/NewTest/runs/operator-learning/OL-G03_window_local_control_v3/20261008T224500015235Z"
+  ],
+  "observed_runtime_versions": {
+    "python": "3.12.13",
+    "numpy": "2.5.2",
+    "scipy": "1.18.0"
+  },
+  "observed_hardware": "Linux-7.1.5-76070105-generic-x86_64-with-glibc2.39"
+}

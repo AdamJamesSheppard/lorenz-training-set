@@ -1,5 +1,22 @@
 # Operator-learning decisions
 
+## 2026-10-08 — OL-D029: record completed G03 controls; propose scoped qualification
+
+Owner requests continuation. Self-review verifies40 v3 seals,15 frozen input
+hashes/config correspondence and all36 bound recomputations. Every local
+combined bound≤unchanged.01, maximum.00679621099; no failures/exclusions;
+producer records36 exact fine replays and33.148s runtime. Source/control/law
+limits and original accumulated failures are preserved in
+evidence/G03_WINDOW_LOCAL_V3_20261008.md and portable report/provenance/config/seal.
+Methods/sources are those predeclared in WINDOW_LOCAL_CONTROL_G03_V3.md.
+Post-hoc630 positive local separation margins are diagnostic, not a gate quota.
+G03 remains OPEN, later gates LOCKED; no new scientific job, target or training.
+G03_QUALIFICATION_SCOPE_PROPOSAL.md proposes owner-reviewed distinction between
+scoped law diversity and later training adequacy. No scientific acceptance
+criterion is selected retrospectively; approval/predeclaration needed before
+qualification. Reviewer is implementing agent, no independent assessor.
+Large arrays remain ignored local evidence; unrelated plotting script preserved.
+
 ## 2026-10-08 — OL-D028: restore access and dispatch window-local controls
 
 Owner continues after enabling full access. Commit the prepared v3 diagnostic

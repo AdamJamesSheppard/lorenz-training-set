@@ -1,5 +1,24 @@
 # Operator-learning claim registry
 
+## OL-C018 — Archived36-law window-local finite-control sensitivity
+
+Class: NUMERICAL. All36 local sufficient combined TV bounds≤.01, maximum
+.00679621099, with recorded bitwise fine replay and preserved input laws.
+Evidence: OL-D029; evidence/G03_WINDOW_LOCAL_V3_20261008.md; method/source
+WINDOW_LOCAL_CONTROL_G03_V3.md. Limits: conditions on saved numerical window
+starts, float64 finite controls, no original30-unit/continuum/posterior or
+coverage guarantee. Falsification: source/seal mismatch, incorrect pairing,
+bound arithmetic or fine replay failure. Original accumulated failures remain.
+
+## OL-C019 — Broader recorded-law separation under local controls
+
+Class: NUMERICAL, POST_HOC_DIAGNOSTIC. All630 v2 grid pairs have positive
+local-control separation margins, minimum approximately.0655424. Evidence:
+OL-D029 review using unchanged v2 TV and v3 local bounds. Limits: dependent
+development pairs; no frozen qualification quota, optimum population, universal
+initial-condition or generalization claim. Falsification: invalid export,
+mass accounting, local bounds or archived pair metrics. G03 remains OPEN.
+
 ## OL-C017 — Six retained finite laws have resolved pairwise variation
 
 Class: NUMERICAL. All15 pairs on each of two conservative grids have positive

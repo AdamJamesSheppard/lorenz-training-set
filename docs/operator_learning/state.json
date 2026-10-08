@@ -7,9 +7,9 @@
   "current_six_law_pilot": "COMPLETED_ENGINEERING_AND_RESTRICTED_LEARNING_PILOT",
   "current_model_scientifically_qualified": false,
   "next_required_gate": "OL-G03_INPUT_DIVERSITY",
-  "active_blocker": "OL-D028 authorizes committed window-local v3 controls; population coverage remains unqualified and original12 third-window bounds unresolved. FE transfer/reference/export checks remain open.",
+  "active_blocker": "OL-D029 reviews completed v2/v3:36 local finite-control bounds supported, scoped law diversity observed; G03 qualification criteria/scope require prospective owner approval. Training coverage and FE/reference/export qualification remain open.",
   "authorized": [
-    "Commit and dispatch bounded window-local G03 v3 under OL-D028; no targets, training or DA",
+    "Prepare owner-reviewed scoped G03 qualification criteria; no new run, targets, training or DA",
     "Inexpensive labelled diagnostics; no expensive targets, neural retraining or DA"
   ],
   "locked": [
@@ -21,7 +21,7 @@
   ],
   "operator_surrogate_authorized_for_da": false,
   "operator_production_authorized": false,
-  "last_adjudicated_evidence": "OL-D024; evidence/G03_CHARACTERIZATION_V1_20261006.md: v1 technical completion and finite-law distinctness verified; G03 remains OPEN, no population-coverage qualification.",
+  "last_adjudicated_evidence": "OL-D029; evidence/G03_WINDOW_LOCAL_V3_20261008.md:40 seals verified,36 local bounds recomputed, unchanged laws; G03 OPEN, original accumulated failures preserved.",
   "gates": {
     "OL-G00_PROBABILITY_DISTRIBUTION_ALIGNMENT": "PASSED",
     "OL-G01_REPRESENTATION_CONTRACT": "PASSED",

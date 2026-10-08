@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "id": "OL-G03_window_local_control_v3",
+  "gate_id": "OL-G03_INPUT_DIVERSITY",
+  "kind": "window_local_integration_diagnostic",
+  "status": "PREDECLARED",
+  "question": "Does window-local integration separate accumulated trajectory divergence from reconstruction sensitivity without changing archived laws?",
+  "hypotheses": [
+    "Accumulated integration discrepancy dominates",
+    "Some windows remain sensitive within10 units",
+    "Paired bound is conservative"
+  ],
+  "metrics": [
+    "bitwise saved fine-window replay",
+    "sampling/local versus accumulated integration TV bounds",
+    "every window attempt and failure",
+    "runtime/provenance/seals"
+  ],
+  "thresholds": {
+    "mass_error_max": 1e-10,
+    "negative_mass_max": 0,
+    "scientific_qualification": "CHARACTERIZATION_ONLY_G03_OPEN",
+    "resolution": "Positive signed mathematical margin is diagnostic, no arbitrary coverage quota",
+    "technical_completion": "Every36 attempts preserved, exact fine replay or recorded failure; no coverage pass",
+    "reconstruction_tv_max": 0.01
+  },
+  "seeds": {
+    "trajectory": [
+      83001,
+      83002,
+      83003,
+      83004,
+      83005,
+      83006,
+      83007,
+      83008,
+      83009,
+      83010,
+      83011,
+      83012
+    ]
+  },
+  "inputs": {
+    "scripts/run_window_local_control.py": "09d33b65fe23b9c9db23d8c989304dec64bdaad523977d0c1b8fe05a9df12e17",
+    "scripts/run_input_coverage.py": "9acf9e80535377ebe46c853bc41bd3a991282a6938a8850c9ab29ec182df5d6f",
+    "scripts/run_input_diversity.py": "d271cabf3f58296dfb8f1eacad28bd7046cf0b371317017f47b726af1ef36d04",
+    "scripts/run_reconstruction_qualification.py": "894080538814441f43bd62f070f247e890848c758c0090b38fad4b5338c4ef21",
+    "operator_learning/reconstruction_controls.py": "ef319bf6ddb90c94dcf4d89d28b36545e0d7763901a04d2b4dc9e081867aa3a6",
+    "operator_learning/reconstruction.py": "9687ec1de3d7d766c74a17f7d79ef5a97aaa299b90a23543960dfc48620c3b5c",
+    "operator_learning/alignment.py": "16dbec8b6f7046d90c15395a229054f0cff47218f50b438a670b8a216a664451",
+    "operator_learning/governance.py": "49912ae3dcf57f37421a9200331821830d2ad3822154f899bad4215213a3a8b5",
+    "docs/operator_learning/WINDOW_LOCAL_CONTROL_G03_V3.md": "ac8d922e6b1e2a60d26a8fab182ddf1320d110d662288a4a71438d9bb068ec25",
+    "SCIENTIFIC_INTEGRITY.md": "f0208b97e2466c14ec10851da5d07ff39be0af3952491f6890eb43c054c7a97e",
+    "AGENTS.md": "dd8519e15fd369ff7e4604a79a69f867e0fa7db75e10bea46dfa5fae6111deeb",
+    "runs/operator-learning/OL-G03_input_coverage_characterization_v2/20261006T190016632767Z/config.json": "f8580e76c07bff84398fe757932849e8170a437c19e30e9ef40caa86dab4083f",
+    "runs/operator-learning/OL-G03_input_coverage_characterization_v2/20261006T190016632767Z/report.json": "c25659cdee478f6d5b436920d4b75b287846d0ff563c60de8a412bf6b69a55bf",
+    "runs/operator-learning/OL-G03_input_coverage_characterization_v2/20261006T190016632767Z/provenance.json": "76d1ff861c02308550da51202de5aff477668f18a34155b5fead2af37dfc32c7",
+    "runs/operator-learning/OL-G03_input_coverage_characterization_v2/20261006T190016632767Z/seal.json": "3649e6536151b7b35d6f8b7558bc120a81ce318f49313888a825ae9076a90a06"
+  },
+  "command": [
+    "env",
+    "OPENBLAS_NUM_THREADS=1",
+    "OMP_NUM_THREADS=1",
+    "/home/adam/.local/share/mamba/envs/pde/bin/python",
+    "scripts/run_window_local_control.py",
+    "{RUN_DIRECTORY}"
+  ],
+  "runtime_versions": {
+    "python": "3.12.13",
+    "numpy": "2.5.2",
+    "scipy": "1.18.0"
+  },
+  "hardware": {
+    "device": "cpu",
+    "gpu": false,
+    "mpi": false,
+    "blas_threads": 1,
+    "openmp_threads": 1
+  },
+  "required_evidence": [
+    "all36 attempts and fine bitwise replay",
+    "unchanged source seal verification",
+    "new local coarse controls and all bounds",
+    "frozen config/source/provenance/report/seal"
+  ],
+  "pass_consequences": "Technical characterization only; G03 remains OPEN pending frozen scientifically justified population/coverage assessment",
+  "failure_consequences": "Preserve every failure/unresolved pair; no threshold relaxation, population narrowing or gate unlock",
+  "assumptions": [
+    "OL-A14",
+    "Finite recorded laws rather than independent invariant-law samples",
+    "Phase controls are deterministic quadrature replicates, not independent laws"
+  ],
+  "review_requirements": "Implementing agent self-review under owner's start instruction; no independent assessor or qualification authority",
+  "scientific_adjudication": "CHARACTERIZATION_ONLY_G03_OPEN",
+  "sampling_count": 20000,
+  "phases": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "bounds": [
+    [
+      -30,
+      30
+    ],
+    [
+      -40,
+      40
+    ],
+    [
+      -10,
+      70
+    ]
+  ],
+  "physical_widths": [
+    4,
+    4.444444444444445,
+    4.444444444444445
+  ],
+  "comparison_shapes": [
+    [
+      60,
+      72,
+      72
+    ],
+    [
+      120,
+      144,
+      144
+    ]
+  ],
+  "regions": {
+    "boundary_layers": 4,
+    "transition_width": 2,
+    "tail_z": [
+      5,
+      50
+    ]
+  },
+  "allowed_untracked": [
+    "scripts/plot_reconstruction_comparison.py"
+  ],
+  "limitations": [
+    "New controls condition on saved numerical window starts",
+    "No original30-unit trajectory/continuum or invariant-law qualification",
+    "No population-coverage pass or input-law modification",
+    "Float64 finite controls, no interval proof",
+    "All36 windows retained; unresolved bounds do not prove true error>.01",
+    "No FPE targets, training or DA"
+  ],
+  "windows": 3,
+  "spinup": 20,
+  "window": 10,
+  "integration_steps": [
+    0.000125,
+    0.00025
+  ],
+  "control_count": 80000,
+  "pool_sizes": [
+    2,
+    4,
+    8
+  ],
+  "group_orders": [
+    [
+      83001,
+      83002,
+      83003,
+      83004,
+      83005,
+      83006,
+      83007,
+      83008,
+      83009,
+      83010,
+      83011,
+      83012
+    ],
+    [
+      83007,
+      83001,
+      83010,
+      83004,
+      83012,
+      83006,
+      83009,
+      83003,
+      83011,
+      83005,
+      83008,
+      83002
+    ]
+  ],
+  "boundary_thickness": [
+    4,
+    4.444444444444445,
+    4.444444444444445
+  ],
+  "source_run": "runs/operator-learning/OL-G03_input_coverage_characterization_v2/20261006T190016632767Z"
+}

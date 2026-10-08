@@ -66,6 +66,12 @@ OL-D027 prepares [window-local integration controls](WINDOW_LOCAL_CONTROL_G03_V3
 for every saved v2 law; original accumulated-control evidence stays unchanged.
 OL-D028 restores access and authorizes committed persistent dispatch; G03 stays OPEN.
 
+V3 has completed: [verified local-control review](evidence/G03_WINDOW_LOCAL_V3_20261008.md)
+under OL-D029. All36 local bounds meet the inherited1% diagnostic budget;
+archived input laws and original accumulated failures remain unchanged.
+[G03 qualification scope](G03_QUALIFICATION_SCOPE_PROPOSAL.md) is an owner-review
+proposal, not a pass or executable predeclaration. No new run is active.
+
 G02 implementation and controlled study design:
 [reconstruction stability v1](RECONSTRUCTION_STABILITY_G02_V1.md).
 Characterization has completed: [adjudication and limits](evidence/G02_CHARACTERIZATION_20261006.md).
