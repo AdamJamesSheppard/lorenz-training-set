@@ -13,9 +13,9 @@ Historical interpretation: DECISIONS.md. FEM method status is separate.
   "current_six_law_pilot": "COMPLETED_ENGINEERING_AND_RESTRICTED_LEARNING_PILOT",
   "current_model_scientifically_qualified": false,
   "next_required_gate": "OL-G03_INPUT_DIVERSITY",
-  "active_blocker": "OL-D029 reviews completed v2/v3:36 local finite-control bounds supported, scoped law diversity observed; G03 qualification criteria/scope require prospective owner approval. Training coverage and FE/reference/export qualification remain open.",
+  "active_blocker": "OL-D030 owner-approved law-diversity scope; prospective qualification criteria/run still required. Training coverage and optimum allocation remain OPEN for later evaluation; FE/reference/export qualification remains open.",
   "authorized": [
-    "Prepare owner-reviewed scoped G03 qualification criteria; no new run, targets, training or DA",
+    "Prepare prospective scoped G03 law-diversity qualification; no retrospective pass, targets, training or DA",
     "Inexpensive labelled diagnostics; no expensive targets, neural retraining or DA"
   ],
   "locked": [

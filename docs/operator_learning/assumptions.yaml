@@ -13,7 +13,7 @@ OL-A03:
 OL-A04:
   statement: The six laws cover a meaningful range of underlying application laws.
   status: unverified
-  evidence: OL-G03_INPUT_DIVERSITY
+  evidence: G03_APPROVED_SCOPE.md OL-D030; law diversity does not settle training coverage; assess adequacy at OL-G10_GENERALIZATION and OL-G11_STRUCTURAL_GENERALIZATION
 OL-A05:
   statement: FNO is preferable to learned linear and reduced-order alternatives.
   status: unverified

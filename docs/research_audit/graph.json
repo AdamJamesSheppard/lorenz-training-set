@@ -3,13 +3,13 @@
   "generated_from": {
     "docs/research_audit/methods.json": "8167012c99375c28b91458671a998fab876ed2c02f9d35387feb62b876e5c791",
     "docs/research_audit/snapshot_20261006.json": "43da62abd04704f92606e2f75bdf919e46fc0908c477ad84da4cad853c1e0fa8",
-    "docs/operator_learning/gates.json": "dca4e83aecf72500e53b21afe1a788e23348b48361d21dcf0f2eb99cb55d0ead",
-    "docs/operator_learning/state.json": "4e16f99cfc2143b0879957447840cc3ab9faa23fc9cb630b182252c114318edf",
+    "docs/operator_learning/gates.json": "a431e303efe7ce277d66ff0b6fa316ce8d11abcdb42bd2746703964ef990b955",
+    "docs/operator_learning/state.json": "269904a1194b12ce40c4961c205332dfbb8d8717c59411732a05b95a6fda2829",
     "docs/operator_learning/CLAIMS.md": "7788d105fbffb896d70419c4d7a8fa843379a90db2802ac1ab16a98470d7d351",
     "docs/CLAIMS.md": "474a415c96ac74dd48eb3901af68660544549b7b966f549d09d712873ef7977c",
-    "docs/operator_learning/DECISIONS.md": "6214e9f8dd619bb9a050dc17a8ce28461bf366ff259e558386b5b6c5804285c4",
+    "docs/operator_learning/DECISIONS.md": "77a00f7dc938ea55996feb8ad0f84f89b35c09c02b048dc76ecc3a2a27505043",
     "docs/DECISIONS.md": "e815b7dd8cd7f274fa88fed0fffc367b34ac32e35a2fffa93c4e694e0189c814",
-    "docs/operator_learning/assumptions.yaml": "bb46bbdb7103d49d84c89a149073f69f3ab8d3f0afedef4a829fc958e6eb6c29",
+    "docs/operator_learning/assumptions.yaml": "ff8a7249386389d72b91939b479d34535cd70e092dab057f9cc32d2712a089af",
     "docs/assumptions.yaml": "51092eeafd2176eadee11442bd8fc9238217a7d772bd797f60ea4c6c5ce844ce",
     "docs/research_audit/gate_updates.json": "181c94edb15b00f7921d16e841649fbea3072898c7604c106792e71a1d5b10f7",
     "docs/research_audit/graph_sources.json": "5d4b54beefa93b17c7b4eca0aac129410bed4e4619c3943cec8906fbc7d313bb",
@@ -4092,7 +4092,7 @@
       "kind": "assumption",
       "label": "The six laws cover a meaningful range of underlying application laws.",
       "status": "unverified",
-      "text": "statement: The six laws cover a meaningful range of underlying application laws.\n  status: unverified\n  evidence: OL-G03_INPUT_DIVERSITY"
+      "text": "statement: The six laws cover a meaningful range of underlying application laws.\n  status: unverified\n  evidence: G03_APPROVED_SCOPE.md OL-D030; law diversity does not settle training coverage; assess adequacy at OL-G10_GENERALIZATION and OL-G11_STRUCTURAL_GENERALIZATION"
     },
     {
       "id": "assumption:OL-A05",
@@ -5382,6 +5382,14 @@
       "label": "2026-10-08 — OL-D029: record completed G03 controls; propose scoped qualification",
       "status": "RECORDED_DECISION",
       "text": "Owner requests continuation. Self-review verifies40 v3 seals,15 frozen input\nhashes/config correspondence and all36 bound recomputations. Every local\ncombined bound≤unchanged.01, maximum.00679621099; no failures/exclusions;\nproducer records36 exact fine replays and33.148s runtime. Source/control/law\nlimits and original accumulated failures are preserved in\nevidence/G03_WINDOW_LOCAL_V3_20261008.md and portable report/provenance/config/seal.\nMethods/sources are those predeclared in WINDOW_LOCAL_CONTROL_G03_V3.md.\nPost-hoc630 positive local separation margins are diagnostic, not a gate quota.\nG03 remains OPEN, later gates LOCKED; no new scientific job, target or training.\nG03_QUALIFICATION_SCOPE_PROPOSAL.md proposes owner-reviewed distinction between\nscoped law diversity and later training adequacy. No scientific acceptance\ncriterion is selected retrospectively; approval/predeclaration needed before\nqualification. Reviewer is implementing agent, no independent assessor.\nLarge arrays remain ignored local evidence; unrelated plotting script preserved.",
+      "path": "docs/operator_learning/DECISIONS.md"
+    },
+    {
+      "id": "decision:OL-D030",
+      "kind": "decision",
+      "label": "2026-10-08 — OL-D030: owner approves G03 law-diversity scope",
+      "status": "RECORDED_DECISION",
+      "text": "Owner: \"Yes you should focus on law diversity I agree, approved\".\nG03_APPROVED_SCOPE.md records approved scope and non-claims. G03 qualifies\ngenuine law variation beyond reconstruction controls, not an optimal dataset.\nTraining coverage/adequacy remains OPEN and is carried into G08–G11 and later\naccuracy/cost checks, with untouched evaluation, retained outliers and baselines.\nNo law, smoothing, historical outcome or failed bound changes. No new acceptance\nthreshold, existing-study promotion or scientific run is approved merely by\nthis scope decision. Prospective committed qualification criteria still required.\nG03 remains OPEN; G04–G17 LOCKED; no targets, training, production or DA.\nImplementing-agent record under explicit owner authority; no independent assessor.",
       "path": "docs/operator_learning/DECISIONS.md"
     },
     {
@@ -15862,6 +15870,13 @@
       "attribution": "AUDIT_SNAPSHOT"
     },
     {
+      "id": "edge:31a41bca877141fc5cb37eca",
+      "source": "assumption:OL-A04",
+      "relation": "references",
+      "target": "gate:OL-G11_STRUCTURAL_GENERALIZATION",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
+    },
+    {
       "id": "edge:31bb81cd759935ed64b98932",
       "source": "record:fem:dd4250596ec9a9b8b435c370",
       "relation": "documents",
@@ -17700,6 +17715,13 @@
       "source": "assumption:OL-A09",
       "relation": "references",
       "target": "gate:OL-G04_REFERENCE_TARGET_APPLICABILITY",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
+    },
+    {
+      "id": "edge:51fa7a277a1f78ab1fc8742a",
+      "source": "decision:OL-D030",
+      "relation": "references",
+      "target": "decision:OL-D030",
       "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
     },
     {
@@ -20144,6 +20166,13 @@
       "relation": "documents",
       "target": "artifact:runs/same-mesh-q2-corrected/20260910T234135Z/q2_certificate_gated/final_raw_cell_classification_rank0004.json",
       "attribution": "HISTORICAL_METADATA_NOT_NEW_ADJUDICATION"
+    },
+    {
+      "id": "edge:7c76119432a2edf39515f1dc",
+      "source": "decision:OL-D030",
+      "relation": "references",
+      "target": "artifact:docs/operator_learning/DECISIONS.md",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
     },
     {
       "id": "edge:7c7c93e8fac26b36ee22f35c",
@@ -23695,13 +23724,6 @@
       "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
     },
     {
-      "id": "edge:b9a2aa6a2be0473155907e56",
-      "source": "assumption:OL-A04",
-      "relation": "references",
-      "target": "gate:OL-G03_INPUT_DIVERSITY",
-      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
-    },
-    {
       "id": "edge:b9a745c630e37cd79c7bcc55",
       "source": "record:fem:88f70d36a8916c3f26457323",
       "relation": "documents",
@@ -23931,6 +23953,13 @@
       "relation": "documents",
       "target": "artifact:runs/local-q2-osqp-profile/20260911T165425Z/q2_local_qp_cn_three_step_profile/final_raw_cell_classification_rank0002.json",
       "attribution": "HISTORICAL_METADATA_NOT_NEW_ADJUDICATION"
+    },
+    {
+      "id": "edge:be2431ca648949fac1c59f02",
+      "source": "assumption:OL-A04",
+      "relation": "references",
+      "target": "decision:OL-D030",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
     },
     {
       "id": "edge:be2ddbbe64eabe71aa400948",
@@ -26362,6 +26391,13 @@
       "attribution": "AUDIT_SNAPSHOT"
     },
     {
+      "id": "edge:e97922ae987c0182f1bbb9c8",
+      "source": "assumption:OL-A04",
+      "relation": "references",
+      "target": "gate:OL-G10_GENERALIZATION",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
+    },
+    {
       "id": "edge:e996548b4bf0e53c4b6d38f5",
       "source": "record:fem:95a9f28eab45ac365b641db5",
       "relation": "has_outcome",
@@ -26892,6 +26928,13 @@
       "relation": "documents",
       "target": "artifact:local_q2_positivity_projection_report.json",
       "attribution": "HISTORICAL_METADATA_NOT_NEW_ADJUDICATION"
+    },
+    {
+      "id": "edge:f3b1046db9f0879fa4ccee80",
+      "source": "decision:OL-D030",
+      "relation": "recorded_in",
+      "target": "artifact:docs/operator_learning/DECISIONS.md",
+      "attribution": "ORIGINAL_DECISION_SECTION"
     },
     {
       "id": "edge:f3d5c410638d3d5ddd61e37c",

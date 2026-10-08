@@ -1,5 +1,18 @@
 # Operator-learning decisions
 
+## 2026-10-08 — OL-D030: owner approves G03 law-diversity scope
+
+Owner: "Yes you should focus on law diversity I agree, approved".
+G03_APPROVED_SCOPE.md records approved scope and non-claims. G03 qualifies
+genuine law variation beyond reconstruction controls, not an optimal dataset.
+Training coverage/adequacy remains OPEN and is carried into G08–G11 and later
+accuracy/cost checks, with untouched evaluation, retained outliers and baselines.
+No law, smoothing, historical outcome or failed bound changes. No new acceptance
+threshold, existing-study promotion or scientific run is approved merely by
+this scope decision. Prospective committed qualification criteria still required.
+G03 remains OPEN; G04–G17 LOCKED; no targets, training, production or DA.
+Implementing-agent record under explicit owner authority; no independent assessor.
+
 ## 2026-10-08 — OL-D029: record completed G03 controls; propose scoped qualification
 
 Owner requests continuation. Self-review verifies40 v3 seals,15 frozen input

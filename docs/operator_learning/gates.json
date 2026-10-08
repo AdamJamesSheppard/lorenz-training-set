@@ -45,7 +45,7 @@
   {
     "id": "OL-G01_REPRESENTATION_CONTRACT",
     "question": "Is every law-to-tensor transformation explicit and correct?",
-    "scientific_motivation": "μ→p→p_h→P_Vp_h→u must not silently change semantics.",
+    "scientific_motivation": "\u03bc\u2192p\u2192p_h\u2192P_Vp_h\u2192u must not silently change semantics.",
     "prerequisites": [
       "OL-G00_PROBABILITY_DISTRIBUTION_ALIGNMENT"
     ],
@@ -128,19 +128,19 @@
   {
     "id": "OL-G03_INPUT_DIVERSITY",
     "question": "Do examples represent genuinely distinct laws?",
-    "scientific_motivation": "Repeated estimates of one invariant measure need not supply operator coverage.",
+    "scientific_motivation": "OL-D030: establish genuine finite-window law variation beyond reconstruction uncertainty; coverage gaps are recorded, optimum dataset and training adequacy remain open for later evaluation.",
     "prerequisites": [
       "OL-G02_RECONSTRUCTION_STABILITY"
     ],
     "frozen_experiment_definition": "Commit a versioned, non-DRAFT config and its hash before execution; current programme catalogue is not an executable predeclaration.",
-    "evidence_required": "Defined law families and hierarchical replicate comparison.",
+    "evidence_required": "Defined law families, hierarchical replicate comparison and retained duplicates/failures; G03_APPROVED_SCOPE.md. Prospective qualification criteria still required.",
     "metrics": "Within-law versus between-law L1/TV; lobe/moment/shape diversity.",
     "predeclared_thresholds": "TO_BE_PREDECLARED_BEFORE_RUN",
     "pass_condition": "All frozen scientific and provenance criteria pass; named reviewer and approver record scope and limitations.",
     "failure_condition": "Any required criterion fails or evidence is missing; missing evidence remains OPEN rather than a fabricated FAIL/PASS.",
     "what_passing_unlocks": "OL-G04_REFERENCE_TARGET_APPLICABILITY design/qualification only; no automatic production or DA authorization.",
     "what_failure_requires": "Preserve failed experiment; diagnose and predeclare a new version without outcome-driven relaxation.",
-    "claims_permitted_after_pass": "Only scoped input diversity evidence for the frozen population/config.",
+    "claims_permitted_after_pass": "Only scoped genuine input-law diversity evidence; no training coverage, optimality or universal-initial-condition claim.",
     "claims_still_forbidden_after_pass": "Unrestricted generalization, continuum accuracy without reference bounds, DA performance and production replacement.",
     "relevant_assumptions": [
       "OL-A01"
@@ -184,7 +184,7 @@
     ],
     "frozen_experiment_definition": "Commit a versioned, non-DRAFT config and its hash before execution; current programme catalogue is not an executable predeclaration.",
     "evidence_required": "Export/dtype error budget compared with required surrogate accuracy.",
-    "metrics": "FE→180×216×216→60×72×72, grid hierarchy, dtype L1/TV/moment error.",
+    "metrics": "FE\u2192180\u00d7216\u00d7216\u219260\u00d772\u00d772, grid hierarchy, dtype L1/TV/moment error.",
     "predeclared_thresholds": "TO_BE_PREDECLARED_BEFORE_RUN",
     "pass_condition": "All frozen scientific and provenance criteria pass; named reviewer and approver record scope and limitations.",
     "failure_condition": "Any required criterion fails or evidence is missing; missing evidence remains OPEN rather than a fabricated FAIL/PASS.",
@@ -234,7 +234,7 @@
     ],
     "frozen_experiment_definition": "Commit a versioned, non-DRAFT config and its hash before execution; current programme catalogue is not an executable predeclaration.",
     "evidence_required": "Same physical-law representation and independently propagated mixtures.",
-    "metrics": "Δlin=||S_h(αp+(1−α)q)−αS_hp−(1−α)S_hq||L1; correlate with corrections.",
+    "metrics": "\u0394lin=||S_h(\u03b1p+(1\u2212\u03b1)q)\u2212\u03b1S_hp\u2212(1\u2212\u03b1)S_hq||L1; correlate with corrections.",
     "predeclared_thresholds": "TO_BE_PREDECLARED_BEFORE_RUN",
     "pass_condition": "All frozen scientific and provenance criteria pass; named reviewer and approver record scope and limitations.",
     "failure_condition": "Any required criterion fails or evidence is missing; missing evidence remains OPEN rather than a fabricated FAIL/PASS.",
@@ -309,7 +309,7 @@
       "OL-G09_FIT_FEASIBILITY"
     ],
     "frozen_experiment_definition": "Commit a versioned, non-DRAFT config and its hash before execution; current programme catalogue is not an executable predeclaration.",
-    "evidence_required": "Independent law population; selection only on development; strong baselines.",
+    "evidence_required": "Independent law population; selection only on development; strong baselines. Carry forward G03 coverage gaps and OPEN training-population adequacy under OL-D030; independently assess them on untouched evaluation.",
     "metrics": "Median/p90/p95/worst L1/TV,L2,means,covariance,marginals,lobes,boundary with counts/uncertainty.",
     "predeclared_thresholds": "TO_BE_PREDECLARED_BEFORE_RUN",
     "pass_condition": "All frozen scientific and provenance criteria pass; named reviewer and approver record scope and limitations.",
@@ -385,7 +385,7 @@
     ],
     "frozen_experiment_definition": "Commit a versioned, non-DRAFT config and its hash before execution; current programme catalogue is not an executable predeclaration.",
     "evidence_required": "Independent 2T targets and identical initial-law representation.",
-    "metrics": "||ŜT(ŜTp)−S2Tp|| and one-shot 2T reference/approximation where available.",
+    "metrics": "||\u015cT(\u015cTp)\u2212S2Tp|| and one-shot 2T reference/approximation where available.",
     "predeclared_thresholds": "TO_BE_PREDECLARED_BEFORE_RUN",
     "pass_condition": "All frozen scientific and provenance criteria pass; named reviewer and approver record scope and limitations.",
     "failure_condition": "Any required criterion fails or evidence is missing; missing evidence remains OPEN rather than a fabricated FAIL/PASS.",

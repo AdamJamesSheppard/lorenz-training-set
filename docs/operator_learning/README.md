@@ -72,6 +72,10 @@ archived input laws and original accumulated failures remain unchanged.
 [G03 qualification scope](G03_QUALIFICATION_SCOPE_PROPOSAL.md) is an owner-review
 proposal, not a pass or executable predeclaration. No new run is active.
 
+Owner approved [G03 law-diversity scope](G03_APPROVED_SCOPE.md) under OL-D030.
+Training-coverage adequacy remains OPEN for later evaluation. Qualification
+criteria must be frozen prospectively; scope approval alone does not pass G03.
+
 G02 implementation and controlled study design:
 [reconstruction stability v1](RECONSTRUCTION_STABILITY_G02_V1.md).
 Characterization has completed: [adjudication and limits](evidence/G02_CHARACTERIZATION_20261006.md).

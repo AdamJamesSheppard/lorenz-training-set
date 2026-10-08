@@ -75,17 +75,17 @@ Each pass unlocks only the next gated study; DA/production need explicit approva
 
 - **id**: OL-G03_INPUT_DIVERSITY
 - **question**: Do examples represent genuinely distinct laws?
-- **scientific_motivation**: Repeated estimates of one invariant measure need not supply operator coverage.
+- **scientific_motivation**: OL-D030: establish genuine finite-window law variation beyond reconstruction uncertainty; coverage gaps are recorded, optimum dataset and training adequacy remain open for later evaluation.
 - **prerequisites**: ["OL-G02_RECONSTRUCTION_STABILITY"]
 - **frozen_experiment_definition**: Commit a versioned, non-DRAFT config and its hash before execution; current programme catalogue is not an executable predeclaration.
-- **evidence_required**: Defined law families and hierarchical replicate comparison.
+- **evidence_required**: Defined law families, hierarchical replicate comparison and retained duplicates/failures; G03_APPROVED_SCOPE.md. Prospective qualification criteria still required.
 - **metrics**: Within-law versus between-law L1/TV; lobe/moment/shape diversity.
 - **predeclared_thresholds**: TO_BE_PREDECLARED_BEFORE_RUN
 - **pass_condition**: All frozen scientific and provenance criteria pass; named reviewer and approver record scope and limitations.
 - **failure_condition**: Any required criterion fails or evidence is missing; missing evidence remains OPEN rather than a fabricated FAIL/PASS.
 - **what_passing_unlocks**: OL-G04_REFERENCE_TARGET_APPLICABILITY design/qualification only; no automatic production or DA authorization.
 - **what_failure_requires**: Preserve failed experiment; diagnose and predeclare a new version without outcome-driven relaxation.
-- **claims_permitted_after_pass**: Only scoped input diversity evidence for the frozen population/config.
+- **claims_permitted_after_pass**: Only scoped genuine input-law diversity evidence; no training coverage, optimality or universal-initial-condition claim.
 - **claims_still_forbidden_after_pass**: Unrestricted generalization, continuum accuracy without reference bounds, DA performance and production replacement.
 - **relevant_assumptions**: ["OL-A01"]
 - **experiment_config**: TO_BE_PREDECLARED_BEFORE_RUN
@@ -232,7 +232,7 @@ Each pass unlocks only the next gated study; DA/production need explicit approva
 - **scientific_motivation**: One held-out law cannot support tail-performance claims.
 - **prerequisites**: ["OL-G09_FIT_FEASIBILITY"]
 - **frozen_experiment_definition**: Commit a versioned, non-DRAFT config and its hash before execution; current programme catalogue is not an executable predeclaration.
-- **evidence_required**: Independent law population; selection only on development; strong baselines.
+- **evidence_required**: Independent law population; selection only on development; strong baselines. Carry forward G03 coverage gaps and OPEN training-population adequacy under OL-D030; independently assess them on untouched evaluation.
 - **metrics**: Median/p90/p95/worst L1/TV,L2,means,covariance,marginals,lobes,boundary with counts/uncertainty.
 - **predeclared_thresholds**: TO_BE_PREDECLARED_BEFORE_RUN
 - **pass_condition**: All frozen scientific and provenance criteria pass; named reviewer and approver record scope and limitations.
