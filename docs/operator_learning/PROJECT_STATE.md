@@ -1,6 +1,6 @@
 # Operator-learning current state
 
-Updated: 2026-10-06. Canonical encoding: state.json; this exact mirror is checked.
+Updated: 2026-10-08. Canonical encoding: state.json; this exact mirror is checked.
 Historical interpretation: DECISIONS.md. FEM method status is separate.
 
 ```json
@@ -13,9 +13,9 @@ Historical interpretation: DECISIONS.md. FEM method status is separate.
   "current_six_law_pilot": "COMPLETED_ENGINEERING_AND_RESTRICTED_LEARNING_PILOT",
   "current_model_scientifically_qualified": false,
   "next_required_gate": "OL-G03_INPUT_DIVERSITY",
-  "active_blocker": "OL-D026 authorizes committed hierarchical G03 v2 dispatch after review. Population coverage remains unqualified; changed FE transfer and reference/export checks remain open.",
+  "active_blocker": "OL-D028 authorizes committed window-local v3 controls; population coverage remains unqualified and original12 third-window bounds unresolved. FE transfer/reference/export checks remain open.",
   "authorized": [
-    "Commit and dispatch bounded hierarchical G03 v2 under OL-D026; no targets, training or DA",
+    "Commit and dispatch bounded window-local G03 v3 under OL-D028; no targets, training or DA",
     "Inexpensive labelled diagnostics; no expensive targets, neural retraining or DA"
   ],
   "locked": [
@@ -48,6 +48,6 @@ Historical interpretation: DECISIONS.md. FEM method status is separate.
     "OL-G16_POSTERIOR_TRANSFER": "LOCKED",
     "OL-G17_SEQUENTIAL_INTERFACE": "LOCKED"
   },
-  "updated": "2026-10-06"
+  "updated": "2026-10-08"
 }
 ```

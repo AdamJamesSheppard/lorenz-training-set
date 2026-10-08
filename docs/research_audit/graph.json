@@ -4,10 +4,10 @@
     "docs/research_audit/methods.json": "8167012c99375c28b91458671a998fab876ed2c02f9d35387feb62b876e5c791",
     "docs/research_audit/snapshot_20261006.json": "43da62abd04704f92606e2f75bdf919e46fc0908c477ad84da4cad853c1e0fa8",
     "docs/operator_learning/gates.json": "dca4e83aecf72500e53b21afe1a788e23348b48361d21dcf0f2eb99cb55d0ead",
-    "docs/operator_learning/state.json": "7e39815e087ef19aec9c3ef2ef6670a6e7ff68b767e9380031ddfd5b5e4bf434",
+    "docs/operator_learning/state.json": "2284a49b2d6abf39f47d0d4e51394567d849f7caa33ff9bccb95e2bcbc6cefca",
     "docs/operator_learning/CLAIMS.md": "4a989e772c0d905bd6c95279db583ac0d7171f2c2d1a15f1699ac0a2a1c42771",
     "docs/CLAIMS.md": "474a415c96ac74dd48eb3901af68660544549b7b966f549d09d712873ef7977c",
-    "docs/operator_learning/DECISIONS.md": "c78283026639e931a7b6840a6b05dd8484ab98d8c912daa621d661accd409a97",
+    "docs/operator_learning/DECISIONS.md": "50a911093b9f04861077e310e15b525d49dcf25dbd44e5912660f9da1d88d800",
     "docs/DECISIONS.md": "e815b7dd8cd7f274fa88fed0fffc367b34ac32e35a2fffa93c4e694e0189c814",
     "docs/operator_learning/assumptions.yaml": "bb46bbdb7103d49d84c89a149073f69f3ab8d3f0afedef4a829fc958e6eb6c29",
     "docs/assumptions.yaml": "51092eeafd2176eadee11442bd8fc9238217a7d772bd797f60ea4c6c5ce844ce",
@@ -25,7 +25,8 @@
     "experiments/operator_learning/OL-G02_reconstruction_qualification_v5.json": "fc8a1bb304e7c2d5e849053b4bb248cb9177bdcbbf71cd5ad92239c8c952deef",
     "experiments/operator_learning/OL-G02_reconstruction_refinement_v2.json": "9a554146d32f1390f9d58456a092914e93498476030172f9dc02d7e0e4dae37a",
     "experiments/operator_learning/OL-G03_input_coverage_characterization_v2.json": "f8580e76c07bff84398fe757932849e8170a437c19e30e9ef40caa86dab4083f",
-    "experiments/operator_learning/OL-G03_input_diversity_characterization_v1.json": "b843f2ca9af19a0466ecbb6d5cf4f0c1e56c0b6d9a303669ada6a4e07557a095"
+    "experiments/operator_learning/OL-G03_input_diversity_characterization_v1.json": "b843f2ca9af19a0466ecbb6d5cf4f0c1e56c0b6d9a303669ada6a4e07557a095",
+    "experiments/operator_learning/OL-G03_window_local_control_v3.json": "be3a9402f943083a438e42be6de3b47189ddadc1852fe50628d621cd9ba6fbd7"
   },
   "relation_vocabulary": [
     "adjudicates",
@@ -262,6 +263,13 @@
       "kind": "artifact",
       "label": "docs/operator_learning/REPRESENTATION_CONTRACT_V1.md",
       "path": "docs/operator_learning/REPRESENTATION_CONTRACT_V1.md",
+      "availability": "REPOSITORY_POINTER"
+    },
+    {
+      "id": "artifact:docs/operator_learning/WINDOW_LOCAL_CONTROL_G03_V3.md",
+      "kind": "artifact",
+      "label": "docs/operator_learning/WINDOW_LOCAL_CONTROL_G03_V3.md",
+      "path": "docs/operator_learning/WINDOW_LOCAL_CONTROL_G03_V3.md",
       "availability": "REPOSITORY_POINTER"
     },
     {
@@ -5330,6 +5338,22 @@
       "path": "docs/operator_learning/DECISIONS.md"
     },
     {
+      "id": "decision:OL-D027",
+      "kind": "decision",
+      "label": "2026-10-08 — OL-D027: prepare window-local G03 diagnostic; dispatch blocked",
+      "status": "RECORDED_DECISION",
+      "text": "Owner requests continuation after the completed v2 analysis. WINDOW_LOCAL_RK4_CONTROL_V3\nis an original diagnostic design recorded in WINDOW_LOCAL_CONTROL_G03_V3.md.\nUse every sealed v2 law; restart each coarse control from the saved fine-window\nstart and require exact fine replay. Save new controls separately, retain old\naccumulated bounds/failures, preserve all laws/widths/criteria and source evidence.\nNo claim of original30-unit trajectory accuracy or population coverage follows.\nG03 OPEN, later gates LOCKED; no targets, training or DA. Self-review only.\nThe v2 analysis reported36 completed laws,88 seals,24/36 sufficient1% bounds,\nwith all12 third-window bounds unresolved; these historical outcomes remain.\nDispatch requires phase-A commit; current session.git is read-only, so no new\nscientific job is launched. Provisional runtime2–4minutes from prior115.8s run;\nfast checks estimated under10seconds cumulatively. No current completion ETA.",
+      "path": "docs/operator_learning/DECISIONS.md"
+    },
+    {
+      "id": "decision:OL-D028",
+      "kind": "decision",
+      "label": "2026-10-08 — OL-D028: restore access and dispatch window-local controls",
+      "status": "RECORDED_DECISION",
+      "text": "Owner continues after enabling full access. Commit the prepared v3 diagnostic\nand reviewed hashes before persistent launch; keep every archived v2 law,\noriginal bound and limitation unchanged. Self-review, no independent assessor.\nUnrelated plotting script stays excluded and is the disclosed untracked\nprovenance exception. G03 remains OPEN; no training, targets or DA.\nFast checks83passed/1skipped previously; rerun before dispatch. Provisional\nruntime2–4minutes; confirm service plus producer progress and hand back.",
+      "path": "docs/operator_learning/DECISIONS.md"
+    },
+    {
       "id": "decision:a13b3c67c70a14d3a5dc7f59",
       "kind": "decision",
       "label": "2026-10-03 - Monograph evidence audit and completed domain record",
@@ -5713,6 +5737,16 @@
       "status": "PREDECLARED",
       "experiment_id": "OL-G03_input_diversity_characterization_v1",
       "kind_of_run": "bounded_diversity_characterization"
+    },
+    {
+      "id": "experiment:experiments/operator_learning/OL-G03_window_local_control_v3.json",
+      "kind": "experiment",
+      "label": "experiments/operator_learning/OL-G03_window_local_control_v3.json",
+      "path": "experiments/operator_learning/OL-G03_window_local_control_v3.json",
+      "availability": "REPOSITORY_POINTER",
+      "status": "PREDECLARED",
+      "experiment_id": "OL-G03_window_local_control_v3",
+      "kind_of_run": "window_local_integration_diagnostic"
     },
     {
       "id": "experiment:experiments/runs",
@@ -16420,6 +16454,13 @@
       "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
     },
     {
+      "id": "edge:3d6f1c2508d768dbc474915b",
+      "source": "decision:OL-D027",
+      "relation": "recorded_in",
+      "target": "artifact:docs/operator_learning/DECISIONS.md",
+      "attribution": "ORIGINAL_DECISION_SECTION"
+    },
+    {
       "id": "edge:3d70600e10646df665c7258a",
       "source": "gate:OL-G00_PROBABILITY_DISTRIBUTION_ALIGNMENT",
       "relation": "recorded_in",
@@ -17489,6 +17530,13 @@
       "relation": "references",
       "target": "method:BOX",
       "attribution": "Recorded methodological context; no external paper replaces project evidence"
+    },
+    {
+      "id": "edge:4f6475509f6df56ec086531d",
+      "source": "decision:OL-D027",
+      "relation": "references",
+      "target": "artifact:docs/operator_learning/WINDOW_LOCAL_CONTROL_G03_V3.md",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
     },
     {
       "id": "edge:4f7c7e9863888bf9f8ecca0c",
@@ -20296,6 +20344,13 @@
       "relation": "required_for",
       "target": "authorization:operator_surrogate_authorized_for_da",
       "attribution": "NECESSARY_NOT_SUFFICIENT_NO_AUTOMATIC_AUTHORIZATION"
+    },
+    {
+      "id": "edge:7f2035d24042b710f41f7d24",
+      "source": "decision:OL-D027",
+      "relation": "references",
+      "target": "artifact:docs/operator_learning/DECISIONS.md",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
     },
     {
       "id": "edge:7f2b13739e1fd5985683870c",
@@ -24106,6 +24161,13 @@
       "attribution": "AUDIT_CONTEXT_NOT_PROOF_OR_CERTIFIED_HISTORICAL_USE"
     },
     {
+      "id": "edge:c52db2d29fb5b398809c2d79",
+      "source": "decision:OL-D027",
+      "relation": "references",
+      "target": "decision:OL-D027",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
+    },
+    {
       "id": "edge:c52f425b86cf116815f1266e",
       "source": "claim:C-029",
       "relation": "references",
@@ -25317,6 +25379,13 @@
       "attribution": "HISTORICAL_METADATA_NOT_NEW_ADJUDICATION"
     },
     {
+      "id": "edge:d88edfb71c5acb8fc2fba53d",
+      "source": "decision:OL-D028",
+      "relation": "references",
+      "target": "decision:OL-D028",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
+    },
+    {
       "id": "edge:d8b3fca96fe9a081d20431d7",
       "source": "record:fem:20c286c69186c333b20470d0",
       "relation": "recorded_in",
@@ -25511,6 +25580,13 @@
       "relation": "recorded_in",
       "target": "artifact:docs/research_audit/snapshot_20261006.json",
       "attribution": "AUDIT_SNAPSHOT"
+    },
+    {
+      "id": "edge:db4b804511e1181784a72102",
+      "source": "decision:OL-D028",
+      "relation": "recorded_in",
+      "target": "artifact:docs/operator_learning/DECISIONS.md",
+      "attribution": "ORIGINAL_DECISION_SECTION"
     },
     {
       "id": "edge:db739551108fbb9af40deff6",
@@ -25903,6 +25979,13 @@
       "relation": "recorded_in",
       "target": "artifact:docs/research_audit/snapshot_20261006.json",
       "attribution": "AUDIT_SNAPSHOT"
+    },
+    {
+      "id": "edge:e430a02a41823b8d3cc2fe91",
+      "source": "decision:OL-D028",
+      "relation": "references",
+      "target": "artifact:docs/operator_learning/DECISIONS.md",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
     },
     {
       "id": "edge:e43421813b359c0f48a42a95",
@@ -26351,6 +26434,13 @@
       "relation": "has_outcome",
       "target": "outcome:fem:0044848df95de7acbe015da1",
       "attribution": "VERBATIM_RECORDED_FIELD"
+    },
+    {
+      "id": "edge:ec6fb8d69ef445b79f68ab7c",
+      "source": "gate:OL-G03_INPUT_DIVERSITY",
+      "relation": "tested_by",
+      "target": "experiment:experiments/operator_learning/OL-G03_window_local_control_v3.json",
+      "attribution": "CONFIG_GATE_ID"
     },
     {
       "id": "edge:ecce73fdedec11ead450370c",

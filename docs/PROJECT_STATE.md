@@ -35,7 +35,9 @@ G03 input diversity is OPEN; changed bin-free FE transfer and reference/export
 checks remain necessary before expensive targets. No target campaign or DA.
 OL-D024 reviews completed G03 v1: resolved finite-law variation, no coverage
 promotion. OL-D025 implements/tests hierarchical coverage v2; OL-D026 restores
-access and authorizes committed dispatch. See operator-learning state.
+access and authorizes committed dispatch. V2 completed; OL-D027 prepares
+window-local controls with unchanged laws. OL-D028 restores committed v3
+dispatch. G03 remains OPEN. See operator-learning state.
 Eventual analysis follows [the full-density Bayesian contract](BAYESIAN_ASSIMILATION_CONTRACT.md).
 
 2026-10-05: user authorized the bounded G00 alignment comparison, predeclared

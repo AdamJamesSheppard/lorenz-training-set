@@ -1,5 +1,30 @@
 # Operator-learning decisions
 
+## 2026-10-08 — OL-D028: restore access and dispatch window-local controls
+
+Owner continues after enabling full access. Commit the prepared v3 diagnostic
+and reviewed hashes before persistent launch; keep every archived v2 law,
+original bound and limitation unchanged. Self-review, no independent assessor.
+Unrelated plotting script stays excluded and is the disclosed untracked
+provenance exception. G03 remains OPEN; no training, targets or DA.
+Fast checks83passed/1skipped previously; rerun before dispatch. Provisional
+runtime2–4minutes; confirm service plus producer progress and hand back.
+
+## 2026-10-08 — OL-D027: prepare window-local G03 diagnostic; dispatch blocked
+
+Owner requests continuation after the completed v2 analysis. WINDOW_LOCAL_RK4_CONTROL_V3
+is an original diagnostic design recorded in WINDOW_LOCAL_CONTROL_G03_V3.md.
+Use every sealed v2 law; restart each coarse control from the saved fine-window
+start and require exact fine replay. Save new controls separately, retain old
+accumulated bounds/failures, preserve all laws/widths/criteria and source evidence.
+No claim of original30-unit trajectory accuracy or population coverage follows.
+G03 OPEN, later gates LOCKED; no targets, training or DA. Self-review only.
+The v2 analysis reported36 completed laws,88 seals,24/36 sufficient1% bounds,
+with all12 third-window bounds unresolved; these historical outcomes remain.
+Dispatch requires phase-A commit; current session.git is read-only, so no new
+scientific job is launched. Provisional runtime2–4minutes from prior115.8s run;
+fast checks estimated under10seconds cumulatively. No current completion ETA.
+
 ## 2026-10-06 — OL-D026: review, commit and dispatch hierarchical G03 v2
 
 Owner explicitly requests commit/review/run after full access is restored.

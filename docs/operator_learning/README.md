@@ -62,6 +62,10 @@ experiments/operator_learning/OL-G03_input_coverage_characterization_v2.json.
 Dispatch requires a verified persistent launch. G03 remains OPEN. OL-D025 records the
 cumulative-job ETA/handoff rule in root AGENTS.md.
 
+OL-D027 prepares [window-local integration controls](WINDOW_LOCAL_CONTROL_G03_V3.md)
+for every saved v2 law; original accumulated-control evidence stays unchanged.
+OL-D028 restores access and authorizes committed persistent dispatch; G03 stays OPEN.
+
 G02 implementation and controlled study design:
 [reconstruction stability v1](RECONSTRUCTION_STABILITY_G02_V1.md).
 Characterization has completed: [adjudication and limits](evidence/G02_CHARACTERIZATION_20261006.md).
