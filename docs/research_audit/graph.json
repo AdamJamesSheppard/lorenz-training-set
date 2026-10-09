@@ -4,10 +4,10 @@
     "docs/research_audit/methods.json": "8167012c99375c28b91458671a998fab876ed2c02f9d35387feb62b876e5c791",
     "docs/research_audit/snapshot_20261006.json": "43da62abd04704f92606e2f75bdf919e46fc0908c477ad84da4cad853c1e0fa8",
     "docs/operator_learning/gates.json": "b3ac6293325d2b68a5c9eae8f18e31241decc1de668b5e9315528aa2cb34af09",
-    "docs/operator_learning/state.json": "799592fa706f63237968f7566ee2ed69a4be0a16aa36616fb5661af6beacd82d",
-    "docs/operator_learning/CLAIMS.md": "96dc5c5a1b2f46fd73a084c902b8eafcd2fc466da10a423f17d503bc2ed71133",
+    "docs/operator_learning/state.json": "3efc4246ba2b7546c96a9140dd3d8bab5b450eaeed4da7c5f276c01f5561c0ab",
+    "docs/operator_learning/CLAIMS.md": "35c8d9fbe4fb85b3e6f0d6a7842c447b02ca92e1a33ac314c856b45021f12b28",
     "docs/CLAIMS.md": "474a415c96ac74dd48eb3901af68660544549b7b966f549d09d712873ef7977c",
-    "docs/operator_learning/DECISIONS.md": "1c5e359fb416e6974485a4f297f2b9e4a14ded6bc2c8ce8494a0d827741701df",
+    "docs/operator_learning/DECISIONS.md": "761c4ba3099bc022ed06e9b3801a83f2d615cce7ee1f303c78d064faea299e8b",
     "docs/DECISIONS.md": "e815b7dd8cd7f274fa88fed0fffc367b34ac32e35a2fffa93c4e694e0189c814",
     "docs/operator_learning/assumptions.yaml": "ff8a7249386389d72b91939b479d34535cd70e092dab057f9cc32d2712a089af",
     "docs/assumptions.yaml": "51092eeafd2176eadee11442bd8fc9238217a7d772bd797f60ea4c6c5ce844ce",
@@ -148,6 +148,13 @@
       "availability": "REPOSITORY_POINTER"
     },
     {
+      "id": "artifact:docs/operator_learning/../../scientific_governance/README.md",
+      "kind": "artifact",
+      "label": "docs/operator_learning/../../scientific_governance/README.md",
+      "path": "docs/operator_learning/../../scientific_governance/README.md",
+      "availability": "REPOSITORY_POINTER"
+    },
+    {
       "id": "artifact:docs/operator_learning/../BAYESIAN_ASSIMILATION_CONTRACT.md",
       "kind": "artifact",
       "label": "docs/operator_learning/../BAYESIAN_ASSIMILATION_CONTRACT.md",
@@ -187,6 +194,13 @@
       "kind": "artifact",
       "label": "docs/operator_learning/G03_QUALIFICATION_V4.md",
       "path": "docs/operator_learning/G03_QUALIFICATION_V4.md",
+      "availability": "REPOSITORY_POINTER"
+    },
+    {
+      "id": "artifact:docs/operator_learning/G04_INDEPENDENT_QUALIFICATION_DESIGN.md",
+      "kind": "artifact",
+      "label": "docs/operator_learning/G04_INDEPENDENT_QUALIFICATION_DESIGN.md",
+      "path": "docs/operator_learning/G04_INDEPENDENT_QUALIFICATION_DESIGN.md",
       "availability": "REPOSITORY_POINTER"
     },
     {
@@ -4687,6 +4701,14 @@
       "path": "docs/operator_learning/CLAIMS.md"
     },
     {
+      "id": "claim:OL-C021",
+      "kind": "claim",
+      "label": "Governance authentication bootstrap",
+      "status": "OPEN",
+      "text": "Class: OPEN for effective outside-agent authority. Candidate signed-receipt,\ntrusted-base transition, full tracked-source inventory, raw-array verification\nand mutation controls are implemented under OL-D034. Main protections were\napplied and read back. Shared admin credentials and filesystem prevent claiming\nindependent approval/execution/archive/evaluation until external deployment.\nMethod/source/outcome: ../../scientific_governance/README.md. Falsification:\nunsigned promotion, altered scientific criteria, wrong keys, missing attempts,\nunverified bytes or editable trust roots admitted by the deployed system.\nInternal test success alone cannot establish independence or scientific truth.\n\nHistorical G03 evidence levels: software checks and numerical/scoped separation\nsupport recorded; independent full raw reconstruction/trajectory replication\nOUTSTANDING; application qualification NOT ESTABLISHED. Separate array arithmetic\ndoes not promote these latter levels. See claim_boundaries.json for all18 gates.",
+      "path": "docs/operator_learning/CLAIMS.md"
+    },
+    {
       "id": "decision:024e022ec860235115756c43",
       "kind": "decision",
       "label": "2026-09-10 - Gate the next implementation on a same-mesh Q2 falsification",
@@ -5444,6 +5466,14 @@
       "label": "2026-10-10 — OL-D033: retain scoped G03 PASS; correct mass summary",
       "status": "RECORDED_DECISION",
       "text": "Owner supplied a detailed audit accepting finite-window separation while\nidentifying limits. Self-review confirms maximum recorded phase mass error\n3.1086244689504383e-15; OL-D032's2.89e-15 described the separate grid replay\nmaximum without identifying the distinction. Dated correction and unresolved\nwork: evidence/G03_AUDIT_RESPONSE_20261010.md and G03_MASS_SUMMARY_20261010.json.\nNo sealed report/config/provenance, threshold, historical failure or PASS changes.\nIndependent raw-array/export verification, third-window robustness and complete\npayload archiving remain unresolved, not newly passed requirements. Owner audit\nindependence is owner-reported; no identity or environment certification claimed.\nG04 remains next; no target generation/training/DA or new experiment authorized.",
+      "path": "docs/operator_learning/DECISIONS.md"
+    },
+    {
+      "id": "decision:OL-D034",
+      "kind": "decision",
+      "label": "2026-10-10 — OL-D034: implement trust-boundary bootstrap; hold deployment",
+      "status": "RECORDED_DECISION",
+      "text": "Owner requests all scientific-governance audit recommendations and explicitly\nselects a separate restricted agent identity with owner approval from another\ndevice. Implement candidate authenticated receipts, base-revision transition\nchecks, complete tracked-source inventory, write-once export, isolated-runner\ntemplate, separately implemented G03 array checker, adversarial tests, protected\ngoal and per-gate three-proposition boundaries. Enable and verify GitHub main\nreviews/checks/admin/signature/force-push protections; deliver through a PR.\nMethod/source/applicability and unresolved external controls are recorded in\n../../scientific_governance/README.md. Agent may not produce real approval keys,\napprove this PR, infer scientific approval from implementation instructions or\nbypass protections. Same-account admin access remains a material blocker.\nDistinct externally provisioned credentials, trusted execution/verification,\nimmutable archives, inaccessible final evaluation and owner approval remain\nrequired. Historical G00–G03 scoped passes and failed evidence are unchanged.\nG04 remains next; G04_INDEPENDENT_QUALIFICATION_DESIGN.md is design only, with\nthresholds unfrozen. No new scientific gate, training, target campaign or DA.\nSeparate AI algorithm review on the shared machine is disclosed, not claimed as\nan independently administered scientific approval. Engineering validation is\nrecorded in the accompanying governance implementation evidence note.",
       "path": "docs/operator_learning/DECISIONS.md"
     },
     {
@@ -13652,6 +13682,13 @@
       "attribution": "HISTORICAL_METADATA_NOT_NEW_ADJUDICATION"
     },
     {
+      "id": "edge:0ae4e90e53827ad52f486b47",
+      "source": "decision:OL-D034",
+      "relation": "references",
+      "target": "artifact:docs/operator_learning/G04_INDEPENDENT_QUALIFICATION_DESIGN.md",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
+    },
+    {
       "id": "edge:0b408c32a6ab62d3db4e6c3b",
       "source": "decision:905aa437f3444fda347ff2ff",
       "relation": "references",
@@ -14140,6 +14177,13 @@
       "relation": "documents",
       "target": "artifact:mature_positivity_certificate_diagnostic_report.json",
       "attribution": "HISTORICAL_METADATA_NOT_NEW_ADJUDICATION"
+    },
+    {
+      "id": "edge:13b10c98e807a6b07c0d9de9",
+      "source": "decision:OL-D034",
+      "relation": "recorded_in",
+      "target": "artifact:docs/operator_learning/DECISIONS.md",
+      "attribution": "ORIGINAL_DECISION_SECTION"
     },
     {
       "id": "edge:13cad6b33e9fbc09cd8131bd",
@@ -15367,6 +15411,13 @@
       "attribution": "AUDIT_CONTEXT_NOT_PROOF_OR_CERTIFIED_HISTORICAL_USE"
     },
     {
+      "id": "edge:27672dac4a618a7a72b05acc",
+      "source": "claim:OL-C021",
+      "relation": "references",
+      "target": "artifact:docs/operator_learning/../../scientific_governance/README.md",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
+    },
+    {
       "id": "edge:27b9cbdf7ed80d80efa54591",
       "source": "record:fem:2be52629ddcf79a2501e3ddb",
       "relation": "has_outcome",
@@ -15757,6 +15808,13 @@
       "relation": "references",
       "target": "artifact:docs/CLAIMS.md",
       "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
+    },
+    {
+      "id": "edge:2dc15a03a734e3cf1591c3dc",
+      "source": "claim:OL-C021",
+      "relation": "recorded_in",
+      "target": "artifact:docs/operator_learning/CLAIMS.md",
+      "attribution": "CLAIM_REGISTRY"
     },
     {
       "id": "edge:2de14139f74d02a468e07f67",
@@ -20260,6 +20318,13 @@
       "attribution": "AUDIT_SNAPSHOT"
     },
     {
+      "id": "edge:7b4b293989830d7b79f7708e",
+      "source": "claim:OL-C021",
+      "relation": "references",
+      "target": "decision:OL-D034",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
+    },
+    {
       "id": "edge:7b619f47948528928383ec66",
       "source": "decision:5d0efb11e4c988969a17a421",
       "relation": "references",
@@ -23466,6 +23531,13 @@
       "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
     },
     {
+      "id": "edge:b10294a2b97a867cb39b28b4",
+      "source": "decision:OL-D034",
+      "relation": "references",
+      "target": "decision:OL-D034",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
+    },
+    {
       "id": "edge:b158e196244a8afee8f6dfd9",
       "source": "record:fem:36581aae82282bf2ee2564c8",
       "relation": "documents",
@@ -23534,6 +23606,13 @@
       "relation": "recorded_in",
       "target": "artifact:docs/research_audit/snapshot_20261006.json",
       "attribution": "AUDIT_SNAPSHOT"
+    },
+    {
+      "id": "edge:b28f3b37cfe704776b9cc9c9",
+      "source": "claim:OL-C021",
+      "relation": "references",
+      "target": "artifact:docs/operator_learning/CLAIMS.md",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
     },
     {
       "id": "edge:b299325c23e78e43c67b2147",
@@ -24815,6 +24894,13 @@
       "relation": "has_outcome",
       "target": "outcome:fem:bcb3ed494db128b7c7e84aee",
       "attribution": "VERBATIM_RECORDED_FIELD"
+    },
+    {
+      "id": "edge:c97d12ebff2af05fee1ed656",
+      "source": "decision:OL-D034",
+      "relation": "references",
+      "target": "artifact:docs/operator_learning/DECISIONS.md",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
     },
     {
       "id": "edge:c9acbc913e496daf40c30f17",

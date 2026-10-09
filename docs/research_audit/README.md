@@ -1,5 +1,11 @@
 # Research, method and gate audit — 2026-10-06
 
+2026-10-10 engineering addition: [scientific authority bootstrap](../../scientific_governance/README.md)
+records method/source/applicability and all external deployment blockers;
+[outcome](../operator_learning/evidence/GOVERNANCE_BOOTSTRAP_20261010.md) records
+successful raw-array checks and preserved validation failures. No scientific
+gate or historical research attribution is changed.
+
 Ongoing project-wide authority: [REQ-RT-001](../../RESEARCH_TRACEABILITY.md).
 The dated snapshot remains historical; the requirement governs new work.
 

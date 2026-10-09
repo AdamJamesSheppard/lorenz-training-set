@@ -1,6 +1,6 @@
 # Operator-learning current state
 
-Updated: 2026-10-09. Canonical encoding: state.json; this exact mirror is checked.
+Updated: 2026-10-10. Canonical encoding: state.json; this exact mirror is checked.
 Historical interpretation: DECISIONS.md. FEM method status is separate.
 
 ```json
@@ -13,12 +13,13 @@ Historical interpretation: DECISIONS.md. FEM method status is separate.
   "current_six_law_pilot": "COMPLETED_ENGINEERING_AND_RESTRICTED_LEARNING_PILOT",
   "current_model_scientifically_qualified": false,
   "next_required_gate": "OL-G04_REFERENCE_TARGET_APPLICABILITY",
-  "active_blocker": "G04 reference-target applicability for accepted bin-free occupation laws is OPEN; FE transfer, numerical accuracy and export fidelity need controlled evidence. Training coverage remains unverified.",
+  "active_blocker": "External governance deployment HOLD: separate restricted agent identity, owner trust roots, independent executor/verifier/archive and isolated evaluation pending. G04 reference applicability remains OPEN; training coverage unverified.",
   "authorized": [
-    "Design/predeclare G04 reference applicability study; no automatic target campaign or training",
+    "G04 design and governance bootstrap only; qualifying execution requires outside-agent authority",
     "Inexpensive labelled diagnostics; no posterior transfer, production or DA"
   ],
   "locked": [
+    "New scientific promotions pending external authority deployment",
     "Large expensive target campaigns",
     "Qualified surrogate use",
     "Posterior-transfer qualification",
@@ -48,6 +49,6 @@ Historical interpretation: DECISIONS.md. FEM method status is separate.
     "OL-G16_POSTERIOR_TRANSFER": "LOCKED",
     "OL-G17_SEQUENTIAL_INTERFACE": "LOCKED"
   },
-  "updated": "2026-10-09"
+  "updated": "2026-10-10"
 }
 ```
