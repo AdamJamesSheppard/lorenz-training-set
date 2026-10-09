@@ -89,9 +89,9 @@ Each pass unlocks only the next gated study; DA/production need explicit approva
 - **claims_still_forbidden_after_pass**: Unrestricted generalization, continuum accuracy without reference bounds, DA performance and production replacement.
 - **relevant_assumptions**: ["OL-A01"]
 - **experiment_config**: experiments/operator_learning/OL-G03_diversity_qualification_v4.json
-- **evidence_run**: null
-- **decision_status**: OPEN
-- **adjudication**: null
+- **evidence_run**: runs/operator-learning/OL-G03_diversity_qualification_v4/20261009T222910816221Z
+- **decision_status**: PASSED
+- **adjudication**: {"approver": "Adam James Sheppard: approved law-diversity scope, instructed G03 completion and continuation toward qualification", "reviewer": "Implementing Codex agent; self-review, no independent assessor", "date": "2026-10-09", "config_sha256": "cd7f675f4ebca0d3a7887b00e0986b24f8b91b743d6829c847f3cf538e0cf5ea", "evidence_sha256": "75c346d8bb01a3e8b76d5fbef2d7f989e682465d28b7b459986ed31df175bb09", "predeclaration_commit": "f94a176f398b34c1ff2d451ef0d7f46fd1b9ebfe", "decision_record": "OL-D032; docs/operator_learning/evidence/G03_QUALIFICATION_V4_20261009.md", "limitations": "24 dependent finite-window laws, fixed regularization and numerical starts; finite controls only, no coverage/continuum/posterior accuracy guarantee; large arrays ignored locally; declared unrelated untracked plotting script"}
 
 ## OL-G04_REFERENCE_TARGET_APPLICABILITY
 
@@ -112,7 +112,7 @@ Each pass unlocks only the next gated study; DA/production need explicit approva
 - **relevant_assumptions**: ["OL-A01"]
 - **experiment_config**: TO_BE_PREDECLARED_BEFORE_RUN
 - **evidence_run**: null
-- **decision_status**: LOCKED
+- **decision_status**: OPEN
 - **adjudication**: null
 
 ## OL-G05_EXPORT_FIDELITY

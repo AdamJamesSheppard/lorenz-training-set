@@ -1,5 +1,17 @@
 # Operator-learning claim registry
 
+## OL-C020 — Fresh G03 v4 finite-law diversity beyond reconstruction variation
+
+Class: NUMERICAL. All24 retained fresh laws satisfy frozen reconstruction/mass/
+negativity criteria and each has22 resolved cross-source witnesses; all276 pair
+margins positive, minimum .0773421. Evidence: OL-D032 and
+evidence/G03_QUALIFICATION_V4_20261009.md; predeclaration f94a176; method/source
+G03_QUALIFICATION_V4.md. Falsification: source/seal/config mismatch, incorrect
+pairing, bound/mass or TV arithmetic, missing attempts. Limits: fixed finite
+dependent windows and regularization; no continuum/invariant/universal law,
+coverage optimum, posterior or neural accuracy guarantee. G03 scoped PASSED;
+G04 reference applicability OPEN. Historical characterization claims unchanged.
+
 ## OL-C018 — Archived36-law window-local finite-control sensitivity
 
 Class: NUMERICAL. All36 local sufficient combined TV bounds≤.01, maximum

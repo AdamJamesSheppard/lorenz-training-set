@@ -223,7 +223,14 @@ def validate(root=ROOT):
                     errors.append(f'missing updated gate traceability: {actual["id"]}/{key}')
             if latest['decision_id'] not in (root / 'docs/operator_learning/DECISIONS.md').read_text():
                 errors.append('updated research decision missing')
-        if actual['decision_status'] in ('PASSED', 'FAILED') and not frozen['historical_events']:
+        # New gates can be adjudicated after the immutable baseline snapshot.
+        # Their explicit versioned overlay supplies outcome history; never edit
+        # the historical snapshot merely to satisfy a current-state check.
+        overlay_history = (actual['id'] in by_id and latest.get('decision_id')
+                           and any(event.get('status') == actual['decision_status']
+                                   for event in latest.get('component_outcomes', [])))
+        if (actual['decision_status'] in ('PASSED', 'FAILED')
+                and not frozen['historical_events'] and not overlay_history):
             errors.append(f"adjudicated gate missing outcome/research history: {actual['id']}")
         if set(frozen['method_ids']) - method_ids or set(frozen['research_source_ids']) - source_ids:
             errors.append('unresolved gate method/source link')

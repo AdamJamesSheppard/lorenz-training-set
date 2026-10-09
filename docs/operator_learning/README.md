@@ -31,15 +31,18 @@ G01 failure, G02 open characterizations and prospective-only later-gate sources.
 Use the [searchable provenance graph](../research_audit/GRAPH.md) to trace both
 successful and unsuccessful outcomes through their research and evidence.
 
-**NEXT_REQUIRED_GATE = OL-G03_INPUT_DIVERSITY.**
+**NEXT_REQUIRED_GATE = OL-G04_REFERENCE_TARGET_APPLICABILITY.**
 
 [Prospective G03 evaluator](G03_QUALIFICATION_CODE.md) implements a proposed
 finite-control non-collapse rule with failure/duplicate retention. Criteria and
 fresh [v4 qualification predeclaration](G03_QUALIFICATION_V4.md) now records the
 executable criteria under OL-D031; no implementation or launch promotes a gate.
+Completed v4 [scoped adjudication](evidence/G03_QUALIFICATION_V4_20261009.md)
+under OL-D032 passes G03 after verified fresh evidence; G04 design is now OPEN.
 G00 passed within the owner-selected attractor-density scope. G01 passed archived
 representation checks; G02 passed scoped finite-control reconstruction under
-OL-D021. G03 is OPEN; G04–G17 are LOCKED. Large target campaigns, qualified
+OL-D021. G03 passed scoped finite-law diversity under OL-D032; G04 is OPEN,
+G05–G17 LOCKED. Large target campaigns, qualified
 surrogate replacement, posterior-transfer qualification and operator-assisted
 DA are not authorized. Cheap explicitly labelled diagnostics on the original
 six pairs are allowed; they do not unlock gates. Do not tune on the original
@@ -61,15 +64,15 @@ Commit predeclaration before dispatch; OL-D023 records restored Git write access
 
 G03 v1 completed and is [reviewed without coverage promotion](evidence/G03_CHARACTERIZATION_V1_20261006.md)
 under OL-D024. A [hierarchical coverage proposal](INPUT_COVERAGE_G03_V2_PROPOSAL.md)
-is implemented and tested; OL-D026 restores access and authorizes committed
+is implemented and tested; OL-D026 restored access and authorized committed
 dispatch. Runner: scripts/run_input_coverage.py; config:
 experiments/operator_learning/OL-G03_input_coverage_characterization_v2.json.
-Dispatch requires a verified persistent launch. G03 remains OPEN. OL-D025 records the
+At that historical stage G03 remained OPEN. OL-D025 records the
 cumulative-job ETA/handoff rule in root AGENTS.md.
 
 OL-D027 prepares [window-local integration controls](WINDOW_LOCAL_CONTROL_G03_V3.md)
 for every saved v2 law; original accumulated-control evidence stays unchanged.
-OL-D028 restores access and authorizes committed persistent dispatch; G03 stays OPEN.
+OL-D028 restored access and authorized v3 dispatch; G03 stayed OPEN at that stage.
 
 V3 has completed: [verified local-control review](evidence/G03_WINDOW_LOCAL_V3_20261008.md)
 under OL-D029. All36 local bounds meet the inherited1% diagnostic budget;

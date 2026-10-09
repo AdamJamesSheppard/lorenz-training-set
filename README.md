@@ -17,7 +17,9 @@ and restricted density-learning gains, with serious statistical and boundary err
 No model is scientifically qualified. The owner accepted the restricted attractor-density
 population; G01 archived representation and G02 scoped finite-control reconstruction
 checks pass. Input-law diversity is next:
-`NEXT_REQUIRED_GATE = OL-G03_INPUT_DIVERSITY`.
+`NEXT_REQUIRED_GATE = OL-G04_REFERENCE_TARGET_APPLICABILITY`.
+G03 passed the scoped fresh finite-law diversity study under OL-D032; training
+coverage, reference applicability and surrogate qualification remain unresolved.
 Production and operator-assisted DA remain unauthorized. FEM evidence below retains
 its historical scope; the eventual posterior forecast and current density-only pilot
 are separate tasks. Run `python scripts/check_operator_learning.py` for fast controls.

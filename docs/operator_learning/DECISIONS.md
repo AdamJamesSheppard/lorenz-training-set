@@ -1,5 +1,21 @@
 # Operator-learning decisions
 
+## 2026-10-09 — OL-D032: adjudicate scoped G03 v4 PASS
+
+Owner requests continued work toward G03 completion. Completed predeclared
+v4 at f94a176 passes unchanged criteria on24/24 fresh laws, all144 within and276
+between comparisons, max finite-control TV .00673069, zero negative mass,
+max mass error2.89e-15, every law22 cross-source witnesses. Self-review verifies
+64 seals,10 source hashes, all24 bounds and276 TV replays. Evidence and method
+attribution: evidence/G03_QUALIFICATION_V4_20261009.md; G03_QUALIFICATION_V4.md.
+Portable report/config/provenance/seal copied unchanged; large arrays ignored
+locally. No method adaptation, threshold relaxation or historical reclassification.
+Record scoped finite-control law-diversity PASS, open G04 design only. Coverage,
+continuum accuracy, reference applicability/export and posterior relevance remain
+open. No training, target campaign, production or DA authorized. Implementing
+agent self-review under owner scope/execution/continuation authority; no independent
+assessor. NEXT_REQUIRED_GATE=OL-G04_REFERENCE_TARGET_APPLICABILITY.
+
 ## 2026-10-09 — OL-D031: predeclare fresh scoped G03 qualification
 
 Owner requests completion of G03 after approving law-diversity scope. Freeze

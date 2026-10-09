@@ -27,6 +27,7 @@ def test_qualification_budget_is_approved_and_g03_open_only_after_pass():
     state = json.loads((base/'state.json').read_text())
     assert catalogue[2]['predeclared_thresholds']['tv_max'] == .01
     assert catalogue[2]['decision_status'] == 'PASSED'
-    assert state['gates'][catalogue[3]['id']] == 'OPEN'
+    assert state['gates'][catalogue[3]['id']] == catalogue[3]['decision_status']
+    assert catalogue[3]['decision_status'] != 'LOCKED'
     assert not state['operator_surrogate_authorized_for_da']
     assert not state['operator_production_authorized']

@@ -35,8 +35,11 @@ def test_scoped_v5_adjudication_and_portable_hashes():
         assert hashlib.sha256(payload).hexdigest() == seal[f'{name}.json']
     state = json.loads((BASE/'state.json').read_text())
     assert state['gates']['OL-G02_RECONSTRUCTION_STABILITY'] == 'PASSED'
-    assert state['gates']['OL-G03_INPUT_DIVERSITY'] == 'OPEN'
-    assert state['next_required_gate'] == 'OL-G03_INPUT_DIVERSITY'
+    # G02 remains adjudicated while later gates progress through explicit review.
+    catalogue = json.loads((BASE/'gates.json').read_text())
+    assert state['gates']['OL-G03_INPUT_DIVERSITY'] == catalogue[3]['decision_status']
+    assert state['next_required_gate'] == next(g['id'] for g in catalogue
+                                              if g['decision_status'] != 'PASSED')
     assert state['operator_surrogate_authorized_for_da'] is False
     report = json.loads((BASE/'evidence'/f'{prefix}_REPORT.json').read_text())
     assert len(report['records']) == 6 and report['exclusions'] == []

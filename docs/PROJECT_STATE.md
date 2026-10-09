@@ -19,7 +19,7 @@ CURRENT_MODEL_SCIENTIFICALLY_QUALIFIED = false
 PRODUCTION_DATASET_AUTHORIZED = false
 OPERATOR_SURROGATE_AUTHORIZED_FOR_DA = false
 OPERATOR_PRODUCTION_AUTHORIZED = false
-NEXT_REQUIRED_GATE = OL-G03_INPUT_DIVERSITY
+NEXT_REQUIRED_GATE = OL-G04_REFERENCE_TARGET_APPLICABILITY
 ```
 
 The six-law pilot `runs/neural-pilot/20261004T133438Z` completed target generation
@@ -31,17 +31,20 @@ it development data. G00 passed within the owner-approved restricted attractor-d
 OL-D014 records approval with reservations of a bin-free reconstruction candidate.
 Owner subsequently approved finite-control reconstruction TV≤.01 (OL-D020).
 G02 qualification_v5 now PASSED within the finite-control scope (OL-D021).
-G03 input diversity is OPEN; changed bin-free FE transfer and reference/export
+G03 input diversity PASSED within its fresh finite-control scope (OL-D032);
+changed bin-free FE transfer and reference/export
 checks remain necessary before expensive targets. No target campaign or DA.
 OL-D024 reviews completed G03 v1: resolved finite-law variation, no coverage
 promotion. OL-D025 implements/tests hierarchical coverage v2; OL-D026 restores
 access and authorizes committed dispatch. V2 completed; OL-D027 prepares
 window-local controls with unchanged laws. OL-D028 restores committed v3
 dispatch. V3 completed; OL-D029 records36 supported local-control bounds and
-retains G03 OPEN pending prospective qualification criteria/scope approval.
+retained G03 OPEN at that historical stage pending prospective criteria/scope.
 OL-D030 approves law-diversity scope; training adequacy remains OPEN for later
-evaluation. OL-D031 prospectively freezes fresh24-law qualification v4; launch
-and reviewed evidence are pending. G03 remains OPEN; no targets or training.
+evaluation. OL-D031 prospectively froze fresh24-law qualification v4. OL-D032
+reviews completed evidence:24/24 laws and all276 pairs supported, no failures,
+zero negative mass. G03 scoped PASSED; G04 reference applicability OPEN.
+No target campaign, training, surrogate qualification, production or DA authorized.
 See operator-learning state.
 Eventual analysis follows [the full-density Bayesian contract](BAYESIAN_ASSIMILATION_CONTRACT.md).
 

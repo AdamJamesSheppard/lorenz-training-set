@@ -12,11 +12,11 @@ Historical interpretation: DECISIONS.md. FEM method status is separate.
   "current_scope": "FIXED_PHYSICS_FIXED_HORIZON_ATTRACTOR_DENSITIES",
   "current_six_law_pilot": "COMPLETED_ENGINEERING_AND_RESTRICTED_LEARNING_PILOT",
   "current_model_scientifically_qualified": false,
-  "next_required_gate": "OL-G03_INPUT_DIVERSITY",
-  "active_blocker": "OL-D031 fresh G03 qualification v4 predeclared; run and reviewed immutable evidence required. Coverage/optimal allocation and FE/reference/export applicability remain OPEN.",
+  "next_required_gate": "OL-G04_REFERENCE_TARGET_APPLICABILITY",
+  "active_blocker": "G04 reference-target applicability for accepted bin-free occupation laws is OPEN; FE transfer, numerical accuracy and export fidelity need controlled evidence. Training coverage remains unverified.",
   "authorized": [
-    "Committed prospective G03 v4 law-diversity run and self-reviewed adjudication; no retrospective pass",
-    "Inexpensive labelled diagnostics; no targets, training or DA"
+    "Design/predeclare G04 reference applicability study; no automatic target campaign or training",
+    "Inexpensive labelled diagnostics; no posterior transfer, production or DA"
   ],
   "locked": [
     "Large expensive target campaigns",
@@ -27,13 +27,13 @@ Historical interpretation: DECISIONS.md. FEM method status is separate.
   ],
   "operator_surrogate_authorized_for_da": false,
   "operator_production_authorized": false,
-  "last_adjudicated_evidence": "OL-D029; evidence/G03_WINDOW_LOCAL_V3_20261008.md:40 seals verified,36 local bounds recomputed, unchanged laws; G03 OPEN, original accumulated failures preserved.",
+  "last_adjudicated_evidence": "OL-D032; evidence/G03_QUALIFICATION_V4_20261009.md: scoped G03 PASS,24 laws,64 seals,24 bound and276 pair replays; no failures/exclusions.",
   "gates": {
     "OL-G00_PROBABILITY_DISTRIBUTION_ALIGNMENT": "PASSED",
     "OL-G01_REPRESENTATION_CONTRACT": "PASSED",
     "OL-G02_RECONSTRUCTION_STABILITY": "PASSED",
-    "OL-G03_INPUT_DIVERSITY": "OPEN",
-    "OL-G04_REFERENCE_TARGET_APPLICABILITY": "LOCKED",
+    "OL-G03_INPUT_DIVERSITY": "PASSED",
+    "OL-G04_REFERENCE_TARGET_APPLICABILITY": "OPEN",
     "OL-G05_EXPORT_FIDELITY": "LOCKED",
     "OL-G06_DATA_PROVENANCE": "LOCKED",
     "OL-G07_OPERATOR_STRUCTURE": "LOCKED",

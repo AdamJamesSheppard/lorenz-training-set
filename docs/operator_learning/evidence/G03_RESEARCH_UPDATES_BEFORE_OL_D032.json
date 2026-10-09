@@ -39,48 +39,24 @@
     },
     {
       "gate_id": "OL-G03_INPUT_DIVERSITY",
-      "status": "PASSED",
-      "adjudication": {
-        "approver": "Adam James Sheppard: approved law-diversity scope, instructed G03 completion and continuation toward qualification",
-        "reviewer": "Implementing Codex agent; self-review, no independent assessor",
-        "date": "2026-10-09",
-        "config_sha256": "cd7f675f4ebca0d3a7887b00e0986b24f8b91b743d6829c847f3cf538e0cf5ea",
-        "evidence_sha256": "75c346d8bb01a3e8b76d5fbef2d7f989e682465d28b7b459986ed31df175bb09",
-        "predeclaration_commit": "f94a176f398b34c1ff2d451ef0d7f46fd1b9ebfe",
-        "decision_record": "OL-D032; docs/operator_learning/evidence/G03_QUALIFICATION_V4_20261009.md",
-        "limitations": "24 dependent finite-window laws, fixed regularization and numerical starts; finite controls only, no coverage/continuum/posterior accuracy guarantee; large arrays ignored locally; declared unrelated untracked plotting script"
-      },
-      "decision_id": "OL-D032",
-      "evidence": "docs/operator_learning/evidence/G03_QUALIFICATION_V4_20261009.md",
-      "method_record": "docs/operator_learning/G03_QUALIFICATION_V4.md",
+      "status": "OPEN",
+      "adjudication": null,
+      "decision_id": "OL-D029",
+      "evidence": "docs/operator_learning/evidence/G03_WINDOW_LOCAL_V3_20261008.md",
+      "method_record": "docs/operator_learning/WINDOW_LOCAL_CONTROL_G03_V3.md",
       "component_outcomes": [
         {
-          "label": "Fresh24-law finite-control non-collapse under frozen criteria",
-          "status": "PASSED",
-          "cases": 24
+          "label": "Window-local finite-control bounds, unchanged1% criterion",
+          "status": "NUMERICAL_SUPPORTED",
+          "cases": 36
         },
         {
-          "label": "Original accumulated-control failures preserved; see archived OL-D029 overlay",
+          "label": "Original accumulated-control sufficient-bound failures preserved",
           "status": "FAILED_SUFFICIENT_BOUND",
           "cases": 12
         },
         {
-          "label": "Training coverage and optimum allocation unverified",
-          "status": "OPEN",
-          "cases": 0
-        }
-      ]
-    },
-    {
-      "gate_id": "OL-G04_REFERENCE_TARGET_APPLICABILITY",
-      "status": "OPEN",
-      "adjudication": null,
-      "decision_id": "OL-D032",
-      "evidence": "docs/operator_learning/evidence/G03_QUALIFICATION_V4_20261009.md",
-      "method_record": "docs/operator_learning/G03_QUALIFICATION_V4.md",
-      "component_outcomes": [
-        {
-          "label": "Prerequisite passed; reference applicability study design open, no target authorization",
+          "label": "Population qualification pending prospective criteria",
           "status": "OPEN",
           "cases": 0
         }

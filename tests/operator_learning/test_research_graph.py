@@ -28,7 +28,9 @@ def test_success_failure_open_and_authorization_are_all_present():
     data = graph()
     assert any('OL-D006' in n['id'] for n in search(data, kind='outcome', status='PASSED'))
     assert any('OL-D005' in n['id'] for n in search(data, kind='outcome', status='FAILED'))
-    assert any('OL-G03' in n['id'] for n in search(data, kind='gate', status='OPEN'))
+    state=json.loads((ROOT/'docs/operator_learning/state.json').read_text())
+    assert any(state['next_required_gate'] in n['id']
+               for n in search(data, kind='gate', status='OPEN'))
     assert any('OL-D021' in n['id'] for n in search(data, kind='outcome', status='PASSED'))
     assert len([n for n in search(data, kind='outcome', status='FAILED') if 'OL-D021' in n['id']]) == 2
     assert len(search(data, kind='gate')) == 18
