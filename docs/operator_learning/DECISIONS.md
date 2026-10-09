@@ -1,5 +1,17 @@
 # Operator-learning decisions
 
+## 2026-10-09 — OL-D031: predeclare fresh scoped G03 qualification
+
+Owner requests completion of G03 after approving law-diversity scope. Freeze
+G03_QUALIFICATION_V4.md and its new24-law configuration before dispatch. Preserve
+all historical studies and failed bounds; fresh seeds, unchanged reconstruction
+budget, window-local controls and no exclusion/automatic promotion. Implementing
+agent self-review, no independent assessor. Acceptance is finite-control
+non-collapse under the documented witness rule; training coverage remains open.
+Full access now permits Git commit. Exclude unrelated plotting work. G03 OPEN;
+G04–G17 LOCKED until reviewed evidence. No targets, training or DA. Persistent
+job ETA2–4minutes; hand back on verified launch under mandatory cumulative rule.
+
 ## 2026-10-08 — OL-D030: owner approves G03 law-diversity scope
 
 Owner: "Yes you should focus on law diversity I agree, approved".

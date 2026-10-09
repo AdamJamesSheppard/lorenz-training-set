@@ -40,7 +40,8 @@ window-local controls with unchanged laws. OL-D028 restores committed v3
 dispatch. V3 completed; OL-D029 records36 supported local-control bounds and
 retains G03 OPEN pending prospective qualification criteria/scope approval.
 OL-D030 approves law-diversity scope; training adequacy remains OPEN for later
-evaluation. Prospective qualification criteria still required; no new run active.
+evaluation. OL-D031 prospectively freezes fresh24-law qualification v4; launch
+and reviewed evidence are pending. G03 remains OPEN; no targets or training.
 See operator-learning state.
 Eventual analysis follows [the full-density Bayesian contract](BAYESIAN_ASSIMILATION_CONTRACT.md).
 

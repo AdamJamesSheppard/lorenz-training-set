@@ -1,6 +1,6 @@
 # Operator-learning current state
 
-Updated: 2026-10-08. Canonical encoding: state.json; this exact mirror is checked.
+Updated: 2026-10-09. Canonical encoding: state.json; this exact mirror is checked.
 Historical interpretation: DECISIONS.md. FEM method status is separate.
 
 ```json
@@ -13,10 +13,10 @@ Historical interpretation: DECISIONS.md. FEM method status is separate.
   "current_six_law_pilot": "COMPLETED_ENGINEERING_AND_RESTRICTED_LEARNING_PILOT",
   "current_model_scientifically_qualified": false,
   "next_required_gate": "OL-G03_INPUT_DIVERSITY",
-  "active_blocker": "OL-D030 owner-approved law-diversity scope; prospective qualification criteria/run still required. Training coverage and optimum allocation remain OPEN for later evaluation; FE/reference/export qualification remains open.",
+  "active_blocker": "OL-D031 fresh G03 qualification v4 predeclared; run and reviewed immutable evidence required. Coverage/optimal allocation and FE/reference/export applicability remain OPEN.",
   "authorized": [
-    "Prepare prospective scoped G03 law-diversity qualification; no retrospective pass, targets, training or DA",
-    "Inexpensive labelled diagnostics; no expensive targets, neural retraining or DA"
+    "Committed prospective G03 v4 law-diversity run and self-reviewed adjudication; no retrospective pass",
+    "Inexpensive labelled diagnostics; no targets, training or DA"
   ],
   "locked": [
     "Large expensive target campaigns",
@@ -48,6 +48,6 @@ Historical interpretation: DECISIONS.md. FEM method status is separate.
     "OL-G16_POSTERIOR_TRANSFER": "LOCKED",
     "OL-G17_SEQUENTIAL_INTERFACE": "LOCKED"
   },
-  "updated": "2026-10-08"
+  "updated": "2026-10-09"
 }
 ```

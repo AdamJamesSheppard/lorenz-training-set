@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "id": "OL-G03_diversity_qualification_v4",
+  "gate_id": "OL-G03_INPUT_DIVERSITY",
+  "kind": "prospective_law_diversity_qualification",
+  "status": "PREDECLARED",
+  "question": "Do fresh finite-window occupation laws exhibit cross-source differences beyond reconstruction controls?",
+  "hypotheses": [
+    "Distinct resolved finite occupation laws",
+    "Sampling/export effects explain separation",
+    "Distinct laws remain insufficient for application coverage"
+  ],
+  "metrics": [
+    "Within-law TV",
+    "Between-law TV and finite-control margins",
+    "Means covariance marginals lobe tail boundary effective volume",
+    "Reconstruction bounds, mass, negativity, missing counts"
+  ],
+  "thresholds": {
+    "reconstruction_tv_max": 0.01,
+    "mass_error_max": 1e-10
+  },
+  "seeds": {
+    "trajectory": [
+      83501,
+      83502,
+      83503,
+      83504,
+      83505,
+      83506,
+      83507,
+      83508,
+      83509,
+      83510,
+      83511,
+      83512
+    ]
+  },
+  "inputs": {
+    "scripts/run_diversity_qualification.py": "2254f861cc8db851c686d1f774fd8baee12268c343b6efffb75aa990fb0d5e15",
+    "operator_learning/diversity_qualification.py": "a5912e43f36e3acff031a3c32a99708da6307f4f169f412da4f4119ad2a8c8a7",
+    "scripts/run_reconstruction_qualification.py": "894080538814441f43bd62f070f247e890848c758c0090b38fad4b5338c4ef21",
+    "operator_learning/reconstruction_controls.py": "ef319bf6ddb90c94dcf4d89d28b36545e0d7763901a04d2b4dc9e081867aa3a6",
+    "operator_learning/reconstruction.py": "9687ec1de3d7d766c74a17f7d79ef5a97aaa299b90a23543960dfc48620c3b5c",
+    "operator_learning/alignment.py": "16dbec8b6f7046d90c15395a229054f0cff47218f50b438a670b8a216a664451",
+    "operator_learning/governance.py": "49912ae3dcf57f37421a9200331821830d2ad3822154f899bad4215213a3a8b5",
+    "docs/operator_learning/G03_QUALIFICATION_V4.md": "d38ce4620ac63bda5a11cc2ff963f6acf891d76ac9e7f6d3f8e942902f212687",
+    "AGENTS.md": "dd8519e15fd369ff7e4604a79a69f867e0fa7db75e10bea46dfa5fae6111deeb",
+    "SCIENTIFIC_INTEGRITY.md": "f0208b97e2466c14ec10851da5d07ff39be0af3952491f6890eb43c054c7a97e"
+  },
+  "command": [
+    "env",
+    "OPENBLAS_NUM_THREADS=1",
+    "OMP_NUM_THREADS=1",
+    "/home/adam/.local/share/mamba/envs/pde/bin/python",
+    "scripts/run_diversity_qualification.py",
+    "{RUN_DIRECTORY}"
+  ],
+  "runtime_versions": {
+    "python": "3.12.13",
+    "numpy": "2.5.2",
+    "scipy": "1.18.0"
+  },
+  "hardware": {
+    "device": "cpu",
+    "gpu": false,
+    "mpi": false,
+    "blas_threads": 1,
+    "openmp_threads": 1
+  },
+  "required_evidence": [
+    "All24 attempted laws and source/window identities, all failures retained",
+    "144 within-phase and276 between-law comparisons or explicit missing failures",
+    "Fine paths, local coarse controls, four phase fields, raw invariants and summaries",
+    "Immutable config/provenance/source hashes and output seals"
+  ],
+  "pass_consequences": "Eligibility for self-reviewed scoped G03 adjudication; pass unlocks G04 design only, no targets/training/DA",
+  "failure_consequences": "Preserve every failure/unresolved pair; no threshold relaxation, population narrowing or gate unlock",
+  "assumptions": [
+    "OL-A14",
+    "Finite recorded laws rather than independent invariant-law samples",
+    "Phase controls are deterministic quadrature replicates, not independent laws"
+  ],
+  "review_requirements": "Implementing agent self-review under owner's start instruction; no independent assessor or qualification authority",
+  "sampling_count": 20000,
+  "bounds": [
+    [
+      -30,
+      30
+    ],
+    [
+      -40,
+      40
+    ],
+    [
+      -10,
+      70
+    ]
+  ],
+  "physical_widths": [
+    4,
+    4.444444444444445,
+    4.444444444444445
+  ],
+  "regions": {
+    "boundary_layers": 4,
+    "transition_width": 2,
+    "tail_z": [
+      5,
+      50
+    ]
+  },
+  "allowed_untracked": [
+    "scripts/plot_reconstruction_comparison.py"
+  ],
+  "limitations": [
+    "24 dependent development windows from12 source groups; no independence or untouched evaluation claim",
+    "Finite numerical controls conditioned on saved starts; no continuum or invariant-law guarantee",
+    "Witness rule establishes non-collapse only; duplicates allowed and ambiguity retained",
+    "No training coverage, unique-law count, optimal allocation or downstream accuracy claim",
+    "No FPE targets, neural training or DA",
+    "All raw large arrays ignored locally; compact evidence required at review"
+  ],
+  "windows": 2,
+  "spinup": 20,
+  "window": 10,
+  "integration_steps": [
+    0.000125,
+    0.00025
+  ],
+  "shape": [
+    60,
+    72,
+    72
+  ],
+  "acceptance_rule": "EVERY_LAW_HAS_CROSS_SOURCE_RESOLVED_WITNESS"
+}

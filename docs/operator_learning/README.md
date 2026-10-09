@@ -32,6 +32,11 @@ Use the [searchable provenance graph](../research_audit/GRAPH.md) to trace both
 successful and unsuccessful outcomes through their research and evidence.
 
 **NEXT_REQUIRED_GATE = OL-G03_INPUT_DIVERSITY.**
+
+[Prospective G03 evaluator](G03_QUALIFICATION_CODE.md) implements a proposed
+finite-control non-collapse rule with failure/duplicate retention. Criteria and
+fresh [v4 qualification predeclaration](G03_QUALIFICATION_V4.md) now records the
+executable criteria under OL-D031; no implementation or launch promotes a gate.
 G00 passed within the owner-selected attractor-density scope. G01 passed archived
 representation checks; G02 passed scoped finite-control reconstruction under
 OL-D021. G03 is OPEN; G04–G17 are LOCKED. Large target campaigns, qualified
@@ -70,11 +75,12 @@ V3 has completed: [verified local-control review](evidence/G03_WINDOW_LOCAL_V3_2
 under OL-D029. All36 local bounds meet the inherited1% diagnostic budget;
 archived input laws and original accumulated failures remain unchanged.
 [G03 qualification scope](G03_QUALIFICATION_SCOPE_PROPOSAL.md) is an owner-review
-proposal, not a pass or executable predeclaration. No new run is active.
+proposal, not a pass or executable predeclaration. OL-D031 subsequently freezes
+the fresh v4 run; reviewed completed evidence is still required.
 
 Owner approved [G03 law-diversity scope](G03_APPROVED_SCOPE.md) under OL-D030.
 Training-coverage adequacy remains OPEN for later evaluation. Qualification
-criteria must be frozen prospectively; scope approval alone does not pass G03.
+criteria are frozen prospectively under OL-D031; scope approval alone does not pass G03.
 
 G02 implementation and controlled study design:
 [reconstruction stability v1](RECONSTRUCTION_STABILITY_G02_V1.md).

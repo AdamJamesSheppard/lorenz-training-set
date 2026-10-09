@@ -77,10 +77,10 @@ Each pass unlocks only the next gated study; DA/production need explicit approva
 - **question**: Do examples represent genuinely distinct laws?
 - **scientific_motivation**: OL-D030: establish genuine finite-window law variation beyond reconstruction uncertainty; coverage gaps are recorded, optimum dataset and training adequacy remain open for later evaluation.
 - **prerequisites**: ["OL-G02_RECONSTRUCTION_STABILITY"]
-- **frozen_experiment_definition**: Commit a versioned, non-DRAFT config and its hash before execution; current programme catalogue is not an executable predeclaration.
-- **evidence_required**: Defined law families, hierarchical replicate comparison and retained duplicates/failures; G03_APPROVED_SCOPE.md. Prospective qualification criteria still required.
+- **frozen_experiment_definition**: OL-D031; G03_QUALIFICATION_V4.md and versioned v4 config; commit before dispatch, no retrospective threshold relaxation.
+- **evidence_required**: Fresh24 laws,12 sources, all phase/path/control evidence, every pair and all duplicates/failures; G03_QUALIFICATION_V4.md. Committed prospective criteria, sealed run and reviewed adjudication required.
 - **metrics**: Within-law versus between-law L1/TV; lobe/moment/shape diversity.
-- **predeclared_thresholds**: TO_BE_PREDECLARED_BEFORE_RUN
+- **predeclared_thresholds**: V4: reconstruction TV bound <=.01; raw mass error <=1e-10; negative mass zero; all24 attempts,144 within and276 between pairs; every law has a positive-margin cross-source witness. No coverage claim.
 - **pass_condition**: All frozen scientific and provenance criteria pass; named reviewer and approver record scope and limitations.
 - **failure_condition**: Any required criterion fails or evidence is missing; missing evidence remains OPEN rather than a fabricated FAIL/PASS.
 - **what_passing_unlocks**: OL-G04_REFERENCE_TARGET_APPLICABILITY design/qualification only; no automatic production or DA authorization.
@@ -88,7 +88,7 @@ Each pass unlocks only the next gated study; DA/production need explicit approva
 - **claims_permitted_after_pass**: Only scoped genuine input-law diversity evidence; no training coverage, optimality or universal-initial-condition claim.
 - **claims_still_forbidden_after_pass**: Unrestricted generalization, continuum accuracy without reference bounds, DA performance and production replacement.
 - **relevant_assumptions**: ["OL-A01"]
-- **experiment_config**: TO_BE_PREDECLARED_BEFORE_RUN
+- **experiment_config**: experiments/operator_learning/OL-G03_diversity_qualification_v4.json
 - **evidence_run**: null
 - **decision_status**: OPEN
 - **adjudication**: null
