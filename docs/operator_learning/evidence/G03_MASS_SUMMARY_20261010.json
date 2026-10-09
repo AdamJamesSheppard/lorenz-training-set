@@ -1,0 +1,16 @@
+{
+  "metric": "Maximum absolute mass error across producer-recorded raw phase masses",
+  "source_report": "docs/operator_learning/evidence/G03_QUALIFICATION_V4_20261009_report.json",
+  "source_sha256": "75c346d8bb01a3e8b76d5fbef2d7f989e682465d28b7b459986ed31df175bb09",
+  "phase_count": 96,
+  "maximum": {
+    "law": "seed83510_window0",
+    "phase": 1,
+    "mass": 1.000000000000003,
+    "absolute_mass_error": 3.1086244689504383e-15
+  },
+  "criterion": 1e-10,
+  "decision": "PASSED_UNCHANGED",
+  "correction_record": "OL-D033; G03_AUDIT_RESPONSE_20261010.md",
+  "limitations": "Report arithmetic only; independent raw-array verification and archive access remain unresolved"
+}

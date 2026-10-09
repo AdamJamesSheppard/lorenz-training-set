@@ -1,11 +1,25 @@
 # Operator-learning decisions
 
+## 2026-10-10 — OL-D033: retain scoped G03 PASS; correct mass summary
+
+Owner supplied a detailed audit accepting finite-window separation while
+identifying limits. Self-review confirms maximum recorded phase mass error
+3.1086244689504383e-15; OL-D032's2.89e-15 described the separate grid replay
+maximum without identifying the distinction. Dated correction and unresolved
+work: evidence/G03_AUDIT_RESPONSE_20261010.md and G03_MASS_SUMMARY_20261010.json.
+No sealed report/config/provenance, threshold, historical failure or PASS changes.
+Independent raw-array/export verification, third-window robustness and complete
+payload archiving remain unresolved, not newly passed requirements. Owner audit
+independence is owner-reported; no identity or environment certification claimed.
+G04 remains next; no target generation/training/DA or new experiment authorized.
+
 ## 2026-10-09 — OL-D032: adjudicate scoped G03 v4 PASS
 
 Owner requests continued work toward G03 completion. Completed predeclared
 v4 at f94a176 passes unchanged criteria on24/24 fresh laws, all144 within and276
 between comparisons, max finite-control TV .00673069, zero negative mass,
-max mass error2.89e-15, every law22 cross-source witnesses. Self-review verifies
+max grid-replay mass error2.89e-15 (recorded raw phase maximum corrected under
+OL-D033), every law22 cross-source witnesses. Self-review verifies
 64 seals,10 source hashes, all24 bounds and276 TV replays. Evidence and method
 attribution: evidence/G03_QUALIFICATION_V4_20261009.md; G03_QUALIFICATION_V4.md.
 Portable report/config/provenance/seal copied unchanged; large arrays ignored

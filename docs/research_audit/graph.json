@@ -7,7 +7,7 @@
     "docs/operator_learning/state.json": "799592fa706f63237968f7566ee2ed69a4be0a16aa36616fb5661af6beacd82d",
     "docs/operator_learning/CLAIMS.md": "96dc5c5a1b2f46fd73a084c902b8eafcd2fc466da10a423f17d503bc2ed71133",
     "docs/CLAIMS.md": "474a415c96ac74dd48eb3901af68660544549b7b966f549d09d712873ef7977c",
-    "docs/operator_learning/DECISIONS.md": "e98f5e72b36a0d828aa462d49e5967ef0b221c0f9c7f90e2c8940f97db445e4e",
+    "docs/operator_learning/DECISIONS.md": "1c5e359fb416e6974485a4f297f2b9e4a14ded6bc2c8ce8494a0d827741701df",
     "docs/DECISIONS.md": "e815b7dd8cd7f274fa88fed0fffc367b34ac32e35a2fffa93c4e694e0189c814",
     "docs/operator_learning/assumptions.yaml": "ff8a7249386389d72b91939b479d34535cd70e092dab057f9cc32d2712a089af",
     "docs/assumptions.yaml": "51092eeafd2176eadee11442bd8fc9238217a7d772bd797f60ea4c6c5ce844ce",
@@ -341,6 +341,13 @@
       "kind": "artifact",
       "label": "docs/operator_learning/evidence/G02_QUALIFICATION_V5_20261006.md",
       "path": "docs/operator_learning/evidence/G02_QUALIFICATION_V5_20261006.md",
+      "availability": "REPOSITORY_POINTER"
+    },
+    {
+      "id": "artifact:docs/operator_learning/evidence/G03_AUDIT_RESPONSE_20261010.md",
+      "kind": "artifact",
+      "label": "docs/operator_learning/evidence/G03_AUDIT_RESPONSE_20261010.md",
+      "path": "docs/operator_learning/evidence/G03_AUDIT_RESPONSE_20261010.md",
       "availability": "REPOSITORY_POINTER"
     },
     {
@@ -5428,7 +5435,15 @@
       "kind": "decision",
       "label": "2026-10-09 — OL-D032: adjudicate scoped G03 v4 PASS",
       "status": "RECORDED_DECISION",
-      "text": "Owner requests continued work toward G03 completion. Completed predeclared\nv4 at f94a176 passes unchanged criteria on24/24 fresh laws, all144 within and276\nbetween comparisons, max finite-control TV .00673069, zero negative mass,\nmax mass error2.89e-15, every law22 cross-source witnesses. Self-review verifies\n64 seals,10 source hashes, all24 bounds and276 TV replays. Evidence and method\nattribution: evidence/G03_QUALIFICATION_V4_20261009.md; G03_QUALIFICATION_V4.md.\nPortable report/config/provenance/seal copied unchanged; large arrays ignored\nlocally. No method adaptation, threshold relaxation or historical reclassification.\nRecord scoped finite-control law-diversity PASS, open G04 design only. Coverage,\ncontinuum accuracy, reference applicability/export and posterior relevance remain\nopen. No training, target campaign, production or DA authorized. Implementing\nagent self-review under owner scope/execution/continuation authority; no independent\nassessor. NEXT_REQUIRED_GATE=OL-G04_REFERENCE_TARGET_APPLICABILITY.",
+      "text": "Owner requests continued work toward G03 completion. Completed predeclared\nv4 at f94a176 passes unchanged criteria on24/24 fresh laws, all144 within and276\nbetween comparisons, max finite-control TV .00673069, zero negative mass,\nmax grid-replay mass error2.89e-15 (recorded raw phase maximum corrected under\nOL-D033), every law22 cross-source witnesses. Self-review verifies\n64 seals,10 source hashes, all24 bounds and276 TV replays. Evidence and method\nattribution: evidence/G03_QUALIFICATION_V4_20261009.md; G03_QUALIFICATION_V4.md.\nPortable report/config/provenance/seal copied unchanged; large arrays ignored\nlocally. No method adaptation, threshold relaxation or historical reclassification.\nRecord scoped finite-control law-diversity PASS, open G04 design only. Coverage,\ncontinuum accuracy, reference applicability/export and posterior relevance remain\nopen. No training, target campaign, production or DA authorized. Implementing\nagent self-review under owner scope/execution/continuation authority; no independent\nassessor. NEXT_REQUIRED_GATE=OL-G04_REFERENCE_TARGET_APPLICABILITY.",
+      "path": "docs/operator_learning/DECISIONS.md"
+    },
+    {
+      "id": "decision:OL-D033",
+      "kind": "decision",
+      "label": "2026-10-10 — OL-D033: retain scoped G03 PASS; correct mass summary",
+      "status": "RECORDED_DECISION",
+      "text": "Owner supplied a detailed audit accepting finite-window separation while\nidentifying limits. Self-review confirms maximum recorded phase mass error\n3.1086244689504383e-15; OL-D032's2.89e-15 described the separate grid replay\nmaximum without identifying the distinction. Dated correction and unresolved\nwork: evidence/G03_AUDIT_RESPONSE_20261010.md and G03_MASS_SUMMARY_20261010.json.\nNo sealed report/config/provenance, threshold, historical failure or PASS changes.\nIndependent raw-array/export verification, third-window robustness and complete\npayload archiving remain unresolved, not newly passed requirements. Owner audit\nindependence is owner-reported; no identity or environment certification claimed.\nG04 remains next; no target generation/training/DA or new experiment authorized.",
       "path": "docs/operator_learning/DECISIONS.md"
     },
     {
@@ -13119,6 +13134,13 @@
       "attribution": "AUDIT_CONTEXT_NOT_PROOF_OR_CERTIFIED_HISTORICAL_USE"
     },
     {
+      "id": "edge:01121ea2a2376d211810d993",
+      "source": "decision:OL-D033",
+      "relation": "references",
+      "target": "artifact:docs/operator_learning/DECISIONS.md",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
+    },
+    {
       "id": "edge:01289295b474a0c5aa1a2fbb",
       "source": "gate:OL-G03_INPUT_DIVERSITY",
       "relation": "depends_on",
@@ -15618,6 +15640,13 @@
       "attribution": "AUDIT_SNAPSHOT"
     },
     {
+      "id": "edge:2bee2db3aeea57b146c0e197",
+      "source": "decision:OL-D033",
+      "relation": "references",
+      "target": "artifact:docs/operator_learning/evidence/G03_AUDIT_RESPONSE_20261010.md",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
+    },
+    {
       "id": "edge:2c352d1024ce647a336c3faf",
       "source": "record:fem:06e71837c02aa4dd581f711f",
       "relation": "documents",
@@ -17219,6 +17248,13 @@
       "relation": "recorded_in",
       "target": "artifact:docs/operator_learning/assumptions.yaml",
       "attribution": "ASSUMPTION_REGISTRY"
+    },
+    {
+      "id": "edge:488042196854b857b6ee7b91",
+      "source": "decision:OL-D032",
+      "relation": "references",
+      "target": "decision:OL-D033",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
     },
     {
       "id": "edge:48b010714f89be801bcd2960",
@@ -19860,6 +19896,13 @@
       "attribution": "CURRENT_CATALOGUE"
     },
     {
+      "id": "edge:74ff6750b889d861a58b0d4a",
+      "source": "decision:OL-D033",
+      "relation": "references",
+      "target": "decision:OL-D032",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
+    },
+    {
       "id": "edge:753e6626db82d5758e6abe3c",
       "source": "record:fem:78c673e1b74e58c91aae5875",
       "relation": "recorded_in",
@@ -20656,6 +20699,13 @@
       "relation": "documents",
       "target": "artifact:runs/same-mesh-q2-corrected/20260910T234135Z/q2_certificate_gated/final_raw_cell_classification_rank0005.json",
       "attribution": "HISTORICAL_METADATA_NOT_NEW_ADJUDICATION"
+    },
+    {
+      "id": "edge:80da7b2c0e147f0d0fcbef3d",
+      "source": "decision:OL-D033",
+      "relation": "recorded_in",
+      "target": "artifact:docs/operator_learning/DECISIONS.md",
+      "attribution": "ORIGINAL_DECISION_SECTION"
     },
     {
       "id": "edge:80db75d58ce2526c84d9fa71",
@@ -24205,6 +24255,13 @@
       "relation": "informed_by",
       "target": "source:MONO-mfemdiff",
       "attribution": "AUDIT_CONTEXT_NOT_PROOF_OR_CERTIFIED_HISTORICAL_USE"
+    },
+    {
+      "id": "edge:c0cd89e8f65d42854a47eb73",
+      "source": "decision:OL-D033",
+      "relation": "references",
+      "target": "decision:OL-D033",
+      "attribution": "EXPLICIT_IDENTIFIER_OR_PATH_MENTION"
     },
     {
       "id": "edge:c0d21264f2e0e250c35c7adb",

@@ -24,7 +24,10 @@ All24 attempted laws from12 declared sources completed. All144 within-phase
 comparisons and276 between-law comparisons are present. No failures, missing
 pairs, unresolved laws, exclusions or retries. All24 sufficient finite-control
 TV bounds ≤.01: maximum .006730688805759805, minimum .00499766926983549.
-Maximum raw phase-grid mass error2.886579864025407e-15 versus1e-10 gate;
+Corrected2026-10-10 under OL-D033: maximum recorded raw phase mass error
+3.1086244689504383e-15 versus1e-10 gate (seed83510_window0, phase1).
+The original2.886579864025407e-15 was the separate grid-integral replay maximum;
+see G03_AUDIT_RESPONSE_20261010.md. No sealed numerical evidence was changed;
 measured negative mass zero. Every law has22 resolved cross-source witnesses.
 All276 pairs have positive signed margins, minimum .07734206307585645;
 zero ambiguous pairs. This exceeds the required witness criterion without

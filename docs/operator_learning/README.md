@@ -39,6 +39,9 @@ fresh [v4 qualification predeclaration](G03_QUALIFICATION_V4.md) now records the
 executable criteria under OL-D031; no implementation or launch promotes a gate.
 Completed v4 [scoped adjudication](evidence/G03_QUALIFICATION_V4_20261009.md)
 under OL-D032 passes G03 after verified fresh evidence; G04 design is now OPEN.
+Owner-supplied audit accepted this limited pass; [OL-D033 response/correction](evidence/G03_AUDIT_RESPONSE_20261010.md)
+records the corrected raw mass summary and outstanding independent verification,
+third-window robustness and complete-payload preservation work.
 G00 passed within the owner-selected attractor-density scope. G01 passed archived
 representation checks; G02 passed scoped finite-control reconstruction under
 OL-D021. G03 passed scoped finite-law diversity under OL-D032; G04 is OPEN,

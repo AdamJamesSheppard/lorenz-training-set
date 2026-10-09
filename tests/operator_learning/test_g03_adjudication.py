@@ -43,3 +43,17 @@ def test_baseline_and_original_failures_preserved():
     assert g['status']=='OPEN'
     assert any(x['status']=='FAILED_SUFFICIENT_BOUND' and x['cases']==12
                for x in g['component_outcomes'])
+
+
+def test_corrected_mass_summary_covers_every_recorded_phase():
+    summary=json.loads((ROOT/'docs/operator_learning/evidence/G03_MASS_SUMMARY_20261010.json').read_text())
+    report=load('_report.json')
+    rows=[dict(law=law['id'],phase=r['phase'],mass=r['mass'],
+               absolute_mass_error=abs(r['mass']-1))
+          for law in report['laws'] for r in law['raw']]
+    assert summary['phase_count']==len(rows)==96
+    assert summary['maximum']==max(rows,key=lambda r:r['absolute_mass_error'])
+    assert summary['maximum']['absolute_mass_error']<=summary['criterion']==1e-10
+    assert summary['source_sha256']==hashlib.sha256((ROOT/summary['source_report']).read_bytes()).hexdigest()
+    review=(ROOT/'docs/operator_learning/evidence/G03_QUALIFICATION_V4_20261009.md').read_text()
+    assert str(summary['maximum']['absolute_mass_error']) in review
