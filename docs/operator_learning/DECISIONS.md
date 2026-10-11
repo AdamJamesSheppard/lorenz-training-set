@@ -1,5 +1,27 @@
 # Operator-learning decisions
 
+## 2026-10-10 — OL-D034: implement trust-boundary bootstrap; hold deployment
+
+Owner requests all scientific-governance audit recommendations and explicitly
+selects a separate restricted agent identity with owner approval from another
+device. Implement candidate authenticated receipts, base-revision transition
+checks, complete tracked-source inventory, write-once export, isolated-runner
+template, separately implemented G03 array checker, adversarial tests, protected
+goal and per-gate three-proposition boundaries. Enable and verify GitHub main
+reviews/checks/admin/signature/force-push protections; deliver through a PR.
+Method/source/applicability and unresolved external controls are recorded in
+../../scientific_governance/README.md. Agent may not produce real approval keys,
+approve this PR, infer scientific approval from implementation instructions or
+bypass protections. Same-account admin access remains a material blocker.
+Distinct externally provisioned credentials, trusted execution/verification,
+immutable archives, inaccessible final evaluation and owner approval remain
+required. Historical G00–G03 scoped passes and failed evidence are unchanged.
+G04 remains next; G04_INDEPENDENT_QUALIFICATION_DESIGN.md is design only, with
+thresholds unfrozen. No new scientific gate, training, target campaign or DA.
+Separate AI algorithm review on the shared machine is disclosed, not claimed as
+an independently administered scientific approval. Engineering validation is
+recorded in the accompanying governance implementation evidence note.
+
 ## 2026-10-10 — OL-D033: retain scoped G03 PASS; correct mass summary
 
 Owner supplied a detailed audit accepting finite-window separation while

@@ -1,6 +1,12 @@
 # Project current state
 
-Updated: 2026-10-06
+Updated: 2026-10-10
+
+Operational hold: new scientific promotion and expensive qualifying execution
+require [outside-agent authority deployment](../scientific_governance/README.md).
+Main protection has been enabled; owner selected a separate restricted agent
+identity with approvals from another device. That identity, independent services
+and trust roots still need external provisioning. No historical gate is changed.
 
 ## Current programme authority
 

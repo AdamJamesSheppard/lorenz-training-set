@@ -1,5 +1,11 @@
 # Operator-learning research programme
 
+[Enforced-authority bootstrap and deployment hold](../../scientific_governance/README.md):
+new scientific promotions require outside-agent owner/executor/verifier authority.
+Branch protection is enabled; separate credentials, independent archive and
+evaluation services remain owner-provisioned prerequisites. G00–G03 scoped
+historical passes remain unchanged, without retroactive authentication.
+
 Read [the repository-wide scientific-integrity policy](../../SCIENTIFIC_INTEGRITY.md)
 and [the gate-by-gate integrity audit](INTEGRITY_GATE_AUDIT_20261006.md) before
 implementation/adjudication. Preserve legitimate variation; never manufacture
@@ -56,8 +62,8 @@ Owner accepted [the restricted attractor-density population](ACCEPTED_POPULATION
 under OL-D004; the mixed proposal remains historical. Read the explicit
 [representation contract](REPRESENTATION_CONTRACT_V1.md) for G01 details.
 [G01 audit and limitations](evidence/G01_REPRESENTATION_V2_20261005.md) record the pass.
-The next study concerns G03 diversity, retaining attractor densities without
-assuming that different seeds supply different laws.
+The next scientific study concerns G04 reference applicability, subject to the
+governance deployment hold. G03 law diversity does not establish training coverage.
 Posterior-population relevance remains unverified.
 
 G03 starts with [bounded within/between-law characterization](INPUT_DIVERSITY_G03_V1.md).

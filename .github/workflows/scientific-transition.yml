@@ -1,0 +1,30 @@
+name: Protected scientific transition
+on: [pull_request]
+permissions:
+  contents: read
+jobs:
+  scientific-transition:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Run verifier from trusted base only
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PUBLIC_TRUST_ROOTS: ${{ vars.LORENZ_SCIENCE_ALLOWED_SIGNERS }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/scientific-base"
+          if git cat-file -e "$BASE_SHA:scientific_governance/check_transition.py"; then
+            git show "$BASE_SHA:scientific_governance/check_transition.py" > "$RUNNER_TEMP/scientific-base/check_transition.py"
+            git show "$BASE_SHA:scientific_governance/authority.py" > "$RUNNER_TEMP/scientific-base/authority.py"
+            if [ -n "$PUBLIC_TRUST_ROOTS" ]; then
+              printf '%s\n' "$PUBLIC_TRUST_ROOTS" > "$RUNNER_TEMP/scientific-base/allowed_signers"
+              python -I "$RUNNER_TEMP/scientific-base/check_transition.py" --base "$BASE_SHA" --root "$GITHUB_WORKSPACE" --allowed-signers "$RUNNER_TEMP/scientific-base/allowed_signers"
+            else
+              python -I "$RUNNER_TEMP/scientific-base/check_transition.py" --base "$BASE_SHA" --root "$GITHUB_WORKSPACE"
+            fi
+          else
+            echo "Bootstrap requires owner review; no trusted verifier exists in base."
+            exit 1
+          fi

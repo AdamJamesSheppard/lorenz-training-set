@@ -1,5 +1,22 @@
 # Operator-learning claim registry
 
+## OL-C021 — Governance authentication bootstrap
+
+Class: OPEN for effective outside-agent authority. Candidate signed-receipt,
+trusted-base transition, full tracked-source inventory, raw-array verification
+and mutation controls are implemented under OL-D034. Main protections were
+applied and read back. Shared admin credentials and filesystem prevent claiming
+independent approval/execution/archive/evaluation until external deployment.
+Method/source/outcome: ../../scientific_governance/README.md. Falsification:
+unsigned promotion, altered scientific criteria, wrong keys, missing attempts,
+unverified bytes or editable trust roots admitted by the deployed system.
+Internal test success alone cannot establish independence or scientific truth.
+
+Historical G03 evidence levels: software checks and numerical/scoped separation
+support recorded; independent full raw reconstruction/trajectory replication
+OUTSTANDING; application qualification NOT ESTABLISHED. Separate array arithmetic
+does not promote these latter levels. See claim_boundaries.json for all18 gates.
+
 ## OL-C020 — Fresh G03 v4 finite-law diversity beyond reconstruction variation
 
 Class: NUMERICAL. All24 retained fresh laws satisfy frozen reconstruction/mass/

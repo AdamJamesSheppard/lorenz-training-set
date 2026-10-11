@@ -1,0 +1,9 @@
+# Effective only with enforced branch protection and a separate agent identity.
+* @AdamJamesSheppard
+/scientific_governance/ @AdamJamesSheppard
+/.github/ @AdamJamesSheppard
+/tests/scientific_governance/ @AdamJamesSheppard
+/docs/operator_learning/gates.json @AdamJamesSheppard
+/docs/operator_learning/state.json @AdamJamesSheppard
+/SCIENTIFIC_INTEGRITY.md @AdamJamesSheppard
+/RESEARCH_TRACEABILITY.md @AdamJamesSheppard
