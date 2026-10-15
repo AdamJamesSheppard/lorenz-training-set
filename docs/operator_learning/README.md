@@ -1,5 +1,7 @@
 # Operator-learning research programme
 
+[Read the explanation](../portfolio/programme.md). This gives the purpose and scope in plain language; the detailed requirements and recorded decisions follow below.
+
 [Enforced-authority bootstrap and deployment hold](../../scientific_governance/README.md):
 new scientific promotions require outside-agent owner/executor/verifier authority.
 Branch protection is enabled; separate credentials, independent archive and
