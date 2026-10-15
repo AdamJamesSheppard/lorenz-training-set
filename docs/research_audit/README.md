@@ -1,5 +1,7 @@
 # Research, method and gate audit — 2026-10-06
 
+[Read the explanation](../portfolio/audit.md). This gives the purpose and scope in plain language; the detailed requirements and recorded decisions follow below.
+
 2026-10-10 engineering addition: [scientific authority bootstrap](../../scientific_governance/README.md)
 records method/source/applicability and all external deployment blockers;
 [outcome](../operator_learning/evidence/GOVERNANCE_BOOTSTRAP_20261010.md) records

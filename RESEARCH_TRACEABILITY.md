@@ -1,5 +1,7 @@
 # Mandatory research traceability
 
+[Read the explanation](docs/portfolio/traceability.md). This gives the purpose and scope in plain language; the detailed requirements and recorded decisions follow below.
+
 Requirement: **REQ-RT-001**. Effective 2026-10-06 under direct owner instruction.
 Applies to every contributor and agent across FEM/FPE, target generation,
 operator learning, forecast/posterior transfer, Bayesian assimilation and
